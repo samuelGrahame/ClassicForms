@@ -30,5 +30,10 @@ namespace Test
             Global.Alert("Hello World");
 #endif
         }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+
+        }
     }
 }
