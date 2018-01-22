@@ -10,6 +10,9 @@ namespace System.Drawing
     {
         public int Width;
         public int Height;
+
+        public static Size Empty = new Size(0, 0);
+
         public Size(int width, int height)
         {
             Width = width;

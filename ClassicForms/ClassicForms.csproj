@@ -46,6 +46,7 @@
     <Compile Include="Windows\Forms\AutoScaleMode.cs" />
     <Compile Include="Windows\Forms\Button.cs" />
     <Compile Include="Windows\Forms\ButtonBase.cs" />
+    <Compile Include="Windows\Forms\CheckBox.cs" />
     <Compile Include="Windows\Forms\ContainerControl.cs" />
     <Compile Include="Windows\Forms\Control.cs" />
     <Compile Include="Windows\Forms\ControlCollection.cs" />

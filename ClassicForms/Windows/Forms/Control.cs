@@ -28,9 +28,17 @@ namespace System.Windows.Forms
         private Size _size;
         public Size Size { get { return _size; } set {
                 _size = value;
-
-                Element.Style.Width = _size.Width + "px";
-                Element.Style.Height = _size.Height + "px";
+                if(_autoSize)
+                {
+                    Element.Style.Width = "auto";
+                    Element.Style.Height = "auto";
+                }
+                else
+                {
+                    Element.Style.Width = _size.Width + "px";
+                    Element.Style.Height = _size.Height + "px";
+                }
+                
 
             } }
 
@@ -40,8 +48,8 @@ namespace System.Windows.Forms
                 TabIndex = _tabIndex;
             } }
 
-        private int _tabIndex;
-        public int TabIndex { get { return _tabIndex; } set {
+        protected int _tabIndex;
+        public virtual int TabIndex { get { return _tabIndex; } set {
                 _tabIndex = value;
                 if(TabStop)
                 {
@@ -65,7 +73,7 @@ namespace System.Windows.Forms
             }
         }
 
-        private object _tag;
+        protected object _tag;
 
         /// <summary>
         /// Use Tag as Class Name
@@ -89,6 +97,16 @@ namespace System.Windows.Forms
 
         public ControlCollection Controls { get; }
         public virtual Font Font { get; set; }
+        private bool _autoSize;
+        protected bool _init;
+        public virtual bool AutoSize { get { return _autoSize; } set {
+                if(_init)
+                {
+                    _autoSize = value;
+
+                    Size = _size;
+                }                
+            } }
 
         internal HTMLElement Element;
 
@@ -108,6 +126,7 @@ namespace System.Windows.Forms
                 ev.StopPropagation();
                 OnClick(EventArgs.Empty);
             };
+            _init = true;
         }
 
         protected virtual void OnClick(EventArgs e)

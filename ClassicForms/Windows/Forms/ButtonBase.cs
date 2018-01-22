@@ -9,11 +9,11 @@ namespace System.Windows.Forms
 {
     public class ButtonBase : Control
     {
-        protected ButtonBase() : base(new HTMLButtonElement())
+        protected ButtonBase(HTMLElement element) : base(element)
         {
 
         }
-
+        public override bool AutoSize { get; set; }
         public override string Text { get { return base.Text; } set {
                 base.Text = value;
                 Element.TextContent = value;
