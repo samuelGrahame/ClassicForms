@@ -56,6 +56,11 @@ namespace System.Windows.Forms
             Document.Body.AppendChild(Element);
         }
 
+        public void PerformLayout()
+        {
+
+        }
+
         public Size ClientSize { get { return GetClientSize(Size); } set { Size = SetSize(value); } }
         public override string Text { get; set; }
     }

@@ -36,6 +36,9 @@
   <ItemGroup>
     <Compile Include="ComponentModel\IContainer.cs" />
     <Compile Include="Drawing\Color.cs" />
+    <Compile Include="Drawing\Font.cs" />
+    <Compile Include="Drawing\FontStyle.cs" />
+    <Compile Include="Drawing\GraphicsUnit.cs" />
     <Compile Include="Drawing\SizeF.cs" />
     <Compile Include="Drawing\Size.cs" />
     <Compile Include="Drawing\Point.cs" />
@@ -49,6 +52,7 @@
     <Compile Include="Windows\Forms\Form.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Windows\Forms\Panel.cs" />
+    <Compile Include="Windows\Forms\TextBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bridge.json" />

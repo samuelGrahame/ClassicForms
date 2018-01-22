@@ -34,13 +34,14 @@
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(12, 12);
+            this.button1.Location = new System.Drawing.Point(12, 17);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(94, 43);
+            this.button1.Size = new System.Drawing.Size(94, 38);
             this.button1.TabIndex = 0;
             this.button1.Tag = "btn btn-primary";
             this.button1.Text = "Primary";
@@ -57,9 +58,9 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(112, 12);
+            this.button2.Location = new System.Drawing.Point(112, 17);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(94, 43);
+            this.button2.Size = new System.Drawing.Size(94, 38);
             this.button2.TabIndex = 2;
             this.button2.Tag = "btn btn-secondary";
             this.button2.Text = "Secondary";
@@ -67,9 +68,9 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(212, 12);
+            this.button3.Location = new System.Drawing.Point(212, 17);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(94, 43);
+            this.button3.Size = new System.Drawing.Size(94, 38);
             this.button3.TabIndex = 3;
             this.button3.Tag = "btn btn-success";
             this.button3.Text = "Success";
@@ -77,9 +78,9 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(312, 12);
+            this.button4.Location = new System.Drawing.Point(312, 17);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(94, 43);
+            this.button4.Size = new System.Drawing.Size(94, 38);
             this.button4.TabIndex = 4;
             this.button4.Tag = "btn btn-danger";
             this.button4.Text = "Danger";
@@ -87,13 +88,22 @@
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(412, 12);
+            this.button5.Location = new System.Drawing.Point(412, 17);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(94, 43);
+            this.button5.Size = new System.Drawing.Size(94, 38);
             this.button5.TabIndex = 5;
             this.button5.Tag = "btn btn-warning";
             this.button5.Text = "Warning";
             this.button5.UseVisualStyleBackColor = true;
+            // 
+            // textBox1
+            // 
+            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 21F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.Location = new System.Drawing.Point(512, 17);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 39);
+            this.textBox1.TabIndex = 6;
+            this.textBox1.Tag = "form-control";
             // 
             // Form1
             // 
@@ -101,6 +111,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(757, 447);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
@@ -108,8 +119,9 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.button1);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "WE";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -121,5 +133,6 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }

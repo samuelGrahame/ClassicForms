@@ -88,6 +88,7 @@ namespace System.Windows.Forms
         }
 
         public ControlCollection Controls { get; }
+        public virtual Font Font { get; set; }
 
         internal HTMLElement Element;
 
