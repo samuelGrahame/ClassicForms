@@ -35,9 +35,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ComponentModel\IContainer.cs" />
+    <Compile Include="Drawing\Color.cs" />
     <Compile Include="Drawing\SizeF.cs" />
     <Compile Include="Drawing\Size.cs" />
     <Compile Include="Drawing\Point.cs" />
+    <Compile Include="Drawing\SystemColors.cs" />
     <Compile Include="Windows\Forms\AutoScaleMode.cs" />
     <Compile Include="Windows\Forms\Button.cs" />
     <Compile Include="Windows\Forms\ButtonBase.cs" />
@@ -46,6 +48,7 @@
     <Compile Include="Windows\Forms\ControlCollection.cs" />
     <Compile Include="Windows\Forms\Form.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Windows\Forms\Panel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bridge.json" />

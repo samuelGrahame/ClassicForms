@@ -38,6 +38,17 @@ namespace System.Windows.Forms
         public int TabIndex { get { return Element.TabIndex; } set { Element.TabIndex = value; } }
         public virtual string Text { get; set; }
 
+        private Color _backColor;
+        public virtual Color BackColor
+        {
+            get { return _backColor; }
+            set
+            {
+                _backColor = value;
+                Element.Style.BackgroundColor = _backColor.ToHex();
+            }
+        }
+
         public ControlCollection Controls { get; }
 
         internal HTMLElement Element;

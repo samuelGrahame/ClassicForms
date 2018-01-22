@@ -15,6 +15,11 @@ namespace System.Windows.Forms
         private static int FormLeftBorder = 6;
         private static int FormRightBorder = 6;
 
+        public Form() : base()
+        {
+            BackColor = SystemColors.Control;
+        }
+
         public static Size GetClientSize(Size size)
         {
             return new Size(size.Width + FormLeftBorder + FormRightBorder, size.Height + FormTopBorder + FormBottonBorder);
