@@ -16,4 +16,15 @@ namespace System.Windows.Forms
         public ObjectCollection Items { get; }
         public virtual bool FormattingEnabled { get; set; }
     }
+
+    public class ListBox : Control
+    {
+        public ListBox() : base(new HTMLSelectElement())
+        {
+            Element.As<HTMLSelectElement>().Multiple = true;
+            Items = new ObjectCollection(this);
+        }
+        public ObjectCollection Items { get; }
+        public virtual bool FormattingEnabled { get; set; }
+    }
 }
