@@ -8,5 +8,9 @@ namespace System.Windows.Forms
 {
     public class Panel : ContainerControl
     {
+        public Panel() : base()
+        {
+            TabStop = false;
+        }        
     }
 }

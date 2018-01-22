@@ -34,8 +34,24 @@ namespace System.Windows.Forms
 
             } }
 
+        private bool _tabStop;
+        public bool TabStop { get { return _tabStop; } set {
+                _tabStop = value;
+                TabIndex = _tabIndex;
+            } }
 
-        public int TabIndex { get { return Element.TabIndex; } set { Element.TabIndex = value; } }
+        private int _tabIndex;
+        public int TabIndex { get { return _tabIndex; } set {
+                _tabIndex = value;
+                if(TabStop)
+                {
+                    Element.TabIndex = value;
+                }
+                else
+                {
+                    Element.RemoveAttribute("TabIndex");                    
+                }                
+            } }
         public virtual string Text { get; set; }
 
         private Color _backColor;
@@ -45,7 +61,29 @@ namespace System.Windows.Forms
             set
             {
                 _backColor = value;
-                Element.Style.BackgroundColor = _backColor.ToHex();
+                Element.Style.BackgroundColor = _backColor.ToHtml();
+            }
+        }
+
+        private object _tag;
+
+        /// <summary>
+        /// Use Tag as Class Name
+        /// </summary>
+        public virtual object Tag
+        {
+            get { return _tag; }
+            set
+            {
+                _tag = value;
+                if(_tag is string)
+                {
+                    Element.ClassName = (_tag + "");
+                }
+                else
+                {
+                    Element.ClassName = "";
+                }
             }
         }
 
@@ -61,6 +99,22 @@ namespace System.Windows.Forms
 
             Element.Style.Position = Position.Absolute;
             Element.Style.BoxSizing = BoxSizing.BorderBox;
+
+            TabStop = true;
+
+            Element.OnClick = (ev) =>
+            {
+                ev.StopPropagation();
+                OnClick(EventArgs.Empty);
+            };
         }
+
+        protected virtual void OnClick(EventArgs e)
+        {
+            if (Click != null)
+                Click(this, e);
+        }
+
+        public event EventHandler Click;
     }
 }

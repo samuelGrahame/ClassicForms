@@ -1153,11 +1153,11 @@ namespace System.Drawing
         }
 
         internal Color(KnownColor knownColor)
-        {
+        {            
             this.value = 0L;
             this.state = StateKnownColorValid;
             this.name = null;
-            this.knownColor = (short)knownColor;
+            this.knownColor = (short)knownColor;            
         }
 
         private Color(long value, short state, string name, KnownColor knownColor)
@@ -1246,7 +1246,7 @@ namespace System.Drawing
 
         public static implicit operator string(Color color)  // implicit digit to byte conversion operator
         {
-            return color.ToHex();
+            return color.ToHtml();
         }
 
         public static implicit operator Color(string hexValue)  // implicit digit to byte conversion operator
@@ -1353,16 +1353,23 @@ namespace System.Drawing
             return (x.Length == 1 ? "0" : "") + x;
         }
 
-        public string ToHex()
+        public string ToHtml()
         {
-            if (A != 255)
-            {
-                return string.Format("#{0}{1}{2}{3}", componentToHex(A), componentToHex(R), componentToHex(G), componentToHex(B)); // "#" + (155).toString(16) + (102).toString(16) + (102).toString(16);
+            if(IsKnownColor)
+            {                
+                return Color.FromArgb(KnownColorTable.KnownColorToArgb((KnownColor)knownColor)).ToHtml();
             }
             else
             {
-                return string.Format("#{0}{1}{2}", componentToHex(R), componentToHex(G), componentToHex(B)); // "#" + (155).toString(16) + (102).toString(16) + (102).toString(16);
-            }
+                if (A != 255)
+                {
+                    return string.Format("#{0}{1}{2}{3}", componentToHex(A), componentToHex(R), componentToHex(G), componentToHex(B));
+                }
+                else
+                {
+                    return string.Format("#{0}{1}{2}", componentToHex(R), componentToHex(G), componentToHex(B));
+                }
+            }   
         }
 
         public static Color FromHex(string value)
@@ -1758,6 +1765,12 @@ namespace System.Drawing
         private const int Win32GreenShift = 8;
         private const int Win32RedShift = 0;
 
+        public static string GetColorName(int index)
+        {
+            EnsureColorNameTable();
+            return colorNameTable[index];
+        }
+
         // Methods
         public static Color ArgbToKnownColor(int targetARGB)
         {
@@ -1983,6 +1996,44 @@ namespace System.Drawing
             colorNameTable = s;
         }
 
+        private static void UpdateSystemColors()
+        {
+            colorTable[1] = SystemColorToArgb(10);
+            colorTable[2] = SystemColorToArgb(2);
+            colorTable[3] = SystemColorToArgb(9);
+            colorTable[4] = SystemColorToArgb(12);
+            colorTable[168] = SystemColorToArgb(15);
+            colorTable[169] = SystemColorToArgb(20);
+            colorTable[170] = SystemColorToArgb(0x10);
+            colorTable[5] = SystemColorToArgb(15);
+            colorTable[6] = SystemColorToArgb(0x10);
+            colorTable[7] = SystemColorToArgb(0x15);
+            colorTable[8] = SystemColorToArgb(0x16);
+            colorTable[9] = SystemColorToArgb(20);
+            colorTable[10] = SystemColorToArgb(0x12);
+            colorTable[11] = SystemColorToArgb(1);
+            colorTable[171] = SystemColorToArgb(0x1b);
+            colorTable[172] = SystemColorToArgb(0x1c);
+            colorTable[12] = SystemColorToArgb(0x11);
+            colorTable[13] = SystemColorToArgb(13);
+            colorTable[14] = SystemColorToArgb(14);
+            colorTable[15] = SystemColorToArgb(0x1a);
+            colorTable[16] = SystemColorToArgb(11);
+            colorTable[17] = SystemColorToArgb(3);
+            colorTable[18] = SystemColorToArgb(0x13);
+            colorTable[19] = SystemColorToArgb(0x18);
+            colorTable[20] = SystemColorToArgb(0x17);
+            colorTable[21] = SystemColorToArgb(4);
+            colorTable[173] = SystemColorToArgb(30);
+            colorTable[174] = SystemColorToArgb(0x1d);
+            colorTable[22] = SystemColorToArgb(7);
+            colorTable[23] = SystemColorToArgb(0);
+            colorTable[24] = SystemColorToArgb(5);
+            colorTable[25] = SystemColorToArgb(6);
+            colorTable[26] = SystemColorToArgb(8);
+        }
+
+
         private static void InitColorTable()
         {
             int[] c = new int[0xaf];
@@ -2129,6 +2180,8 @@ namespace System.Drawing
             c[0xa6] = -256;
             c[0xa7] = -6632142;
             colorTable = c;
+
+            UpdateSystemColors();
         }
 
         public static int KnownColorToArgb(KnownColor color)
@@ -2150,5 +2203,45 @@ namespace System.Drawing
             }
             return null;
         }
+
+        private static int[] _SysColors = new int[] 
+            {11842740,
+            13743257,
+            0,
+            11250603,
+            15790320,
+            16777215,
+            10526880,
+            15790320,
+            10526880,
+            6908265,
+            14935011,
+            16777215,
+            0,
+            0,
+            15389113,
+            15918295,
+            7171437,
+            16750899,
+            16777215,
+            13395456,
+            16578548,
+            14405055,
+            5525059,
+            14811135,
+            0,
+            15790320,
+            15790320,
+            16750899,
+            0,
+            13158600,
+            16777215,
+            6579300,
+            0};
+
+        private static int SystemColorToArgb(int index)
+        {
+            return FromWin32Value(_SysColors[index]);
+        }    
     }
 }

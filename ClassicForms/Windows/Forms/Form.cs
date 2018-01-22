@@ -18,16 +18,23 @@ namespace System.Windows.Forms
         public Form() : base()
         {
             BackColor = SystemColors.Control;
+            Element.Style.BorderTop = "solid " + FormTopBorder + "px" + " " + Color.CornflowerBlue;
+            Element.Style.BorderBottom = "solid " + FormBottonBorder + "px" + " " + Color.CornflowerBlue;
+
+            Element.Style.BorderLeft = "solid " + FormLeftBorder + "px" + " " + Color.CornflowerBlue;
+            Element.Style.BorderRight = "solid " + FormRightBorder + "px" + " " + Color.CornflowerBlue;
+
+            TabStop = false;
         }
 
         public static Size GetClientSize(Size size)
         {
-            return new Size(size.Width + FormLeftBorder + FormRightBorder, size.Height + FormTopBorder + FormBottonBorder);
+            return new Size(size.Width - (FormLeftBorder + FormRightBorder), size.Height - (FormTopBorder + FormBottonBorder));
         }
 
         public static Size SetSize(Size clientSize)
         {
-            return new Size(clientSize.Width - (FormLeftBorder + FormRightBorder), clientSize.Height - (FormTopBorder + FormBottonBorder));
+            return new Size(clientSize.Width + (FormLeftBorder + FormRightBorder), clientSize.Height + (FormTopBorder + FormBottonBorder));
         }
 
         protected virtual void Dispose(bool disposing)
