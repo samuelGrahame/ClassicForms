@@ -47,6 +47,7 @@
     <Compile Include="Windows\Forms\Button.cs" />
     <Compile Include="Windows\Forms\ButtonBase.cs" />
     <Compile Include="Windows\Forms\CheckBox.cs" />
+    <Compile Include="Windows\Forms\ComboBox.cs" />
     <Compile Include="Windows\Forms\ContainerControl.cs" />
     <Compile Include="Windows\Forms\Control.cs" />
     <Compile Include="Windows\Forms\ControlCollection.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Windows\Forms\LinkLabel.cs" />
     <Compile Include="Windows\Forms\LinkLabelLinkClickedEventHandler.cs" />
     <Compile Include="Windows\Forms\MouseButtons.cs" />
+    <Compile Include="Windows\Forms\ObjectCollection.cs" />
     <Compile Include="Windows\Forms\Panel.cs" />
     <Compile Include="Windows\Forms\TextBox.cs" />
   </ItemGroup>

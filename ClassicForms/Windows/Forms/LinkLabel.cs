@@ -12,7 +12,8 @@ namespace System.Windows.Forms
         public LinkLabel() : base(new HTMLAnchorElement())
         {
             TabStop = false;
-            Element.As<HTMLAnchorElement>().Href = "#";
+            //Element.As<HTMLAnchorElement>().Href = "#";
+            Element.Style.Cursor = Cursor.Pointer;
         }
 
         public override string Text

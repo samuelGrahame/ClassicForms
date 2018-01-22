@@ -12,5 +12,10 @@ namespace System.Drawing
         {
 
         }
+        public Font(string familyName, float emSize)
+        {
+
+        }
+
     }
 }
