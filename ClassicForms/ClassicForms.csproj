@@ -52,6 +52,7 @@
     <Compile Include="Windows\Forms\ControlCollection.cs" />
     <Compile Include="Windows\Forms\Form.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Windows\Forms\Label.cs" />
     <Compile Include="Windows\Forms\Panel.cs" />
     <Compile Include="Windows\Forms\TextBox.cs" />
   </ItemGroup>
