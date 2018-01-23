@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ComponentModel\IContainer.cs" />
+    <Compile Include="ComponentModel\ISupportInitialize.cs" />
     <Compile Include="Drawing\Color.cs" />
     <Compile Include="Drawing\Font.cs" />
     <Compile Include="Drawing\FontStyle.cs" />
@@ -52,7 +53,12 @@
     <Compile Include="Windows\Forms\ComboBox.cs" />
     <Compile Include="Windows\Forms\ContainerControl.cs" />
     <Compile Include="Windows\Forms\Control.cs" />
+    <Compile Include="Windows\Forms\DataGridViewColumn.cs" />
+    <Compile Include="Windows\Forms\DataGridViewColumnCollection.cs" />
     <Compile Include="Windows\Forms\ControlCollection.cs" />
+    <Compile Include="Windows\Forms\DataGridView.cs" />
+    <Compile Include="Windows\Forms\DataGridViewColumnHeadersHeightSizeMode.cs" />
+    <Compile Include="Windows\Forms\DataGridViewTextBoxColumn.cs" />
     <Compile Include="Windows\Forms\DrawMode.cs" />
     <Compile Include="Windows\Forms\Form.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

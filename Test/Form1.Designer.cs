@@ -30,6 +30,7 @@
         {
             this.button1 = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.button6 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
@@ -43,10 +44,13 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.comboBoxResize1 = new System.ComboBoxResize();
             this.textBoxResize1 = new System.TextBoxResize();
-            this.button6 = new System.Windows.Forms.Button();
+            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
@@ -71,6 +75,17 @@
             this.panel1.Size = new System.Drawing.Size(390, 225);
             this.panel1.TabIndex = 1;
             this.panel1.Tag = "card";
+            // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(4, 5);
+            this.button6.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(136, 39);
+            this.button6.TabIndex = 17;
+            this.button6.Tag = "btn btn-warning";
+            this.button6.Text = "Warning";
+            this.button6.UseVisualStyleBackColor = true;
             // 
             // button2
             // 
@@ -183,10 +198,10 @@
             "Apple",
             "Orange",
             "Mango"});
-            this.listBox1.Location = new System.Drawing.Point(738, 300);
+            this.listBox1.Location = new System.Drawing.Point(579, 71);
             this.listBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(294, 151);
+            this.listBox1.Size = new System.Drawing.Size(294, 67);
             this.listBox1.TabIndex = 11;
             this.listBox1.Tag = "form-control";
             // 
@@ -222,6 +237,23 @@
             this.label2.TabIndex = 14;
             this.label2.Text = "Readonly:";
             // 
+            // dataGridView1
+            // 
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column1,
+            this.Column2});
+            this.dataGridView1.Location = new System.Drawing.Point(442, 204);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(546, 103);
+            this.dataGridView1.TabIndex = 17;
+            this.dataGridView1.Tag = "table";
+            // 
+            // Column1
+            // 
+            this.Column1.HeaderText = "Column1";
+            this.Column1.Name = "Column1";
+            // 
             // comboBoxResize1
             // 
             this.comboBoxResize1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
@@ -233,7 +265,7 @@
             "House Warranty",
             "Extended Warranty"});
             this.comboBoxResize1.Location = new System.Drawing.Point(677, 14);
-            this.comboBoxResize1.MinimumSize = new System.Drawing.Size(121, 0);
+            this.comboBoxResize1.MinimumSize = new System.Drawing.Size(339, 0);
             this.comboBoxResize1.Name = "comboBoxResize1";
             this.comboBoxResize1.Size = new System.Drawing.Size(339, 49);
             this.comboBoxResize1.TabIndex = 16;
@@ -241,22 +273,16 @@
             // 
             // textBoxResize1
             // 
-            this.textBoxResize1.Location = new System.Drawing.Point(460, 268);
+            this.textBoxResize1.Location = new System.Drawing.Point(410, 61);
             this.textBoxResize1.Name = "textBoxResize1";
             this.textBoxResize1.Size = new System.Drawing.Size(162, 48);
             this.textBoxResize1.TabIndex = 15;
             this.textBoxResize1.Tag = "form-control";
             // 
-            // button6
+            // Column2
             // 
-            this.button6.Location = new System.Drawing.Point(4, 5);
-            this.button6.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(136, 39);
-            this.button6.TabIndex = 17;
-            this.button6.Tag = "btn btn-warning";
-            this.button6.Text = "Warning";
-            this.button6.UseVisualStyleBackColor = true;
+            this.Column2.HeaderText = "Column2";
+            this.Column2.Name = "Column2";
             // 
             // Form1
             // 
@@ -264,6 +290,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1050, 627);
+            this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.comboBoxResize1);
             this.Controls.Add(this.textBoxResize1);
             this.Controls.Add(this.label2);
@@ -286,6 +313,7 @@
             this.Name = "Form1";
             this.Text = "Form";
             this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -311,5 +339,8 @@
         private System.TextBoxResize textBoxResize1;
         private System.ComboBoxResize comboBoxResize1;
         private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
     }
 }

@@ -95,42 +95,50 @@ namespace System.Windows.Forms
             }
         }
 
-        protected void ApplyDisabled()
+        protected void ApplyDisabled(HTMLElement element = null)
         {
+            if(element == null)
+            {
+                element = Element;
+            }
             if(Enabled)
             {
-                if(Element.ClassList.Contains("disabled"))
+                if(element.ClassList.Contains("disabled"))
                 {
-                    Element.ClassList.Remove("disabled");                  
-                    Element.RemoveAttribute("disabled");
+                    element.ClassList.Remove("disabled");
+                    element.RemoveAttribute("disabled");
                 }
             }
             else
             {
-                if (!Element.ClassList.Contains("disabled"))
+                if (!element.ClassList.Contains("disabled"))
                 {
-                    Element.ClassList.Add("disabled");                 
-                    Element.SetAttribute("disabled", "");
+                    element.ClassList.Add("disabled");
+                    element.SetAttribute("disabled", "");
                 }
             }
         }
 
-        protected void ApplyReadonly()
+        protected void ApplyReadonly(HTMLElement element = null)
         {
+            if (element == null)
+            {
+                element = Element;
+            }
             if (ReadOnly)
             {
-                if (!Element.ClassList.Contains("readonly"))
+                if (!element.ClassList.Contains("readonly"))
                 {
-                    Element.ClassList.Add("readonly");
-                    Element.SetAttribute("readonly", "");
+                    element.ClassList.Add("readonly");
+                    element.SetAttribute("readonly", "");
                 }
             }
             else
             {
-                if(Element.ClassList.Contains("readonly"))
+                if(element.ClassList.Contains("readonly"))
                 {
-                    Element.ClassList.Remove("readonly");
-                    Element.RemoveAttribute("readonly");
+                    element.ClassList.Remove("readonly");
+                    element.RemoveAttribute("readonly");
                 }
             }
         }

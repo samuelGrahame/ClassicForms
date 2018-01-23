@@ -63,7 +63,7 @@ namespace System.Windows.Forms
 			var len = _owner.Element.childNodes.length;
 			while(len--)
 			{
-				element.removeChild(_owner.Element.lastChild);
+				_owner.Element.removeChild(_owner.Element.lastChild);
 			};
 			*/
             _controls.Clear();
