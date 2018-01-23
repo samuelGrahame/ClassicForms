@@ -70,6 +70,7 @@
     <Compile Include="Windows\Forms\ObjectCollection.cs" />
     <Compile Include="Windows\Forms\Padding.cs" />
     <Compile Include="Windows\Forms\Panel.cs" />
+    <Compile Include="Windows\Forms\ProgressBar.cs" />
     <Compile Include="Windows\Forms\TextBox.cs" />
   </ItemGroup>
   <ItemGroup>

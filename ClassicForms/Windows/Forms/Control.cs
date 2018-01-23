@@ -119,6 +119,8 @@ namespace System.Windows.Forms
             }
         }
 
+        public virtual Color ForeColor { get; set; }
+
         protected void ApplyReadonly(HTMLElement element = null)
         {
             if (element == null)

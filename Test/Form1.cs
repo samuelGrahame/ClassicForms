@@ -35,5 +35,31 @@ namespace Test
         {
 
         }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            int value = 1;
+            if(int.TryParse(textBox3.Text + "", out value))
+            {
+                progressBar1.Value += value;
+            }
+            else
+            {
+                progressBar1.Value += 1;
+            }            
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            int value = 1;
+            if (int.TryParse(textBox3.Text + "", out value))
+            {
+                progressBar1.Value -= value;
+            }
+            else
+            {
+                progressBar1.Value -= 1;
+            }
+        }
     }
 }
