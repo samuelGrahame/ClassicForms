@@ -42,6 +42,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\ClassicForms\ComboBoxResize.cs">
+      <Link>ComboBoxResize.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\ClassicForms\TextBoxResize.cs">
+      <Link>TextBoxResize.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

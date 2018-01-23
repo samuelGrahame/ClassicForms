@@ -73,6 +73,68 @@ namespace System.Windows.Forms
             }
         }
 
+        private bool _enabled = true;
+        public virtual bool Enabled
+        {
+            get { return _enabled; }
+            set
+            {
+                _enabled = value;
+                ApplyDisabled();                
+            }
+        }
+
+        private bool _readonly = false;
+        public virtual bool ReadOnly
+        {
+            get { return _readonly; }
+            set
+            {
+                _readonly = value;
+                ApplyReadonly();
+            }
+        }
+
+        protected void ApplyDisabled()
+        {
+            if(Enabled)
+            {
+                if(Element.ClassList.Contains("disabled"))
+                {
+                    Element.ClassList.Remove("disabled");                  
+                    Element.RemoveAttribute("disabled");
+                }
+            }
+            else
+            {
+                if (!Element.ClassList.Contains("disabled"))
+                {
+                    Element.ClassList.Add("disabled");                 
+                    Element.SetAttribute("disabled", "");
+                }
+            }
+        }
+
+        protected void ApplyReadonly()
+        {
+            if (ReadOnly)
+            {
+                if (!Element.ClassList.Contains("readonly"))
+                {
+                    Element.ClassList.Add("readonly");
+                    Element.SetAttribute("readonly", "");
+                }
+            }
+            else
+            {
+                if(Element.ClassList.Contains("readonly"))
+                {
+                    Element.ClassList.Remove("readonly");
+                    Element.RemoveAttribute("readonly");
+                }
+            }
+        }
+
         protected object _tag;
 
         /// <summary>
@@ -92,6 +154,7 @@ namespace System.Windows.Forms
                 {
                     Element.ClassName = "";
                 }
+                ApplyDisabled();
             }
         }
 
@@ -135,6 +198,22 @@ namespace System.Windows.Forms
                 Click(this, e);
         }
 
+        public Padding Margin { get; set; }
+        public Padding Padding { get; set; }
+
         public event EventHandler Click;
+
+        public void SuspendLayout()
+        {
+
+        }
+        public void ResumeLayout(bool performLayout)
+        {
+
+        }
+        public void PerformLayout()
+        {
+
+        }
     }
 }

@@ -42,24 +42,13 @@ namespace System.Windows.Forms
 
         }
 
-        public void SuspendLayout()
-        {
-
-        }
-        public void ResumeLayout(bool performLayout)
-        {
-
-        }
-
+       
         public void Show()
         {
             Document.Body.AppendChild(Element);
         }
 
-        public void PerformLayout()
-        {
-
-        }
+        
 
         public Size ClientSize { get { return GetClientSize(Size); } set { Size = SetSize(value); } }
         public override string Text { get; set; }

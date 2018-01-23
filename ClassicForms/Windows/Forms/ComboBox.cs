@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,9 @@ namespace System.Windows.Forms
         }
         public ObjectCollection Items { get; }
         public virtual bool FormattingEnabled { get; set; }
+        public virtual int ItemHeight { get; set; }
+        public DrawMode DrawMode { get; set; }
+        public virtual Size MinimumSize { get; set; }
     }
 
     public class ListBox : Control
@@ -26,5 +30,6 @@ namespace System.Windows.Forms
         }
         public ObjectCollection Items { get; }
         public virtual bool FormattingEnabled { get; set; }
+        public virtual int ItemHeight { get; set; }
     }
 }
