@@ -17,6 +17,10 @@ using System.Windows.Forms;
 
 namespace Test
 {
+    /// <summary>
+    /// https://getmdl.io/started/index.html
+    /// https://getbootstrap.com/docs/4.0/getting-started/introduction/
+    /// </summary>
     public partial class Form1 : Form
     {
         public Form1()

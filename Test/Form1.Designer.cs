@@ -47,13 +47,14 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.comboBoxResize1 = new System.ComboBoxResize();
-            this.textBoxResize1 = new System.TextBoxResize();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.comboBoxResize1 = new System.ComboBoxResize();
+            this.textBoxResize1 = new System.TextBoxResize();
+            this.button9 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -264,31 +265,6 @@
             this.Column2.HeaderText = "Column2";
             this.Column2.Name = "Column2";
             // 
-            // comboBoxResize1
-            // 
-            this.comboBoxResize1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.comboBoxResize1.FormattingEnabled = true;
-            this.comboBoxResize1.ItemHeight = 43;
-            this.comboBoxResize1.Items.AddRange(new object[] {
-            "Not Applicable",
-            "Manufacturer\'s Warranty",
-            "House Warranty",
-            "Extended Warranty"});
-            this.comboBoxResize1.Location = new System.Drawing.Point(677, 14);
-            this.comboBoxResize1.MinimumSize = new System.Drawing.Size(339, 0);
-            this.comboBoxResize1.Name = "comboBoxResize1";
-            this.comboBoxResize1.Size = new System.Drawing.Size(339, 49);
-            this.comboBoxResize1.TabIndex = 16;
-            this.comboBoxResize1.Tag = "form-control";
-            // 
-            // textBoxResize1
-            // 
-            this.textBoxResize1.Location = new System.Drawing.Point(410, 61);
-            this.textBoxResize1.Name = "textBoxResize1";
-            this.textBoxResize1.Size = new System.Drawing.Size(162, 48);
-            this.textBoxResize1.TabIndex = 15;
-            this.textBoxResize1.Tag = "form-control";
-            // 
             // progressBar1
             // 
             this.progressBar1.Location = new System.Drawing.Point(442, 385);
@@ -341,12 +317,50 @@
             this.label3.TabIndex = 22;
             this.label3.Text = "Increase By:";
             // 
+            // comboBoxResize1
+            // 
+            this.comboBoxResize1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.comboBoxResize1.FormattingEnabled = true;
+            this.comboBoxResize1.ItemHeight = 43;
+            this.comboBoxResize1.Items.AddRange(new object[] {
+            "Not Applicable",
+            "Manufacturer\'s Warranty",
+            "House Warranty",
+            "Extended Warranty"});
+            this.comboBoxResize1.Location = new System.Drawing.Point(677, 14);
+            this.comboBoxResize1.MinimumSize = new System.Drawing.Size(339, 0);
+            this.comboBoxResize1.Name = "comboBoxResize1";
+            this.comboBoxResize1.Size = new System.Drawing.Size(339, 49);
+            this.comboBoxResize1.TabIndex = 16;
+            this.comboBoxResize1.Tag = "form-control";
+            // 
+            // textBoxResize1
+            // 
+            this.textBoxResize1.Location = new System.Drawing.Point(410, 61);
+            this.textBoxResize1.Name = "textBoxResize1";
+            this.textBoxResize1.Size = new System.Drawing.Size(162, 48);
+            this.textBoxResize1.TabIndex = 15;
+            this.textBoxResize1.Tag = "form-control";
+            // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(827, 509);
+            this.button9.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(136, 39);
+            this.button9.TabIndex = 23;
+            this.button9.Tag = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--acce" +
+    "nt";
+            this.button9.Text = "Ripple";
+            this.button9.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1050, 627);
+            this.Controls.Add(this.button9);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.button8);
@@ -409,5 +423,6 @@
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button button9;
     }
 }
