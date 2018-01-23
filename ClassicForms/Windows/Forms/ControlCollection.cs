@@ -13,7 +13,7 @@ namespace System.Windows.Forms
     /// </summary>
     public class ControlCollection : IList<Control>, ICollection, IEnumerable
     {
-        private Control _owner;
+        internal Control _owner;
 
         public ControlCollection(Control owner)
         {
