@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,5 +50,35 @@ namespace System.Windows.Forms
                 ApplyDisabled(table);
             }
         }
+
+        private void OnNewRowEvent(object sender, NewRowEventArgs args)
+        {
+
+        }
+
+        private object dataSource;
+        public object DataSource { get { return dataSource; } set {
+                if(value != dataSource)
+                {
+                    if(dataSource != null)
+                    {
+                        if(dataSource is DataTable)
+                        {
+                            var dt = dataSource.As<DataTable>();
+
+                            dt.NewRowEvent -= OnNewRowEvent;
+                        }
+                    }
+
+                    dataSource = value;
+
+                    if (dataSource != null && dataSource is DataTable)
+                    {
+                        var dt = dataSource.As<DataTable>();
+
+                        dt.NewRowEvent += OnNewRowEvent;
+                    }
+                }                
+            } }
     }
 }

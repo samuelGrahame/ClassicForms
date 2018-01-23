@@ -13,6 +13,7 @@ using Bridge.Html5;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Data;
 #endif
 
 namespace Test
@@ -64,6 +65,31 @@ namespace Test
             {
                 progressBar1.Value -= 1;
             }
+        }
+
+        private DataTable dt;
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            if(dt == null)
+            {
+                dt = new DataTable();
+
+                dt.Columns.Add("Column1");
+                dt.Columns.Add("Column2");
+
+                dataGridView1.DataSource = dt;
+            }
+
+            var row = dt.NewRow();
+
+            row["Column1"] = "1";
+            row["Column2"] = "Hello World!";
+
+            dt.Rows.Add(row);
+
+            dt.AcceptChanges();
+
         }
     }
 }
