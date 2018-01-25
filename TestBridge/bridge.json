@@ -21,7 +21,7 @@
   "sourceMap": {
     "enabled": true
   },
-
+  
   // Set to true to disable Reflection metadata generation.
   // Default is false.
   "reflection": {
