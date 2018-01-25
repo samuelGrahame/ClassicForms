@@ -1,9 +1,9 @@
-﻿using Bridge.Html5;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
@@ -13,16 +13,16 @@ namespace System.Windows.Forms
         {
             TabStop = false;
             //Element.As<HTMLAnchorElement>().Href = "#";
-            Element.Style.Cursor = Cursor.Pointer;
+            Element.style.cursor = "pointer";
         }
 
         public override string Text
         {
-            get { return Element.TextContent; }
+            get { return Element.textContent; }
             set
             {
                 base.Text = value;
-                Element.TextContent = value;
+                Element.textContent = value;
             }
         }
 

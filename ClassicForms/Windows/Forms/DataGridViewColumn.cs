@@ -1,9 +1,9 @@
-﻿using Bridge.Html5;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
@@ -11,13 +11,13 @@ namespace System.Windows.Forms
     {
         internal HTMLTableHeaderCellElement Element;
         public string HeaderText {
-            get { return Element.TextContent; }
+            get { return Element.textContent; }
             set
             {                
-                Element.TextContent = value;
+                Element.textContent = value;
             }
         }
-        public string Name { get { return Element.GetAttribute("Name"); } set { Element.SetAttribute("Name", value); } }
+        public string Name { get { return Element.getAttribute("Name"); } set { Element.setAttribute("Name", value); } }
 
         public DataGridViewColumn()
         {

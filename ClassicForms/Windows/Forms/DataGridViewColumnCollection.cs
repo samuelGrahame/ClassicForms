@@ -1,10 +1,10 @@
-﻿using Bridge.Html5;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
@@ -21,8 +21,8 @@ namespace System.Windows.Forms
             _owner = owner;
             _controls = new List<DataGridViewColumn>();            
 
-            header = table.CreateTHead();
-            table.AppendChild(header);
+            header = table.createTHead();
+            table.appendChild(header);
         }
 
         public DataGridView Owner { get { return _owner; } }
@@ -40,7 +40,7 @@ namespace System.Windows.Forms
         public void Add(DataGridViewColumn item)
         {
 
-            header.AppendChild(item.Element);
+            header.appendChild(item.Element);
             _controls.Add(item);
         }
 
@@ -48,13 +48,13 @@ namespace System.Windows.Forms
         {
             if (item == null || item.Length == 0)
                 return;
-            var frag = Document.CreateDocumentFragment();
+            var frag = document.createDocumentFragment();
             for (int i = 0; i < item.Length; i++)
             {
-                frag.AppendChild(item[i].Element);
+                frag.appendChild(item[i].Element);
                 _controls.Add(item[i]);
             }
-            header.AppendChild(frag);
+            header.appendChild(frag);
         }
 
         public void Clear()
@@ -96,19 +96,19 @@ namespace System.Windows.Forms
 
         public void Insert(int index, DataGridViewColumn item)
         {
-            header.InsertBefore(item.Element, header.ChildNodes[index]);
+            header.insertBefore(item.Element, header.childNodes[index]);
             _controls.Insert(index, item);
         }
 
         public bool Remove(DataGridViewColumn item)
         {
-            header.RemoveChild(item.Element);
+            header.removeChild(item.Element);
             return _controls.Remove(item);
         }
 
         public void RemoveAt(int index)
         {
-            header.RemoveChild(header.ChildNodes[index]);
+            header.removeChild(header.childNodes[index]);
             _controls.RemoveAt(index);
         }
 

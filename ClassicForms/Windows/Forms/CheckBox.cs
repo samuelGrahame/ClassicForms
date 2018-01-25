@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bridge.Html5;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
@@ -19,21 +19,21 @@ namespace System.Windows.Forms
 
             
 
-            Element.AppendChild((checkBox = new HTMLInputElement() { Type = InputType.Checkbox, Id = ids }));
-            Element.AppendChild(text = new HTMLLabelElement() { HtmlFor = ids });
+            Element.appendChild((checkBox = new HTMLInputElement() { type = "checkbox", id = ids }));
+            Element.appendChild(text = new HTMLLabelElement() { htmlFor = ids });
 
-            checkBox.Style.Cursor = Cursor.Pointer;
-            text.Style.Cursor = Cursor.Pointer;
+            checkBox.style.cursor = "pointer";
+            text.style.cursor = "pointer";
         }
 
-        public bool Checked { get { return checkBox.Checked; } set { checkBox.Checked = value; } }
+        public bool Checked { get { return checkBox.@checked; } set { checkBox.@checked = value; } }
 
         public override string Text
         {
-            get { return text.TextContent; }
+            get { return text.textContent; }
             set
             {
-                text.TextContent = value;
+                text.textContent = value;
             }
         }
 
@@ -48,31 +48,31 @@ namespace System.Windows.Forms
                     var str = (_tag + "");
                     if(str.Contains(","))
                     {
-                        var arry = str.Split(",");
-                        Element.ClassName = arry[0];
+                        var arry = str.Split(',');
+                        Element.className = arry[0];
                         if(arry.Length == 3)
                         {
-                            checkBox.ClassName = arry[1];
-                            text.ClassName = arry[2];
+                            checkBox.className = arry[1];
+                            text.className = arry[2];
                         }
                         else
                         {
-                            checkBox.ClassName = "";
-                            text.ClassName = "";
+                            checkBox.className = "";
+                            text.className = "";
                         }                            
                     }
                     else
                     {
-                        Element.ClassName = str;
-                        checkBox.ClassName = "";
-                        text.ClassName = "";
+                        Element.className = str;
+                        checkBox.className = "";
+                        text.className = "";
                     }                    
                 }
                 else
                 {
-                    Element.ClassName = "";
-                    checkBox.ClassName = "";
-                    text.ClassName = "";
+                    Element.className = "";
+                    checkBox.className = "";
+                    text.className = "";
                 }
             }
         }
@@ -88,11 +88,11 @@ namespace System.Windows.Forms
                     _tabIndex = value;
                     if (TabStop)
                     {
-                        checkBox.TabIndex = value;
+                        checkBox.tabIndex = value;
                     }
                     else
                     {
-                        checkBox.RemoveAttribute("TabIndex");
+                        checkBox.removeAttribute("TabIndex");
                     }
                 }                
             }

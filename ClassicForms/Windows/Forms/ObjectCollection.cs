@@ -1,10 +1,10 @@
-﻿using Bridge.Html5;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
@@ -40,7 +40,7 @@ namespace System.Windows.Forms
 
         public void Add(object item)
         {
-            _owner.Element.AppendChild(new HTMLOptionElement() { Value = _controls.Count.ToString(), TextContent = (item + "") } );
+            _owner.Element.appendChild(new HTMLOptionElement() { value = _controls.Count.ToString(), textContent = (item + "") } );
             _controls.Add(item);
         }
 
@@ -48,13 +48,13 @@ namespace System.Windows.Forms
         {
             if (item == null || item.Length == 0)
                 return;
-            var frag = Document.CreateDocumentFragment();
+            var frag = document.createDocumentFragment();
             for (int i = 0; i < item.Length; i++)
             {
-                frag.AppendChild(new HTMLOptionElement() { Value = _controls.Count.ToString(), TextContent = (item[i] + "") });
+                frag.appendChild(new HTMLOptionElement() { value = _controls.Count.ToString(), textContent = (item[i] + "") });
                 _controls.Add(item[i]);
             }
-            _owner.Element.AppendChild(frag);
+            _owner.Element.appendChild(frag);
         }
 
         public void Clear()
@@ -96,19 +96,19 @@ namespace System.Windows.Forms
 
         public void Insert(int index, object item)
         {
-            _owner.Element.InsertBefore(new HTMLOptionElement() { Value = _controls.Count.ToString(), TextContent = (item + "") }, _owner.Element.ChildNodes[index]);
+            _owner.Element.insertBefore(new HTMLOptionElement() { value = _controls.Count.ToString(), textContent = (item + "") }, _owner.Element.childNodes[index]);
             _controls.Insert(index, item);
         }
 
         public bool Remove(object item)
         {
-            _owner.Element.RemoveChild(_owner.Element.ChildNodes[_controls.IndexOf(item)]);            
+            _owner.Element.removeChild(_owner.Element.childNodes[_controls.IndexOf(item)]);            
             return _controls.Remove(item);
         }
 
         public void RemoveAt(int index)
         {
-            _owner.Element.RemoveChild(_owner.Element.ChildNodes[index]);
+            _owner.Element.removeChild(_owner.Element.childNodes[index]);
             _controls.RemoveAt(index);
         }
 

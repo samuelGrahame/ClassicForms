@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bridge.Html5;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
@@ -15,19 +15,19 @@ namespace System.Windows.Forms
         {
             panel = new Panel();
 
-            Element.AppendChild(legend = new HTMLDivElement());
-            Element.AppendChild(panel.Element);
-            panel.Element.Style.Position = Position.Relative;
+            Element.appendChild(legend = new HTMLDivElement());
+            Element.appendChild(panel.Element);
+            panel.Element.style.position = "relative";
             Controls._owner = panel;
         }
 
         public override string Text
         {
-            get { return legend.TextContent; }
+            get { return legend.textContent; }
             set
             {
                 base.Text = value;
-                legend.TextContent = value;
+                legend.textContent = value;
             }
         }
 
@@ -42,31 +42,31 @@ namespace System.Windows.Forms
                     var str = (_tag + "");
                     if (str.Contains(","))
                     {
-                        var arry = str.Split(",");
-                        Element.ClassName = arry[0];
+                        var arry = str.Split(',');
+                        Element.className = arry[0];
                         if (arry.Length == 3)
                         {
-                            legend.ClassName = arry[1];
-                            panel.Element.ClassName = arry[2];
+                            legend.className = arry[1];
+                            panel.Element.className = arry[2];
                         }
                         else
                         {
-                            legend.ClassName = "";
-                            panel.Element.ClassName = "";
+                            legend.className = "";
+                            panel.Element.className = "";
                         }
                     }
                     else
                     {
-                        Element.ClassName = str;
-                        legend.ClassName = "";
-                        panel.Element.ClassName = "";
+                        Element.className = str;
+                        legend.className = "";
+                        panel.Element.className = "";
                     }
                 }
                 else
                 {
-                    Element.ClassName = "";
-                    legend.ClassName = "";
-                    panel.Element.ClassName = "";
+                    Element.className = "";
+                    legend.className = "";
+                    panel.Element.className = "";
                 }
             }
         }

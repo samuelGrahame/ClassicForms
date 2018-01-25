@@ -1,9 +1,10 @@
-﻿using Bridge.Html5;
+﻿using Bridge;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Retyped.dom;
 
 namespace System.Drawing
 {
@@ -1378,7 +1379,7 @@ namespace System.Drawing
                 return FromHex(value.Substring(1));
             else
             {
-                return Color.FromArgb(Global.ParseInt(value));
+                return Color.FromArgb(Script.ParseInt(value));
             }
         }
 

@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bridge.Html5;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
@@ -25,7 +25,7 @@ namespace System.Windows.Forms
     {
         public ListBox() : base(new HTMLSelectElement())
         {
-            Element.As<HTMLSelectElement>().Multiple = true;
+            Element.As<HTMLSelectElement>().multiple = true;
             Items = new ObjectCollection(this);
         }
         public ObjectCollection Items { get; }

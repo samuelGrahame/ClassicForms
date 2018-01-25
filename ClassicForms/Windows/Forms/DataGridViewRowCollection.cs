@@ -1,11 +1,11 @@
-﻿using Bridge.Html5;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
@@ -23,7 +23,7 @@ namespace System.Windows.Forms
             _controls = new List<DataRow>();            
 
             body = new HTMLBodyElement();
-            table.AppendChild(body);
+            table.appendChild(body);
         }
 
         public DataGridView Owner { get { return _owner; } }
@@ -40,7 +40,7 @@ namespace System.Windows.Forms
 
         public void Add(DataRow item)
         {
-            body.AppendChild(item.Element);
+            body.appendChild(item.Element);
             _controls.Add(item);
         }
 
@@ -48,13 +48,13 @@ namespace System.Windows.Forms
         {
             if (item == null || item.Length == 0)
                 return;
-            var frag = Document.CreateDocumentFragment();
+            var frag = document.createDocumentFragment();
             for (int i = 0; i < item.Length; i++)
             {
-                frag.AppendChild(item[i].Element);
+                frag.appendChild(item[i].Element);
                 _controls.Add(item[i]);
             }
-            body.AppendChild(frag);
+            body.appendChild(frag);
         }
 
         public void Clear()
@@ -96,19 +96,19 @@ namespace System.Windows.Forms
 
         public void Insert(int index, DataRow item)
         {
-            body.InsertBefore(item.Element, body.ChildNodes[index]);
+            body.insertBefore(item.Element, body.childNodes[index]);
             _controls.Insert(index, item);
         }
 
         public bool Remove(DataRow item)
         {
-            body.RemoveChild(item.Element);
+            body.removeChild(item.Element);
             return _controls.Remove(item);
         }
 
         public void RemoveAt(int index)
         {
-            body.RemoveChild(body.ChildNodes[index]);
+            body.removeChild(body.childNodes[index]);
             _controls.RemoveAt(index);
         }
 

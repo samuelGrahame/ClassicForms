@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bridge.Html5;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
@@ -17,7 +17,7 @@ namespace System.Windows.Forms
         public DataGridView() : base(new HTMLDivElement())
         {
             table = new HTMLTableElement();
-            Element.AppendChild(table);
+            Element.appendChild(table);
             Columns = new DataGridViewColumnCollection(this, table);
 
             TabStop = false;
@@ -41,11 +41,11 @@ namespace System.Windows.Forms
                 _tag = value;
                 if (_tag is string)
                 {
-                    table.ClassName = (_tag + "");
+                    table.className = (_tag + "");
                 }
                 else
                 {
-                    table.ClassName = "";
+                    table.className = "";
                 }
                 ApplyDisabled(table);
             }

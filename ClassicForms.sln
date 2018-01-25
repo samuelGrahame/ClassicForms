@@ -7,10 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassicForms", "ClassicForm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{77102865-25D0-4161-90EB-8DFAEE23B116}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App", "App\App.csproj", "{2630E2E4-D979-4BAE-863E-8CCEC05CDF51}"
-	ProjectSection(ProjectDependencies) = postProject
-		{77102865-25D0-4161-90EB-8DFAEE23B116} = {77102865-25D0-4161-90EB-8DFAEE23B116}
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBridge", "TestBridge\TestBridge.csproj", "{9C228AB6-D9C3-4AD9-B2F5-2F71CB3EFB56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,10 +23,10 @@ Global
 		{77102865-25D0-4161-90EB-8DFAEE23B116}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77102865-25D0-4161-90EB-8DFAEE23B116}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77102865-25D0-4161-90EB-8DFAEE23B116}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2630E2E4-D979-4BAE-863E-8CCEC05CDF51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2630E2E4-D979-4BAE-863E-8CCEC05CDF51}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2630E2E4-D979-4BAE-863E-8CCEC05CDF51}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2630E2E4-D979-4BAE-863E-8CCEC05CDF51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C228AB6-D9C3-4AD9-B2F5-2F71CB3EFB56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C228AB6-D9C3-4AD9-B2F5-2F71CB3EFB56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C228AB6-D9C3-4AD9-B2F5-2F71CB3EFB56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C228AB6-D9C3-4AD9-B2F5-2F71CB3EFB56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

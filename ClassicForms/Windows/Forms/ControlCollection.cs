@@ -1,10 +1,10 @@
-﻿using Bridge.Html5;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
@@ -35,7 +35,7 @@ namespace System.Windows.Forms
 
         public void Add(Control item)
         {
-            _owner.Element.AppendChild(item.Element);
+            _owner.Element.appendChild(item.Element);
             _controls.Add(item);
         }
 
@@ -43,13 +43,13 @@ namespace System.Windows.Forms
         {
             if (item == null || item.Length == 0)
                 return;
-            var frag = Document.CreateDocumentFragment();
+            var frag = document.createDocumentFragment();
             for (int i = 0; i < item.Length; i++)
             {
-                frag.AppendChild(item[i].Element);
+                frag.appendChild(item[i].Element);
                 _controls.Add(item[i]);
             }
-            _owner.Element.AppendChild(frag);
+            _owner.Element.appendChild(frag);
         }
 
         public void Clear()
@@ -91,19 +91,19 @@ namespace System.Windows.Forms
 
         public void Insert(int index, Control item)
         {
-            _owner.Element.InsertBefore(item.Element, _owner.Element.ChildNodes[index]);
+            _owner.Element.insertBefore(item.Element, _owner.Element.childNodes[index]);
             _controls.Insert(index, item);
         }
 
         public bool Remove(Control item)
         {
-            _owner.Element.RemoveChild(item.Element);
+            _owner.Element.removeChild(item.Element);
             return _controls.Remove(item);
         }
 
         public void RemoveAt(int index)
         {
-            _owner.Element.RemoveChild(_owner.Element.ChildNodes[index]);
+            _owner.Element.removeChild(_owner.Element.childNodes[index]);
             _controls.RemoveAt(index);
         }
 

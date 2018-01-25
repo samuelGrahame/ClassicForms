@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 #else
-using Bridge.Html5;
+using static Retyped.dom;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -31,8 +31,8 @@ namespace Test
 
         private void button1_Click(object sender, EventArgs e)
         {
-#if BRIDGE
-            Global.Alert("Hello World");
+#if BRIDGE            
+            alert("Hello World");
 #endif
         }
 

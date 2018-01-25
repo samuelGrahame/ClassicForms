@@ -1,16 +1,16 @@
-﻿using Bridge.Html5;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
     public class Control
     {
-        public string Name { get { return Element.GetAttribute("Name"); } set { Element.SetAttribute("Name", value); } }
+        public string Name { get { return Element.getAttribute("Name"); } set { Element.setAttribute("Name", value); } }
         private Point _location;
         public Point Location
         {
@@ -19,8 +19,8 @@ namespace System.Windows.Forms
             {
                 _location = value;
 
-                Element.Style.Left = _location.X + "px";
-                Element.Style.Top = _location.Y + "px";
+                Element.style.left = _location.X + "px";
+                Element.style.top = _location.Y + "px";
 
             }
         }
@@ -30,13 +30,13 @@ namespace System.Windows.Forms
                 _size = value;
                 if(_autoSize)
                 {
-                    Element.Style.Width = "auto";
-                    Element.Style.Height = "auto";
+                    Element.style.width = "auto";
+                    Element.style.height = "auto";
                 }
                 else
                 {
-                    Element.Style.Width = _size.Width + "px";
-                    Element.Style.Height = _size.Height + "px";
+                    Element.style.width = _size.Width + "px";
+                    Element.style.height = _size.Height + "px";
                 }
                 
 
@@ -53,11 +53,11 @@ namespace System.Windows.Forms
                 _tabIndex = value;
                 if(TabStop)
                 {
-                    Element.TabIndex = value;
+                    Element.tabIndex = value;
                 }
                 else
                 {
-                    Element.RemoveAttribute("TabIndex");                    
+                    Element.removeAttribute("TabIndex");                    
                 }                
             } }
         public virtual string Text { get; set; }
@@ -69,7 +69,7 @@ namespace System.Windows.Forms
             set
             {
                 _backColor = value;
-                Element.Style.BackgroundColor = _backColor.ToHtml();
+                Element.style.backgroundColor = _backColor.ToHtml();
             }
         }
 
@@ -103,18 +103,18 @@ namespace System.Windows.Forms
             }
             if(Enabled)
             {
-                if(element.ClassList.Contains("disabled"))
+                if(element.classList.contains("disabled"))
                 {
-                    element.ClassList.Remove("disabled");
-                    element.RemoveAttribute("disabled");
+                    element.classList.remove("disabled");
+                    element.removeAttribute("disabled");
                 }
             }
             else
             {
-                if (!element.ClassList.Contains("disabled"))
+                if (!element.classList.contains("disabled"))
                 {
-                    element.ClassList.Add("disabled");
-                    element.SetAttribute("disabled", "");
+                    element.classList.add("disabled");
+                    element.setAttribute("disabled", "");
                 }
             }
         }
@@ -129,18 +129,18 @@ namespace System.Windows.Forms
             }
             if (ReadOnly)
             {
-                if (!element.ClassList.Contains("readonly"))
+                if (!element.classList.contains("readonly"))
                 {
-                    element.ClassList.Add("readonly");
-                    element.SetAttribute("readonly", "");
+                    element.classList.add("readonly");
+                    element.setAttribute("readonly", "");
                 }
             }
             else
             {
-                if(element.ClassList.Contains("readonly"))
+                if(element.classList.contains("readonly"))
                 {
-                    element.ClassList.Remove("readonly");
-                    element.RemoveAttribute("readonly");
+                    element.classList.remove("readonly");
+                    element.removeAttribute("readonly");
                 }
             }
         }
@@ -158,11 +158,11 @@ namespace System.Windows.Forms
                 _tag = value;
                 if(_tag is string)
                 {
-                    Element.ClassName = (_tag + "");
+                    Element.className = (_tag + "");
                 }
                 else
                 {
-                    Element.ClassName = "";
+                    Element.className = "";
                 }
                 ApplyDisabled();
             }
@@ -189,16 +189,18 @@ namespace System.Windows.Forms
 
             Controls = new ControlCollection(this);
 
-            Element.Style.Position = Position.Absolute;
-            Element.Style.BoxSizing = BoxSizing.BorderBox;
+            Element.style.position = "absolute";
+            Element.style.boxSizing = "borderbox";
 
             TabStop = true;
 
-            Element.OnClick = (ev) =>
+            Element.onclick = new HTMLElement.onclickFn((ev) =>
             {
-                ev.StopPropagation();
+                ev.stopPropagation();
                 OnClick(EventArgs.Empty);
-            };
+                return null;
+            });
+
             _init = true;
         }
 

@@ -1,10 +1,10 @@
-﻿using Bridge.Html5;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
@@ -18,11 +18,11 @@ namespace System.Windows.Forms
         public Form() : base()
         {
             BackColor = SystemColors.Control;
-            Element.Style.BorderTop = "solid " + FormTopBorder + "px" + " " + Color.CornflowerBlue;
-            Element.Style.BorderBottom = "solid " + FormBottonBorder + "px" + " " + Color.CornflowerBlue;
+            Element.style.borderTop = "solid " + FormTopBorder + "px" + " " + Color.CornflowerBlue;
+            Element.style.borderBottom = "solid " + FormBottonBorder + "px" + " " + Color.CornflowerBlue;
 
-            Element.Style.BorderLeft = "solid " + FormLeftBorder + "px" + " " + Color.CornflowerBlue;
-            Element.Style.BorderRight = "solid " + FormRightBorder + "px" + " " + Color.CornflowerBlue;
+            Element.style.borderLeft = "solid " + FormLeftBorder + "px" + " " + Color.CornflowerBlue;
+            Element.style.borderRight = "solid " + FormRightBorder + "px" + " " + Color.CornflowerBlue;
 
             TabStop = false;
         }
@@ -45,10 +45,9 @@ namespace System.Windows.Forms
        
         public void Show()
         {
-            Document.Body.AppendChild(Element);
+            document.body.appendChild(Element);
         }
-
-        
+               
 
         public Size ClientSize { get { return GetClientSize(Size); } set { Size = SetSize(value); } }
         public override string Text { get; set; }

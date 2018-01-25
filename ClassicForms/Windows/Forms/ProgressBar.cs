@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bridge.Html5;
+using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
@@ -13,14 +13,14 @@ namespace System.Windows.Forms
         internal HTMLDivElement progressBar;
         public ProgressBar() : base(new HTMLDivElement())
         {
-            Element.AppendChild(progressBar = new HTMLDivElement());
+            Element.appendChild(progressBar = new HTMLDivElement());
             TabStop = false;
         }
         
         public override Color ForeColor { get { return base.ForeColor; } set {
                 base.ForeColor = value;
                 if(_init)
-                    progressBar.Style.BackgroundColor = value.ToHtml();
+                    progressBar.style.backgroundColor = value.ToHtml();
             } }
 
         private int _value;
@@ -31,7 +31,7 @@ namespace System.Windows.Forms
                     value = 100;
                 _value = value;
                 if(_init)
-                    progressBar.Style.Width = _value + "%";
+                    progressBar.style.width = _value + "%";
             } }
 
         public override object Tag
@@ -45,27 +45,27 @@ namespace System.Windows.Forms
                     var str = (_tag + "");
                     if (str.Contains(","))
                     {
-                        var arry = str.Split(",");
-                        Element.ClassName = arry[0];
+                        var arry = str.Split(',');
+                        Element.className = arry[0];
                         if (arry.Length == 2)
                         {
-                            progressBar.ClassName = arry[1];                            
+                            progressBar.className = arry[1];                            
                         }
                         else
                         {
-                            progressBar.ClassName = "";                            
+                            progressBar.className = "";                            
                         }
                     }
                     else
                     {
-                        Element.ClassName = str;
-                        progressBar.ClassName = "";
+                        Element.className = str;
+                        progressBar.className = "";
                     }
                 }
                 else
                 {
-                    Element.ClassName = "";
-                    progressBar.ClassName = "";
+                    Element.className = "";
+                    progressBar.className = "";
                 }
             }
         }
