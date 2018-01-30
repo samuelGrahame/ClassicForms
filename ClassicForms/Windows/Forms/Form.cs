@@ -27,6 +27,10 @@ namespace System.Windows.Forms
             TabStop = false;
         }
 
+        public override Font Font { get { return base.Font; } set {                
+                base.Font = value;                
+            } }        
+
         public static Size GetClientSize(Size size)
         {
             return new Size(size.Width - (FormLeftBorder + FormRightBorder), size.Height - (FormTopBorder + FormBottonBorder));

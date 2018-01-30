@@ -9,13 +9,13 @@ namespace System.Data
 {
     public class DataRow
     {
-        internal HTMLTableRowElement Element;
+        internal HTMLTableRowElement Element;        
         internal List<object> data;
         public DataColumnCollection Columns { get; }
         internal DataRow(DataColumnCollection columns)
         {
             Columns = columns;
-            data = new List<object>(Columns.Count);
+            data = new List<object>(Columns.Count);            
             Element = new HTMLTableRowElement();
         }
 
@@ -33,24 +33,34 @@ namespace System.Data
             } set {
                 if (columnIndex < 0)
                     return;
+                if (columnIndex > Columns.Count - 1)
+                    return;
 
-                if(columnIndex > Columns.Count - 1)
+                if (columnIndex > data.Count - 1)
                 {
-                    for (int i = Columns.Count - 1; i < columnIndex + 1; i++)
+                    for (int i = data.Count; i < columnIndex + 1; i++)
                     {
-                        if(i == columnIndex)
+                        var dc = new HTMLTableDataCellElement();
+
+                        if (i == columnIndex)
                         {
                             data.Add(value);
+                            dc.innerText = (value + "");
+                            
+                            Element.appendChild(dc);
+
                             return;
                         }
                         else
-                        {
+                        {                            
+                            Element.appendChild(dc);                            
                             data.Add(null);
                         }
                     }
                 }
                 else
                 {
+                    Element.children[columnIndex].As<HTMLElement>().innerText = (value + "");
                     data[columnIndex] = value;
                 }                
             } }       

@@ -15,14 +15,14 @@ namespace System.Windows.Forms
     public class DataGridViewRowCollection : IList<DataRow>, ICollection, IEnumerable
     {
         internal DataGridView _owner;
-        internal HTMLBodyElement body;
+        internal HTMLTableSectionElement body;
 
         public DataGridViewRowCollection(DataGridView owner, HTMLTableElement table)
         {
             _owner = owner;
-            _controls = new List<DataRow>();            
+            _controls = new List<DataRow>();
 
-            body = new HTMLBodyElement();
+            body = table.createTBody();
             table.appendChild(body);
         }
 

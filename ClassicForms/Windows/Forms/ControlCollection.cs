@@ -36,6 +36,8 @@ namespace System.Windows.Forms
         public void Add(Control item)
         {
             _owner.Element.appendChild(item.Element);
+            item._parent = Owner;
+            item.Load();
             _controls.Add(item);
         }
 
@@ -47,7 +49,9 @@ namespace System.Windows.Forms
             for (int i = 0; i < item.Length; i++)
             {
                 frag.appendChild(item[i].Element);
-                _controls.Add(item[i]);
+                item[i]._parent = Owner;
+                item[i].Load();
+                _controls.Add(item[i]);                
             }
             _owner.Element.appendChild(frag);
         }

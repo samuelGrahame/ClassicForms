@@ -25,6 +25,31 @@ namespace System.Windows.Forms
             }
         }
 
+        private bool _visible;
+        public bool Visible { get { return _visible; } set {
+                _visible = value;
+                Element.style.visibility = _visible ? "inherit" : "hidden";                
+            } }
+
+        internal Control _parent;
+
+        public Control Parent { get { return _parent; } }
+
+        public Form GetForm()
+        {
+            if (this.Parent == null)
+                return null;
+
+            if(this.Parent is Form)
+            {
+                return this.Parent.As<Form>();
+            }
+            else
+            {
+                return this.Parent.GetForm();
+            }
+        }
+
         private Size _size;
         public Size Size { get { return _size; } set {
                 _size = value;
@@ -37,9 +62,7 @@ namespace System.Windows.Forms
                 {
                     Element.style.width = _size.Width + "px";
                     Element.style.height = _size.Height + "px";
-                }
-                
-
+                }                
             } }
 
         private bool _tabStop;
@@ -119,6 +142,16 @@ namespace System.Windows.Forms
             }
         }
 
+        internal void Load()
+        {            
+            OnLoad();
+        }
+
+        protected virtual void OnLoad()
+        {
+
+        }
+
         public virtual Color ForeColor { get; set; }
 
         protected void ApplyReadonly(HTMLElement element = null)
@@ -169,7 +202,21 @@ namespace System.Windows.Forms
         }
 
         public ControlCollection Controls { get; }
-        public virtual Font Font { get; set; }
+        private Font _font;
+        public virtual Font Font { get { return _font; } set {
+                _font = value;
+                if(_font == null)
+                {
+                    Element.style.fontSize = "inherit";
+                    Element.style.fontFamily = "inherit";
+                }
+                else
+                {
+                    Element.style.fontSize = _font.EmSize.ToString() + "pt";
+                    Element.style.fontFamily = _font.FamilyName;
+                }
+
+            } }
         private bool _autoSize;
         protected bool _init;
         public virtual bool AutoSize { get { return _autoSize; } set {
@@ -191,6 +238,12 @@ namespace System.Windows.Forms
 
             Element.style.position = "absolute";
             Element.style.boxSizing = "borderbox";
+
+
+            Element.style.fontSize = "inherit";
+            Element.style.fontFamily = "inherit";
+
+            Visible = true;
 
             TabStop = true;
 

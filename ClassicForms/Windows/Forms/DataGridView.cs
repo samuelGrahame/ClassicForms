@@ -13,12 +13,18 @@ namespace System.Windows.Forms
     {
         public DataGridViewColumnHeadersHeightSizeMode ColumnHeadersHeightSizeMode { get; set; }
         public DataGridViewColumnCollection Columns { get; }
+        public DataGridViewRowCollection Rows { get; }
+
         internal HTMLTableElement table;
         public DataGridView() : base(new HTMLDivElement())
         {
             table = new HTMLTableElement();
             Element.appendChild(table);
+
+            Element.style.overflow = "auto";
+
             Columns = new DataGridViewColumnCollection(this, table);
+            Rows = new DataGridViewRowCollection(this, table);
 
             TabStop = false;
         }
@@ -53,7 +59,7 @@ namespace System.Windows.Forms
 
         private void OnNewRowEvent(object sender, NewRowEventArgs args)
         {
-
+            Rows.Add(args.Row);
         }
 
         private object dataSource;

@@ -1,3 +1,47 @@
 ﻿body
 {
 }
+
+button {
+    border: solid 1px rgb(173, 173, 173);
+    background-color: rgb(225, 225, 225);
+}
+
+button:hover:not(.disabled)
+{
+    border: solid 1px rgb(0, 120, 215);
+    background-color: rgb(229, 241, 251);
+}
+ 
+button:active:not(.disabled)
+{
+    border: solid 2px rgb(0, 120, 215);    
+}
+
+button:focus
+{
+    border: solid 2px rgb(0, 120, 215);
+    outline:none;
+}
+
+input {
+    border: solid 1px rgb(122, 122, 122);
+    transition: border 100ms ease;
+    text-indent: 3px;
+}
+
+input:hover:not(.disabled) {
+    border: solid 1px rgb(23, 23, 23);
+    
+}
+
+input:active:not(.disabled) {
+    border: solid 1px rgb(0, 120, 215) !important;
+}
+
+input:focus {
+    border: solid 1px rgb(0, 120, 215) !important;
+    outline: none !important;
+}
+
+
