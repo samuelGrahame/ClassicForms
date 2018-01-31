@@ -86,6 +86,7 @@
     <Content Include="bin\Debug\bridge\index.windows10.html" />
     <Content Include="bin\Debug\bridge\index.bootstrap.html" />
     <Content Include="bin\Debug\bridge\index.html" />
+    <Content Include="bin\Debug\bridge\preview.windows.html" />
     <Content Include="bin\Debug\bridge\preview.bootstrap.html" />
     <Content Include="bin\Debug\bridge\System.js" />
     <Content Include="bin\Debug\bridge\System.meta.js" />
