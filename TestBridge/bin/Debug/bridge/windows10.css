@@ -12,10 +12,10 @@ button:hover:not(.disabled)
     border: solid 1px rgb(0, 120, 215);
     background-color: rgb(229, 241, 251);
 }
- 
-button:active:not(.disabled)
-{
-    border: solid 2px rgb(0, 120, 215);    
+
+button:active:not(.disabled) {
+    border: solid 1px rgb(0, 84, 153);
+    background-color: rgb(204, 228, 247);
 }
 
 button:focus
@@ -43,5 +43,51 @@ input:focus {
     border: solid 1px rgb(0, 120, 215) !important;
     outline: none !important;
 }
+
+input[type=checkbox] {
+    -webkit-appearance: none;
+    border: solid 1px rgb(51, 51, 51) !important;
+    width: 13px;
+    height: 13px;
+    vertical-align: middle
+}
+
+input[type=checkbox] + label {    
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select : none;
+    user-select: none;
+}
+
+input[type=checkbox]:checked {
+    -webkit-appearance: none;
+    background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAIAAAAmzuBxAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABSSURBVChTpY/JDcAwCMAYj11YkHkYgm/qiiqqBFUe9SvEVg5ZJ34UEaGq7j4Xpc0sM4firRmFc5jZHTUIK+aKuob7lh11Dc87KuoaPn+7ORVrXbo/Qb5jc9mpAAAAAElFTkSuQmCC') repeat 0 0;
+}
+
+input[type=checkbox]:hover:not(.disabled) {
+    -webkit-appearance: none;
+    border: solid 1px rgb(0, 120, 215) !important;
+}
+
+input[type=checkbox]:active:not(.disabled) {
+    -webkit-appearance: none;
+    border: solid 1px rgb(0, 84, 153) !important;
+    background-color: rgb(204, 228, 247) !important;
+}
+
+input[type=checkbox]:hover:checked:not(.disabled) {
+    -webkit-appearance: none;
+    border: solid 1px rgb(0, 84, 153) !important;
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAIAAAAmzuBxAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABjSURBVChTY/hPCOBTsefyByCJU0XbpmcMFdfvv/yBXQVEGmoGUBUQQSQgAFkaCBjKVz5RbroJV4QmDQQMX3/8DZ52H6IIUxoIQO6AKALKYUoDAdSlEEWY0kCALzwggJCK//8Ba5NNFryLmiMAAAAASUVORK5CYII=') !important;
+}
+
+input[type=checkbox]:active:checked:not(.disabled) {
+    -webkit-appearance: none;
+    border: solid 1px rgb(0, 84, 153) !important;
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAIAAAAmzuBxAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACESURBVChTYzzz5DsDXsAEpbGBU5ceAEmcKuZtOJE179CzVx+wqwBKTztwa1qSnZSYABNQFRBBZcAALm2mpwDkMrMou03act5BR4aXmwNTGgiY0oMt1cX40iftAJqEKQ0EIN/++Pm7ZubuA/feAPlo0kAADQ+IojAHLTRpIKAsxECAgQEAU81I4YV4nf4AAAAASUVORK5CYII=') !important;
+}
+
+
+
 
 
