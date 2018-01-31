@@ -42,6 +42,10 @@ input:focus {
     outline: none !important;
 }
 
+input[readonly]:not(:disabled) {
+    background-color: rgb(240, 240, 240) !important;
+}
+
 input[type=checkbox] {
     -webkit-appearance: none;
     border: 1px solid rgb(51, 51, 51) !important;
@@ -160,8 +164,17 @@ div[scope="progress"] div {
     transition: width 110ms ease;
 }
 
+
+select::-ms-expand {
+    display: none;
+}
+
 select {
-    -webkit-appearance: textfield;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    text-indent: 0.01px;
+    text-overflow: '';
     border: 1px solid rgb(122, 122, 122);
     transition: border 100ms ease;
     text-indent: 3px;

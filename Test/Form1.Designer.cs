@@ -45,6 +45,8 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
@@ -52,14 +54,12 @@
             this.label3 = new System.Windows.Forms.Label();
             this.button9 = new System.Windows.Forms.Button();
             this.button10 = new System.Windows.Forms.Button();
-            this.comboBoxResize1 = new System.ComboBoxResize();
-            this.textBoxResize1 = new System.TextBoxResize();
             this.button11 = new System.Windows.Forms.Button();
             this.button12 = new System.Windows.Forms.Button();
             this.button13 = new System.Windows.Forms.Button();
             this.button14 = new System.Windows.Forms.Button();
-            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.comboBoxResize1 = new System.ComboBoxResize();
+            this.textBoxResize1 = new System.TextBoxResize();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -237,6 +237,7 @@
             this.textBox2.Size = new System.Drawing.Size(148, 29);
             this.textBox2.TabIndex = 13;
             this.textBox2.Tag = "form-control";
+            this.textBox2.Text = "this is readonly";
             // 
             // label2
             // 
@@ -259,6 +260,18 @@
             this.dataGridView1.Size = new System.Drawing.Size(656, 161);
             this.dataGridView1.TabIndex = 17;
             this.dataGridView1.Tag = "card,table,thead-dark";
+            // 
+            // Column1
+            // 
+            this.Column1.DataPropertyName = "Column1";
+            this.Column1.HeaderText = "Column1";
+            this.Column1.Name = "Column1";
+            // 
+            // Column2
+            // 
+            this.Column2.DataPropertyName = "Column2";
+            this.Column2.HeaderText = "Column2";
+            this.Column2.Name = "Column2";
             // 
             // progressBar1
             // 
@@ -336,31 +349,6 @@
             this.button10.UseVisualStyleBackColor = true;
             this.button10.Click += new System.EventHandler(this.button10_Click);
             // 
-            // comboBoxResize1
-            // 
-            this.comboBoxResize1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.comboBoxResize1.FormattingEnabled = true;
-            this.comboBoxResize1.ItemHeight = 43;
-            this.comboBoxResize1.Items.AddRange(new object[] {
-            "Not Applicable",
-            "Manufacturer\'s Warranty",
-            "House Warranty",
-            "Extended Warranty"});
-            this.comboBoxResize1.Location = new System.Drawing.Point(677, 14);
-            this.comboBoxResize1.MinimumSize = new System.Drawing.Size(339, 0);
-            this.comboBoxResize1.Name = "comboBoxResize1";
-            this.comboBoxResize1.Size = new System.Drawing.Size(339, 49);
-            this.comboBoxResize1.TabIndex = 16;
-            this.comboBoxResize1.Tag = "form-control";
-            // 
-            // textBoxResize1
-            // 
-            this.textBoxResize1.Location = new System.Drawing.Point(410, 61);
-            this.textBoxResize1.Name = "textBoxResize1";
-            this.textBoxResize1.Size = new System.Drawing.Size(162, 48);
-            this.textBoxResize1.TabIndex = 15;
-            this.textBoxResize1.Tag = "form-control";
-            // 
             // button11
             // 
             this.button11.Location = new System.Drawing.Point(561, 315);
@@ -409,17 +397,30 @@
             this.button14.UseVisualStyleBackColor = true;
             this.button14.Click += new System.EventHandler(this.button14_Click);
             // 
-            // Column1
+            // comboBoxResize1
             // 
-            this.Column1.DataPropertyName = "Column1";
-            this.Column1.HeaderText = "Column1";
-            this.Column1.Name = "Column1";
+            this.comboBoxResize1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.comboBoxResize1.FormattingEnabled = true;
+            this.comboBoxResize1.ItemHeight = 43;
+            this.comboBoxResize1.Items.AddRange(new object[] {
+            "Not Applicable",
+            "Manufacturer\'s Warranty",
+            "House Warranty",
+            "Extended Warranty"});
+            this.comboBoxResize1.Location = new System.Drawing.Point(677, 14);
+            this.comboBoxResize1.MinimumSize = new System.Drawing.Size(339, 0);
+            this.comboBoxResize1.Name = "comboBoxResize1";
+            this.comboBoxResize1.Size = new System.Drawing.Size(339, 49);
+            this.comboBoxResize1.TabIndex = 16;
+            this.comboBoxResize1.Tag = "form-control";
             // 
-            // Column2
+            // textBoxResize1
             // 
-            this.Column2.DataPropertyName = "Column2";
-            this.Column2.HeaderText = "Column2";
-            this.Column2.Name = "Column2";
+            this.textBoxResize1.Location = new System.Drawing.Point(410, 61);
+            this.textBoxResize1.Name = "textBoxResize1";
+            this.textBoxResize1.Size = new System.Drawing.Size(162, 48);
+            this.textBoxResize1.TabIndex = 15;
+            this.textBoxResize1.Tag = "form-control";
             // 
             // Form1
             // 
