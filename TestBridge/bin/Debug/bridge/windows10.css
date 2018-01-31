@@ -1,5 +1,5 @@
-﻿body
-{
+﻿* {
+    font: 8.25pt "Microsoft Sans Serif";
 }
 
 button {
@@ -104,8 +104,10 @@ th {
     border-bottom: solid 1px rgb(160, 160, 160) !important;
     border-top: solid 1px rgb(160, 160, 160) !important;
     font-weight: normal;
-    padding-left: 3px;
-    padding-right: 3px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 th:hover:not(.disabled)
