@@ -27,6 +27,8 @@ namespace System.Windows.Forms
             Rows = new DataGridViewRowCollection(this, table);
 
             TabStop = false;
+
+            Element.setAttribute("scope", "table");
         }
 
         public void BeginInit()
@@ -47,13 +49,42 @@ namespace System.Windows.Forms
                 _tag = value;
                 if (_tag is string)
                 {
-                    table.className = (_tag + "");
+                    var str = (_tag + "");
+                    if (str.Contains(","))
+                    {
+                        var arry = str.Split(',');
+                        Element.className = arry[0];
+                        if (arry.Length >= 2)
+                        {
+                            table.className = arry[1];
+                            if (arry.Length >= 3)
+                            {
+                                Columns.header.className = arry[2];
+                            }
+                            else
+                            {
+                                Columns.header.className = "";
+                            }
+                        }
+                        else
+                        {
+                            table.className = "";
+                            Columns.header.className = "";
+                        }
+                    }
+                    else
+                    {
+                        Element.className = str;
+                        table.className = "";
+                        Columns.header.className = "";
+                    }
                 }
                 else
                 {
                     table.className = "";
+                    Element.className = "";
+                    Columns.header.className = "";
                 }
-                ApplyDisabled(table);
             }
         }
 

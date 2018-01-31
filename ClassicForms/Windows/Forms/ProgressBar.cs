@@ -15,6 +15,7 @@ namespace System.Windows.Forms
         {
             Element.appendChild(progressBar = new HTMLDivElement());
             TabStop = false;
+            Element.setAttribute("scope", "progress");            
         }
         
         public override Color ForeColor { get { return base.ForeColor; } set {

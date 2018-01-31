@@ -91,5 +91,25 @@ namespace Test
             dt.AcceptChanges();
 
         }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            dataGridView1.Tag = "card,table table-dark";
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            dataGridView1.Tag = "card,table";
+        }
+
+        private void button13_Click(object sender, EventArgs e)
+        {
+            dataGridView1.Tag = "card,table table-striped";
+        }
+
+        private void button14_Click(object sender, EventArgs e)
+        {
+            dataGridView1.Tag = "card,table table-striped table-dark";
+        }
     }
 }
