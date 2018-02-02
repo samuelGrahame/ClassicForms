@@ -239,6 +239,8 @@ namespace System.Windows.Forms
             Element.style.position = "absolute";
             Element.style.boxSizing = "borderbox";
 
+            Element.style.padding = "0";
+
 
             Element.style.fontSize = "inherit";
             Element.style.fontFamily = "inherit";

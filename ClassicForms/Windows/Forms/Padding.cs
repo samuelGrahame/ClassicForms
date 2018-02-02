@@ -13,5 +13,10 @@ namespace System.Windows.Forms
         {
             Left = left; Top = top; Right = right; Bottom = bottom;
         }
+
+        public Padding(int all)
+        {
+            Left = all; Top = all; Right = all; Bottom = all;
+        }
     }
 }

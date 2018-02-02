@@ -110,6 +110,6 @@ namespace Test
         private void button14_Click(object sender, EventArgs e)
         {
             dataGridView1.Tag = "card,table table-striped table-dark";
-        }
+        }        
     }
 }
