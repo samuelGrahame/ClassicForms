@@ -9,13 +9,18 @@ namespace System.Windows.Forms
 {
     public class GroupBox : Control
     {
-        private HTMLDivElement legend;
+        private HTMLLegendElement legend;
         private Panel panel;
-        public GroupBox() : base(new HTMLDivElement())
+        public GroupBox() : base(new HTMLFieldSetElement())
         {
             panel = new Panel();
 
-            Element.appendChild(legend = new HTMLDivElement());
+            Element.setAttribute("scope", "groupbox");
+
+            Element.appendChild(legend = new HTMLLegendElement());
+
+            legend.setAttribute("scope", "groupboxlegend");
+
             Element.appendChild(panel.Element);
             panel.Element.style.position = "relative";
             Controls._owner = panel;

@@ -328,3 +328,12 @@ select:focus {
     background-repeat: no-repeat, repeat-y;
     background-position: right -1px center, right center;
 }
+
+fieldset[scope=groupbox] {
+    border: 1px solid rgb(220, 220, 220);
+    margin: 0 !important;
+}
+
+legend[scope=groupboxlegend] {    
+    margin-left: 8px;
+}
