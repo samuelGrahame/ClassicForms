@@ -27,7 +27,9 @@
   "reflection": {
     "disabled": false
   },
-
+  //"logging": {
+  //  "level": "Trace"
+  //},
   // Generate TypeScript Definition (.d.ts) files.
   // Default is false.
   "generateTypeScript": false,

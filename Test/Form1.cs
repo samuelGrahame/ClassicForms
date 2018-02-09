@@ -114,16 +114,18 @@ namespace Test
             dataGridView1.Tag = "card,table table-striped table-dark";
         }
 
-        [ServerSide]
-        private void button9_Click(object sender, EventArgs e)
+        private void serverButton1_Sending(object sender, SeverSendingEventArgs e)
         {
-            var arg = e as ServerEventArgs;
+            e.Data = "this is a test";
+            e.ContentType = "text/plain";            
+        }
 
-            if(arg != null)
+        private void serverButton1_Sent(object sender, ServerSentEventArgs e)
+        {
+            if(e.ex != null)
             {
-                var result = arg.Result;
-            }
 
+            }
         }
     }
 }

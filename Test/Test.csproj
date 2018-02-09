@@ -42,11 +42,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ClassicForms\ServerEventArgs.cs">
-      <Link>ServerEventArgs.cs</Link>
+    <Compile Include="..\ClassicForms\ServerButton.cs">
+      <Link>ServerButton.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\ClassicForms\ServerSentEventArgs.cs">
+      <Link>ServerSentEventArgs.cs</Link>
     </Compile>
     <Compile Include="..\ClassicForms\ServerSideAttribute.cs">
       <Link>ServerSideAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\ClassicForms\SeverEventDelegates.cs">
+      <Link>SeverEventDelegates.cs</Link>
+    </Compile>
+    <Compile Include="..\ClassicForms\SeverSendingEventArgs.cs">
+      <Link>SeverSendingEventArgs.cs</Link>
     </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Retyped.dom;
-
+using static Retyped.jquery;
 namespace System.Windows.Forms
 {
     public class TextBox : Control
     {        
         public TextBox() : base(new HTMLInputElement() { type = "text" })
         {
-
+            
         }
-
+        
         public override string Text { get { return Element.As<HTMLInputElement>().value; } set
             {
                 base.Text = value;

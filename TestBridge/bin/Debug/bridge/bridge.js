@@ -1,5 +1,5 @@
 /**
- * @version   : 16.7.0 - Bridge.NET
+ * @version   : 16.7.1 - Bridge.NET
  * @author    : Object.NET, Inc. http://bridge.net/
  * @copyright : Copyright 2008-2018 Object.NET, Inc. http://object.net/
  * @license   : See license.txt and https://github.com/bridgedotnet/Bridge/blob/master/LICENSE.md
@@ -72,6 +72,10 @@
                     return this.fn.getHashCode ? this.fn.getHashCode(this.v) : Bridge.getHashCode(this.v);
                 },
                 equals: function (o) {
+                    if (this === o) {
+                        return true;
+                    }
+
                     var eq = this.equals;
                     this.equals = null;
                     var r = Bridge.equals(this.v, o);
@@ -3191,8 +3195,8 @@
     // @source systemAssemblyVersion.js
 
     Bridge.init(function () {
-        Bridge.SystemAssembly.version = "16.7.0";
-        Bridge.SystemAssembly.compiler = "16.7.0";
+        Bridge.SystemAssembly.version = "16.7.1";
+        Bridge.SystemAssembly.compiler = "16.7.1";
     });
 
     Bridge.define("Bridge.Utils.SystemAssemblyVersion");
@@ -10902,9 +10906,9 @@ Bridge.Class.addExtend(System.Boolean, [System.IComparable$1(System.Boolean), Sy
             }
 
             arr.length = length;
-
+            var isFn = Bridge.isFunction(defvalue);
             for (var k = 0; k < length; k++) {
-                arr[k] = defvalue;
+                arr[k] = isFn ? defvalue() : defvalue;
             }
 
             if (initValues) {
@@ -11487,7 +11491,7 @@ Bridge.Class.addExtend(System.Boolean, [System.IComparable$1(System.Boolean), Sy
                 i = lo + ((hi - lo) >> 1);
 
                 try {
-                    c = comparer.compare(array[i], value);
+                    c = System.Collections.Generic.Comparer$1.get(comparer)(array[i], value);
                 } catch (e) {
                     throw new System.InvalidOperationException("Failed to compare two elements in the array.", e);
                 }
@@ -11534,11 +11538,11 @@ Bridge.Class.addExtend(System.Boolean, [System.IComparable$1(System.Boolean), Sy
             }
 
             if (index === 0 && length === array.length) {
-                array.sort(Bridge.fn.bind(comparer, comparer.compare));
+                array.sort(Bridge.fn.bind(comparer, System.Collections.Generic.Comparer$1.get(comparer)));
             } else {
                 var newarray = array.slice(index, index + length);
 
-                newarray.sort(Bridge.fn.bind(comparer, comparer.compare));
+                newarray.sort(Bridge.fn.bind(comparer, System.Collections.Generic.Comparer$1.get(comparer)));
 
                 for (var i = index; i < (index + length) ; i++) {
                     array[i] = newarray[i - index];
@@ -12388,6 +12392,19 @@ Bridge.Class.addExtend(System.Boolean, [System.IComparable$1(System.Boolean), Sy
 
         return Bridge.compare(x, y);
     });
+
+    System.Collections.Generic.Comparer$1.get = function (obj, T) {
+        var m;
+        if (T && (m = obj["System$Collections$Generic$IComparer$1$" + Bridge.getTypeAlias(T) + "$compare"])) {
+            return m;
+        }
+
+        if (m = obj["System$Collections$Generic$IComparer$1$compare"]) {
+            return m;
+        }
+
+        return obj.compare;
+    };
 
     // @source Dictionary.js
 
@@ -15914,7 +15931,8 @@ Bridge.Class.addExtend(System.String, [System.IComparable$1(System.String), Syst
         },
 
         toChar: function (value, formatProvider, valueTypeCode) {
-            var typeCodes = scope.convert.typeCodes;
+            var typeCodes = scope.convert.typeCodes,
+                isChar = Bridge.is(value, System.Char);
 
             value = Bridge.unbox(value, true);
 
@@ -15934,7 +15952,7 @@ Bridge.Class.addExtend(System.String, [System.IComparable$1(System.String), Syst
                 type = "string";
             }
 
-            if (valueTypeCode !== typeCodes.Object) {
+            if (valueTypeCode !== typeCodes.Object || isChar) {
                 switch (type) {
                     case "boolean":
                         scope.internal.throwInvalidCastEx(typeCodes.Boolean, typeCodes.Char);

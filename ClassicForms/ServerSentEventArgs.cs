@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClassicForms
 {
-    public class ServerEventArgs : EventArgs
+    public class ServerSentEventArgs : EventArgs
     {
         public Exception ex;
         public object Result;

@@ -57,7 +57,7 @@
             this.button12 = new System.Windows.Forms.Button();
             this.button13 = new System.Windows.Forms.Button();
             this.button14 = new System.Windows.Forms.Button();
-            this.button9 = new System.Windows.Forms.Button();
+            this.serverButton1 = new ClassicForms.ServerButton();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -358,16 +358,16 @@
             this.button14.UseVisualStyleBackColor = true;
             this.button14.Click += new System.EventHandler(this.button14_Click);
             // 
-            // button9
+            // serverButton1
             // 
-            this.button9.Location = new System.Drawing.Point(629, 353);
-            this.button9.Name = "button9";
-            this.button9.Size = new System.Drawing.Size(103, 30);
-            this.button9.TabIndex = 29;
-            this.button9.Tag = "btn btn-primary";
-            this.button9.Text = "Server Side Test";
-            this.button9.UseVisualStyleBackColor = true;
-            this.button9.Click += new System.EventHandler(this.button9_Click);
+            this.serverButton1.Location = new System.Drawing.Point(642, 350);
+            this.serverButton1.Name = "serverButton1";
+            this.serverButton1.Size = new System.Drawing.Size(90, 26);
+            this.serverButton1.TabIndex = 29;
+            this.serverButton1.Text = "Ajax Call";
+            this.serverButton1.UseVisualStyleBackColor = true;
+            this.serverButton1.Sending += new ClassicForms.SeverSendingEventHandler(this.serverButton1_Sending);
+            this.serverButton1.Sent += new ClassicForms.SeverSentEventHandler(this.serverButton1_Sent);
             // 
             // Form1
             // 
@@ -375,7 +375,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(745, 388);
-            this.Controls.Add(this.button9);
+            this.Controls.Add(this.serverButton1);
             this.Controls.Add(this.button14);
             this.Controls.Add(this.button13);
             this.Controls.Add(this.button12);
@@ -442,6 +442,6 @@
         private System.Windows.Forms.Button button14;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
-        private System.Windows.Forms.Button button9;
+        private ClassicForms.ServerButton serverButton1;
     }
 }
