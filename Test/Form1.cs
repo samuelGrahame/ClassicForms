@@ -1,4 +1,6 @@
-﻿#if !BRIDGE
+﻿using ClassicForms;
+
+#if !BRIDGE
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -110,6 +112,18 @@ namespace Test
         private void button14_Click(object sender, EventArgs e)
         {
             dataGridView1.Tag = "card,table table-striped table-dark";
-        }        
+        }
+
+        [ServerSide]
+        private void button9_Click(object sender, EventArgs e)
+        {
+            var arg = e as ServerEventArgs;
+
+            if(arg != null)
+            {
+                var result = arg.Result;
+            }
+
+        }
     }
 }
