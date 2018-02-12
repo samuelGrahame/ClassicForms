@@ -7,8 +7,8 @@
     <ProjectGuid>{61E272B6-A81D-4184-8E9F-D6159643FEBF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClassicFroms</RootNamespace>
-    <AssemblyName>ClassicFroms</AssemblyName>
+    <RootNamespace>ClassicForms</RootNamespace>
+    <AssemblyName>ClassicForms</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBridge", "TestBridge\TestBridge.csproj", "{9C228AB6-D9C3-4AD9-B2F5-2F71CB3EFB56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassicFromsWin", "ClassicFromsWin\ClassicFromsWin.csproj", "{61E272B6-A81D-4184-8E9F-D6159643FEBF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassicFormsWin", "ClassicFromsWin\ClassicFormsWin.csproj", "{61E272B6-A81D-4184-8E9F-D6159643FEBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
