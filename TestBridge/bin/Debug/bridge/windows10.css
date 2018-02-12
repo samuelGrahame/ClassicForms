@@ -1,5 +1,6 @@
 ﻿* {
     font: 8.25pt "Microsoft Sans Serif";
+    box-sizing: border-box;
 }
 
 *::-webkit-scrollbar {
@@ -146,7 +147,7 @@ button:focus {
 input {
     border: 1px solid rgb(122, 122, 122);
     transition: border 100ms ease;
-    text-indent: 3px;
+    text-indent: 3px;    
 }
 
 input:hover:not(.disabled) {
@@ -336,4 +337,8 @@ fieldset[scope=groupbox] {
 
 legend[scope=groupboxlegend] {    
     margin-left: 8px;
+}
+
+span[scope=label] {
+    margin: 0 3px 0 3px;
 }

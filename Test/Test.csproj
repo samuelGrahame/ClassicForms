@@ -55,5 +55,11 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClassicFormsWin\ClassicFormsWin.csproj">
+      <Project>{61e272b6-a81d-4184-8e9f-d6159643febf}</Project>
+      <Name>ClassicFormsWin</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
