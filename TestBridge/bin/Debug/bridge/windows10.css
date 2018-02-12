@@ -345,4 +345,8 @@ span[scope=label] {
 
 div[scope=form] {
     background-color: rgb(240, 240, 240);
+    border-top: solid 27px rgb(0, 120, 215);
+    border-left: solid 1px rgb(0, 120, 215);
+    border-right: solid 1px rgb(0, 120, 215);
+    border-bottom: solid 1px rgb(0, 120, 215);
 }

@@ -18,13 +18,7 @@ namespace System.Windows.Forms
         public Form() : base()
         {            
             Element.setAttribute("scope", "form");
-
-            Element.style.borderTop = "solid " + FormTopBorder + "px" + " " + Color.CornflowerBlue;
-            Element.style.borderBottom = "solid " + FormBottonBorder + "px" + " " + Color.CornflowerBlue;
-
-            Element.style.borderLeft = "solid " + FormLeftBorder + "px" + " " + Color.CornflowerBlue;
-            Element.style.borderRight = "solid " + FormRightBorder + "px" + " " + Color.CornflowerBlue;
-
+            
             TabStop = false;
         }
 

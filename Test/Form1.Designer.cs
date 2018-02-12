@@ -403,6 +403,7 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.button1);
             this.Name = "Form1";
+            this.Tag = "modal-content";
             this.Text = "Form";
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
