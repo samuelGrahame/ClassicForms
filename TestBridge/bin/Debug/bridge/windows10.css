@@ -342,3 +342,7 @@ legend[scope=groupboxlegend] {
 span[scope=label] {
     margin: 0 3px 0 3px;
 }
+
+div[scope=form] {
+    background-color: rgb(240, 240, 240);
+}

@@ -16,8 +16,9 @@ namespace System.Windows.Forms
         private static int FormRightBorder = 6;
 
         public Form() : base()
-        {
-            BackColor = SystemColors.Control;
+        {            
+            Element.setAttribute("scope", "form");
+
             Element.style.borderTop = "solid " + FormTopBorder + "px" + " " + Color.CornflowerBlue;
             Element.style.borderBottom = "solid " + FormBottonBorder + "px" + " " + Color.CornflowerBlue;
 

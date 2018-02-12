@@ -30,7 +30,7 @@ namespace System.Drawing
             new Color(KnownColor.ButtonShadow);
 
         public static Color Control =>
-            new Color(KnownColor.Control);
+            Color.FromArgb(240, 240, 240);
 
         public static Color ControlDark =>
             new Color(KnownColor.ControlDark);
