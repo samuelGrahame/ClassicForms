@@ -35,7 +35,7 @@
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ServerButtonDespatch.cs" />
+    <Compile Include="ServerHelper.cs" />
     <Compile Include="SeverEventDelegates.cs" />
     <Compile Include="SeverSendingEventArgs.cs" />
     <Compile Include="ServerSideAttribute.cs" />

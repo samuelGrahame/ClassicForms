@@ -7,13 +7,27 @@ using static Retyped.jquery;
 
 namespace ClassicForms
 {
-    public static class ServerButtonHelper
-    {
+    public static class ServerHelper
+    {        
+        public static string ContentType;
+        public static string DataType;
+
+        public static string Password;
+        public static string Username;
+        public static string Url;
+        public static string Method;
+
         public static bool OnClickServer(ServerButton button)
         {
             if (!button.IsSendingEventNull())
             {
                 var evArgs = new SeverSendingEventArgs();
+                evArgs.Url = Url;
+                evArgs.ContentType = ContentType;
+                evArgs.DataType = DataType;
+                evArgs.Password = Username;
+                evArgs.Method = Method;
+
                 button.RaiseSendingEvent(evArgs); // maybe get defaults..
                 
                 if (evArgs == null || evArgs.Cancel)
@@ -31,6 +45,7 @@ namespace ClassicForms
                             dataType = evArgs.DataType,
                             username = evArgs.Username,
                             password = evArgs.Password,
+                            url = evArgs.Url,
                             method = string.IsNullOrWhiteSpace(evArgs.Method) ? "POST" : evArgs.Method,
                             success = new JQueryAjaxSettings.successFn((o, str, jq) =>
                             {

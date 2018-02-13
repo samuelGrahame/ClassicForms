@@ -15,7 +15,7 @@ namespace ClassicForms
         protected override void OnClick(EventArgs e)
         {
 #if BRIDGE            
-            if (!ServerButtonHelper.OnClickServer(this))
+            if (!ServerHelper.OnClickServer(this))
                 base.OnClick(e);
 #endif
         }
