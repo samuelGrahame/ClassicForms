@@ -18,7 +18,8 @@ namespace System.Windows.Forms
         public Form() : base()
         {            
             Element.setAttribute("scope", "form");
-            
+
+
             TabStop = false;
         }
 

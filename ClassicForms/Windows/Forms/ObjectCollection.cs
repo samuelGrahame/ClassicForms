@@ -22,7 +22,15 @@ namespace System.Windows.Forms
         }
 
         public Control Owner { get { return _owner; } }
+        public bool IsSynchronized { get { return false; } }
 
+        public object SyncRoot
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
         private List<object> _controls;
 
         public object this[int index]

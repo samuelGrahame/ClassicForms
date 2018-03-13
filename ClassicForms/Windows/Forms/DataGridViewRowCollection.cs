@@ -37,7 +37,15 @@ namespace System.Windows.Forms
         public int Count { get { return _controls.Count;  } }
 
         public bool IsReadOnly { get { return false; } }
+        public bool IsSynchronized { get { return false; } }
 
+        public object SyncRoot
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
         public void Add(DataRow item)
         {
             body.appendChild(item.Element);

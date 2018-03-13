@@ -231,8 +231,8 @@ namespace System.Windows.Forms
             } }
 
         internal HTMLElement Element;
-
-        protected Control(HTMLElement element)
+        
+        internal Control(HTMLElement element)
         {            
             Element = element;
 

@@ -17,5 +17,10 @@ namespace System.Windows.Forms
         {
 
         }
+
+        public ContainerControl(HTMLElement element) : base(element)
+        {
+
+        }
     }
 }

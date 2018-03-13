@@ -28,7 +28,15 @@ namespace System.Windows.Forms
         public DataGridView Owner { get { return _owner; } }
 
         private List<DataGridViewColumn> _controls;
+        public bool IsSynchronized { get { return false; } }
 
+        public object SyncRoot
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
         public DataGridViewColumn this[int index] { get { return _controls[index];  } set {
                 _controls[index] = value;
             } }
