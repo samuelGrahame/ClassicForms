@@ -77,6 +77,8 @@
     <Compile Include="Windows\Forms\LinkLabel.cs" />
     <Compile Include="Windows\Forms\LinkLabelLinkClickedEventHandler.cs" />
     <Compile Include="Windows\Forms\MouseButtons.cs" />
+    <Compile Include="Windows\Forms\MouseEventArgs.cs" />
+    <Compile Include="Windows\Forms\MouseEventHandler.cs" />
     <Compile Include="Windows\Forms\NewRowEventArgs.cs" />
     <Compile Include="Windows\Forms\NewRowEventHandler.cs" />
     <Compile Include="Windows\Forms\ObjectCollection.cs" />

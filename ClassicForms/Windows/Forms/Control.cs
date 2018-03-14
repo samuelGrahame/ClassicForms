@@ -231,6 +231,35 @@ namespace System.Windows.Forms
             } }
 
         internal HTMLElement Element;
+        internal static Control ClickedOnControl;
+
+        static Control()
+        {
+            window.onmousemove = new Window.onmousemoveFn((ev) =>
+            {
+                if (ClickedOnControl != null)
+                {
+                    ev.stopPropagation();
+
+                    ClickedOnControl.OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev));
+                }
+                return null;
+            });
+
+            window.onmouseup = new Window.onmouseupFn((ev) =>
+            {
+                if (ClickedOnControl != null)
+                {
+                    ev.stopPropagation();
+
+                    ClickedOnControl.OnMouseUp(MouseEventArgs.CreateFromMouseEvent(ev));
+
+                    ClickedOnControl = null;
+                }
+                return null;
+            });
+
+        }
         
         internal Control(HTMLElement element)
         {            
@@ -253,8 +282,36 @@ namespace System.Windows.Forms
 
             Element.onclick = new HTMLElement.onclickFn((ev) =>
             {
-                ev.stopPropagation();
                 OnClick(EventArgs.Empty);
+                return null;
+            });
+
+            Element.onmousedown = new HTMLElement.onmousedownFn((ev) => {
+                ClickedOnControl = this;
+                ev.stopPropagation();
+
+                OnMouseDown(MouseEventArgs.CreateFromMouseEvent(ev));
+                
+                return null;
+            });
+
+            Element.onmousemove = new HTMLElement.onmousemoveFn((ev) => {
+                if(ClickedOnControl == null)
+                {
+                    ev.stopPropagation();
+
+                    OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev));
+                }
+
+                return null;
+            });
+
+            Element.onmouseup = new HTMLElement.onmouseupFn((ev) => {
+                ev.stopPropagation();
+
+                OnMouseUp(MouseEventArgs.CreateFromMouseEvent(ev));
+                ClickedOnControl = null;
+
                 return null;
             });
 
@@ -267,10 +324,31 @@ namespace System.Windows.Forms
                 Click(this, e);
         }
 
+        protected virtual void OnMouseDown(MouseEventArgs e)
+        {
+            if (MouseDown != null)
+                MouseDown(this, e);
+        }
+
+        protected virtual void OnMouseMove(MouseEventArgs e)
+        {
+            if (MouseMove != null)
+                MouseMove(this, e);
+        }
+
+        protected virtual void OnMouseUp(MouseEventArgs e)
+        {
+            if (MouseUp != null)
+                MouseUp(this, e);
+        }
+
         public Padding Margin { get; set; }
         public Padding Padding { get; set; }
 
         public event EventHandler Click;
+        public event MouseEventHandler MouseDown;
+        public event MouseEventHandler MouseMove;
+        public event MouseEventHandler MouseUp;
 
         public void SuspendLayout()
         {

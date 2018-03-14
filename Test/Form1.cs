@@ -127,5 +127,31 @@ namespace Test
 
             }
         }
+        public bool _isMouseDown = false;
+        public Point point;
+        public Point location;
+
+        private void Form1_MouseDown(object sender, MouseEventArgs e)
+        {
+            point = e.Location;
+            location = this.Location;
+
+            _isMouseDown = true;
+        }
+
+        private void Form1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if(_isMouseDown)
+            {
+                this.Location = new Point(location.X + (e.Location.X - point.X), location.Y + (e.Location.Y - point.Y));
+                point = e.Location;
+                location = this.Location;
+            }
+        }
+
+        private void Form1_MouseUp(object sender, MouseEventArgs e)
+        {
+            _isMouseDown = false;
+        }
     }
 }

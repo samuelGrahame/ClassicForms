@@ -14,12 +14,11 @@ namespace System.Windows.Forms
         private static int FormBottonBorder = 6;
         private static int FormLeftBorder = 6;
         private static int FormRightBorder = 6;
-
+        
         public Form() : base()
         {            
             Element.setAttribute("scope", "form");
-
-
+            
             TabStop = false;
         }
 
