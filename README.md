@@ -27,7 +27,9 @@ https://rawgit.com/samuelGrahame/ClassicForms/master/TestBridge/bin/Debug/bridge
 here is an example of what the designer code looks like.
 as you can see. it supports Visual Studio's Windows Forms Code for the Designer.
 
-`using ClassicForms;
+
+`
+using ClassicForms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +41,7 @@ namespace Test
     public class frmCustomer : CrudForm
     {
         private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label1;        
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label label3;
@@ -53,7 +55,7 @@ namespace Test
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox textBox3;     
 
         public frmCustomer() : base()
         {            
