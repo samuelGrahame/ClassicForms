@@ -26,8 +26,8 @@ https://rawgit.com/samuelGrahame/ClassicForms/master/TestBridge/bin/Debug/bridge
 
 here is an example of what the designer code looks like.
 as you can see. it supports Visual Studio's Windows Forms Code for the Designer.
-`
-using ClassicForms;
+
+`using ClassicForms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -313,6 +313,5 @@ namespace Test
         }
     }
 }
-
 `
 
