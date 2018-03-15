@@ -28,7 +28,7 @@ here is an example of what the designer code looks like.
 as you can see. it supports Visual Studio's Windows Forms Code for the Designer.
 
 
-`
+```csharp
 using ClassicForms;
 using System;
 using System.Collections.Generic;
@@ -315,4 +315,4 @@ namespace Test
         }
     }
 }
-`
+```
