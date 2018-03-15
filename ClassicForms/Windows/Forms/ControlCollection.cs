@@ -46,8 +46,9 @@ namespace System.Windows.Forms
         {
             _owner.Element.appendChild(item.Element);
             item._parent = Owner;
-            item.Load();
+            item.InvokeLoad();
             _controls.Add(item);
+            _owner.OnControlAdded(item);
         }
 
         public void AddRange(Control[] item)
@@ -59,8 +60,9 @@ namespace System.Windows.Forms
             {
                 frag.appendChild(item[i].Element);
                 item[i]._parent = Owner;
-                item[i].Load();
-                _controls.Add(item[i]);                
+                item[i].InvokeLoad();
+                _controls.Add(item[i]);
+                _owner.OnControlAdded(item[i]);
             }
             _owner.Element.appendChild(frag);
         }
@@ -106,17 +108,24 @@ namespace System.Windows.Forms
         {
             _owner.Element.insertBefore(item.Element, _owner.Element.childNodes[index]);
             _controls.Insert(index, item);
+            _owner.OnControlAdded(item);
         }
 
         public bool Remove(Control item)
         {
             _owner.Element.removeChild(item.Element);
+
+            _owner.OnControlRemoved(item);
+
             return _controls.Remove(item);
         }
 
         public void RemoveAt(int index)
         {
             _owner.Element.removeChild(_owner.Element.childNodes[index]);
+
+            _owner.OnControlRemoved(_controls[index]);
+
             _controls.RemoveAt(index);
         }
 

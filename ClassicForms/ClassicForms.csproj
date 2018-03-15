@@ -35,6 +35,15 @@
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\ClassicFormsWin\CrudForm.cs">
+      <Link>Crud\CrudForm.cs</Link>
+    </Compile>
+    <Compile Include="..\ClassicFormsWin\Enums.cs">
+      <Link>Enums.cs</Link>
+    </Compile>
+    <Compile Include="..\ClassicFormsWin\ICrud.cs">
+      <Link>ICrud.cs</Link>
+    </Compile>
     <Compile Include="ServerHelper.cs" />
     <Compile Include="SeverEventDelegates.cs" />
     <Compile Include="SeverSendingEventArgs.cs" />
@@ -86,6 +95,9 @@
     <Compile Include="Windows\Forms\Panel.cs" />
     <Compile Include="Windows\Forms\ProgressBar.cs" />
     <Compile Include="ServerButton.cs" />
+    <Compile Include="Windows\Forms\TabControl.cs" />
+    <Compile Include="Windows\Forms\TabPage.cs" />
+    <Compile Include="Windows\Forms\TabPageHeader.cs" />
     <Compile Include="Windows\Forms\TextBox.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -152,6 +152,6 @@ namespace Test
         private void Form1_MouseUp(object sender, MouseEventArgs e)
         {
             _isMouseDown = false;
-        }
+        }        
     }
 }

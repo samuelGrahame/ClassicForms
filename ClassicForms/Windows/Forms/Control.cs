@@ -25,7 +25,15 @@ namespace System.Windows.Forms
             }
         }
 
+        internal virtual void OnControlAdded(Control control)
+        {
 
+        }
+
+        internal virtual void OnControlRemoved(Control control)
+        {
+
+        }
 
         private bool _visible;
         public bool Visible { get { return _visible; } set {
@@ -143,16 +151,7 @@ namespace System.Windows.Forms
                 }
             }
         }
-
-        internal void Load()
-        {            
-            OnLoad();
-        }
-
-        protected virtual void OnLoad()
-        {
-
-        }
+        
 
         public virtual Color ForeColor { get; set; }
 
@@ -336,6 +335,19 @@ namespace System.Windows.Forms
                 MouseMove(this, e);
         }
 
+        internal void InvokeLoad()
+        {
+            OnLoad(EventArgs.Empty);
+        }
+
+        protected virtual void OnLoad(EventArgs e)
+        {
+            if (Load != null)
+                Load(this, e);
+        }
+
+        public event EventHandler Load;
+
         protected virtual void OnMouseUp(MouseEventArgs e)
         {
             if (MouseUp != null)
@@ -349,18 +361,31 @@ namespace System.Windows.Forms
         public event MouseEventHandler MouseDown;
         public event MouseEventHandler MouseMove;
         public event MouseEventHandler MouseUp;
+        protected bool layoutSuspended = false;
 
         public void SuspendLayout()
         {
-
+            layoutSuspended = true;
         }
         public void ResumeLayout(bool performLayout)
         {
-
+            layoutSuspended = false;
+            if(performLayout)
+            {
+                PerformLayout();
+            }
         }
-        public void PerformLayout()
+        public virtual void PerformLayout()
         {
+            if (layoutSuspended)
+            {
+                return;
+            }
 
+            foreach (var item in Controls)
+            {
+                item.PerformLayout();
+            }
         }
     }
 }

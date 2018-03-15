@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Test;
+using System.Windows.Forms;
 
-namespace TestBridge
+namespace Test
 {
-    public class Class1
+    class Program
     {
         public static void Main()
         {
+            Application.EnableVisualStyles();
+
             var x = new frmCustomer();
-            x.Show();
+            
+            Application.Run(x);
         }
     }
 }

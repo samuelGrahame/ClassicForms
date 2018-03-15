@@ -44,11 +44,12 @@ namespace System.Windows.Forms
        
         public void Show()
         {
+            OnLoad(EventArgs.Empty);
             document.body.appendChild(Element);
         }
                
 
         public Size ClientSize { get { return GetClientSize(Size); } set { Size = SetSize(value); } }
-        public override string Text { get; set; }
+        public override string Text { get; set; }        
     }
 }

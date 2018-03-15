@@ -350,3 +350,61 @@ div[scope=form] {
     border-right: solid 1px rgb(0, 120, 215);
     border-bottom: solid 1px rgb(0, 120, 215);
 }
+
+ul[scope=tabcontrol] {
+    border-bottom: solid 1px rgb(217, 217, 217);
+}
+
+div[scope=tabpage] {
+    background-color: white;
+    border-top: solid 1px rgb(217, 217, 217);    
+    left: 0 !important;
+    width: 100% !important;
+    
+    border-left: solid 1px rgb(217, 217, 217);
+    border-right: solid 1px rgb(217, 217, 217);
+}
+
+a[scope=tabpageheader] {
+    padding-top: 4px !important;
+    margin-left: -2px;
+}
+
+a[scope=tabpageheader]:not(.active) {
+    background-color: rgb(240, 240, 240);
+    border-top: solid 1px rgb(217, 217, 217);
+    border-right: solid 1px rgb(217, 217, 217);
+    border-left: solid 1px rgb(217, 217, 217);
+    padding-bottom: 2px !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+    top: 2px !important;
+}
+
+a[scope=tabpageheader].first {
+    margin-left: 0 !important;
+}
+
+a[scope=tabpageheader]:not(.active):hover {
+    background-color: rgb(216, 234, 249);
+}
+
+a[scope=tabpageheader].active {
+    background-color: white;
+    border-bottom: solid 1px white;
+    border-top: solid 1px rgb(217, 217, 217);
+    border-right: solid 1px rgb(217, 217, 217);
+    top: 0 !important;
+    padding-bottom: 5px !important;
+    border-left: solid 1px rgb(217, 217, 217);
+
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+}
+
+a[scope=tabpageheader]:focus {
+    outline: none;
+}
+a[scope=tabpageheader] {
+    cursor: default;
+}

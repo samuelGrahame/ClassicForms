@@ -10,9 +10,10 @@ namespace ClassicForms
     [AttributeUsage(AttributeTargets.Method)]
     public class ServerSideAttribute : Attribute
     {
-        public ServerSideAttribute()
+        public CrudCommand Crud;
+        public ServerSideAttribute(CrudCommand crud)
         {
-
+            Crud = crud;
         }
     }
 }
