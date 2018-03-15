@@ -77,7 +77,7 @@ namespace System.Windows.Forms
                 page.Element.style.width = "100%";
                 
                 i++;
-            } // tim web messaged you i reckon he will ask you something, okay
+            }
         } 
 
         public override void PerformLayout()
