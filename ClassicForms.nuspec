@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>ClassicForms</id>
+    <version>0.0.1</version>
+    <title>ClassicForms (For Bridge.Net)</title>
+    <authors>SG - BL - PH</authors>
+    <owners>SG - BL - PH</owners>
+    <projectUrl>https://github.com/samuelGrahame/ClassicForms</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>ClassicForms (For Bridge.Net) - Create a Windows Application using ClassicForms UI and Bridge for the Browser..
+</description>
+    <releaseNotes>
+	</releaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <tags>Bridge Bridge.net Javascript Forms ExpressCraft C# UI jQuery HTML</tags>
+	<dependencies>
+		<dependency id="Bridge" version="[16.8.2]"/>
+		<dependency id="Bridge.Core" version="[16.8.2]"/>
+		<dependency id="Bridge.Html5" version="[16.8.2]"/>		
+		<dependency id="Bridge.Min" version="[16.8.2]"/>
+		<dependency id="Bridge.Newtonsoft.Json" version="[1.6.0]"/>		
+		<dependency id="Retyped" version="[1.4.6556]"/>
+		<dependency id="Retyped.Core" version="[1.4.6556]"/>		
+		<dependency id="Retyped.dom" version="[2.3.6556]"/>
+		<dependency id="Retyped.es5" version="[2.3.6556]"/>
+		<dependency id="Retyped.jquery" version="[2.0.6556]"/>
+		<dependency id="Retyped.scripthost" version="[2.3.6556]"/>
+	  </dependencies>
+  </metadata>
+  <files>
+	<file src="ClassicForms\bin\Release\ClassicForms.dll" target="lib\ClassicForms.dll" />
+	<file src="ClassicForms\Bridge\windows10.css" target="content\Bridge" />	
+  </files>
+ 
+</package>
