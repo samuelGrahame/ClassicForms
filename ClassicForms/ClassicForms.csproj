@@ -38,17 +38,7 @@
     <Compile Include="..\ClassicFormsWin\CrudForm.cs">
       <Link>Crud\CrudForm.cs</Link>
     </Compile>
-    <Compile Include="..\ClassicFormsWin\Enums.cs">
-      <Link>Enums.cs</Link>
-    </Compile>
-    <Compile Include="..\ClassicFormsWin\ICrud.cs">
-      <Link>ICrud.cs</Link>
-    </Compile>
     <Compile Include="ComponentModel\Container.cs" />
-    <Compile Include="ServerHelper.cs" />
-    <Compile Include="SeverEventDelegates.cs" />
-    <Compile Include="SeverSendingEventArgs.cs" />
-    <Compile Include="ServerSideAttribute.cs" />
     <Compile Include="ComponentModel\IContainer.cs" />
     <Compile Include="ComponentModel\ISupportInitialize.cs" />
     <Compile Include="Data\DataColumn.cs" />
@@ -64,7 +54,6 @@
     <Compile Include="Drawing\Size.cs" />
     <Compile Include="Drawing\Point.cs" />
     <Compile Include="Drawing\SystemColors.cs" />
-    <Compile Include="ServerSentEventArgs.cs" />
     <Compile Include="Windows\Forms\AutoScaleMode.cs" />
     <Compile Include="Windows\Forms\Button.cs" />
     <Compile Include="Windows\Forms\ButtonBase.cs" />
@@ -95,7 +84,6 @@
     <Compile Include="Windows\Forms\Padding.cs" />
     <Compile Include="Windows\Forms\Panel.cs" />
     <Compile Include="Windows\Forms\ProgressBar.cs" />
-    <Compile Include="ServerButton.cs" />
     <Compile Include="Windows\Forms\TabControl.cs" />
     <Compile Include="Windows\Forms\TabPage.cs" />
     <Compile Include="Windows\Forms\TabPageHeader.cs" />

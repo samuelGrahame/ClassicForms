@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Test
 {
-    public class frmCustomer : CrudForm
+    public class frmCustomer : Form
     {
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
@@ -31,8 +32,6 @@ namespace Test
             InitializeComponent();
         }
         
-        public Customer Customer => GetCrud<Customer>() ?? (Customer)(CrudObject = new Customer());
-
         private void InitializeComponent()
         {
             this.textBox1 = new System.Windows.Forms.TextBox();
@@ -119,7 +118,6 @@ namespace Test
             this.button1.Tag = "btn btn-primary";
             this.button1.Text = "Insert";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button2
             // 
@@ -130,7 +128,6 @@ namespace Test
             this.button2.Tag = "btn btn-primary";
             this.button2.Text = "Update";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button3
             // 
@@ -141,7 +138,6 @@ namespace Test
             this.button3.Tag = "btn btn-primary";
             this.button3.Text = "Delete";
             this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // button4
             // 
@@ -152,7 +148,6 @@ namespace Test
             this.button4.Tag = "btn btn-primary";
             this.button4.Text = "Select";
             this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // checkBox1
             // 
@@ -246,41 +241,17 @@ namespace Test
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            Customer.LastName = textBox1.Text;
+            
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
-            Customer.FirstName = textBox2.Text;
+            
         }
 
         private void textBox3_TextChanged(object sender, EventArgs e)
         {
-            Customer.Address = textBox3.Text;
-        }
-
-        [ServerSide(CrudCommand.INSERT)]
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        [ServerSide(CrudCommand.UPDATE)]
-        private void button2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        [ServerSide(CrudCommand.DELETE)]
-        private void button3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        [ServerSide(CrudCommand.SELECT)]
-        private void button4_Click(object sender, EventArgs e)
-        {
-
+            
         }
     }
 }

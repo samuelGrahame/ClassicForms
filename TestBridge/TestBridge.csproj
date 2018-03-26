@@ -37,12 +37,6 @@
     <Compile Include="..\Test\Customer.cs">
       <Link>Crud\Customer.cs</Link>
     </Compile>
-    <Compile Include="..\Test\Form1.cs">
-      <Link>UI\Form1.cs</Link>
-    </Compile>
-    <Compile Include="..\Test\Form1.Designer.cs">
-      <Link>UI\Form1.Designer.cs</Link>
-    </Compile>
     <Compile Include="..\Test\frmCustomer.cs">
       <Link>UI\frmCustomer.cs</Link>
     </Compile>
