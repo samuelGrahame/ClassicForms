@@ -34,9 +34,6 @@
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Test\Customer.cs">
-      <Link>Crud\Customer.cs</Link>
-    </Compile>
     <Compile Include="..\Test\frmCustomer.cs">
       <Link>UI\frmCustomer.cs</Link>
     </Compile>

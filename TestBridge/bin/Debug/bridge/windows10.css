@@ -345,10 +345,20 @@ span[scope=label] {
 
 div[scope=form] {
     background-color: rgb(240, 240, 240);
-    border-top: solid 27px rgb(0, 120, 215);
+
+    /*border-top: solid 27px rgb(0, 120, 215);
     border-left: solid 1px rgb(0, 120, 215);
     border-right: solid 1px rgb(0, 120, 215);
-    border-bottom: solid 1px rgb(0, 120, 215);
+    border-bottom: solid 1px rgb(0, 120, 215);*/
+
+    border-bottom-style: solid;
+    border-bottom-color: rgb(0, 120, 215);
+    border-top-style: solid;
+    border-top-color: rgb(0, 120, 215);
+    border-right-style: solid;
+    border-right-color: rgb(0, 120, 215);
+    border-left-style: solid;
+    border-left-color: rgb(0, 120, 215);
 }
 
 ul[scope=tabcontrol] {

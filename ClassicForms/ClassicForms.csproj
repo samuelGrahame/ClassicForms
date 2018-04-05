@@ -35,9 +35,6 @@
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\ClassicFormsWin\CrudForm.cs">
-      <Link>Crud\CrudForm.cs</Link>
-    </Compile>
     <Compile Include="ComponentModel\Container.cs" />
     <Compile Include="ComponentModel\IContainer.cs" />
     <Compile Include="ComponentModel\ISupportInitialize.cs" />
@@ -71,6 +68,7 @@
     <Compile Include="Windows\Forms\DrawMode.cs" />
     <Compile Include="Windows\Forms\Form.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Windows\Forms\FormBorderStyle.cs" />
     <Compile Include="Windows\Forms\GroupBox.cs" />
     <Compile Include="Windows\Forms\Label.cs" />
     <Compile Include="Windows\Forms\LinkLabel.cs" />
