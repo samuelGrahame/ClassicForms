@@ -18,7 +18,527 @@ namespace System.Windows.Forms
         private bool _allowMoveChange = true; // not yet implemented.
         private bool _mouseDownOnBorder = false;
         private FormMovementModes _formMovementModes = FormMovementModes.None;
+        public static HTMLDivElement _formOverLay = null;
         
+        static Form()
+        {
+            _formOverLay = new HTMLDivElement();
+
+            _formOverLay.style.height = "100%";
+            _formOverLay.style.width = "100%";
+            _formOverLay.style.opacity = "0.3";
+            _formOverLay.style.backgroundColor = "grey";
+            _formOverLay.style.position = "absolute";
+            _formOverLay.style.visibility = "visible";
+
+            _formOverLay.onmousedown = (ev) =>
+            {        
+                if (document.activeElement != null)
+                {
+                    //FormPopup
+                    document.activeElement.As<HTMLElement>().focus();
+                    ev.preventDefault();                    
+                }
+                return null;
+            };
+
+            document.body.appendChild(_formOverLay);
+        }
+
+        // what we need to do is support modals      
+        private static List<FormCollection> _formCollections = new List<FormCollection>();
+
+        private class FormCollection
+        {
+            public Form FormOwner;
+            public List<Form> VisibleForms = new List<Form>();
+
+            public FormCollection(Form formOwner)
+            {
+                FormOwner = formOwner;
+            }
+        }
+        private static Form _ActiveForm;
+        private static Form _PrevActiveForm;
+
+        public static Form ActiveForm
+        {
+            get { return _ActiveForm; }
+            set
+            {
+                if (_ActiveForm != value)
+                {
+                    _PrevActiveForm = _ActiveForm;
+
+                    if (_ActiveForm != null)
+                    {
+                        //_ActiveForm.OnLostFocus();
+                        if (_ActiveForm.Element != null)
+                        {
+                            //if (_ActiveForm.InDesign)
+                            //{
+                            //    _ActiveForm.BodyOverLay.style.visibility = "collapse";
+                            //    return;
+                            //}
+                            //_ActiveForm.BodyOverLay.style.visibility = "visible";
+                        }
+                    }
+                    _ActiveForm = value;
+                    if (_ActiveForm != null)
+                    {
+                        //_ActiveForm.OnGotFocus();
+                        if (_ActiveForm.Element != null)
+                        {
+                            //_ActiveForm.BodyOverLay.style.visibility = "collapse";
+                            _ActiveForm.BringToFront();
+                        }
+                    }
+                    //if (_PrevActiveForm is FormPopup && ((_ActiveForm != null && !(_ActiveForm is FormPopup)) || _ActiveForm == null))
+                    //{
+                    //    CloseFormPopups();
+                    //}
+                }
+            }
+        }
+
+        protected virtual void OnClosing()
+        {
+
+        }
+
+        public List<DialogOption> DialogResults = new List<DialogOption>();
+
+        private FormCollection GetFormCollectionFromForm(Form form)
+        {
+            for (int i = 0; i < _formCollections.Count; i++)
+            {
+                if (this == _formCollections[i].FormOwner)
+                    return _formCollections[i];
+                var visibleForms = _formCollections[i].VisibleForms;
+                for (int x = 0; x < visibleForms.Count; x++)
+                {
+                    if (visibleForms[x] == this)
+                        return _formCollections[i];
+                }
+            }
+
+            return null;
+        }
+
+        private bool _isDialog;
+        private bool _inClose;
+        private bool _inDialogResult = false;
+
+        private WindowState _windowState;
+
+        public WindowState WindowState
+        {
+            get { return _windowState; }
+            set { _windowState = value; }
+        }
+
+        public static void CalculateZOrder()
+        {
+            GetActiveFormCollection();
+
+            if (_formCollections == null)
+                return;
+            _formCollections.Remove(null);
+            var count = _formCollections.Count;
+            int zIndex = 1;
+
+            //var frag = Document.CreateDocumentFragment();
+
+            _formOverLay.style.opacity = count == 0 ? "" : count == 1 ? "0" : "0.4";
+
+            for (int x = 0; x < count; x++)
+            {
+                //if(Helper.NotDesktop)
+                //{
+                //    if(x == count - 1)
+                //    {
+                //        frag.AppendChild(FormOverLay);
+                //        zIndex = CalculateZOrder(FormCollections[x], zIndex, frag);
+                //    }
+                //}
+                //else
+                //{
+                //}
+                if (x == count - 1)
+                {
+                    //frag.AppendChild(FormOverLay);
+                    _formOverLay.style.zIndex = Convert.ToString(zIndex);
+                    zIndex++;
+                }
+                zIndex = CalculateZOrder(_formCollections[x], zIndex); // frag
+            }
+            //zIndex = CalculateZOrder(standAloneForms, zIndex); // frag
+
+            //WindowHolder.Empty();
+            //WindowHolder.AppendChild(frag);
+
+            if (ActiveForm != null)
+            {
+                ActiveForm.Element.focus();
+            }
+        }
+        private static List<Form> ToClean = new List<Form>();
+        private static int CalculateZOrder(FormCollection formCollection, int zIndex) // , DocumentFragment frag
+        {
+            List<Form> TopMostForms = new List<Form>();
+
+            var VisibleForms = formCollection.VisibleForms;
+            if (VisibleForms != null)
+            {
+                for (int i = 0; i < VisibleForms.Count; i++)
+                {
+                    if (VisibleForms[i].Element == null)
+                    {
+                        ToClean.Add(VisibleForms[i]);
+                    }
+                    else
+                    {
+                        //if (VisibleForms[i].TopMost)
+                        //    TopMostForms.Add(VisibleForms[i]);
+                    }
+                }
+                for (int i = 0; i < ToClean.Count; i++)
+                {
+                    if (VisibleForms.Contains(ToClean[i]))
+                    {
+                        VisibleForms.Remove(ToClean[i]);
+                        ToClean[i] = null;
+                    }
+                }
+
+                ToClean.Remove(null);
+
+                if (formCollection.FormOwner != null)
+                {
+                    //formCollection.FormOwner.ManagePlaceHolders();
+                    formCollection.FormOwner.Element.style.zIndex = Convert.ToString(zIndex);
+                    zIndex++;
+                    //frag.AppendChild(formCollection.FormOwner);
+
+                    //if(Helper.NotDesktop)
+                    //{
+                    //    if(VisibleForms.Count == 0)
+                    //    {
+                    //        formCollection.FormOwner.ManagePlaceHolders();
+                    //        frag.AppendChild(formCollection.FormOwner);
+                    //        return zIndex;
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    formCollection.FormOwner.ManagePlaceHolders();
+                    //    frag.AppendChild(formCollection.FormOwner);
+                    //}
+                }
+
+                for (int i = 0; i < TopMostForms.Count; i++)
+                {
+                    var form = TopMostForms[i];
+                    VisibleForms.Remove(form);
+                    VisibleForms.Add(form);
+                }
+                int length = VisibleForms.Count;
+                for (int i = 0; i < length; i++)
+                {
+                    if (VisibleForms[i] != null &&
+                        VisibleForms[i].Element != null)
+                    {
+                        //VisibleForms[i].ManagePlaceHolders();
+                        VisibleForms[i].Element.style.zIndex = Convert.ToString(zIndex);
+                        zIndex++;
+                        //frag.AppendChild(VisibleForms[i]);
+
+                        //if(Helper.NotDesktop)
+                        //{
+                        //    if(length - 1 == i)
+                        //    {
+                        //        VisibleForms[i].ManagePlaceHolders();
+                        //        frag.AppendChild(VisibleForms[i]);
+                        //        return zIndex;
+                        //    }
+                        //}else
+                        //{
+                        //    VisibleForms[i].ManagePlaceHolders();
+                        //    frag.AppendChild(VisibleForms[i]);
+                        //}
+                    }
+                }
+            }
+
+            return zIndex;
+        }
+        public DialogResult DialogResult = DialogResult.None;
+        public void Close()
+        {
+            if (_isDialog && _inDialogResult)
+                return;
+
+            _inClose = true;
+
+            OnClosing();
+
+            ToClean.Add(this);
+
+            var ownerFormCollection = GetFormCollectionFromForm(this);
+
+            if (ownerFormCollection != null)
+            {
+                if (ownerFormCollection.FormOwner == this)
+                {
+                    ownerFormCollection.FormOwner = null;
+                    for (int i = 0; i < ownerFormCollection.VisibleForms.Count; i++)
+                    {
+                        if (ownerFormCollection.VisibleForms[i] == this)
+                            continue;
+                        ownerFormCollection.VisibleForms[i].Close();
+                    }
+                    if (_formCollections.Count == 1)
+                    {
+                        _formCollections = new List<FormCollection>();
+                    }
+                }
+                else
+                {
+                    ownerFormCollection.VisibleForms.Remove(this);
+                }
+            }
+
+            if (Element != null)
+            {
+                //if (!ForReuse)
+                //{
+                //    if (Settings.FormFadeDuration > 0)
+                //    {
+                //        Self.fadeOut(Settings.FormFadeDuration, closeAction);
+                //    }
+                //    else
+                //    {
+                //        closeAction();
+                //    }
+                //}
+                //else
+                //{
+                //    Content.style.visibility = "collapse";
+                //}
+                Element.style.visibility = "collapse";
+            }
+
+            CalculateZOrder();
+
+            ActiveForm = _PrevActiveForm;
+            if (_isDialog)
+            {
+                _inDialogResult = true;
+                if (DialogResult != DialogResult.None &&
+                DialogResults != null && DialogResults.Count > 0)
+                {
+                    for (int i = 0; i < DialogResults.Count; i++)
+                    {
+                        DialogResults[i].InvokeIfResult(DialogResult);
+                    }
+                }
+            }
+
+            OnFormClosed();
+
+            OnClosed();
+
+            if (WindowState == WindowState.Minimized)
+            {
+                _minimizedForms.Remove(this);
+                CalculateMinmizedFormsLocation();
+            }
+
+            _inClose = false;
+        }
+
+        private static void CalculateMinmizedFormsLocation()
+        {
+            if (_minimizedForms.Count > 0 && _minimizedForms.Contains(null))
+                _minimizedForms.Remove(null);
+            var RemoveList = new List<Form>();
+            int count = 0;
+            float widthTotal = 0;
+            int y = 30;
+
+            var viewSize = document.body.getBoundingClientRect();
+
+            foreach (var item in _minimizedForms)
+            {
+                if (item.Element == null || item.WindowState != WindowState.Minimized)
+                {
+                    RemoveList.Add(item);
+                }
+                else
+                {
+                    var ToIncrement = 3 + item.Size.Width;
+
+                    if (widthTotal + ToIncrement > viewSize.width)
+                    {
+                        widthTotal = 0;
+                        count = 0;
+                        y += 33;
+                    }
+
+                    //item.Location = new Vector2(widthTotal, "(100% - " + (y + 2) + "px)");
+                    item.Element.style.left = $"{widthTotal}px";
+                    item.Element.style.top = "calc(100% - " + (y + 2) + "px)";
+
+                    count++;
+
+                    widthTotal += ToIncrement;
+                }
+            }
+            foreach (var item in RemoveList)
+            {
+                _minimizedForms.Remove(item);
+            }
+        }
+
+        private static List<Form> _minimizedForms = new List<Form>();
+        protected virtual void OnFormClosed()
+        {
+
+        }
+
+        protected virtual void OnClosed()
+        {
+
+        }
+
+        private static FormCollection GetActiveFormCollection()
+        {
+            for (int i = _formCollections.Count - 1; i >= 0; i--)
+            {
+                var frmCol = _formCollections[i];
+                if (frmCol.FormOwner == null)
+                {
+                    for (int x = 0; x < frmCol.VisibleForms.Count; x++)
+                    {
+                        if (frmCol.VisibleForms[x] != null)
+                        {
+                            frmCol.VisibleForms[x].Close();
+                        }
+                    }
+                    _formCollections.RemoveAt(i);
+                }
+                else
+                {
+                    return frmCol;
+                }
+            }
+
+            return null;
+        }
+
+        public void BringToFront()
+        {
+            var activeCollect = GetActiveFormCollection();
+            if (activeCollect != null)
+            {
+                if (activeCollect.FormOwner == this)
+                    return;
+                var visibleForms = activeCollect.VisibleForms;
+                if (visibleForms != null && visibleForms.Count > 1)
+                {
+                    visibleForms.Remove(this);
+                    visibleForms.Add(this);
+                }
+
+                CalculateZOrder();
+            }
+        }
+
+        public void Show()
+        {            
+            if (_isDialog)
+                return;
+            if ((_formCollections == null || _formCollections.Count == 0))
+            {
+                _showStartNewLevel();
+                return;
+            }
+
+            var activeCollect = GetActiveFormCollection();
+            var visbileForms = activeCollect.VisibleForms;
+
+            if (!visbileForms.Contains(this))
+            {
+                visbileForms.Add(this);
+                _showForm();
+                
+                CalculateZOrder();
+
+                OnShowed();
+
+                Resizing();
+
+                OnLoad(EventArgs.Empty);
+            }
+
+            ActiveForm = this;            
+        }
+
+        public void ShowDialog(params DialogOption[] dialogResults)
+        {            
+            _inDialogResult = false;
+
+            _isDialog = true;
+            //if (StartPosition != FormStartPosition.Manual)
+            //{
+            //    if (!Helper.NotDesktop)
+            //        StartPosition = FormStartPosition.Center;
+            //}
+            _showStartNewLevel();
+
+            if (dialogResults != null && dialogResults.Length > 0)
+            {
+                DialogResults.AddRange(dialogResults);
+            }
+        }
+
+        private void _showForm()
+        {
+            document.body.appendChild(this.Element);            
+        }
+
+        private void _showStartNewLevel()
+        {            
+            _formCollections.Add(new FormCollection(this));
+            _showForm();
+            CalculateZOrder();
+
+            //if (StartPosition == FormStartPosition.Center)
+            //{
+            //    CentreForm();
+            //}
+
+            OnShowed();
+            
+            Resizing();
+
+            ActiveForm = this;
+
+            Element.focus();
+
+            OnLoad(EventArgs.Empty);
+        }
+
+        protected virtual void OnShowed()
+        {
+
+        }
+
+        protected void Resizing()
+        {
+
+        }
+
         private int _prevX;
         private int _prevY;
 
@@ -74,6 +594,7 @@ namespace System.Windows.Forms
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
+            ActiveForm = this;
             // work out area... of click.
             var size = Size;
             _formMovementModes = FormMovementModes.None;
@@ -112,9 +633,7 @@ namespace System.Windows.Forms
             if(_mouseDownOnBorder)
             {
                 if(_formMovementModes == FormMovementModes.Move)
-                {
-                    
-
+                {                    
                     Location = new Point((Location.X + e.X) + _prevX, (Location.Y + e.Y) + _prevY);
                     //var newX = ((mX = mousePos.Xf) + MovingForm.prev_px);
                     //var newY = ((mY = mousePos.Yf) + MovingForm.prev_py);
@@ -266,13 +785,6 @@ namespace System.Windows.Forms
         protected virtual void Dispose(bool disposing)
         {
 
-        }
-
-       
-        public void Show()
-        {
-            OnLoad(EventArgs.Empty);
-            document.body.appendChild(Element);
         }
                
 

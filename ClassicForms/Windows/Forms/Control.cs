@@ -305,15 +305,6 @@ namespace System.Windows.Forms
                 return null;
             });
 
-            Element.onmouseup = new HTMLElement.onmouseupFn((ev) => {
-                ev.stopPropagation();
-
-                OnMouseUp(MouseEventArgs.CreateFromMouseEvent(ev, this));
-                ClickedOnControl = null;
-
-                return null;
-            });
-
             _init = true;
         }
 

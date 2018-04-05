@@ -65,6 +65,7 @@
     <Compile Include="Windows\Forms\DataGridView.cs" />
     <Compile Include="Windows\Forms\DataGridViewColumnHeadersHeightSizeMode.cs" />
     <Compile Include="Windows\Forms\DataGridViewTextBoxColumn.cs" />
+    <Compile Include="Windows\Forms\DialogResult.cs" />
     <Compile Include="Windows\Forms\DrawMode.cs" />
     <Compile Include="Windows\Forms\Form.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="Windows\Forms\TabPage.cs" />
     <Compile Include="Windows\Forms\TabPageHeader.cs" />
     <Compile Include="Windows\Forms\TextBox.cs" />
+    <Compile Include="Windows\Forms\WindowState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bridge.json" />
