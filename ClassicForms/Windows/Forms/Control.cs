@@ -240,7 +240,7 @@ namespace System.Windows.Forms
                 {
                     ev.stopPropagation();
 
-                    ClickedOnControl.OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev));
+                    ClickedOnControl.OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev, ClickedOnControl));
                 }
                 return null;
             });
@@ -251,7 +251,7 @@ namespace System.Windows.Forms
                 {
                     ev.stopPropagation();
 
-                    ClickedOnControl.OnMouseUp(MouseEventArgs.CreateFromMouseEvent(ev));
+                    ClickedOnControl.OnMouseUp(MouseEventArgs.CreateFromMouseEvent(ev, ClickedOnControl));
 
                     ClickedOnControl = null;
                 }
@@ -289,7 +289,7 @@ namespace System.Windows.Forms
                 ClickedOnControl = this;
                 ev.stopPropagation();
 
-                OnMouseDown(MouseEventArgs.CreateFromMouseEvent(ev));
+                OnMouseDown(MouseEventArgs.CreateFromMouseEvent(ev, this));
                 
                 return null;
             });
@@ -299,7 +299,7 @@ namespace System.Windows.Forms
                 {
                     ev.stopPropagation();
 
-                    OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev));
+                    OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev, this));
                 }
 
                 return null;
@@ -308,7 +308,7 @@ namespace System.Windows.Forms
             Element.onmouseup = new HTMLElement.onmouseupFn((ev) => {
                 ev.stopPropagation();
 
-                OnMouseUp(MouseEventArgs.CreateFromMouseEvent(ev));
+                OnMouseUp(MouseEventArgs.CreateFromMouseEvent(ev, this));
                 ClickedOnControl = null;
 
                 return null;

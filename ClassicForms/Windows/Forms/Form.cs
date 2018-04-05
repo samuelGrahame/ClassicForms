@@ -10,11 +10,13 @@ namespace System.Windows.Forms
 {
     public class Form : ContainerControl
     {
-        private int FormTopBorder = 31;
-        private int FormBottonBorder = 1;
-        private int FormLeftBorder = 1;
-        private int FormRightBorder = 1;
-        private bool allowSizeChange = true;
+        private int _formTopBorder = 31;
+        private int _formBottonBorder = 1;
+        private int _formLeftBorder = 1;
+        private int _formRightBorder = 1;
+        private bool _allowSizeChange = true; // not yet implemented.
+        private bool _allowMoveChange = true; // not yet implemented.
+        private bool _mouseDownOnBorder = false;
 
         public Form() : base()
         {            
@@ -55,6 +57,33 @@ namespace System.Windows.Forms
             }
         }
 
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            // work out area... of click.
+
+            _mouseDownOnBorder = true;
+
+            base.OnMouseDown(e);
+        }
+
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            _mouseDownOnBorder = false;
+            base.OnMouseUp(e);
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            // is mouse down???
+            if(_mouseDownOnBorder)
+            {
+                // we should do some action regarding this... etc move form, resize in direction.
+
+            }
+            base.OnMouseMove(e);
+        }
+
         private void _processWinFormView()
         {
             var clientSize = ClientSize;
@@ -62,60 +91,60 @@ namespace System.Windows.Forms
             switch (_formBorderStyle)
             {
                 case FormBorderStyle.None:
-                    FormTopBorder = 0;
-                    FormBottonBorder = 0;
-                    FormLeftBorder = 0;
-                    FormRightBorder = 0;
-                    allowSizeChange = false;
+                    _formTopBorder = 0;
+                    _formBottonBorder = 0;
+                    _formLeftBorder = 0;
+                    _formRightBorder = 0;
+                    _allowSizeChange = false;
 
                     break;
                 case FormBorderStyle.FixedSingle:
-                    allowSizeChange = false;
+                    _allowSizeChange = false;
                     if (!ControlBox)
                     {
-                        FormTopBorder = 1;
+                        _formTopBorder = 1;
                     }
                     else
                     {
-                        FormTopBorder = 31;
+                        _formTopBorder = 31;
                     }                        
-                    FormBottonBorder = 1;
-                    FormLeftBorder = 1;
-                    FormRightBorder = 1;
+                    _formBottonBorder = 1;
+                    _formLeftBorder = 1;
+                    _formRightBorder = 1;
                     break;
                 case FormBorderStyle.Fixed3D:
-                    allowSizeChange = false;
+                    _allowSizeChange = false;
                     if (!ControlBox)
                     {
-                        FormTopBorder = 3;
-                        FormBottonBorder = 3;
-                        FormLeftBorder = 3;
-                        FormRightBorder = 3;
+                        _formTopBorder = 3;
+                        _formBottonBorder = 3;
+                        _formLeftBorder = 3;
+                        _formRightBorder = 3;
                     }
                     else
                     {
-                        FormTopBorder = 31;
-                        FormBottonBorder = 1;
-                        FormLeftBorder = 1;
-                        FormRightBorder = 1;
+                        _formTopBorder = 31;
+                        _formBottonBorder = 1;
+                        _formLeftBorder = 1;
+                        _formRightBorder = 1;
                     }
                     break;
                 case FormBorderStyle.FixedDialog:
 
-                    allowSizeChange = false;
+                    _allowSizeChange = false;
                     if (!ControlBox)
                     {
-                        FormTopBorder = 2;
-                        FormBottonBorder = 2;
-                        FormLeftBorder = 2;
-                        FormRightBorder = 2;
+                        _formTopBorder = 2;
+                        _formBottonBorder = 2;
+                        _formLeftBorder = 2;
+                        _formRightBorder = 2;
                     }
                     else
                     {
-                        FormTopBorder = 31;
-                        FormBottonBorder = 1;
-                        FormLeftBorder = 1;
-                        FormRightBorder = 1;
+                        _formTopBorder = 31;
+                        _formBottonBorder = 1;
+                        _formLeftBorder = 1;
+                        _formRightBorder = 1;
                     }
 
                     
@@ -123,44 +152,44 @@ namespace System.Windows.Forms
                 case FormBorderStyle.Sizable:
                     if(!ControlBox)
                     {
-                        FormTopBorder = 8;
+                        _formTopBorder = 8;
                     }
                     else
                     {
-                        FormTopBorder = 31;
+                        _formTopBorder = 31;
                     }
-                    FormBottonBorder = 1;
-                    FormLeftBorder = 1;
-                    FormRightBorder = 1;
-                    allowSizeChange = true;
+                    _formBottonBorder = 1;
+                    _formLeftBorder = 1;
+                    _formRightBorder = 1;
+                    _allowSizeChange = true;
                     break;
                 case FormBorderStyle.FixedToolWindow:
                     if (!ControlBox)
                     {
-                        FormTopBorder = 1;
+                        _formTopBorder = 1;
                     }
                     else
                     {
-                        FormTopBorder = 31;
+                        _formTopBorder = 31;
                     }
-                    FormBottonBorder = 0;
-                    FormLeftBorder = 0;
-                    FormRightBorder = 0;
-                    allowSizeChange = false;
+                    _formBottonBorder = 0;
+                    _formLeftBorder = 0;
+                    _formRightBorder = 0;
+                    _allowSizeChange = false;
                     break;
                 case FormBorderStyle.SizableToolWindow:
                     if (!ControlBox)
                     {
-                        FormTopBorder = 8;
+                        _formTopBorder = 8;
                     }
                     else
                     {
-                        FormTopBorder = 31;
+                        _formTopBorder = 31;
                     }
-                    FormBottonBorder = 1;
-                    FormLeftBorder = 1;
-                    FormRightBorder = 1;
-                    allowSizeChange = true;
+                    _formBottonBorder = 1;
+                    _formLeftBorder = 1;
+                    _formRightBorder = 1;
+                    _allowSizeChange = true;
                     break;
                 default:
                     break;
@@ -173,10 +202,10 @@ namespace System.Windows.Forms
 
         private void _setBorderWidth()
         {
-            Element.style.borderTopWidth = FormTopBorder + "px";
-            Element.style.borderBottomWidth = FormBottonBorder + "px";
-            Element.style.borderLeftWidth = FormLeftBorder + "px";
-            Element.style.borderRightWidth = FormRightBorder + "px";
+            Element.style.borderTopWidth = _formTopBorder + "px";
+            Element.style.borderBottomWidth = _formBottonBorder + "px";
+            Element.style.borderLeftWidth = _formLeftBorder + "px";
+            Element.style.borderRightWidth = _formRightBorder + "px";
         }
         
         public override Font Font { get { return base.Font; } set {                
@@ -185,12 +214,12 @@ namespace System.Windows.Forms
 
         private Size GetClientSize(Size size)
         {
-            return new Size(size.Width - (FormLeftBorder + FormRightBorder), size.Height - (FormTopBorder + FormBottonBorder));
+            return new Size(size.Width - (_formLeftBorder + _formRightBorder), size.Height - (_formTopBorder + _formBottonBorder));
         }
 
         private Size SetSize(Size clientSize)
         {
-            return new Size(clientSize.Width + (FormLeftBorder + FormRightBorder), clientSize.Height + (FormTopBorder + FormBottonBorder));
+            return new Size(clientSize.Width + (_formLeftBorder + _formRightBorder), clientSize.Height + (_formTopBorder + _formBottonBorder));
         }
 
         protected virtual void Dispose(bool disposing)

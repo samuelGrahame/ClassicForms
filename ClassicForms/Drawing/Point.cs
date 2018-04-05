@@ -16,6 +16,11 @@ namespace System.Drawing
             Y = y;
         }
 
+        public override string ToString()
+        {
+            return $"X:{X}, Y:{Y}";
+        }
+
 
     }
 }

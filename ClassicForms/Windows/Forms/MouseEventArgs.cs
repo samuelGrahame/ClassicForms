@@ -15,8 +15,32 @@ namespace System.Windows.Forms
     public class MouseEventArgs : EventArgs
     {
         public MouseEvent Original;
-        public static MouseEventArgs CreateFromMouseEvent(MouseEvent original)
-        {            
+        public static MouseEventArgs CreateFromMouseEvent(MouseEvent original, Control target)
+        {
+            // what we need to do is get the local x, y off from the target.
+
+            Point mousePoint;
+
+            if(original.currentTarget == target.Element)
+            {
+                mousePoint = new Point((int)original.clientX, (int)original.clientY);
+            }
+            else
+            {
+                double top = 0;
+                double left = 0;
+                Element element = target.Element;
+                do
+                {
+                    dynamic dym = element;
+                    top += dym.offsetTop;
+                    left += dym.offsetLeft;
+                    element = dym.offsetParent;
+                } while (element != null);
+
+                mousePoint = new Point((int)(original.x - left), (int)(original.y - top));
+            }
+            
             var button = (int)original.button;
             return new MouseEventArgs(
                 button == 1 ? MouseButtons.Left :
@@ -24,7 +48,7 @@ namespace System.Windows.Forms
                 button == 4 ? MouseButtons.Middle :
                 button == 8 ? MouseButtons.XButton2 :
                 MouseButtons.XButton2,
-                1, (int)original.x, (int)original.y, 0)
+                1, mousePoint.X, mousePoint.Y, 0)
             { Original = original };            
         }
 
