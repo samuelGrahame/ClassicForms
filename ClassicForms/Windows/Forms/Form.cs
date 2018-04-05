@@ -26,6 +26,8 @@ namespace System.Windows.Forms
 
             _formOverLay.style.height = "100%";
             _formOverLay.style.width = "100%";
+            _formOverLay.style.top = "0";
+            _formOverLay.style.left = "0";
             _formOverLay.style.opacity = "0.3";
             _formOverLay.style.backgroundColor = "grey";
             _formOverLay.style.position = "absolute";
