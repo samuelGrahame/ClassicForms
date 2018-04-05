@@ -17,6 +17,13 @@ namespace System.Windows.Forms
         private bool _allowSizeChange = true; // not yet implemented.
         private bool _allowMoveChange = true; // not yet implemented.
         private bool _mouseDownOnBorder = false;
+        private FormMovementModes _formMovementModes = FormMovementModes.None;
+        
+        private int _prevX;
+        private int _prevY;
+
+        private int _prevFormX;
+        private int _prevFormY;
 
         public Form() : base()
         {            
@@ -57,9 +64,35 @@ namespace System.Windows.Forms
             }
         }
 
+        
+
+        private enum FormMovementModes
+        {
+            None,
+            Move
+        }
+
         protected override void OnMouseDown(MouseEventArgs e)
         {
             // work out area... of click.
+            var size = Size;
+            _formMovementModes = FormMovementModes.None;
+
+            //if(e.X > 1 && e.X < )
+            if (_allowMoveChange)
+            {
+                if (e.X > 1 && e.X <= size.Width - _formRightBorder && e.Y > 1 && e.Y <= _formTopBorder)
+                {
+                    _formMovementModes = FormMovementModes.Move;
+                    _prevX = Location.X - (e.X + Location.X);
+                    _prevY = Location.Y - (e.Y + Location.Y);
+
+                    _prevFormX = Location.X;
+                    _prevFormY = Location.Y;
+
+                    //clientRec.top - mousePos.Yf;
+                }
+            }
 
             _mouseDownOnBorder = true;
 
@@ -78,6 +111,14 @@ namespace System.Windows.Forms
             // is mouse down???
             if(_mouseDownOnBorder)
             {
+                if(_formMovementModes == FormMovementModes.Move)
+                {
+                    
+
+                    Location = new Point((Location.X + e.X) + _prevX, (Location.Y + e.Y) + _prevY);
+                    //var newX = ((mX = mousePos.Xf) + MovingForm.prev_px);
+                    //var newY = ((mY = mousePos.Yf) + MovingForm.prev_py);
+                }
                 // we should do some action regarding this... etc move form, resize in direction.
 
             }

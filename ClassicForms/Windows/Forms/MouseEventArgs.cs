@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bridge;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -15,6 +16,27 @@ namespace System.Windows.Forms
     public class MouseEventArgs : EventArgs
     {
         public MouseEvent Original;
+
+        private static Point GetOffsetPoint(Element element)
+        {
+            double top = 0;
+            double left = 0;            
+            do
+            {
+                dynamic dym = element;
+                top += dym.offsetTop;
+                left += dym.offsetLeft;
+                element = dym.offsetParent;
+            } while (element != null);
+
+            return new Point((int)left, (int)top);
+        }
+        static bool IsEdge;
+        static MouseEventArgs()
+        {
+            IsEdge = window.navigator.userAgent.IndexOf("Edge") > -1;
+        }
+
         public static MouseEventArgs CreateFromMouseEvent(MouseEvent original, Control target)
         {
             // what we need to do is get the local x, y off from the target.
@@ -23,23 +45,24 @@ namespace System.Windows.Forms
 
             if(original.currentTarget == target.Element)
             {
-                mousePoint = new Point((int)original.clientX, (int)original.clientY);
+                if(Browser.IsIE || IsEdge)
+                {
+                    var offset = GetOffsetPoint(target.Element);
+                    mousePoint = new Point((int)(original.clientX - offset.X), (int)(original.clientY - offset.Y));
+                }
+                else
+                {
+                    mousePoint = new Point((int)original.layerX, (int)original.layerY);
+                }                
             }
             else
             {
-                double top = 0;
-                double left = 0;
-                Element element = target.Element;
-                do
-                {
-                    dynamic dym = element;
-                    top += dym.offsetTop;
-                    left += dym.offsetLeft;
-                    element = dym.offsetParent;
-                } while (element != null);
-
-                mousePoint = new Point((int)(original.x - left), (int)(original.y - top));
+                var offset = GetOffsetPoint(target.Element);
+                mousePoint = new Point((int)(original.x - offset.X), (int)(original.y - offset.Y));
             }
+
+            //Console.Clear();
+            //Console.WriteLine(mousePoint.ToString());
             
             var button = (int)original.button;
             return new MouseEventArgs(
