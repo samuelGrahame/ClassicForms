@@ -4848,7 +4848,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         statics: {
             fields: {
                 None: 0,
-                Move: 1
+                Move: 1,
+                TopLeft: 2
             }
         }
     });
@@ -9956,6 +9957,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 },
                 LayoutAnchoredControls: function (container) {
                     var displayRectangle = container.System$Windows$Forms$Layout$IArrangedElement$DisplayRectangle.$clone();
+
                     if (!System.Windows.Forms.Layout.CommonProperties.GetAutoSize(container) || ((displayRectangle.Width !== 0) && (displayRectangle.Height !== 0))) {
                         var children = container.System$Windows$Forms$Layout$IArrangedElement$Children;
                         for (var i = (children.Count - 1) | 0; i >= 0; i = (i - 1) | 0) {
@@ -9973,14 +9975,15 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         if (System.Windows.Forms.Layout.CommonProperties.xGetAutoSizedAndAnchored(element)) {
                             var cachedBounds = System.Windows.Forms.Layout.DefaultLayout.GetCachedBounds(element);
                             var anchor = System.Windows.Forms.Layout.DefaultLayout.GetAnchor(element);
-                            var maxSize = System.Windows.Forms.Layout.LayoutUtils.MaxSize.$clone();
+                            var preferredSize = element.System$Windows$Forms$Layout$IArrangedElement$DisplayRectangle.Size.$clone();
+                            //Size maxSize = cachedBounds.Size;
                             if ((anchor & (12)) === (12)) {
-                                maxSize.Width = cachedBounds.Width;
+                                preferredSize.Width = cachedBounds.Width;
                             }
                             if ((anchor & (3)) === (3)) {
-                                maxSize.Height = cachedBounds.Height;
+                                preferredSize.Height = cachedBounds.Height;
                             }
-                            var preferredSize = element.System$Windows$Forms$Layout$IArrangedElement$GetPreferredSize(maxSize.$clone());
+
                             var bounds = cachedBounds.$clone();
                             if (System.Windows.Forms.Layout.CommonProperties.GetAutoSizeMode(element) === System.Windows.Forms.AutoSizeMode.GrowAndShrink) {
                                 bounds = System.Windows.Forms.Layout.DefaultLayout.GetGrowthBounds(element, preferredSize.$clone());
@@ -10427,6 +10430,25 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this.Element.setAttribute("Name", value);
                 }
             },
+            AutoSizeMode: {
+                get: function () {
+                    return this.GetAutoSizeMode();
+                },
+                set: function (value) {
+                    if (!System.Windows.Forms.ClientUtils.IsEnumValid(Bridge.box(value, System.Windows.Forms.AutoSizeMode, System.Enum.toStringFn(System.Windows.Forms.AutoSizeMode)), value, 0, 1)) {
+                        throw new System.ComponentModel.InvalidEnumArgumentException.$ctor3("value", value, System.Windows.Forms.AutoSizeMode);
+                    }
+                    if (this.GetAutoSizeMode() !== value) {
+                        this.SetAutoSizeMode(value);
+                        if (this.ParentInternal != null) {
+                            if (Bridge.referenceEquals(this.ParentInternal.LayoutEngine, System.Windows.Forms.Layout.DefaultLayout.Instance)) {
+                                this.ParentInternal.LayoutEngine.InitLayout(this, System.Windows.Forms.BoundsSpecified.Size);
+                            }
+                            System.Windows.Forms.Layout.LayoutTransaction.DoLayout(this.ParentInternal, this, System.Windows.Forms.Layout.PropertyNames.AutoSize);
+                        }
+                    }
+                }
+            },
             Location: {
                 get: function () {
                     return this._location.$clone();
@@ -10439,6 +10461,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this.Element.style.top = this._location.Y + "px";
 
                     if (prev.X !== value.X || prev.Y !== value.Y) {
+                        System.Windows.Forms.Layout.CommonProperties.UpdateSpecifiedBounds(this, value.X, value.Y, this.Width, this.Height);
                         this.OnLocationChanged({ });
                     }
 
@@ -10533,6 +10556,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         this.Element.style.height = this._size.Height + "px";
 
                         if (System.Drawing.Size.op_Inequality(value.$clone(), prev.$clone())) {
+                            System.Windows.Forms.Layout.CommonProperties.UpdateSpecifiedBounds(this, this.Location.X, this.Location.Y, value.Width, value.Height);
                             this.OnResize({ });
                         }
                     }
@@ -10729,6 +10753,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 this.Controls = new System.Windows.Forms.ControlCollection(this);
 
+                this.Element.style.overflow = "hidden";
+
                 this.Element.style.position = "absolute";
                 this.Element.style.boxSizing = "borderbox";
 
@@ -10765,11 +10791,17 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                     return null;
                 });
-
+                this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowOnly;
                 this._init = true;
             }
         },
         methods: {
+            GetAutoSizeMode: function () {
+                return System.Windows.Forms.Layout.CommonProperties.GetAutoSizeMode(this);
+            },
+            SetAutoSizeMode: function (mode) {
+                System.Windows.Forms.Layout.CommonProperties.SetAutoSizeMode(this, mode);
+            },
             Invalidate: function () {
                 // TODO: Paint.. Support.
             },
@@ -11027,11 +11059,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         return size2.$clone();
                     }
                 }
+                this.CacheTextInternal = true;
                 try {
                     preferredSizeCore = this.GetPreferredSizeCore(proposedSize.$clone());
                 }
                 finally {
-                    //   this.CacheTextInternal = false;
+                    this.CacheTextInternal = false;
                 }
                 preferredSizeCore = this.ApplySizeConstraints(preferredSizeCore.$clone());
                 if (this.GetState2(2048) && (System.Drawing.Size.op_Equality(proposedSize.$clone(), System.Windows.Forms.Layout.LayoutUtils.MaxSize.$clone()))) {
@@ -11228,13 +11261,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             Items: null,
             FormattingEnabled: false,
             ItemHeight: 0,
-            DrawMode: 0,
-            MinimumSize$1: null
+            DrawMode: 0
         },
         ctors: {
-            init: function () {
-                this.MinimumSize$1 = new System.Drawing.Size();
-            },
             ctor: function () {
                 this.$initialize();
                 System.Windows.Forms.Control.ctor.call(this, document.createElement("select"));
@@ -12697,26 +12726,40 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 // work out area... of click.
                 var size = this.Size.$clone();
                 this._formMovementModes = System.Windows.Forms.Form.FormMovementModes.None;
+                document.body.style.userSelect = null;
+                this._mouseDownOnBorder = false;
 
                 //if(e.X > 1 && e.X < )
-                if (this._allowMoveChange) {
-                    if (e.X > 1 && e.X <= ((size.Width - this._formRightBorder) | 0) && e.Y > 1 && e.Y <= this._formTopBorder) {
+                if (this._allowMoveChange || this._allowSizeChange) {
+
+
+                    if (this._allowSizeChange) {
+                        if (e.X >= 0 && e.X <= 3 && e.Y >= 0 && e.Y <= 3) {
+                            this._mouseDownOnBorder = true;
+                            this._formMovementModes = System.Windows.Forms.Form.FormMovementModes.TopLeft;
+                        }
+                    }
+
+                    if (!this._mouseDownOnBorder && this._allowMoveChange && e.X > 1 && e.X <= ((size.Width - this._formRightBorder) | 0) && e.Y > 1 && e.Y <= this._formTopBorder) {
                         this._formMovementModes = System.Windows.Forms.Form.FormMovementModes.Move;
-                        this._prevX = (this.Location.X - (((e.X + this.Location.X) | 0))) | 0;
-                        this._prevY = (this.Location.Y - (((e.Y + this.Location.Y) | 0))) | 0;
-
-                        this._prevFormX = this.Location.X;
-                        this._prevFormY = this.Location.Y;
-
-                        //clientRec.top - mousePos.Yf;
+                        this._mouseDownOnBorder = true;
                     }
                 }
 
-                this._mouseDownOnBorder = true;
+                if (this._mouseDownOnBorder) {
+                    document.body.style.userSelect = "none";
+                    this._prevX = (this.Location.X - (((e.X + this.Location.X) | 0))) | 0;
+                    this._prevY = (this.Location.Y - (((e.Y + this.Location.Y) | 0))) | 0;
+
+                    this._prevFormX = this.Location.X;
+                    this._prevFormY = this.Location.Y;
+                }
+
 
                 System.Windows.Forms.ContainerControl.prototype.OnMouseDown.call(this, e);
             },
             OnMouseUp: function (e) {
+                document.body.style.userSelect = null;
                 this._mouseDownOnBorder = false;
                 System.Windows.Forms.ContainerControl.prototype.OnMouseUp.call(this, e);
             },
@@ -12727,6 +12770,13 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         this.Location = new System.Drawing.Point.$ctor1((((((this.Location.X + e.X) | 0)) + this._prevX) | 0), (((((this.Location.Y + e.Y) | 0)) + this._prevY) | 0));
                         //var newX = ((mX = mousePos.Xf) + MovingForm.prev_px);
                         //var newY = ((mY = mousePos.Yf) + MovingForm.prev_py);
+                    } else if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.TopLeft) {
+                        var prev = this.Location.$clone();
+                        this.SuspendLayout();
+                        this.Location = new System.Drawing.Point.$ctor1((((((this.Location.X + e.X) | 0)) + this._prevX) | 0), (((((this.Location.Y + e.Y) | 0)) + this._prevY) | 0));
+                        this.Size = new System.Drawing.Size.$ctor2(((this.Size.Width + (((prev.X - this.Location.X) | 0))) | 0), ((this.Size.Height + (((prev.Y - this.Location.Y) | 0))) | 0));
+
+                        this.ResumeLayout$1(true);
                     }
                     // we should do some action regarding this... etc move form, resize in direction.
 

@@ -601,7 +601,8 @@ namespace System.Windows.Forms
         private enum FormMovementModes
         {
             None,
-            Move
+            Move,
+            TopLeft
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -610,24 +611,40 @@ namespace System.Windows.Forms
             // work out area... of click.
             var size = Size;
             _formMovementModes = FormMovementModes.None;
+            document.body.style.userSelect = null;
+            _mouseDownOnBorder = false;
 
             //if(e.X > 1 && e.X < )
-            if (_allowMoveChange)
+            if (_allowMoveChange || _allowSizeChange)
             {
-                if (e.X > 1 && e.X <= size.Width - _formRightBorder && e.Y > 1 && e.Y <= _formTopBorder)
+                
+
+                if (_allowSizeChange)
+                {
+                    if (e.X >= 0 && e.X <= 3 && e.Y >= 0 && e.Y <= 3)
+                    {
+                        _mouseDownOnBorder = true;
+                        _formMovementModes = FormMovementModes.TopLeft;
+                    }
+                }
+
+                if (!_mouseDownOnBorder && _allowMoveChange && e.X > 1 && e.X <= size.Width - _formRightBorder && e.Y > 1 && e.Y <= _formTopBorder)
                 {
                     _formMovementModes = FormMovementModes.Move;
-                    _prevX = Location.X - (e.X + Location.X);
-                    _prevY = Location.Y - (e.Y + Location.Y);
-
-                    _prevFormX = Location.X;
-                    _prevFormY = Location.Y;
-
-                    //clientRec.top - mousePos.Yf;
+                    _mouseDownOnBorder = true;
                 }
             }
 
-            _mouseDownOnBorder = true;
+            if(_mouseDownOnBorder)
+            {
+                document.body.style.userSelect = "none";
+                _prevX = Location.X - (e.X + Location.X);
+                _prevY = Location.Y - (e.Y + Location.Y);
+
+                _prevFormX = Location.X;
+                _prevFormY = Location.Y;
+            }
+            
 
             base.OnMouseDown(e);
         }
@@ -635,6 +652,7 @@ namespace System.Windows.Forms
 
         protected override void OnMouseUp(MouseEventArgs e)
         {
+            document.body.style.userSelect = null;
             _mouseDownOnBorder = false;
             base.OnMouseUp(e);
         }
@@ -649,6 +667,14 @@ namespace System.Windows.Forms
                     Location = new Point((Location.X + e.X) + _prevX, (Location.Y + e.Y) + _prevY);
                     //var newX = ((mX = mousePos.Xf) + MovingForm.prev_px);
                     //var newY = ((mY = mousePos.Yf) + MovingForm.prev_py);
+                }else if(_formMovementModes == FormMovementModes.TopLeft)
+                {
+                    var prev = Location;
+                    SuspendLayout();
+                    Location = new Point((Location.X + e.X) + _prevX, (Location.Y + e.Y) + _prevY);
+                    Size = new Size(Size.Width + (prev.X - Location.X), Size.Height + (prev.Y - Location.Y));
+
+                    ResumeLayout(true);
                 }
                 // we should do some action regarding this... etc move form, resize in direction.
 

@@ -278,6 +278,7 @@
         private static void LayoutAnchoredControls(IArrangedElement container)
         {
             Rectangle displayRectangle = container.DisplayRectangle;
+      
             if (!CommonProperties.GetAutoSize(container) || ((displayRectangle.Width != 0) && (displayRectangle.Height != 0)))
             {
                 ArrangedElementCollection children = container.Children;
@@ -302,18 +303,19 @@
                 {
                     Rectangle cachedBounds = GetCachedBounds(element);
                     AnchorStyles anchor = GetAnchor(element);
-                    Size maxSize = LayoutUtils.MaxSize;
+                    Size preferredSize = element.DisplayRectangle.Size;
+                    //Size maxSize = cachedBounds.Size;
                     if ((anchor & (AnchorStyles.Right | AnchorStyles.Left)) == (AnchorStyles.Right | AnchorStyles.Left))
                     {
-                        maxSize.Width = cachedBounds.Width;
+                        preferredSize.Width = cachedBounds.Width;
                     }
                     if ((anchor & (AnchorStyles.Bottom | AnchorStyles.Top)) == (AnchorStyles.Bottom | AnchorStyles.Top))
                     {
-                        maxSize.Height = cachedBounds.Height;
+                        preferredSize.Height = cachedBounds.Height;
                     }
-                    Size preferredSize = element.GetPreferredSize(maxSize);
+
                     Rectangle bounds = cachedBounds;
-                    if (CommonProperties.GetAutoSizeMode(element) == AutoSizeMode.GrowAndShrink)
+                    if ( CommonProperties.GetAutoSizeMode(element) == AutoSizeMode.GrowAndShrink)
                     {
                         bounds = GetGrowthBounds(element, preferredSize);
                     }

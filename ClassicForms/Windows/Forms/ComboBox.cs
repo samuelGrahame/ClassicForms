@@ -18,7 +18,6 @@ namespace System.Windows.Forms
         public virtual bool FormattingEnabled { get; set; }
         public virtual int ItemHeight { get; set; }
         public DrawMode DrawMode { get; set; }
-        public virtual Size MinimumSize { get; set; }
     }
 
     public class ListBox : Control

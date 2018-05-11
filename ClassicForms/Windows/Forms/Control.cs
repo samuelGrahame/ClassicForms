@@ -15,6 +15,38 @@ namespace System.Windows.Forms
         public string Name { get { return Element.getAttribute("Name"); } set { Element.setAttribute("Name", value); } }
         private Point _location;
 
+        protected AutoSizeMode GetAutoSizeMode() =>
+    CommonProperties.GetAutoSizeMode(this);
+
+        protected void SetAutoSizeMode(AutoSizeMode mode)
+        {
+            CommonProperties.SetAutoSizeMode(this, mode);
+        }
+        public AutoSizeMode AutoSizeMode
+        {
+            get =>
+                this.GetAutoSizeMode();
+            set
+            {
+                if (!ClientUtils.IsEnumValid(value, (int)value, 0, 1))
+                {
+                    throw new InvalidEnumArgumentException("value", (int)value, typeof(AutoSizeMode));
+                }
+                if (this.GetAutoSizeMode() != value)
+                {
+                    this.SetAutoSizeMode(value);
+                    if (this.ParentInternal != null)
+                    {
+                        if (this.ParentInternal.LayoutEngine == DefaultLayout.Instance)
+                        {
+                            this.ParentInternal.LayoutEngine.InitLayout(this, BoundsSpecified.Size);
+                        }
+                        LayoutTransaction.DoLayout(this.ParentInternal, this, PropertyNames.AutoSize);
+                    }
+                }
+            }
+        }
+
         public Point Location
         {
             get { return _location; }
@@ -26,8 +58,9 @@ namespace System.Windows.Forms
                 Element.style.left = _location.X + "px";
                 Element.style.top = _location.Y + "px";
 
-                if(prev.X != value.X || prev.Y != value.Y)
+                if (prev.X != value.X || prev.Y != value.Y)
                 {
+                    CommonProperties.UpdateSpecifiedBounds(this, value.X, value.Y, this.Width, this.Height);
                     OnLocationChanged(EventArgs.Empty);
                 }
 
@@ -78,7 +111,7 @@ namespace System.Windows.Forms
                 this.Invalidate();
             }
         }
-        
+
         protected virtual void OnLocationChanged(EventArgs e)
         {
             this.OnMove(EventArgs.Empty);
@@ -149,7 +182,7 @@ namespace System.Windows.Forms
         private bool _visible;
         public bool Visible { get { return _visible; } set {
                 _visible = value;
-                Element.style.visibility = _visible ? "inherit" : "hidden";                
+                Element.style.visibility = _visible ? "inherit" : "hidden";
             } }
         [DefaultValue(0)]//[SRCategory("CatLayout"), Localizable(true), RefreshProperties(RefreshProperties.Repaint), , SRDescription("ControlDockDescr")]
         public virtual DockStyle Dock
@@ -206,7 +239,7 @@ namespace System.Windows.Forms
             if (this.Parent == null)
                 return null;
 
-            if(this.Parent is Form)
+            if (this.Parent is Form)
             {
                 return this.Parent.As<Form>();
             }
@@ -220,7 +253,7 @@ namespace System.Windows.Forms
         public Size Size { get { return _size; } set {
                 var prev = _size;
                 _size = value;
-                if(_autoSize)
+                if (_autoSize)
                 {
                     Element.style.width = "auto";
                     Element.style.height = "auto";
@@ -231,11 +264,12 @@ namespace System.Windows.Forms
                     Element.style.width = _size.Width + "px";
                     Element.style.height = _size.Height + "px";
 
-                    if(value != prev)
+                    if (value != prev)
                     {
+                        CommonProperties.UpdateSpecifiedBounds(this, this.Location.X, this.Location.Y, value.Width, value.Height);
                         OnResize(EventArgs.Empty);
                     }
-                }                
+                }
             } }
 
         private bool _tabStop;
@@ -247,14 +281,14 @@ namespace System.Windows.Forms
         protected int _tabIndex;
         public virtual int TabIndex { get { return _tabIndex; } set {
                 _tabIndex = value;
-                if(TabStop)
+                if (TabStop)
                 {
                     Element.tabIndex = value;
                 }
                 else
                 {
-                    Element.removeAttribute("TabIndex");                    
-                }                
+                    Element.removeAttribute("TabIndex");
+                }
             } }
         public virtual string Text { get; set; }
 
@@ -276,7 +310,7 @@ namespace System.Windows.Forms
             set
             {
                 _enabled = value;
-                ApplyDisabled();                
+                ApplyDisabled();
             }
         }
 
@@ -293,13 +327,13 @@ namespace System.Windows.Forms
 
         protected void ApplyDisabled(HTMLElement element = null)
         {
-            if(element == null)
+            if (element == null)
             {
                 element = Element;
             }
-            if(Enabled)
+            if (Enabled)
             {
-                if(element.classList.contains("disabled"))
+                if (element.classList.contains("disabled"))
                 {
                     element.classList.remove("disabled");
                     element.removeAttribute("disabled");
@@ -314,7 +348,7 @@ namespace System.Windows.Forms
                 }
             }
         }
-        
+
 
         public virtual Color ForeColor { get; set; }
 
@@ -334,7 +368,7 @@ namespace System.Windows.Forms
             }
             else
             {
-                if(element.classList.contains("readonly"))
+                if (element.classList.contains("readonly"))
                 {
                     element.classList.remove("readonly");
                     element.removeAttribute("readonly");
@@ -353,7 +387,7 @@ namespace System.Windows.Forms
             set
             {
                 _tag = value;
-                if(_tag is string)
+                if (_tag is string)
                 {
                     Element.className = (_tag + "");
                 }
@@ -369,7 +403,7 @@ namespace System.Windows.Forms
         private Font _font;
         public virtual Font Font { get { return _font; } set {
                 _font = value;
-                if(_font == null)
+                if (_font == null)
                 {
                     Element.style.fontSize = "inherit";
                     Element.style.fontFamily = "inherit";
@@ -384,12 +418,12 @@ namespace System.Windows.Forms
         private bool _autoSize;
         protected bool _init;
         public virtual bool AutoSize { get { return _autoSize; } set {
-                if(_init)
+                if (_init)
                 {
                     _autoSize = value;
 
                     Size = _size;
-                }                
+                }
             } }
 
         internal HTMLElement Element;
@@ -422,12 +456,14 @@ namespace System.Windows.Forms
             };
 
         }
-        
+
         internal Control(HTMLElement element)
-        {            
+        {
             Element = element;
 
             Controls = new ControlCollection(this);
+
+            Element.style.overflow = "hidden";
 
             Element.style.position = "absolute";
             Element.style.boxSizing = "borderbox";
@@ -469,7 +505,7 @@ namespace System.Windows.Forms
 
                 return null;
             };
-
+            AutoSizeMode = AutoSizeMode.GrowOnly;
             _init = true;
         }
 
@@ -491,7 +527,7 @@ namespace System.Windows.Forms
                 MouseMove(this, e);
         }
 
-        
+
 
         //protected virtual void OnResize(EventArgs e)
         //{
@@ -556,7 +592,7 @@ namespace System.Windows.Forms
         public event MouseEventHandler MouseDown;
         public event MouseEventHandler MouseMove;
         public event MouseEventHandler MouseUp;
-        public event EventHandler Disposed;        
+        public event EventHandler Disposed;
         protected byte layoutSuspendCount;
 
         public void SuspendLayout()
@@ -651,7 +687,7 @@ namespace System.Windows.Forms
             //{
             //    this.ActiveXViewChanged();
             //}
-           // LayoutEventHandler handler = (LayoutEventHandler)base.Events[EventLayout];
+            // LayoutEventHandler handler = (LayoutEventHandler)base.Events[EventLayout];
             if (LayoutChanged != null)
             {
                 LayoutChanged(this, levent);
@@ -739,7 +775,7 @@ namespace System.Windows.Forms
                 this.PerformLayout(null, null);
             }
         }
-        
+
         public int state;
         public int state2;
 
@@ -772,14 +808,15 @@ namespace System.Windows.Forms
                 {
                     return size2;
                 }
-            }            
+            }
+            this.CacheTextInternal = true;
             try
             {
                 preferredSizeCore = this.GetPreferredSizeCore(proposedSize);
             }
             finally
             {
-             //   this.CacheTextInternal = false;
+                this.CacheTextInternal = false;
             }
             preferredSizeCore = this.ApplySizeConstraints(preferredSizeCore);
             if (this.GetState2(0x800) && (proposedSize == LayoutUtils.MaxSize))
@@ -788,6 +825,7 @@ namespace System.Windows.Forms
             }
             return preferredSizeCore;
         }
+
 
 
         internal virtual Rectangle ApplyBoundsConstraints(int suggestedX, int suggestedY, int proposedWidth, int proposedHeight)
@@ -954,7 +992,7 @@ namespace System.Windows.Forms
             if (((this.Location.X != x) || (this.Location.Y != y)) || ((this.Size.Width != width) || (this.Size.Height != height)))
             {
                 this.SetBoundsCore(x, y, width, height, specified);
-                LayoutTransaction.DoLayout(this.ParentInternal, this, PropertyNames.Bounds);
+                LayoutTransaction.DoLayout(this.ParentInternal, this, PropertyNames.Bounds);                
             }
             else
             {
