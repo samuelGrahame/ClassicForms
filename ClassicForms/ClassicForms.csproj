@@ -23,7 +23,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoStdLib>true</NoStdLib>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,8 +36,21 @@
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Collections\DictionaryEntryV2.cs" />
+    <Compile Include="Collections\IDict.cs" />
+    <Compile Include="Collections\IDictEnumrator.cs" />
+    <Compile Include="ComponentModel\InvalidEnumArgumentException.cs" />
+    <Compile Include="IServiceProviderV2.cs" />
+    <Compile Include="OrdinalRandomizedComparer.cs" />
+    <Compile Include="StringComparer.cs" />
+    <Compile Include="Collections\ArrayList.cs" />
+    <Compile Include="Collections\Generic\Specialized\BitVector32.cs" />
+    <Compile Include="Collections\Generic\Specialized\HybridDictionary.cs" />
+    <Compile Include="Collections\Generic\Specialized\ListDictionary.cs" />
     <Compile Include="ComponentModel\Container.cs" />
+    <Compile Include="ComponentModel\IComponent.cs" />
     <Compile Include="ComponentModel\IContainer.cs" />
+    <Compile Include="ComponentModel\ISite.cs" />
     <Compile Include="ComponentModel\ISupportInitialize.cs" />
     <Compile Include="Data\DataColumn.cs" />
     <Compile Include="Data\DataColumnCollection.cs" />
@@ -44,17 +58,34 @@
     <Compile Include="Data\DataRowCollection.cs" />
     <Compile Include="Data\DataTable.cs" />
     <Compile Include="Drawing\Color.cs" />
+    <Compile Include="Drawing\ContentAlignment.cs" />
     <Compile Include="Drawing\Font.cs" />
     <Compile Include="Drawing\FontStyle.cs" />
     <Compile Include="Drawing\GraphicsUnit.cs" />
+    <Compile Include="Drawing\PointF.cs" />
+    <Compile Include="Drawing\RectangeF.cs" />
+    <Compile Include="Drawing\Rectangle.cs" />
     <Compile Include="Drawing\SizeF.cs" />
     <Compile Include="Drawing\Size.cs" />
     <Compile Include="Drawing\Point.cs" />
     <Compile Include="Drawing\SystemColors.cs" />
+    <Compile Include="Drawing\TextRenderer.cs" />
+    <Compile Include="Enviroment.cs" />
+    <Compile Include="IWellKnownStringEqualityComparer.cs" />
+    <Compile Include="OrdinalComparer.cs" />
+    <Compile Include="StringUtils.cs" />
+    <Compile Include="Windows\Forms\DpiHelper.cs" />
+    <Compile Include="Windows\Forms\AnchorStyles.cs" />
     <Compile Include="Windows\Forms\AutoScaleMode.cs" />
+    <Compile Include="Windows\Forms\AutoSizeMode.cs" />
+    <Compile Include="Windows\Forms\BoundsSpecified.cs" />
     <Compile Include="Windows\Forms\Button.cs" />
     <Compile Include="Windows\Forms\ButtonBase.cs" />
     <Compile Include="Windows\Forms\CheckBox.cs" />
+    <Compile Include="Windows\Forms\ClientUtils.cs" />
+    <Compile Include="Windows\Forms\Layout\LayoutTransaction.cs" />
+    <Compile Include="Windows\Forms\Layout\PropertyNames.cs" />
+    <Compile Include="Windows\Forms\TextFormatFlags.cs" />
     <Compile Include="Windows\Forms\ComboBox.cs" />
     <Compile Include="Windows\Forms\ContainerControl.cs" />
     <Compile Include="Windows\Forms\Control.cs" />
@@ -66,12 +97,20 @@
     <Compile Include="Windows\Forms\DataGridViewColumnHeadersHeightSizeMode.cs" />
     <Compile Include="Windows\Forms\DataGridViewTextBoxColumn.cs" />
     <Compile Include="Windows\Forms\DialogResult.cs" />
+    <Compile Include="Windows\Forms\DockStyle.cs" />
     <Compile Include="Windows\Forms\DrawMode.cs" />
     <Compile Include="Windows\Forms\Form.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Windows\Forms\FormBorderStyle.cs" />
     <Compile Include="Windows\Forms\GroupBox.cs" />
     <Compile Include="Windows\Forms\Label.cs" />
+    <Compile Include="Windows\Forms\LayoutEventArgs.cs" />
+    <Compile Include="Windows\Forms\Layout\ArrangedElementCollection.cs" />
+    <Compile Include="Windows\Forms\Layout\CommonProperties.cs" />
+    <Compile Include="Windows\Forms\Layout\DefaultLayout.cs" />
+    <Compile Include="Windows\Forms\Layout\IArrangedElement.cs" />
+    <Compile Include="Windows\Forms\Layout\LayoutEngine.cs" />
+    <Compile Include="Windows\Forms\Layout\LayoutUtils.cs" />
     <Compile Include="Windows\Forms\LinkLabel.cs" />
     <Compile Include="Windows\Forms\LinkLabelLinkClickedEventHandler.cs" />
     <Compile Include="Windows\Forms\MouseButtons.cs" />
@@ -83,10 +122,14 @@
     <Compile Include="Windows\Forms\Padding.cs" />
     <Compile Include="Windows\Forms\Panel.cs" />
     <Compile Include="Windows\Forms\ProgressBar.cs" />
+    <Compile Include="Windows\Forms\PropertyStore.cs" />
+    <Compile Include="Windows\Forms\SR.cs" />
     <Compile Include="Windows\Forms\TabControl.cs" />
     <Compile Include="Windows\Forms\TabPage.cs" />
     <Compile Include="Windows\Forms\TabPageHeader.cs" />
     <Compile Include="Windows\Forms\TextBox.cs" />
+    <Compile Include="Windows\Forms\TextImageRelation.cs" />
+    <Compile Include="Windows\Forms\WindowsFormsUtils.cs" />
     <Compile Include="Windows\Forms\WindowState.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -94,37 +137,47 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Bridge, Version=16.8.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Bridge.Core.16.8.2\lib\net40\Bridge.dll</HintPath>
+    <Reference Include="Bridge, Version=17.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bridge.Core.17.0.0\lib\net40\Bridge.dll</HintPath>
     </Reference>
-    <Reference Include="Bridge.Html5, Version=16.8.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Bridge.Html5.16.8.2\lib\net40\Bridge.Html5.dll</HintPath>
+    <Reference Include="Bridge.Html5, Version=17.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bridge.Html5.17.0.0\lib\net40\Bridge.Html5.dll</HintPath>
     </Reference>
-    <Reference Include="Retyped.Core, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Retyped.Core.1.4.6556\lib\net40\Retyped.Core.dll</HintPath>
+    <Reference Include="Retyped.Core, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Retyped.Core.1.5.6685\lib\net40\Retyped.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Retyped.dom, Version=2.3.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Retyped.dom.2.3.6556\lib\net40\Retyped.dom.dll</HintPath>
+    <Reference Include="Retyped.dom, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Retyped.dom.2.8.6685\lib\net40\Retyped.dom.dll</HintPath>
     </Reference>
-    <Reference Include="Retyped.es5, Version=2.3.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Retyped.es5.2.3.6556\lib\net40\Retyped.es5.dll</HintPath>
+    <Reference Include="Retyped.es2015.core, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Retyped.es2015.core.2.8.6685\lib\net40\Retyped.es2015.core.dll</HintPath>
     </Reference>
-    <Reference Include="Retyped.jquery, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Retyped.jquery.2.0.6556\lib\net40\Retyped.jquery.dll</HintPath>
+    <Reference Include="Retyped.es2015.iterable, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Retyped.es2015.iterable.2.8.6685\lib\net40\Retyped.es2015.iterable.dll</HintPath>
     </Reference>
-    <Reference Include="Retyped.scripthost, Version=2.3.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Retyped.scripthost.2.3.6556\lib\net40\Retyped.scripthost.dll</HintPath>
+    <Reference Include="Retyped.es2015.symbol, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Retyped.es2015.symbol.2.8.6685\lib\net40\Retyped.es2015.symbol.dll</HintPath>
+    </Reference>
+    <Reference Include="Retyped.es5, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Retyped.es5.2.8.6685\lib\net40\Retyped.es5.dll</HintPath>
+    </Reference>
+    <Reference Include="Retyped.jquery, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Retyped.jquery.3.3.6685\lib\net40\Retyped.jquery.dll</HintPath>
+    </Reference>
+    <Reference Include="Retyped.scripthost, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Retyped.scripthost.2.8.6685\lib\net40\Retyped.scripthost.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Bridge\windows10.css" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Bridge.Min.16.8.2\build\Bridge.Min.targets" Condition="Exists('..\packages\Bridge.Min.16.8.2\build\Bridge.Min.targets')" />
+  <Import Project="..\packages\Bridge.Min.17.0.0\build\Bridge.Min.targets" Condition="Exists('..\packages\Bridge.Min.17.0.0\build\Bridge.Min.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Bridge.Min.16.8.2\build\Bridge.Min.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Bridge.Min.16.8.2\build\Bridge.Min.targets'))" />
+    <Error Condition="!Exists('..\packages\Bridge.Min.17.0.0\build\Bridge.Min.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Bridge.Min.17.0.0\build\Bridge.Min.targets'))" />
   </Target>
 </Project>

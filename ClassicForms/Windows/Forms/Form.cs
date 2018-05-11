@@ -19,6 +19,7 @@ namespace System.Windows.Forms
         private bool _mouseDownOnBorder = false;
         private FormMovementModes _formMovementModes = FormMovementModes.None;
         public static HTMLDivElement _formOverLay = null;
+        private Button btnClose;
         
         static Form()
         {
@@ -44,6 +45,8 @@ namespace System.Windows.Forms
                 return null;
             };
 
+
+            
             document.body.appendChild(_formOverLay);
         }
 
@@ -368,7 +371,7 @@ namespace System.Windows.Forms
             float widthTotal = 0;
             int y = 30;
 
-            var viewSize = document.body.getBoundingClientRect();
+            var viewSize = document.body.getBoundingClientRect().As<ClientRect>();
 
             foreach (var item in _minimizedForms)
             {
@@ -533,7 +536,7 @@ namespace System.Windows.Forms
 
         protected virtual void OnShowed()
         {
-
+            
         }
 
         protected void Resizing()
@@ -554,6 +557,13 @@ namespace System.Windows.Forms
             TabStop = false;
 
             this.Location = new Point(0, 0);
+
+            btnClose = new Button()
+            {
+                Tag = "Close"
+            };
+            btnClose.Element.setAttribute("scope", "closeform");            
+            Controls.Add(btnClose);
 
             _setBorderWidth();
         }
@@ -644,6 +654,11 @@ namespace System.Windows.Forms
 
             }
             base.OnMouseMove(e);
+        }
+
+        private void _processWinFormCloseButton()
+        {
+            
         }
 
         private void _processWinFormView()
@@ -788,9 +803,7 @@ namespace System.Windows.Forms
         {
 
         }
-               
-
-        public Size ClientSize { get { return GetClientSize(Size); } set { Size = SetSize(value); } }
+        public override Size ClientSize { get { return GetClientSize(Size); } set { Size = SetSize(value); } }
         public override string Text { get; set; }        
     }
 }

@@ -1,33 +1,131 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.Layout;
 using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
-    public class Control
+    public class Control : IArrangedElement, IComponent
     {
         public string Name { get { return Element.getAttribute("Name"); } set { Element.setAttribute("Name", value); } }
         private Point _location;
+
         public Point Location
         {
             get { return _location; }
             set
             {
+                var prev = _location;
                 _location = value;
 
                 Element.style.left = _location.X + "px";
                 Element.style.top = _location.Y + "px";
 
+                if(prev.X != value.X || prev.Y != value.Y)
+                {
+                    OnLocationChanged(EventArgs.Empty);
+                }
+
             }
         }
+
+        public virtual Size MaximumSize { get; set; }
+        public virtual Size MinimumSize { get; set; }
+
+        public int Width {
+            get
+            {
+                return Size.Width;
+            }
+            set
+            {
+                Size = new Size(value, Size.Height);
+            }
+        }
+
+        public int Height
+        {
+            get
+            {
+                return Size.Height;
+            }
+            set
+            {
+                Size = new Size(Size.Width, value);
+            }
+        }
+
+        public bool RenderTransparent;
+
+        public void Invalidate()
+        {
+            // TODO: Paint.. Support.
+        }
+
+        protected virtual void OnMove(EventArgs e)
+        {
+            if (Move != null)
+            {
+                Move(this, e);
+            }
+            if (this.RenderTransparent)
+            {
+                this.Invalidate();
+            }
+        }
+        
+        protected virtual void OnLocationChanged(EventArgs e)
+        {
+            this.OnMove(EventArgs.Empty);
+            if (LocationChanged != null)
+            {
+                LocationChanged(this, e);
+            }
+        }
+
+
+        protected virtual void OnResize(EventArgs e)
+        {
+            // TODO: if (((this.controlStyle & ControlStyles.ResizeRedraw) == ControlStyles.ResizeRedraw) || this.GetState(0x400000))
+            //{
+            //    this.Invalidate();
+            //}
+            LayoutTransaction.DoLayout(this, this, PropertyNames.Bounds);
+            if (Resize != null)
+            {
+                Resize(this, e);
+            }
+        }
+
 
         internal virtual void OnControlAdded(Control control)
         {
 
+        }
+
+        internal virtual Control ParentInternal
+        {
+            get =>
+                this._parent;
+            set
+            {
+                if (this._parent != value)
+                {
+                    if (value != null)
+                    {
+                        value.Controls.Add(this);
+                    }
+                    else
+                    {
+                        this._parent.Controls.Remove(this);
+                    }
+                }
+            }
         }
 
         internal virtual void OnControlRemoved(Control control)
@@ -35,15 +133,73 @@ namespace System.Windows.Forms
 
         }
 
+        //public virtual AnchorStyles Anchor { get; set; }
+
+        [DefaultValue(5)]//[SRCategory("CatLayout"), Localizable(true), DefaultValue(5), SRDescription("ControlAnchorDescr"), RefreshProperties(RefreshProperties.Repaint)]
+        public virtual AnchorStyles Anchor
+        {
+            get =>
+                DefaultLayout.GetAnchor(this);
+            set
+            {
+                DefaultLayout.SetAnchor(this.ParentInternal, this, value);
+            }
+        }
+
         private bool _visible;
         public bool Visible { get { return _visible; } set {
                 _visible = value;
                 Element.style.visibility = _visible ? "inherit" : "hidden";                
             } }
+        [DefaultValue(0)]//[SRCategory("CatLayout"), Localizable(true), RefreshProperties(RefreshProperties.Repaint), , SRDescription("ControlDockDescr")]
+        public virtual DockStyle Dock
+        {
+            get =>
+                DefaultLayout.GetDock(this);
+            set
+            {
+                if (value != this.Dock)
+                {
+                    this.SuspendLayout();
+                    try
+                    {
+                        DefaultLayout.SetDock(this, value);
+                        this.OnDockChanged(EventArgs.Empty);
+                    }
+                    finally
+                    {
+                        this.ResumeLayout();
+                    }
+                }
+            }
+        }
+
+        protected virtual void OnDockChanged(EventArgs e)
+        {
+            if (DockChanged != null)
+            {
+                DockChanged(this, e);
+            }
+        }
+
 
         internal Control _parent;
 
-        public Control Parent { get { return _parent; } }
+        //public Control Parent { get { return _parent; } }
+
+        //[SRCategory("CatBehavior"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), SRDescription("ControlParentDescr")]
+        public Control Parent
+        {
+            get
+            {
+                //IntSecurity.GetParent.Demand();
+                return this.ParentInternal;
+            }
+            set
+            {
+                this.ParentInternal = value;
+            }
+        }
 
         public Form GetForm()
         {
@@ -62,6 +218,7 @@ namespace System.Windows.Forms
 
         private Size _size;
         public Size Size { get { return _size; } set {
+                var prev = _size;
                 _size = value;
                 if(_autoSize)
                 {
@@ -70,8 +227,14 @@ namespace System.Windows.Forms
                 }
                 else
                 {
+                    //Resize
                     Element.style.width = _size.Width + "px";
                     Element.style.height = _size.Height + "px";
+
+                    if(value != prev)
+                    {
+                        OnResize(EventArgs.Empty);
+                    }
                 }                
             } }
 
@@ -234,7 +397,7 @@ namespace System.Windows.Forms
 
         static Control()
         {
-            window.onmousemove = new Window.onmousemoveFn((ev) =>
+            window.onmousemove = (ev) =>
             {
                 if (ClickedOnControl != null)
                 {
@@ -243,9 +406,9 @@ namespace System.Windows.Forms
                     ClickedOnControl.OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev, ClickedOnControl));
                 }
                 return null;
-            });
+            };
 
-            window.onmouseup = new Window.onmouseupFn((ev) =>
+            window.onmouseup = (ev) =>
             {
                 if (ClickedOnControl != null)
                 {
@@ -256,7 +419,7 @@ namespace System.Windows.Forms
                     ClickedOnControl = null;
                 }
                 return null;
-            });
+            };
 
         }
         
@@ -279,23 +442,25 @@ namespace System.Windows.Forms
 
             TabStop = true;
 
-            Element.onclick = new HTMLElement.onclickFn((ev) =>
+            Element.onclick = (ev) =>
             {
                 OnClick(EventArgs.Empty);
                 return null;
-            });
+            };
 
-            Element.onmousedown = new HTMLElement.onmousedownFn((ev) => {
+            Element.onmousedown = (ev) =>
+            {
                 ClickedOnControl = this;
                 ev.stopPropagation();
 
                 OnMouseDown(MouseEventArgs.CreateFromMouseEvent(ev, this));
-                
-                return null;
-            });
 
-            Element.onmousemove = new HTMLElement.onmousemoveFn((ev) => {
-                if(ClickedOnControl == null)
+                return null;
+            };
+
+            Element.onmousemove = (ev) =>
+            {
+                if (ClickedOnControl == null)
                 {
                     ev.stopPropagation();
 
@@ -303,7 +468,7 @@ namespace System.Windows.Forms
                 }
 
                 return null;
-            });
+            };
 
             _init = true;
         }
@@ -325,6 +490,24 @@ namespace System.Windows.Forms
             if (MouseMove != null)
                 MouseMove(this, e);
         }
+
+        
+
+        //protected virtual void OnResize(EventArgs e)
+        //{
+        //    if (Resize != null)
+        //        Resize(this, e);
+
+        //    if (layoutSuspended)
+        //    {
+        //        return;
+        //    }
+
+        //    foreach (var control in Controls)
+        //    {
+        //        control.PerformLayout();
+        //    }
+        //}
 
         internal void InvokeLoad()
         {
@@ -348,34 +531,449 @@ namespace System.Windows.Forms
         public Padding Margin { get; set; }
         public Padding Padding { get; set; }
 
+        public Rectangle Bounds => new Rectangle(Location, Size);
+
+        public ArrangedElementCollection Children => new ArrangedElementCollection(new Collections.ArrayList(this.Controls._items));
+
+        public IArrangedElement Container => this.Parent;
+
+        public Rectangle DisplayRectangle => new Rectangle(0, 0, this.ClientSize.Width, this.ClientSize.Height);
+        public virtual Size ClientSize { get { return Size; } set { Size = value; } }
+
+        private bool _participatesInLayout = true;
+        public bool ParticipatesInLayout => _participatesInLayout;
+
+        private PropertyStore _properties = new PropertyStore();
+        public PropertyStore Properties => _properties;
+
+        public ISite Site { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public event EventHandler Click;
+        public event EventHandler Resize;
+        public event EventHandler LocationChanged;
+        public event EventHandler Move;
+        public event EventHandler DockChanged;
         public event MouseEventHandler MouseDown;
         public event MouseEventHandler MouseMove;
         public event MouseEventHandler MouseUp;
-        protected bool layoutSuspended = false;
+        public event EventHandler Disposed;        
+        protected byte layoutSuspendCount;
 
         public void SuspendLayout()
         {
-            layoutSuspended = true;
+            this.layoutSuspendCount = (byte)(this.layoutSuspendCount + 1);
+            if (this.layoutSuspendCount == 1)
+            {
+                this.OnLayoutSuspended();
+            }
         }
+
+        internal virtual void OnLayoutSuspended()
+        {
+        }
+
+
+        public void ResumeLayout()
+        {
+            this.ResumeLayout(true);
+        }
+
+        internal virtual void OnLayoutResuming(bool performLayout)
+        {
+            if (this.ParentInternal != null)
+            {
+                this.ParentInternal.OnChildLayoutResuming(this, performLayout);
+            }
+        }
+
+        internal virtual void OnChildLayoutResuming(Control child, bool performLayout)
+        {
+            if (this.ParentInternal != null)
+            {
+                this.ParentInternal.OnChildLayoutResuming(child, performLayout);
+            }
+        }
+
         public void ResumeLayout(bool performLayout)
         {
-            layoutSuspended = false;
-            if(performLayout)
+            bool flag = false;
+            if (this.layoutSuspendCount > 0)
             {
-                PerformLayout();
+                if (this.layoutSuspendCount == 1)
+                {
+                    this.layoutSuspendCount = (byte)(this.layoutSuspendCount + 1);
+                    try
+                    {
+                        this.OnLayoutResuming(performLayout);
+                    }
+                    finally
+                    {
+                        this.layoutSuspendCount = (byte)(this.layoutSuspendCount - 1);
+                    }
+                }
+                this.layoutSuspendCount = (byte)(this.layoutSuspendCount - 1);
+                if (((this.layoutSuspendCount == 0) && this.GetState(0x200)) & performLayout)
+                {
+                    this.PerformLayout();
+                    flag = true;
+                }
+            }
+            if (!flag)
+            {
+                this.SetState2(0x40, true);
+            }
+            if (!performLayout)
+            {
+                CommonProperties.xClearPreferredSizeCache(this);
+                ControlCollection controls = Controls;
+                if (controls != null)
+                {
+                    for (int i = 0; i < controls.Count; i++)
+                    {
+                        this.LayoutEngine.InitLayout(controls[i], BoundsSpecified.All);
+                        CommonProperties.xClearPreferredSizeCache(controls[i]);
+                    }
+                }
             }
         }
+        private static readonly int PropControlsCollection = PropertyStore.CreateKey();
+        internal void SetState2(int flag, bool value)
+        {
+            this.state2 = value ? (this.state2 | flag) : (this.state2 & ~flag);
+        }
+
+        public DefaultLayout LayoutEngine = new DefaultLayout();
+
+        public EventHandler LayoutChanged;
+        protected virtual void OnLayout(LayoutEventArgs levent)
+        {
+            //if (this.IsActiveX)
+            //{
+            //    this.ActiveXViewChanged();
+            //}
+           // LayoutEventHandler handler = (LayoutEventHandler)base.Events[EventLayout];
+            if (LayoutChanged != null)
+            {
+                LayoutChanged(this, levent);
+            }
+            if (this.LayoutEngine.Layout(this, levent) && (this.ParentInternal != null))
+            {
+                this.ParentInternal.SetState(0x800000, true);
+            }
+        }
+
+
+        internal void SetState(int flag, bool value)
+        {
+            this.state = value ? (this.state | flag) : (this.state & ~flag);
+        }
+        private bool _disposing = false;
+
+        public bool Disposing => _disposing;
+        internal bool GetAnyDisposingInHierarchy()
+        {
+            Control parent = this;
+            while (parent != null)
+            {
+                if (parent.Disposing)
+                {
+                    return true;
+                }
+                parent = parent.Parent;
+            }
+            return false;
+        }
+
+        internal bool CacheTextInternal;
+        internal void PerformLayout(LayoutEventArgs args)
+        {
+            if (!this.GetAnyDisposingInHierarchy())
+            {
+                if (this.layoutSuspendCount > 0)
+                {
+                    this.SetState(0x200, true);
+                    if ((this.cachedLayoutEventArgs == null) || (this.GetState2(0x40) && (args != null)))
+                    {
+                        this.cachedLayoutEventArgs = args;
+                        if (this.GetState2(0x40))
+                        {
+                            this.SetState2(0x40, false);
+                        }
+                    }
+                    this.LayoutEngine.ProcessSuspendedLayoutEventArgs(this, args);
+                }
+                else
+                {
+                    this.layoutSuspendCount = 1;
+                    try
+                    {
+                        this.CacheTextInternal = true;
+                        this.OnLayout(args);
+                    }
+                    finally
+                    {
+                        this.CacheTextInternal = false;
+                        this.SetState(0x800200, false);
+                        this.layoutSuspendCount = 0;
+                        if ((this.ParentInternal != null) && this.ParentInternal.GetState(0x800000))
+                        {
+                            LayoutTransaction.DoLayout(this.ParentInternal, this, PropertyNames.PreferredSize);
+                        }
+                    }
+                }
+            }
+        }
+
+        internal LayoutEventArgs cachedLayoutEventArgs;
+
         public virtual void PerformLayout()
         {
-            if (layoutSuspended)
+            if (this.cachedLayoutEventArgs != null)
             {
-                return;
+                this.PerformLayout(this.cachedLayoutEventArgs);
+                this.cachedLayoutEventArgs = null;
+                this.SetState2(0x40, false);
             }
+            else
+            {
+                this.PerformLayout(null, null);
+            }
+        }
+        
+        public int state;
+        public int state2;
+
+        internal bool GetState(int flag) =>
+    ((this.state & flag) > 0);
+        private bool GetState2(int flag) =>
+    ((this.state2 & flag) > 0);
+
+
+        internal Size ApplySizeConstraints(Size proposedSize) =>
+    this.ApplyBoundsConstraints(0, 0, proposedSize.Width, proposedSize.Height).Size;
+
+        internal virtual Size GetPreferredSizeCore(Size proposedSize) =>
+    CommonProperties.GetSpecifiedBounds(this).Size;
+
+
+        public virtual Size GetPreferredSize(Size proposedSize)
+        {
+            Size preferredSizeCore;
+            if (this.GetState(0x1800))
+            {
+                return CommonProperties.xGetPreferredSizeCache(this);
+            }
+            proposedSize = LayoutUtils.ConvertZeroToUnbounded(proposedSize);
+            proposedSize = this.ApplySizeConstraints(proposedSize);
+            if (this.GetState2(0x800))
+            {
+                Size size2 = CommonProperties.xGetPreferredSizeCache(this);
+                if (!size2.IsEmpty && (proposedSize == LayoutUtils.MaxSize))
+                {
+                    return size2;
+                }
+            }            
+            try
+            {
+                preferredSizeCore = this.GetPreferredSizeCore(proposedSize);
+            }
+            finally
+            {
+             //   this.CacheTextInternal = false;
+            }
+            preferredSizeCore = this.ApplySizeConstraints(preferredSizeCore);
+            if (this.GetState2(0x800) && (proposedSize == LayoutUtils.MaxSize))
+            {
+                CommonProperties.xSetPreferredSizeCache(this, preferredSizeCore);
+            }
+            return preferredSizeCore;
+        }
+
+
+        internal virtual Rectangle ApplyBoundsConstraints(int suggestedX, int suggestedY, int proposedWidth, int proposedHeight)
+        {
+            if (!(this.MaximumSize != Size.Empty) && !(this.MinimumSize != Size.Empty))
+            {
+                return new Rectangle(suggestedX, suggestedY, proposedWidth, proposedHeight);
+            }
+            Size b = LayoutUtils.ConvertZeroToUnbounded(this.MaximumSize);
+            Rectangle rectangle = new Rectangle(suggestedX, suggestedY, 0, 0)
+            {
+                Size = LayoutUtils.IntersectSizes(new Size(proposedWidth, proposedHeight), b)
+            };
+            rectangle.Size = LayoutUtils.UnionSizes(rectangle.Size, this.MinimumSize);
+            return rectangle;
+        }
+
+
+        public void PerformLayout(IArrangedElement affectedElement, string propertyName)
+        {
+            PerformLayout(new LayoutEventArgs(affectedElement, propertyName));            
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        protected virtual void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified)
+        {
+            if (this.ParentInternal != null)
+            {
+                this.ParentInternal.SuspendLayout();
+            }
+            try
+            {
+                if (((this.Location.X != x) || (this.Location.Y != y)) || ((this.Width != width) || (this.Height != height)))
+                {
+                    CommonProperties.UpdateSpecifiedBounds(this, x, y, width, height, specified);
+                    Rectangle rectangle = this.ApplyBoundsConstraints(x, y, width, height);
+                    
+                   
+
+                    //y = rectangle.Y;
+                    //if (!this.IsHandleCreated)
+                    //{
+                    //    this.UpdateBounds(x, y, width, height);
+                    //}
+                    if (!this.GetState(0x10000))
+                    {
+                        Location = rectangle.Location;
+                        Size = rectangle.Size;
+
+
+                        //int flags = 20;
+                        //if ((this.x == x) && (this.y == y))
+                        //{
+                        //    flags |= 2;
+                        //}
+                        //if ((this.width == width) && (this.height == height))
+                        //{
+                        //    flags |= 1;
+                        //}
+                        this.OnBoundsUpdate(Location.X, Location.Y, Size.Width, Size.Height);
+                        //SafeNativeMethods.SetWindowPos(new HandleRef(this.window, this.Handle), NativeMethods.NullHandleRef, x, y, width, height, flags);
+                    }
+                }
+            }
+            finally
+            {
+              //  this.InitScaling(specified);
+                if (this.ParentInternal != null)
+                {
+                    CommonProperties.xClearPreferredSizeCache(this.ParentInternal);
+                    this.ParentInternal.LayoutEngine.InitLayout(this, specified);
+                    this.ParentInternal.ResumeLayout(true);
+                }
+            }
+        }
+
+        internal virtual void OnBoundsUpdate(int x, int y, int width, int height)
+        {
+        }
+
+
+        void IArrangedElement.SetBounds(Rectangle bounds, BoundsSpecified specified)
+        {
+            //ISite site = this.Site;
+            //IComponentChangeService service = null;
+            //PropertyDescriptor member = null;
+            //PropertyDescriptor descriptor2 = null;
+            //bool flag = false;
+            //bool flag2 = false;
+            //if ((site != null) && site.DesignMode)
+            //{
+            //    service = (IComponentChangeService)site.GetService(typeof(IComponentChangeService));
+            //    if (service != null)
+            //    {
+            //        member = TypeDescriptor.GetProperties(this)[PropertyNames.Size];
+            //        descriptor2 = TypeDescriptor.GetProperties(this)[PropertyNames.Location];
+            //        try
+            //        {
+            //            if (((member != null) && !member.IsReadOnly) && ((bounds.Width != this.Width) || (bounds.Height != this.Height)))
+            //            {
+            //                //if (!(site is INestedSite))
+            //                //{
+            //                //    service.OnComponentChanging(this, member);
+            //                //}
+            //                flag = true;
+            //            }
+            //            if (((descriptor2 != null) && !descriptor2.IsReadOnly) && ((bounds.X != this.x) || (bounds.Y != this.y)))
+            //            {
+            //                //if (!(site is INestedSite))
+            //                //{
+            //                //    service.OnComponentChanging(this, descriptor2);
+            //                //}
+            //                flag2 = true;
+            //            }
+            //        }
+            //        catch (InvalidOperationException)
+            //        {
+            //        }
+            //    }
+            //}
+            this.SetBoundsCore(bounds.X, bounds.Y, bounds.Width, bounds.Height, specified);
+            //if ((site != null) && (service != null))
+            //{
+            //    try
+            //    {
+            //        if (flag)
+            //        {
+            //            service.OnComponentChanged(this, member, null, null);
+            //        }
+            //        if (flag2)
+            //        {
+            //            service.OnComponentChanged(this, descriptor2, null, null);
+            //        }
+            //    }
+            //    catch (InvalidOperationException)
+            //    {
+            //    }
+            //}
+        }
+
+        //public void SetBounds(Rectangle rectange, BoundsSpecified specified)
+        //{
+        //    SetBounds(rectange.X, rectange.Y, rectange.Width, rectange.Height, specified);
+        //}
+
+        public void SetBounds(int x, int y, int width, int height, BoundsSpecified specified)
+        {
+            if ((specified & BoundsSpecified.X) == BoundsSpecified.None)
+            {
+                x = this.Location.X;
+            }
+            if ((specified & BoundsSpecified.Y) == BoundsSpecified.None)
+            {
+                y = this.Location.Y;
+            }
+            if ((specified & BoundsSpecified.Width) == BoundsSpecified.None)
+            {
+                width = this.Size.Width;
+            }
+            if ((specified & BoundsSpecified.Height) == BoundsSpecified.None)
+            {
+                height = this.Size.Height;
+            }
+            if (((this.Location.X != x) || (this.Location.Y != y)) || ((this.Size.Width != width) || (this.Size.Height != height)))
+            {
+                this.SetBoundsCore(x, y, width, height, specified);
+                LayoutTransaction.DoLayout(this.ParentInternal, this, PropertyNames.Bounds);
+            }
+            else
+            {
+                //this.InitScaling(specified);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_disposing)
+                return;
+
+            _disposing = true;
+            if (Disposed != null)
+                Disposed(this, EventArgs.Empty);
 
             foreach (var item in Controls)
             {
-                item.PerformLayout();
+                item?.Dispose();
             }
         }
     }

@@ -25,10 +25,10 @@ namespace System.Windows.Forms
                 return null;
             };
 
-            Element.onchange = new HTMLElement.onchangeFn(workOutEvent);
-            Element.onpaste = new HTMLElement.onpasteFn(workOutEvent);
+            Element.onchange = new HTMLElement.onactivateFn(workOutEvent);
+            Element.onpaste = new HTMLElement.oncopyFn(workOutEvent);
             Element.onkeydown = new HTMLElement.onkeydownFn(workOutEvent);
-            Element.onkeyup = new HTMLElement.onkeyupFn(workOutEvent);
+            Element.onkeyup = new HTMLElement.onkeydownFn(workOutEvent);
             Element.onblur = new HTMLElement.onblurFn(workOutEvent);
         }
         private string prevString;

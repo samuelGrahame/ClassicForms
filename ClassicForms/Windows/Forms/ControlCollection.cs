@@ -18,18 +18,18 @@ namespace System.Windows.Forms
         public ControlCollection(Control owner)
         {
             _owner = owner;
-            _controls = new List<Control>();
+            _items = new List<Control>();
         }
 
         public Control Owner { get { return _owner; } }
 
-        private List<Control> _controls;
+        public List<Control> _items;
 
-        public Control this[int index] { get { return _controls[index];  } set {
-                _controls[index] = value;
+        public Control this[int index] { get { return _items[index];  } set {
+                _items[index] = value;
             } }
 
-        public int Count { get { return _controls.Count;  } }
+        public int Count { get { return _items.Count;  } }
 
         public bool IsReadOnly { get { return false; } }
         public bool IsSynchronized { get { return false; } }
@@ -47,7 +47,7 @@ namespace System.Windows.Forms
             _owner.Element.appendChild(item.Element);
             item._parent = Owner;
             item.InvokeLoad();
-            _controls.Add(item);
+            _items.Add(item);
             _owner.OnControlAdded(item);
         }
 
@@ -61,7 +61,7 @@ namespace System.Windows.Forms
                 frag.appendChild(item[i].Element);
                 item[i]._parent = Owner;
                 item[i].InvokeLoad();
-                _controls.Add(item[i]);
+                _items.Add(item[i]);
                 _owner.OnControlAdded(item[i]);
             }
             _owner.Element.appendChild(frag);
@@ -76,38 +76,38 @@ namespace System.Windows.Forms
 				_owner.Element.removeChild(_owner.Element.lastChild);
 			};
 			*/
-            _controls.Clear();
+            _items.Clear();
         }
 
         public bool Contains(Control item)
         {
-            return _controls.Contains(item);
+            return _items.Contains(item);
         }
 
         public void CopyTo(Control[] array, int arrayIndex)
         {
-            _controls.CopyTo(array, arrayIndex);
+            _items.CopyTo(array, arrayIndex);
         }
 
         public void CopyTo(Array array, int arrayIndex)
         {
-            _controls.CopyTo((Control[])array, arrayIndex);
+            _items.CopyTo((Control[])array, arrayIndex);
         }
 
         public IEnumerator<Control> GetEnumerator()
         {
-            return _controls.GetEnumerator();
+            return _items.GetEnumerator();
         }
 
         public int IndexOf(Control item)
         {
-            return _controls.IndexOf(item);
+            return _items.IndexOf(item);
         }
 
         public void Insert(int index, Control item)
         {
-            _owner.Element.insertBefore(item.Element, _owner.Element.childNodes[index]);
-            _controls.Insert(index, item);
+            _owner.Element.insertBefore(item.Element, (Node)_owner.Element.childNodes[index]);
+            _items.Insert(index, item);
             _owner.OnControlAdded(item);
         }
 
@@ -117,21 +117,21 @@ namespace System.Windows.Forms
 
             _owner.OnControlRemoved(item);
 
-            return _controls.Remove(item);
+            return _items.Remove(item);
         }
 
         public void RemoveAt(int index)
         {
             _owner.Element.removeChild(_owner.Element.childNodes[index]);
 
-            _owner.OnControlRemoved(_controls[index]);
+            _owner.OnControlRemoved(_items[index]);
 
-            _controls.RemoveAt(index);
+            _items.RemoveAt(index);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _controls.GetEnumerator();
+            return _items.GetEnumerator();
         }
     }
 }

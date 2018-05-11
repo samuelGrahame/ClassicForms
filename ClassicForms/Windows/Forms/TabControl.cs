@@ -62,7 +62,7 @@ namespace System.Windows.Forms
                 div.Element.style.visibility = "hidden";
                 document.body.appendChild(div.Element);
                 
-                var rec = div.Element.getBoundingClientRect();
+                var rec = div.Element.getBoundingClientRect().As<ClientRect>();
 
                 //page.Header.Location = new Drawing.Point((int)x, i == _selectedIndex ? 0 : 4);
                 page.Header.Element.style.left = x + "px";
@@ -82,7 +82,7 @@ namespace System.Windows.Forms
 
         public override void PerformLayout()
         {
-            if(layoutSuspended)
+            if(layoutSuspendCount > 0)
             {
                 return;
             }

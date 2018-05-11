@@ -1,13 +1,1527 @@
 /**
  * @version 1.0.0.0
  * @copyright Copyright ©  2018
- * @compiler Bridge.NET 16.8.2
+ * @compiler Bridge.NET 17.0.0
  */
 Bridge.assembly("ClassicForms", function ($asm, globals) {
     "use strict";
 
+    Bridge.define("System.Collections.ArrayList", {
+        inherits: [System.Collections.IList,System.Collections.ICollection,System.Collections.IEnumerable,System.ICloneable],
+        statics: {
+            fields: {
+                _defaultCapacity: 0,
+                emptyArray: null
+            },
+            ctors: {
+                init: function () {
+                    this._defaultCapacity = 4;
+                    this.emptyArray = System.Collections.EmptyArray$1(System.Object).Value;
+                }
+            },
+            methods: {
+                Adapter: function (list) {
+                    if (list == null) {
+                        throw new System.ArgumentNullException.$ctor1("list");
+                    }
+                    return new System.Collections.ArrayList.IListWrapper(list);
+                },
+                FixedSize: function (list) {
+                    if (list == null) {
+                        throw new System.ArgumentNullException.$ctor1("list");
+                    }
+                    return new System.Collections.ArrayList.FixedSizeArrayList(list);
+                },
+                FixedSize$1: function (list) {
+                    if (list == null) {
+                        throw new System.ArgumentNullException.$ctor1("list");
+                    }
+                    return new System.Collections.ArrayList.FixedSizeList(list);
+                },
+                ReadOnly: function (list) {
+                    if (list == null) {
+                        throw new System.ArgumentNullException.$ctor1("list");
+                    }
+                    return new System.Collections.ArrayList.ReadOnlyArrayList(list);
+                },
+                ReadOnly$1: function (list) {
+                    if (list == null) {
+                        throw new System.ArgumentNullException.$ctor1("list");
+                    }
+                    return new System.Collections.ArrayList.ReadOnlyList(list);
+                },
+                Repeat: function (value, count) {
+                    if (count < 0) {
+                        throw new System.ArgumentOutOfRangeException.$ctor4("count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                    }
+                    var list = new System.Collections.ArrayList.$ctor3((count > 4) ? count : 4);
+                    for (var i = 0; i < count; i = (i + 1) | 0) {
+                        list.add(value);
+                    }
+                    return list;
+                },
+                Synchronized: function (list) {
+                    if (list == null) {
+                        throw new System.ArgumentNullException.$ctor1("list");
+                    }
+                    return new System.Collections.ArrayList.SyncArrayList(list);
+                },
+                Synchronized$1: function (list) {
+                    if (list == null) {
+                        throw new System.ArgumentNullException.$ctor1("list");
+                    }
+                    return new System.Collections.ArrayList.SyncIList(list);
+                }
+            }
+        },
+        fields: {
+            _items: null,
+            _size: 0,
+            _syncRoot: null,
+            _version: 0
+        },
+        props: {
+            Capacity: {
+                get: function () {
+                    return this._items.length;
+                },
+                set: function (value) {
+                    if (value < this._size) {
+                        throw new System.ArgumentOutOfRangeException.$ctor4("value", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_SmallCapacity"));
+                    }
+                    if (value !== this._items.length) {
+                        if (value > 0) {
+                            var destinationArray = System.Array.init(value, null, System.Object);
+                            if (this._size > 0) {
+                                System.Array.copy(this._items, 0, destinationArray, 0, this._size);
+                            }
+                            this._items = destinationArray;
+                        } else {
+                            this._items = System.Array.init(4, null, System.Object);
+                        }
+                    }
+                }
+            },
+            Count: {
+                get: function () {
+                    return this._size;
+                }
+            },
+            IsFixedSize: {
+                get: function () {
+                    return false;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return false;
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return false;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    if (this._syncRoot == null) {
+                        this._syncRoot = { };
+                        //Interlocked.CompareExchange<object>(ref this._syncRoot, new object(), null);
+                    }
+                    return this._syncRoot;
+                }
+            }
+        },
+        alias: [
+            "add", "System$Collections$IList$add",
+            "clear", "System$Collections$IList$clear",
+            "clone", "System$ICloneable$clone",
+            "contains", "System$Collections$IList$contains",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", "System$Collections$IEnumerable$GetEnumerator",
+            "indexOf", "System$Collections$IList$indexOf",
+            "insert", "System$Collections$IList$insert",
+            "remove", "System$Collections$IList$remove",
+            "removeAt", "System$Collections$IList$removeAt",
+            "Count", "System$Collections$ICollection$Count",
+            "IsFixedSize", "System$Collections$IList$IsFixedSize",
+            "IsReadOnly", "System$Collections$IList$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "getItem", "System$Collections$IList$getItem",
+            "setItem", "System$Collections$IList$setItem",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot"
+        ],
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+                this._items = System.Collections.ArrayList.emptyArray;
+            },
+            $ctor1: function (trash) {
+                this.$initialize();
+            },
+            $ctor2: function (c) {
+                this.$initialize();
+                if (c == null) {
+                    throw new System.ArgumentNullException.$ctor3("c", System.EnvironmentV2.GetResourceString("ArgumentNull_Collection"));
+                }
+                var count = System.Array.getCount(c);
+                if (count === 0) {
+                    this._items = System.Collections.ArrayList.emptyArray;
+                } else {
+                    this._items = System.Array.init(count, null, System.Object);
+                    this.AddRange(c);
+                }
+            },
+            $ctor3: function (capacity) {
+                this.$initialize();
+                if (capacity < 0) {
+                    var values = System.Array.init(["capacity"], System.Object);
+                    throw new System.ArgumentOutOfRangeException.$ctor4("capacity", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_MustBeNonNegNum", values));
+                }
+                if (capacity === 0) {
+                    this._items = System.Collections.ArrayList.emptyArray;
+                } else {
+                    this._items = System.Array.init(capacity, null, System.Object);
+                }
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                if ((index < 0) || (index >= this._size)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                return this._items[System.Array.index(index, this._items)];
+            },
+            setItem: function (index, value) {
+                if ((index < 0) || (index >= this._size)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                this._items[System.Array.index(index, this._items)] = value;
+                this._version = (this._version + 1) | 0;
+            },
+            add: function (value) {
+                if (this._size === this._items.length) {
+                    this.EnsureCapacity(((this._size + 1) | 0));
+                }
+                this._items[System.Array.index(this._size, this._items)] = value;
+                this._version = (this._version + 1) | 0;
+                var num = this._size;
+                this._size = (num + 1) | 0;
+                return num;
+            },
+            AddRange: function (c) {
+                this.InsertRange(this._size, c);
+            },
+            BinarySearch$1: function (value) {
+                return this.BinarySearch(0, this.Count, value, null);
+            },
+            BinarySearch$2: function (value, comparer) {
+                return this.BinarySearch(0, this.Count, value, comparer);
+            },
+            BinarySearch: function (index, count, value, comparer) {
+                if (index < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if (count < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this._size - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                return System.Array.binarySearch(this._items, index, count, value, comparer);
+            },
+            clear: function () {
+                if (this._size > 0) {
+                    System.Array.fill(this._items, null, 0, this._size);
+                    this._size = 0;
+                }
+                this._version = (this._version + 1) | 0;
+            },
+            clone: function () {
+                var $t;
+                var list = ($t = new System.Collections.ArrayList.$ctor3(this._size), $t._size = this._size, $t._version = this._version, $t);
+                System.Array.copy(this._items, 0, list._items, 0, this._size);
+                return list;
+            },
+            contains: function (item) {
+                if (item == null) {
+                    for (var j = 0; j < this._size; j = (j + 1) | 0) {
+                        if (this._items[System.Array.index(j, this._items)] == null) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                for (var i = 0; i < this._size; i = (i + 1) | 0) {
+                    if ((this._items[System.Array.index(i, this._items)] != null) && Bridge.equals(this._items[System.Array.index(i, this._items)], item)) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            CopyTo: function (array) {
+                this.copyTo(array, 0);
+            },
+            copyTo: function (array, arrayIndex) {
+                if ((array != null) && (System.Array.getRank(array) !== 1)) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Arg_RankMultiDimNotSupported"));
+                }
+                System.Array.copy(this._items, 0, array, arrayIndex, this._size);
+            },
+            CopyTo$1: function (index, array, arrayIndex, count) {
+                if ((((this._size - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                if ((array != null) && (System.Array.getRank(array) !== 1)) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Arg_RankMultiDimNotSupported"));
+                }
+                System.Array.copy(this._items, index, array, arrayIndex, count);
+            },
+            EnsureCapacity: function (min) {
+                if (this._items.length < min) {
+                    var num = (this._items.length === 0) ? 4 : (Bridge.Int.mul(this._items.length, 2));
+                    if (num > 2146435071) {
+                        num = 2146435071;
+                    }
+                    if (num < min) {
+                        num = min;
+                    }
+                    this.Capacity = num;
+                }
+            },
+            GetEnumerator: function () {
+                return new System.Collections.ArrayList.ArrayListEnumeratorSimple.$ctor1(this);
+            },
+            GetEnumerator$1: function (index, count) {
+                if (index < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if (count < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this._size - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                return new System.Collections.ArrayList.ArrayListEnumerator.$ctor1(this, index, count);
+            },
+            GetRange: function (index, count) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this._size - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                return new System.Collections.ArrayList.Range(this, index, count);
+            },
+            indexOf: function (value) {
+                return System.Array.indexOfT(this._items, value, 0, this._size);
+            },
+            IndexOf: function (value, startIndex) {
+                if (startIndex > this._size) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("startIndex", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                return System.Array.indexOfT(this._items, value, startIndex, ((this._size - startIndex) | 0));
+            },
+            IndexOf$1: function (value, startIndex, count) {
+                if (startIndex > this._size) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("startIndex", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                if ((count < 0) || (startIndex > (((this._size - count) | 0)))) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Count"));
+                }
+                return System.Array.indexOfT(this._items, value, startIndex, count);
+            },
+            insert: function (index, value) {
+                if ((index < 0) || (index > this._size)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_ArrayListInsert"));
+                }
+                if (this._size === this._items.length) {
+                    this.EnsureCapacity(((this._size + 1) | 0));
+                }
+                if (index < this._size) {
+                    System.Array.copy(this._items, index, this._items, ((index + 1) | 0), ((this._size - index) | 0));
+                }
+                this._items[System.Array.index(index, this._items)] = value;
+                this._size = (this._size + 1) | 0;
+                this._version = (this._version + 1) | 0;
+            },
+            InsertRange: function (index, c) {
+                if (c == null) {
+                    throw new System.ArgumentNullException.$ctor3("c", System.EnvironmentV2.GetResourceString("ArgumentNull_Collection"));
+                }
+                if ((index < 0) || (index > this._size)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                var count = System.Array.getCount(c);
+                if (count > 0) {
+                    this.EnsureCapacity(((this._size + count) | 0));
+                    if (index < this._size) {
+                        System.Array.copy(this._items, index, this._items, ((index + count) | 0), ((this._size - index) | 0));
+                    }
+                    var array = System.Array.init(count, null, System.Object);
+                    System.Array.copyTo(c, array, 0);
+                    System.Array.copy(array, 0, this._items, index, array.length);
+                    this._size = (this._size + count) | 0;
+                    this._version = (this._version + 1) | 0;
+                }
+            },
+            LastIndexOf: function (value) {
+                return this.LastIndexOf$2(value, ((this._size - 1) | 0), this._size);
+            },
+            LastIndexOf$1: function (value, startIndex) {
+                if (startIndex >= this._size) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("startIndex", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                return this.LastIndexOf$2(value, startIndex, ((startIndex + 1) | 0));
+            },
+            LastIndexOf$2: function (value, startIndex, count) {
+                if ((this.Count !== 0) && ((startIndex < 0) || (count < 0))) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((startIndex < 0) ? "startIndex" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if (this._size === 0) {
+                    return -1;
+                }
+                if ((startIndex >= this._size) || (count > (((startIndex + 1) | 0)))) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((startIndex >= this._size) ? "startIndex" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_BiggerThanCollection"));
+                }
+                return System.Array.lastIndexOfT(this._items, value, startIndex, count);
+            },
+            remove: function (obj) {
+                var index = this.indexOf(obj);
+                if (index >= 0) {
+                    this.removeAt(index);
+                }
+            },
+            removeAt: function (index) {
+                if ((index < 0) || (index >= this._size)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                this._size = (this._size - 1) | 0;
+                if (index < this._size) {
+                    System.Array.copy(this._items, ((index + 1) | 0), this._items, index, ((this._size - index) | 0));
+                }
+                this._items[System.Array.index(this._size, this._items)] = null;
+                this._version = (this._version + 1) | 0;
+            },
+            RemoveRange: function (index, count) {
+                if (index < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if (count < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this._size - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                if (count > 0) {
+                    var num = this._size;
+                    this._size = (this._size - count) | 0;
+                    if (index < this._size) {
+                        System.Array.copy(this._items, ((index + count) | 0), this._items, index, ((this._size - index) | 0));
+                    }
+                    while (num > this._size) {
+                        this._items[System.Array.index(((num = (num - 1) | 0)), this._items)] = null;
+                    }
+                    this._version = (this._version + 1) | 0;
+                }
+            },
+            Reverse: function () {
+                this.Reverse$1(0, this.Count);
+            },
+            Reverse$1: function (index, count) {
+                if (index < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if (count < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this._size - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                System.Array.reverse(this._items, index, count);
+                this._version = (this._version + 1) | 0;
+            },
+            SetRange: function (index, c) {
+                if (c == null) {
+                    throw new System.ArgumentNullException.$ctor3("c", System.EnvironmentV2.GetResourceString("ArgumentNull_Collection"));
+                }
+                var count = System.Array.getCount(c);
+                if ((index < 0) || (index > (((this._size - count) | 0)))) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                if (count > 0) {
+                    System.Array.copyTo(c, this._items, index);
+                    this._version = (this._version + 1) | 0;
+                }
+            },
+            Sort: function () {
+                this.Sort$2(0, this.Count, new (System.Collections.Generic.Comparer$1(System.Object))(System.Collections.Generic.Comparer$1.$default.fn));
+            },
+            Sort$1: function (comparer) {
+                this.Sort$2(0, this.Count, comparer);
+            },
+            Sort$2: function (index, count, comparer) {
+                if (index < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if (count < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this._size - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                System.Array.sort(this._items, index, count, comparer);
+                this._version = (this._version + 1) | 0;
+            },
+            ToArray$1: function () {
+                var destinationArray = System.Array.init(this._size, null, System.Object);
+                System.Array.copy(this._items, 0, destinationArray, 0, this._size);
+                return destinationArray;
+            },
+            ToArray: function (type) {
+                if (type == null) {
+                    throw new System.ArgumentNullException.$ctor1("type");
+                }
+                var destinationArray = System.Array.init(this._size, Bridge.getDefaultValue(type), type);
+                System.Array.copy(this._items, 0, destinationArray, 0, this._size);
+                return destinationArray;
+            },
+            TrimToSize: function () {
+                this.Capacity = this._size;
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.ArrayList.ArrayListDebugView", {
+        $kind: "nested class",
+        fields: {
+            arrayList: null
+        },
+        props: {
+            Items: {
+                get: function () {
+                    return this.arrayList.ToArray$1();
+                }
+            }
+        },
+        ctors: {
+            ctor: function (arrayList) {
+                this.$initialize();
+                if (arrayList == null) {
+                    throw new System.ArgumentNullException.$ctor1("arrayList");
+                }
+                this.arrayList = arrayList;
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.ArrayList.ArrayListEnumerator", {
+        inherits: [System.Collections.IEnumerator,System.ICloneable],
+        $kind: "nested class",
+        fields: {
+            currentElement: null,
+            endIndex: 0,
+            index: 0,
+            list: null,
+            startIndex: 0,
+            version: 0
+        },
+        props: {
+            Current: {
+                get: function () {
+                    if (this.index < this.startIndex) {
+                        throw new System.InvalidOperationException.$ctor1(System.EnvironmentV2.GetResourceString("InvalidOperation_EnumNotStarted"));
+                    }
+                    if (this.index > this.endIndex) {
+                        throw new System.InvalidOperationException.$ctor1(System.EnvironmentV2.GetResourceString("InvalidOperation_EnumEnded"));
+                    }
+                    return this.currentElement;
+                }
+            }
+        },
+        alias: [
+            "clone", "System$ICloneable$clone",
+            "moveNext", "System$Collections$IEnumerator$moveNext",
+            "reset", "System$Collections$IEnumerator$reset",
+            "Current", "System$Collections$IEnumerator$Current"
+        ],
+        ctors: {
+            $ctor1: function (list, index, count) {
+                this.$initialize();
+                this.list = list;
+                this.startIndex = index;
+                this.index = (index - 1) | 0;
+                this.endIndex = (this.index + count) | 0;
+                this.version = list._version;
+                this.currentElement = null;
+            },
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            clone: function () {
+                var ale = new System.Collections.ArrayList.ArrayListEnumerator.ctor();
+                ale.currentElement = this.currentElement;
+                ale.endIndex = this.endIndex;
+                ale.index = this.index;
+                ale.list = this.list;
+                ale.startIndex = this.startIndex;
+                ale.version = this.version;
+
+                return ale;
+            },
+            moveNext: function () {
+                if (this.version !== this.list._version) {
+                    throw new System.InvalidOperationException.$ctor1(System.EnvironmentV2.GetResourceString("InvalidOperation_EnumFailedVersion"));
+                }
+                if (this.index < this.endIndex) {
+                    var num = (this.index + 1) | 0;
+                    this.index = num;
+                    this.currentElement = this.list.getItem(num);
+                    return true;
+                }
+                this.index = (this.endIndex + 1) | 0;
+                return false;
+            },
+            reset: function () {
+                if (this.version !== this.list._version) {
+                    throw new System.InvalidOperationException.$ctor1(System.EnvironmentV2.GetResourceString("InvalidOperation_EnumFailedVersion"));
+                }
+                this.index = (this.startIndex - 1) | 0;
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.ArrayList.ArrayListEnumeratorSimple", {
+        inherits: [System.Collections.IEnumerator,System.ICloneable],
+        $kind: "nested class",
+        statics: {
+            fields: {
+                dummyObject: null
+            },
+            ctors: {
+                init: function () {
+                    this.dummyObject = { };
+                }
+            }
+        },
+        fields: {
+            currentElement: null,
+            index: 0,
+            isArrayList: false,
+            list: null,
+            version: 0
+        },
+        props: {
+            Current: {
+                get: function () {
+                    var currentElement = this.currentElement;
+                    if (!Bridge.referenceEquals(System.Collections.ArrayList.ArrayListEnumeratorSimple.dummyObject, currentElement)) {
+                        return currentElement;
+                    }
+                    if (this.index === -1) {
+                        throw new System.InvalidOperationException.$ctor1(System.EnvironmentV2.GetResourceString("InvalidOperation_EnumNotStarted"));
+                    }
+                    throw new System.InvalidOperationException.$ctor1(System.EnvironmentV2.GetResourceString("InvalidOperation_EnumEnded"));
+                }
+            }
+        },
+        alias: [
+            "clone", "System$ICloneable$clone",
+            "moveNext", "System$Collections$IEnumerator$moveNext",
+            "reset", "System$Collections$IEnumerator$reset",
+            "Current", "System$Collections$IEnumerator$Current"
+        ],
+        ctors: {
+            $ctor1: function (list) {
+                this.$initialize();
+                this.list = list;
+                this.index = -1;
+                this.version = list._version;
+                this.isArrayList = Bridge.referenceEquals(Bridge.getType(list), System.Collections.ArrayList);
+                this.currentElement = System.Collections.ArrayList.ArrayListEnumeratorSimple.dummyObject;
+            },
+            ctor: function () {
+                this.$initialize();
+
+            }
+        },
+        methods: {
+            clone: function () {
+                var ale = new System.Collections.ArrayList.ArrayListEnumeratorSimple.ctor();
+                ale.currentElement = this.currentElement;
+                ale.index = this.index;
+                ale.list = this.list;
+                ale.isArrayList = this.isArrayList;
+                ale.version = this.version;
+
+                return ale;
+            },
+            moveNext: function () {
+                var $t;
+                var num;
+                if (this.version !== this.list._version) {
+                    throw new System.InvalidOperationException.$ctor1(System.EnvironmentV2.GetResourceString("InvalidOperation_EnumFailedVersion"));
+                }
+                if (this.isArrayList) {
+                    if (this.index < (((this.list._size - 1) | 0))) {
+                        num = (this.index + 1) | 0;
+                        this.index = num;
+                        this.currentElement = ($t = this.list._items)[System.Array.index(num, $t)];
+                        return true;
+                    }
+                    this.currentElement = System.Collections.ArrayList.ArrayListEnumeratorSimple.dummyObject;
+                    this.index = this.list._size;
+                    return false;
+                }
+                if (this.index < (((this.list.Count - 1) | 0))) {
+                    num = (this.index + 1) | 0;
+                    this.index = num;
+                    this.currentElement = this.list.getItem(num);
+                    return true;
+                }
+                this.index = this.list.Count;
+                this.currentElement = System.Collections.ArrayList.ArrayListEnumeratorSimple.dummyObject;
+                return false;
+            },
+            reset: function () {
+                if (this.version !== this.list._version) {
+                    throw new System.InvalidOperationException.$ctor1(System.EnvironmentV2.GetResourceString("InvalidOperation_EnumFailedVersion"));
+                }
+                this.currentElement = System.Collections.ArrayList.ArrayListEnumeratorSimple.dummyObject;
+                this.index = -1;
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.ArrayList.FixedSizeList", {
+        inherits: [System.Collections.IList,System.Collections.ICollection,System.Collections.IEnumerable],
+        $kind: "nested class",
+        fields: {
+            _list: null
+        },
+        props: {
+            Count: {
+                get: function () {
+                    return System.Array.getCount(this._list);
+                }
+            },
+            IsFixedSize: {
+                get: function () {
+                    return true;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return System.Array.getIsReadOnly(this._list);
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return this._list.System$Collections$ICollection$IsSynchronized;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    return this._list.System$Collections$ICollection$SyncRoot;
+                }
+            }
+        },
+        alias: [
+            "add", "System$Collections$IList$add",
+            "clear", "System$Collections$IList$clear",
+            "contains", "System$Collections$IList$contains",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", "System$Collections$IEnumerable$GetEnumerator",
+            "indexOf", "System$Collections$IList$indexOf",
+            "insert", "System$Collections$IList$insert",
+            "remove", "System$Collections$IList$remove",
+            "removeAt", "System$Collections$IList$removeAt",
+            "Count", "System$Collections$ICollection$Count",
+            "IsFixedSize", "System$Collections$IList$IsFixedSize",
+            "IsReadOnly", "System$Collections$IList$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "getItem", "System$Collections$IList$getItem",
+            "setItem", "System$Collections$IList$setItem",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot"
+        ],
+        ctors: {
+            ctor: function (l) {
+                this.$initialize();
+                this._list = l;
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                return System.Array.getItem(this._list, index);
+            },
+            setItem: function (index, value) {
+                System.Array.setItem(this._list, index, value);
+            },
+            add: function (obj) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            },
+            clear: function () {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            },
+            contains: function (obj) {
+                return System.Array.contains(this._list, obj);
+            },
+            copyTo: function (array, index) {
+                System.Array.copyTo(this._list, array, index);
+            },
+            GetEnumerator: function () {
+                return Bridge.getEnumerator(this._list);
+            },
+            indexOf: function (value) {
+                return System.Array.indexOf(this._list, value, 0, null);
+            },
+            insert: function (index, obj) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            },
+            remove: function (value) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            },
+            removeAt: function (index) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.ArrayList.IListWrapper.IListWrapperEnumWrapper", {
+        inherits: [System.Collections.IEnumerator,System.ICloneable],
+        $kind: "nested class",
+        fields: {
+            _en: null,
+            _firstCall: false,
+            _initialCount: 0,
+            _initialStartIndex: 0,
+            _remaining: 0
+        },
+        props: {
+            Current: {
+                get: function () {
+                    if (this._firstCall) {
+                        throw new System.InvalidOperationException.$ctor1(System.EnvironmentV2.GetResourceString("InvalidOperation_EnumNotStarted"));
+                    }
+                    if (this._remaining < 0) {
+                        throw new System.InvalidOperationException.$ctor1(System.EnvironmentV2.GetResourceString("InvalidOperation_EnumEnded"));
+                    }
+                    return this._en.System$Collections$IEnumerator$Current;
+                }
+            }
+        },
+        alias: [
+            "clone", "System$ICloneable$clone",
+            "moveNext", "System$Collections$IEnumerator$moveNext",
+            "reset", "System$Collections$IEnumerator$reset",
+            "Current", "System$Collections$IEnumerator$Current"
+        ],
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+            },
+            $ctor1: function (listWrapper, startIndex, count) {
+                this.$initialize();
+                this._en = listWrapper.GetEnumerator();
+                this._initialStartIndex = startIndex;
+                this._initialCount = count;
+                while ((Bridge.identity(startIndex, (startIndex = (startIndex - 1) | 0)) > 0) && this._en.System$Collections$IEnumerator$moveNext()) {
+                }
+                this._remaining = count;
+                this._firstCall = true;
+            }
+        },
+        methods: {
+            clone: function () {
+                var $t;
+                return ($t = new System.Collections.ArrayList.IListWrapper.IListWrapperEnumWrapper.ctor(), $t._en = Bridge.cast(Bridge.clone(Bridge.cast(this._en, System.ICloneable)), System.Collections.IEnumerator), $t._initialStartIndex = this._initialStartIndex, $t._initialCount = this._initialCount, $t._remaining = this._remaining, $t._firstCall = this._firstCall, $t);
+            },
+            moveNext: function () {
+                var num;
+                if (this._firstCall) {
+                    this._firstCall = false;
+                    num = this._remaining;
+                    this._remaining = (num - 1) | 0;
+                    return ((num > 0) && this._en.System$Collections$IEnumerator$moveNext());
+                }
+                if ((this._remaining >= 0) && this._en.System$Collections$IEnumerator$moveNext()) {
+                    num = this._remaining;
+                    this._remaining = (num - 1) | 0;
+                    return (num > 0);
+                }
+                return false;
+            },
+            reset: function () {
+                this._en.System$Collections$IEnumerator$reset();
+                var num = this._initialStartIndex;
+                while ((Bridge.identity(num, (num = (num - 1) | 0)) > 0) && this._en.System$Collections$IEnumerator$moveNext()) {
+                }
+                this._remaining = this._initialCount;
+                this._firstCall = true;
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.ArrayList.ReadOnlyList", {
+        inherits: [System.Collections.IList,System.Collections.ICollection,System.Collections.IEnumerable],
+        $kind: "nested class",
+        fields: {
+            _list: null
+        },
+        props: {
+            Count: {
+                get: function () {
+                    return System.Array.getCount(this._list);
+                }
+            },
+            IsFixedSize: {
+                get: function () {
+                    return true;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return true;
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return this._list.System$Collections$ICollection$IsSynchronized;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    return this._list.System$Collections$ICollection$SyncRoot;
+                }
+            }
+        },
+        alias: [
+            "add", "System$Collections$IList$add",
+            "clear", "System$Collections$IList$clear",
+            "contains", "System$Collections$IList$contains",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", "System$Collections$IEnumerable$GetEnumerator",
+            "indexOf", "System$Collections$IList$indexOf",
+            "insert", "System$Collections$IList$insert",
+            "remove", "System$Collections$IList$remove",
+            "removeAt", "System$Collections$IList$removeAt",
+            "Count", "System$Collections$ICollection$Count",
+            "IsFixedSize", "System$Collections$IList$IsFixedSize",
+            "IsReadOnly", "System$Collections$IList$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "getItem", "System$Collections$IList$getItem",
+            "setItem", "System$Collections$IList$setItem",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot"
+        ],
+        ctors: {
+            ctor: function (l) {
+                this.$initialize();
+                this._list = l;
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                return System.Array.getItem(this._list, index);
+            },
+            setItem: function (index, value) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            add: function (obj) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            clear: function () {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            contains: function (obj) {
+                return System.Array.contains(this._list, obj);
+            },
+            copyTo: function (array, index) {
+                System.Array.copyTo(this._list, array, index);
+            },
+            GetEnumerator: function () {
+                return Bridge.getEnumerator(this._list);
+            },
+            indexOf: function (value) {
+                return System.Array.indexOf(this._list, value, 0, null);
+            },
+            insert: function (index, obj) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            remove: function (value) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            removeAt: function (index) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.ArrayList.SyncIList", {
+        inherits: [System.Collections.IList,System.Collections.ICollection,System.Collections.IEnumerable],
+        $kind: "nested class",
+        fields: {
+            _list: null,
+            _root: null
+        },
+        props: {
+            Count: {
+                get: function () {
+                    var obj2 = this._root;
+                    obj2;
+                    {
+                        return System.Array.getCount(this._list);
+                    }
+                }
+            },
+            IsFixedSize: {
+                get: function () {
+                    return this._list.System$Collections$IList$IsFixedSize;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return System.Array.getIsReadOnly(this._list);
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return true;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    return this._root;
+                }
+            }
+        },
+        alias: [
+            "add", "System$Collections$IList$add",
+            "clear", "System$Collections$IList$clear",
+            "contains", "System$Collections$IList$contains",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", "System$Collections$IEnumerable$GetEnumerator",
+            "indexOf", "System$Collections$IList$indexOf",
+            "insert", "System$Collections$IList$insert",
+            "remove", "System$Collections$IList$remove",
+            "removeAt", "System$Collections$IList$removeAt",
+            "Count", "System$Collections$ICollection$Count",
+            "IsFixedSize", "System$Collections$IList$IsFixedSize",
+            "IsReadOnly", "System$Collections$IList$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "getItem", "System$Collections$IList$getItem",
+            "setItem", "System$Collections$IList$setItem",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot"
+        ],
+        ctors: {
+            ctor: function (list) {
+                this.$initialize();
+                this._list = list;
+                this._root = list.System$Collections$ICollection$SyncRoot;
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return System.Array.getItem(this._list, index);
+                }
+            },
+            setItem: function (index, value) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    System.Array.setItem(this._list, index, value);
+                }
+            },
+            add: function (value) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return System.Array.add(this._list, value);
+                }
+            },
+            clear: function () {
+                var obj2 = this._root;
+                obj2;
+                {
+                    System.Array.clear(this._list);
+                }
+            },
+            contains: function (item) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return System.Array.contains(this._list, item);
+                }
+            },
+            copyTo: function (array, index) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    System.Array.copyTo(this._list, array, index);
+                }
+            },
+            GetEnumerator: function () {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return Bridge.getEnumerator(this._list);
+                }
+            },
+            indexOf: function (value) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return System.Array.indexOf(this._list, value, 0, null);
+                }
+            },
+            insert: function (index, value) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    System.Array.insert(this._list, index, value);
+                }
+            },
+            remove: function (value) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    System.Array.remove(this._list, value);
+                }
+            },
+            removeAt: function (index) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.System$Collections$IList$removeAt(index);
+                }
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.DictionaryEntryV2", {
+        $kind: "struct",
+        statics: {
+            methods: {
+                getDefaultValue: function () { return new System.Collections.DictionaryEntryV2(); }
+            }
+        },
+        fields: {
+            Key: null,
+            Value: null
+        },
+        ctors: {
+            $ctor1: function (key, value) {
+                this.$initialize();
+                this.Key = key;
+                this.Value = value;
+            },
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            getHashCode: function () {
+                var h = Bridge.addHash([6888146117, this.Key, this.Value]);
+                return h;
+            },
+            equals: function (o) {
+                if (!Bridge.is(o, System.Collections.DictionaryEntryV2)) {
+                    return false;
+                }
+                return Bridge.equals(this.Key, o.Key) && Bridge.equals(this.Value, o.Value);
+            },
+            $clone: function (to) {
+                var s = to || new System.Collections.DictionaryEntryV2();
+                s.Key = this.Key;
+                s.Value = this.Value;
+                return s;
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.EmptyArray$1", function (T) { return {
+        statics: {
+            fields: {
+                Value: null
+            },
+            ctors: {
+                ctor: function () {
+                    System.Collections.EmptyArray$1(T).Value = System.Array.init(0, function (){
+                        return Bridge.getDefaultValue(T);
+                    }, T);
+                }
+            }
+        }
+    }; });
+
+    Bridge.define("System.Collections.IDict", {
+        inherits: [System.Collections.ICollection,System.Collections.IEnumerable],
+        $kind: "interface"
+    });
+
+    Bridge.define("System.Collections.IDictEnumrator", {
+        inherits: [System.Collections.IEnumerator],
+        $kind: "interface"
+    });
+
+    Bridge.define("System.Collections.Specialized.BitVector32", {
+        $kind: "struct",
+        statics: {
+            methods: {
+                CountBitsSet: function (mask) {
+                    var num = 0;
+                    while ((mask & 1) !== 0) {
+                        num = Bridge.Int.sxs((((num + 1) | 0)) & 65535);
+                        mask = Bridge.Int.sxs((mask >> 1) & 65535);
+                    }
+                    return num;
+                },
+                CreateMask: function () {
+                    return System.Collections.Specialized.BitVector32.CreateMask$1(0);
+                },
+                CreateMask$1: function (previous) {
+                    if (previous === 0) {
+                        return 1;
+                    }
+                    if (previous === -2147483648) {
+                        throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("BitVectorFull"));
+                    }
+                    return (previous << 1);
+                },
+                CreateMaskFromHighValue: function (highValue) {
+                    var num = 16;
+                    while ((highValue & 32768) === 0) {
+                        num = Bridge.Int.sxs((((num - 1) | 0)) & 65535);
+                        highValue = Bridge.Int.sxs((highValue << 1) & 65535);
+                    }
+                    var num2 = 0;
+                    while (num > 0) {
+                        num = Bridge.Int.sxs((((num - 1) | 0)) & 65535);
+                        num2 = (num2 << 1) & 65535;
+                        num2 = (num2 | 1) & 65535;
+                    }
+                    return Bridge.Int.sxs(num2 & 65535);
+                },
+                CreateSection: function (maxValue) {
+                    return System.Collections.Specialized.BitVector32.CreateSectionHelper(maxValue, 0, 0);
+                },
+                CreateSection$1: function (maxValue, previous) {
+                    return System.Collections.Specialized.BitVector32.CreateSectionHelper(maxValue, previous.Mask, previous.Offset);
+                },
+                CreateSectionHelper: function (maxValue, priorMask, priorOffset) {
+                    if (maxValue < 1) {
+                        var args = System.Array.init(["maxValue", Bridge.box(0, System.Int32)], System.Object);
+                        throw new System.ArgumentException.$ctor3(System.Windows.Forms.SR.GetString("Argument_InvalidValue", args), "maxValue");
+                    }
+                    var offset = Bridge.Int.sxs((((priorOffset + System.Collections.Specialized.BitVector32.CountBitsSet(priorMask)) | 0)) & 65535);
+                    if (offset >= 32) {
+                        throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("BitVectorFull"));
+                    }
+                    return new System.Collections.Specialized.BitVector32.Section.$ctor1(System.Collections.Specialized.BitVector32.CreateMaskFromHighValue(maxValue), offset);
+                },
+                ToString: function (value) {
+                    var builder = new System.Text.StringBuilder("", 45);
+                    builder.append("BitVector32{");
+                    var data = value.data | 0;
+                    for (var i = 0; i < 32; i = (i + 1) | 0) {
+                        if ((System.Int64(data).and(System.Int64([-2147483648,0]))).ne(System.Int64(0))) {
+                            builder.append("1");
+                        } else {
+                            builder.append("0");
+                        }
+                        data = data << 1;
+                    }
+                    builder.append("}");
+                    return builder.toString();
+                },
+                getDefaultValue: function () { return new System.Collections.Specialized.BitVector32(); }
+            }
+        },
+        fields: {
+            data: 0
+        },
+        props: {
+            Data: {
+                get: function () {
+                    return (this.data | 0);
+                }
+            }
+        },
+        ctors: {
+            $ctor2: function (data) {
+                this.$initialize();
+                this.data = data >>> 0;
+            },
+            $ctor1: function (value) {
+                this.$initialize();
+                this.data = value.data;
+            },
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            getItem: function (bit) {
+                return ((System.Int64(this.data).and(System.Int64(bit))).equals((bit >>> 0)));
+            },
+            setItem: function (bit, value) {
+                if (value) {
+                    this.data = (this.data | (bit >>> 0)) >>> 0;
+                } else {
+                    this.data = (this.data & (((~bit) >>> 0))) >>> 0;
+                }
+            },
+            getItem$1: function (section) {
+                return (System.Int64.clip32((System.Int64(this.data).and(System.Int64((section.Mask << (section.Offset & 31))))).shr((section.Offset & 31))));
+            },
+            setItem$1: function (section, value) {
+                value = value << section.Offset;
+                var num = (65535 & section.Mask) << section.Offset;
+                this.data = System.Int64.clipu32((System.Int64(this.data).and(System.Int64(~num))).or(System.Int64((((value & num)) >>> 0))));
+            },
+            equals: function (o) {
+                return ((Bridge.is(o, System.Collections.Specialized.BitVector32)) && (this.data === System.Nullable.getValue(Bridge.cast(Bridge.unbox(o), System.Collections.Specialized.BitVector32)).data));
+            },
+            getHashCode: function () {
+                return Bridge.getHashCode(this);
+            },
+            toString: function () {
+                return System.Collections.Specialized.BitVector32.ToString(this);
+            },
+            $clone: function (to) {
+                var s = to || new System.Collections.Specialized.BitVector32();
+                s.data = this.data;
+                return s;
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.Specialized.BitVector32.Section", {
+        $kind: "nested struct",
+        statics: {
+            methods: {
+                ToString: function (value) {
+                    var textArray1 = System.Array.init(["Section{0x", System.Convert.toStringInBase(value.Mask, 16, 7), ", 0x", System.Convert.toStringInBase(value.Offset, 16, 7), "}"], System.String);
+                    return System.String.concat(textArray1);
+                },
+                op_Equality: function (a, b) {
+                    return a.Equals(b);
+                },
+                op_Inequality: function (a, b) {
+                    return !(System.Collections.Specialized.BitVector32.Section.op_Equality(a, b));
+                },
+                getDefaultValue: function () { return new System.Collections.Specialized.BitVector32.Section(); }
+            }
+        },
+        fields: {
+            mask: 0,
+            offset: 0
+        },
+        props: {
+            Mask: {
+                get: function () {
+                    return this.mask;
+                }
+            },
+            Offset: {
+                get: function () {
+                    return this.offset;
+                }
+            }
+        },
+        ctors: {
+            $ctor1: function (mask, offset) {
+                this.$initialize();
+                this.mask = mask;
+                this.offset = offset;
+            },
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            equals: function (o) {
+                return ((Bridge.is(o, System.Collections.Specialized.BitVector32.Section)) && this.Equals(System.Nullable.getValue(Bridge.cast(Bridge.unbox(o), System.Collections.Specialized.BitVector32.Section))));
+            },
+            Equals: function (obj) {
+                return ((obj.mask === this.mask) && (obj.offset === this.offset));
+            },
+            getHashCode: function () {
+                return Bridge.getHashCode(this);
+            },
+            toString: function () {
+                return System.Collections.Specialized.BitVector32.Section.ToString(this);
+            },
+            $clone: function (to) {
+                var s = to || new System.Collections.Specialized.BitVector32.Section();
+                s.mask = this.mask;
+                s.offset = this.offset;
+                return s;
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.Specialized.ListDictionary.DictionaryNode", {
+        $kind: "nested class",
+        fields: {
+            key: null,
+            next: null,
+            value: null
+        }
+    });
+
+    Bridge.define("System.Collections.Specialized.ListDictionary.NodeKeyValueCollection", {
+        inherits: [System.Collections.ICollection,System.Collections.IEnumerable],
+        $kind: "nested class",
+        fields: {
+            isKeys: false,
+            list: null
+        },
+        props: {
+            System$Collections$ICollection$Count: {
+                get: function () {
+                    var num = 0;
+                    for (var node = this.list.head; node != null; node = node.next) {
+                        num = (num + 1) | 0;
+                    }
+                    return num;
+                }
+            },
+            System$Collections$ICollection$IsSynchronized: {
+                get: function () {
+                    return false;
+                }
+            },
+            System$Collections$ICollection$SyncRoot: {
+                get: function () {
+                    return this.list.SyncRoot;
+                }
+            }
+        },
+        ctors: {
+            ctor: function (list, isKeys) {
+                this.$initialize();
+                this.list = list;
+                this.isKeys = isKeys;
+            }
+        },
+        methods: {
+            System$Collections$ICollection$copyTo: function (array, index) {
+                if (array == null) {
+                    throw new System.ArgumentNullException.$ctor1("array");
+                }
+                if (index < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.Windows.Forms.SR.GetString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                for (var node = this.list.head; node != null; node = node.next) {
+                    System.Array.set(array, this.isKeys ? node.key : node.value, index);
+                    index = (index + 1) | 0;
+                }
+            },
+            System$Collections$IEnumerable$GetEnumerator: function () {
+                return new System.Collections.Specialized.ListDictionary.NodeKeyValueCollection.NodeKeyValueEnumerator(this.list, this.isKeys);
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.Specialized.ListDictionary.NodeKeyValueCollection.NodeKeyValueEnumerator", {
+        inherits: [System.Collections.IEnumerator],
+        $kind: "nested class",
+        fields: {
+            current: null,
+            isKeys: false,
+            list: null,
+            start: false,
+            version: 0
+        },
+        props: {
+            Current: {
+                get: function () {
+                    if (this.current == null) {
+                        throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumOpCantHappen"));
+                    }
+                    if (!this.isKeys) {
+                        return this.current.value;
+                    }
+                    return this.current.key;
+                }
+            }
+        },
+        alias: [
+            "moveNext", "System$Collections$IEnumerator$moveNext",
+            "reset", "System$Collections$IEnumerator$reset",
+            "Current", "System$Collections$IEnumerator$Current"
+        ],
+        ctors: {
+            ctor: function (list, isKeys) {
+                this.$initialize();
+                this.list = list;
+                this.isKeys = isKeys;
+                this.version = list.version;
+                this.start = true;
+                this.current = null;
+            }
+        },
+        methods: {
+            moveNext: function () {
+                if (this.version !== this.list.version) {
+                    throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumFailedVersion"));
+                }
+                if (this.start) {
+                    this.current = this.list.head;
+                    this.start = false;
+                } else if (this.current != null) {
+                    this.current = this.current.next;
+                }
+                return (this.current != null);
+            },
+            reset: function () {
+                if (this.version !== this.list.version) {
+                    throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumFailedVersion"));
+                }
+                this.start = true;
+                this.current = null;
+            }
+        }
+    });
+
     Bridge.define("System.ComponentModel.IContainer", {
         inherits: [System.IDisposable],
+        $kind: "interface"
+    });
+
+    Bridge.define("System.ComponentModel.IComponent", {
+        inherits: [System.IDisposable],
+        $kind: "interface"
+    });
+
+    Bridge.define("System.ComponentModel.InvalidEnumArgumentException", {
+        inherits: [System.ArgumentException],
+        ctors: {
+            ctor: function () {
+                System.ComponentModel.InvalidEnumArgumentException.$ctor1.call(this, null);
+            },
+            $ctor1: function (message) {
+                this.$initialize();
+                System.ArgumentException.$ctor1.call(this, message);
+            },
+            $ctor2: function (message, innerException) {
+                this.$initialize();
+                System.ArgumentException.$ctor2.call(this, message, innerException);
+            },
+            $ctor3: function (argumentName, invalidValue, enumClass) {
+                this.$initialize();
+                System.ArgumentException.$ctor3.call(this, System.Windows.Forms.SR.GetString("InvalidEnumArgument"), argumentName);
+                var objArray1 = System.Array.init([argumentName, Bridge.toString(invalidValue), Bridge.Reflection.getTypeName(enumClass)], System.Object);
+            }
+        }
+    });
+
+    Bridge.define("System.IServiceProviderV2", {
         $kind: "interface"
     });
 
@@ -927,7 +2441,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             methods: {
                 CheckByte: function (value) {
                     if ((value < 0) || (value > 255)) {
-                        throw new System.ArgumentException("InvalidEx2BoundArgument");
+                        throw new System.ArgumentException.$ctor1("InvalidEx2BoundArgument");
                     }
                 },
                 MakeArgb: function (alpha, red, green, blue) {
@@ -1229,6 +2743,23 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 s.knownColor = this.knownColor;
                 s.state = this.state;
                 return s;
+            }
+        }
+    });
+
+    Bridge.define("System.Drawing.ContentAlignment", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                BottomCenter: 512,
+                BottomLeft: 256,
+                BottomRight: 1024,
+                MiddleCenter: 32,
+                MiddleLeft: 16,
+                MiddleRight: 64,
+                TopCenter: 2,
+                TopLeft: 1,
+                TopRight: 4
             }
         }
     });
@@ -1947,6 +3478,551 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.Drawing.PointF", {
+        $kind: "struct",
+        statics: {
+            fields: {
+                Empty: null
+            },
+            ctors: {
+                init: function () {
+                    this.Empty = new System.Drawing.PointF();
+                },
+                ctor: function () {
+                }
+            },
+            methods: {
+                Add: function (pt, sz) {
+                    return new System.Drawing.PointF.$ctor1(pt.X + sz.Width, pt.Y + sz.Height);
+                },
+                Add$1: function (pt, sz) {
+                    return new System.Drawing.PointF.$ctor1(pt.X + sz.Width, pt.Y + sz.Height);
+                },
+                Subtract: function (pt, sz) {
+                    return new System.Drawing.PointF.$ctor1(pt.X - sz.Width, pt.Y - sz.Height);
+                },
+                Subtract$1: function (pt, sz) {
+                    return new System.Drawing.PointF.$ctor1(pt.X - sz.Width, pt.Y - sz.Height);
+                },
+                op_Addition: function (pt, sz) {
+                    return System.Drawing.PointF.Add(pt.$clone(), sz.$clone());
+                },
+                op_Addition$1: function (pt, sz) {
+                    return System.Drawing.PointF.Add$1(pt.$clone(), sz.$clone());
+                },
+                op_Subtraction: function (pt, sz) {
+                    return System.Drawing.PointF.Subtract(pt.$clone(), sz.$clone());
+                },
+                op_Subtraction$1: function (pt, sz) {
+                    return System.Drawing.PointF.Subtract$1(pt.$clone(), sz.$clone());
+                },
+                op_Equality: function (left, right) {
+                    return ((left.X === right.X) && (left.Y === right.Y));
+                },
+                op_Inequality: function (left, right) {
+                    return !(System.Drawing.PointF.op_Equality(left.$clone(), right.$clone()));
+                },
+                getDefaultValue: function () { return new System.Drawing.PointF(); }
+            }
+        },
+        fields: {
+            x: 0,
+            y: 0
+        },
+        props: {
+            IsEmpty: {
+                get: function () {
+                    return ((this.x === 0.0) && (this.y === 0.0));
+                }
+            },
+            X: {
+                get: function () {
+                    return this.x;
+                },
+                set: function (value) {
+                    this.x = value;
+                }
+            },
+            Y: {
+                get: function () {
+                    return this.y;
+                },
+                set: function (value) {
+                    this.y = value;
+                }
+            }
+        },
+        ctors: {
+            $ctor1: function (x, y) {
+                this.$initialize();
+                this.x = x;
+                this.y = y;
+            },
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            equals: function (obj) {
+                if (!(Bridge.is(obj, System.Drawing.PointF))) {
+                    return false;
+                }
+                var tf = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj), System.Drawing.PointF));
+                return (((tf.X === this.X) && (tf.Y === this.Y)) && Bridge.equals(System.Drawing.PointF, Bridge.getType(this)));
+            },
+            getHashCode: function () {
+                return Bridge.getHashCode(this);
+            },
+            toString: function () {
+                var args = System.Array.init([Bridge.box(this.x, System.Single, System.Single.format, System.Single.getHashCode), Bridge.box(this.y, System.Single, System.Single.format, System.Single.getHashCode)], System.Object);
+                return System.String.formatProvider.apply(System.String, [System.Globalization.CultureInfo.getCurrentCulture(), "{{X={0}, Y={1}}}"].concat(args));
+            },
+            $clone: function (to) {
+                var s = to || new System.Drawing.PointF();
+                s.x = this.x;
+                s.y = this.y;
+                return s;
+            }
+        }
+    });
+
+    Bridge.define("System.Drawing.Rectangle", {
+        $kind: "struct",
+        statics: {
+            fields: {
+                Empty: null
+            },
+            ctors: {
+                init: function () {
+                    this.Empty = new System.Drawing.Rectangle();
+                },
+                ctor: function () {
+                }
+            },
+            methods: {
+                FromLTRB: function (left, top, right, bottom) {
+                    return new System.Drawing.Rectangle.$ctor2(left, top, ((right - left) | 0), ((bottom - top) | 0));
+                },
+                Ceiling: function (value) {
+                    return new System.Drawing.Rectangle.$ctor2(Bridge.Int.clip32(Math.ceil(value.X)), Bridge.Int.clip32(Math.ceil(value.Y)), Bridge.Int.clip32(Math.ceil(value.Width)), Bridge.Int.clip32(Math.ceil(value.Height)));
+                },
+                Truncate: function (value) {
+                    return new System.Drawing.Rectangle.$ctor2(Bridge.Int.clip32(value.X), Bridge.Int.clip32(value.Y), Bridge.Int.clip32(value.Width), Bridge.Int.clip32(value.Height));
+                },
+                Round: function (value) {
+                    return new System.Drawing.Rectangle.$ctor2(Bridge.Int.clip32(Bridge.Math.round(value.X, 0, 6)), Bridge.Int.clip32(Bridge.Math.round(value.Y, 0, 6)), Bridge.Int.clip32(Bridge.Math.round(value.Width, 0, 6)), Bridge.Int.clip32(Bridge.Math.round(value.Height, 0, 6)));
+                },
+                Inflate: function (rect, x, y) {
+                    var rectangle = rect.$clone();
+                    rectangle.Inflate$1(x, y);
+                    return rectangle.$clone();
+                },
+                Intersect: function (a, b) {
+                    var x = Math.max(a.X, b.X);
+                    var num2 = Math.min(((a.X + a.Width) | 0), ((b.X + b.Width) | 0));
+                    var y = Math.max(a.Y, b.Y);
+                    var num4 = Math.min(((a.Y + a.Height) | 0), ((b.Y + b.Height) | 0));
+                    if ((num2 >= x) && (num4 >= y)) {
+                        return new System.Drawing.Rectangle.$ctor2(x, y, ((num2 - x) | 0), ((num4 - y) | 0));
+                    }
+                    return System.Drawing.Rectangle.Empty.$clone();
+                },
+                Union: function (a, b) {
+                    var x = Math.min(a.X, b.X);
+                    var num2 = Math.max(((a.X + a.Width) | 0), ((b.X + b.Width) | 0));
+                    var y = Math.min(a.Y, b.Y);
+                    var num4 = Math.max(((a.Y + a.Height) | 0), ((b.Y + b.Height) | 0));
+                    return new System.Drawing.Rectangle.$ctor2(x, y, ((num2 - x) | 0), ((num4 - y) | 0));
+                },
+                op_Equality: function (left, right) {
+                    return ((((left.X === right.X) && (left.Y === right.Y)) && (left.Width === right.Width)) && (left.Height === right.Height));
+                },
+                op_Inequality: function (left, right) {
+                    return !(System.Drawing.Rectangle.op_Equality(left.$clone(), right.$clone()));
+                },
+                getDefaultValue: function () { return new System.Drawing.Rectangle(); }
+            }
+        },
+        fields: {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0
+        },
+        props: {
+            Location: {
+                get: function () {
+                    return new System.Drawing.Point.$ctor1(this.X, this.Y);
+                },
+                set: function (value) {
+                    this.X = value.X;
+                    this.Y = value.Y;
+                }
+            },
+            Size: {
+                get: function () {
+                    return new System.Drawing.Size.$ctor2(this.Width, this.Height);
+                },
+                set: function (value) {
+                    this.Width = value.Width;
+                    this.Height = value.Height;
+                }
+            },
+            X: {
+                get: function () {
+                    return this.x;
+                },
+                set: function (value) {
+                    this.x = value;
+                }
+            },
+            Y: {
+                get: function () {
+                    return this.y;
+                },
+                set: function (value) {
+                    this.y = value;
+                }
+            },
+            Width: {
+                get: function () {
+                    return this.width;
+                },
+                set: function (value) {
+                    this.width = value;
+                }
+            },
+            Height: {
+                get: function () {
+                    return this.height;
+                },
+                set: function (value) {
+                    this.height = value;
+                }
+            },
+            Left: {
+                get: function () {
+                    return this.X;
+                }
+            },
+            Top: {
+                get: function () {
+                    return this.Y;
+                }
+            },
+            Right: {
+                get: function () {
+                    return (((this.X + this.Width) | 0));
+                }
+            },
+            Bottom: {
+                get: function () {
+                    return (((this.Y + this.Height) | 0));
+                }
+            },
+            IsEmpty: {
+                get: function () {
+                    return ((((this.height === 0) && (this.width === 0)) && (this.x === 0)) && (this.y === 0));
+                }
+            }
+        },
+        ctors: {
+            $ctor2: function (x, y, width, height) {
+                this.$initialize();
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+            },
+            $ctor1: function (location, size) {
+                this.$initialize();
+                this.x = location.X;
+                this.y = location.Y;
+                this.width = size.Width;
+                this.height = size.Height;
+            },
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            equals: function (obj) {
+                if (!(Bridge.is(obj, System.Drawing.Rectangle))) {
+                    return false;
+                }
+                var rectangle = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj), System.Drawing.Rectangle));
+                return ((((rectangle.X === this.X) && (rectangle.Y === this.Y)) && (rectangle.Width === this.Width)) && (rectangle.Height === this.Height));
+            },
+            Contains$2: function (x, y) {
+                return ((((this.X <= x) && (x < (((this.X + this.Width) | 0)))) && (this.Y <= y)) && (y < (((this.Y + this.Height) | 0))));
+            },
+            Contains: function (pt) {
+                return this.Contains$2(pt.X, pt.Y);
+            },
+            Contains$1: function (rect) {
+                return ((((this.X <= rect.X) && ((((rect.X + rect.Width) | 0)) <= (((this.X + this.Width) | 0)))) && (this.Y <= rect.Y)) && ((((rect.Y + rect.Height) | 0)) <= (((this.Y + this.Height) | 0))));
+            },
+            getHashCode: function () {
+                return (((this.X ^ ((this.Y << 13) | (this.Y >> 19))) ^ ((this.Width << 26) | (this.Width >> 6))) ^ ((this.Height << 7) | (this.Height >> 25)));
+            },
+            Inflate$1: function (width, height) {
+                this.X = (this.X - width) | 0;
+                this.Y = (this.Y - height) | 0;
+                this.Width = (this.Width + (Bridge.Int.mul(2, width))) | 0;
+                this.Height = (this.Height + (Bridge.Int.mul(2, height))) | 0;
+            },
+            Inflate: function (size) {
+                this.Inflate$1(size.Width, size.Height);
+            },
+            Intersect: function (rect) {
+                var rectangle = System.Drawing.Rectangle.Intersect(rect.$clone(), this);
+                this.X = rectangle.X;
+                this.Y = rectangle.Y;
+                this.Width = rectangle.Width;
+                this.Height = rectangle.Height;
+            },
+            IntersectsWith: function (rect) {
+                return ((((rect.X < (((this.X + this.Width) | 0))) && (this.X < (((rect.X + rect.Width) | 0)))) && (rect.Y < (((this.Y + this.Height) | 0)))) && (this.Y < (((rect.Y + rect.Height) | 0))));
+            },
+            Offset: function (pos) {
+                this.Offset$1(pos.X, pos.Y);
+            },
+            Offset$1: function (x, y) {
+                this.X = (this.X + x) | 0;
+                this.Y = (this.Y + y) | 0;
+            },
+            toString: function () {
+                var textArray1 = System.Array.init(["{X=", Bridge.toString(this.X), ",Y=", Bridge.toString(this.Y), ",Width=", Bridge.toString(this.Width), ",Height=", Bridge.toString(this.Height), "}"], System.String);
+                return System.String.concat(textArray1);
+            },
+            $clone: function (to) {
+                var s = to || new System.Drawing.Rectangle();
+                s.x = this.x;
+                s.y = this.y;
+                s.width = this.width;
+                s.height = this.height;
+                return s;
+            }
+        }
+    });
+
+    Bridge.define("System.Drawing.RectangleF", {
+        $kind: "struct",
+        statics: {
+            fields: {
+                Empty: null
+            },
+            ctors: {
+                init: function () {
+                    this.Empty = new System.Drawing.RectangleF();
+                },
+                ctor: function () {
+                }
+            },
+            methods: {
+                FromLTRB: function (left, top, right, bottom) {
+                    return new System.Drawing.RectangleF.$ctor2(left, top, right - left, bottom - top);
+                },
+                Inflate: function (rect, x, y) {
+                    var ef = rect.$clone();
+                    ef.Inflate$1(x, y);
+                    return ef.$clone();
+                },
+                Intersect: function (a, b) {
+                    var x = Math.max(a.X, b.X);
+                    var num2 = Math.min(a.X + a.Width, b.X + b.Width);
+                    var y = Math.max(a.Y, b.Y);
+                    var num4 = Math.min(a.Y + a.Height, b.Y + b.Height);
+                    if ((num2 >= x) && (num4 >= y)) {
+                        return new System.Drawing.RectangleF.$ctor2(x, y, num2 - x, num4 - y);
+                    }
+                    return System.Drawing.RectangleF.Empty.$clone();
+                },
+                Union: function (a, b) {
+                    var x = Math.min(a.X, b.X);
+                    var num2 = Math.max(a.X + a.Width, b.X + b.Width);
+                    var y = Math.min(a.Y, b.Y);
+                    var num4 = Math.max(a.Y + a.Height, b.Y + b.Height);
+                    return new System.Drawing.RectangleF.$ctor2(x, y, num2 - x, num4 - y);
+                },
+                op_Equality: function (left, right) {
+                    return ((((left.X === right.X) && (left.Y === right.Y)) && (left.Width === right.Width)) && (left.Height === right.Height));
+                },
+                op_Inequality: function (left, right) {
+                    return !(System.Drawing.RectangleF.op_Equality(left.$clone(), right.$clone()));
+                },
+                op_Implicit: function (r) {
+                    return new System.Drawing.RectangleF.$ctor2(r.X, r.Y, r.Width, r.Height);
+                },
+                getDefaultValue: function () { return new System.Drawing.RectangleF(); }
+            }
+        },
+        fields: {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0
+        },
+        props: {
+            Location: {
+                get: function () {
+                    return new System.Drawing.PointF.$ctor1(this.X, this.Y);
+                },
+                set: function (value) {
+                    this.X = value.X;
+                    this.Y = value.Y;
+                }
+            },
+            Size: {
+                get: function () {
+                    return new System.Drawing.SizeF.$ctor3(this.Width, this.Height);
+                },
+                set: function (value) {
+                    this.Width = value.Width;
+                    this.Height = value.Height;
+                }
+            },
+            X: {
+                get: function () {
+                    return this.x;
+                },
+                set: function (value) {
+                    this.x = value;
+                }
+            },
+            Y: {
+                get: function () {
+                    return this.y;
+                },
+                set: function (value) {
+                    this.y = value;
+                }
+            },
+            Width: {
+                get: function () {
+                    return this.width;
+                },
+                set: function (value) {
+                    this.width = value;
+                }
+            },
+            Height: {
+                get: function () {
+                    return this.height;
+                },
+                set: function (value) {
+                    this.height = value;
+                }
+            },
+            Left: {
+                get: function () {
+                    return this.X;
+                }
+            },
+            Top: {
+                get: function () {
+                    return this.Y;
+                }
+            },
+            Right: {
+                get: function () {
+                    return (this.X + this.Width);
+                }
+            },
+            Bottom: {
+                get: function () {
+                    return (this.Y + this.Height);
+                }
+            },
+            IsEmpty: {
+                get: function () {
+                    if (this.Width > 0.0) {
+                        return (this.Height <= 0.0);
+                    }
+                    return true;
+                }
+            }
+        },
+        ctors: {
+            $ctor2: function (x, y, width, height) {
+                this.$initialize();
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+            },
+            $ctor1: function (location, size) {
+                this.$initialize();
+                this.x = location.X;
+                this.y = location.Y;
+                this.width = size.Width;
+                this.height = size.Height;
+            },
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            equals: function (obj) {
+                if (!(Bridge.is(obj, System.Drawing.RectangleF))) {
+                    return false;
+                }
+                var ef = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj), System.Drawing.RectangleF));
+                return ((((ef.X === this.X) && (ef.Y === this.Y)) && (ef.Width === this.Width)) && (ef.Height === this.Height));
+            },
+            Contains$2: function (x, y) {
+                return ((((this.X <= x) && (x < (this.X + this.Width))) && (this.Y <= y)) && (y < (this.Y + this.Height)));
+            },
+            Contains: function (pt) {
+                return this.Contains$2(pt.X, pt.Y);
+            },
+            Contains$1: function (rect) {
+                return ((((this.X <= rect.X) && ((rect.X + rect.Width) <= (this.X + this.Width))) && (this.Y <= rect.Y)) && ((rect.Y + rect.Height) <= (this.Y + this.Height)));
+            },
+            getHashCode: function () {
+                return (((((((((((Bridge.Int.clipu32(this.X) ^ ((((((Bridge.Int.clipu32(this.Y) << 13) >>> 0)) | (Bridge.Int.clipu32(this.Y) >>> 19)) >>> 0))) >>> 0)) ^ ((((((Bridge.Int.clipu32(this.Width) << 26) >>> 0)) | (Bridge.Int.clipu32(this.Width) >>> 6)) >>> 0))) >>> 0)) ^ ((((((Bridge.Int.clipu32(this.Height) << 7) >>> 0)) | (Bridge.Int.clipu32(this.Height) >>> 25)) >>> 0))) >>> 0)) | 0));
+            },
+            Inflate$1: function (x, y) {
+                this.X -= x;
+                this.Y -= y;
+                this.Width += 2.0 * x;
+                this.Height += 2.0 * y;
+            },
+            Inflate: function (size) {
+                this.Inflate$1(size.Width, size.Height);
+            },
+            Intersect: function (rect) {
+                var ef = System.Drawing.RectangleF.Intersect(rect.$clone(), this);
+                this.X = ef.X;
+                this.Y = ef.Y;
+                this.Width = ef.Width;
+                this.Height = ef.Height;
+            },
+            IntersectsWith: function (rect) {
+                return ((((rect.X < (this.X + this.Width)) && (this.X < (rect.X + rect.Width))) && (rect.Y < (this.Y + this.Height))) && (this.Y < (rect.Y + rect.Height)));
+            },
+            Offset: function (pos) {
+                this.Offset$1(pos.X, pos.Y);
+            },
+            Offset$1: function (x, y) {
+                this.X += x;
+                this.Y += y;
+            },
+            toString: function () {
+                var textArray1 = System.Array.init(["{X=", System.Single.format(this.X, "G", System.Globalization.CultureInfo.getCurrentCulture()), ",Y=", System.Single.format(this.Y, "G", System.Globalization.CultureInfo.getCurrentCulture()), ",Width=", System.Single.format(this.Width, "G", System.Globalization.CultureInfo.getCurrentCulture()), ",Height=", System.Single.format(this.Height, "G", System.Globalization.CultureInfo.getCurrentCulture()), "}"], System.String);
+                return System.String.concat(textArray1);
+            },
+            $clone: function (to) {
+                var s = to || new System.Drawing.RectangleF();
+                s.x = this.x;
+                s.y = this.y;
+                s.width = this.width;
+                s.height = this.height;
+                return s;
+            }
+        }
+    });
+
     Bridge.define("System.Drawing.Size", {
         $kind: "struct",
         statics: {
@@ -1956,42 +4032,108 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             ctors: {
                 init: function () {
                     this.Empty = new System.Drawing.Size();
-                    this.Empty = new System.Drawing.Size.$ctor1(0, 0);
+                },
+                ctor: function () {
                 }
             },
             methods: {
+                Add: function (sz1, sz2) {
+                    return new System.Drawing.Size.$ctor2(((sz1.Width + sz2.Width) | 0), ((sz1.Height + sz2.Height) | 0));
+                },
+                Ceiling: function (value) {
+                    return new System.Drawing.Size.$ctor2(Bridge.Int.clip32(Math.ceil(value.Width)), Bridge.Int.clip32(Math.ceil(value.Height)));
+                },
+                Subtract: function (sz1, sz2) {
+                    return new System.Drawing.Size.$ctor2(((sz1.Width - sz2.Width) | 0), ((sz1.Height - sz2.Height) | 0));
+                },
+                Truncate: function (value) {
+                    return new System.Drawing.Size.$ctor2(Bridge.Int.clip32(value.Width), Bridge.Int.clip32(value.Height));
+                },
+                Round: function (value) {
+                    return new System.Drawing.Size.$ctor2(Bridge.Int.clip32(Bridge.Math.round(value.Width, 0, 6)), Bridge.Int.clip32(Bridge.Math.round(value.Height, 0, 6)));
+                },
+                op_Implicit: function (p) {
+                    return new System.Drawing.SizeF.$ctor3(p.Width, p.Height);
+                },
+                op_Addition: function (sz1, sz2) {
+                    return System.Drawing.Size.Add(sz1.$clone(), sz2.$clone());
+                },
+                op_Subtraction: function (sz1, sz2) {
+                    return System.Drawing.Size.Subtract(sz1.$clone(), sz2.$clone());
+                },
+                op_Equality: function (sz1, sz2) {
+                    return ((sz1.Width === sz2.Width) && (sz1.Height === sz2.Height));
+                },
+                op_Inequality: function (sz1, sz2) {
+                    return !(System.Drawing.Size.op_Equality(sz1.$clone(), sz2.$clone()));
+                },
+                op_Explicit: function (size) {
+                    return new System.Drawing.Point.$ctor1(size.Width, size.Height);
+                },
                 getDefaultValue: function () { return new System.Drawing.Size(); }
             }
         },
         fields: {
-            Width: 0,
-            Height: 0
+            width: 0,
+            height: 0
+        },
+        props: {
+            IsEmpty: {
+                get: function () {
+                    return ((this.width === 0) && (this.height === 0));
+                }
+            },
+            Width: {
+                get: function () {
+                    return this.width;
+                },
+                set: function (value) {
+                    this.width = value;
+                }
+            },
+            Height: {
+                get: function () {
+                    return this.height;
+                },
+                set: function (value) {
+                    this.height = value;
+                }
+            }
         },
         ctors: {
-            $ctor1: function (width, height) {
+            $ctor1: function (pt) {
                 this.$initialize();
-                this.Width = width;
-                this.Height = height;
+                this.width = pt.X;
+                this.height = pt.Y;
+            },
+            $ctor2: function (width, height) {
+                this.$initialize();
+                this.width = width;
+                this.height = height;
             },
             ctor: function () {
                 this.$initialize();
             }
         },
         methods: {
-            getHashCode: function () {
-                var h = Bridge.addHash([1702521171, this.Width, this.Height]);
-                return h;
-            },
-            equals: function (o) {
-                if (!Bridge.is(o, System.Drawing.Size)) {
+            equals: function (obj) {
+                if (!(Bridge.is(obj, System.Drawing.Size))) {
                     return false;
                 }
-                return Bridge.equals(this.Width, o.Width) && Bridge.equals(this.Height, o.Height);
+                var size = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj), System.Drawing.Size));
+                return ((size.width === this.width) && (size.height === this.height));
+            },
+            getHashCode: function () {
+                return (this.width ^ this.height);
+            },
+            toString: function () {
+                var textArray1 = System.Array.init(["{Width=", Bridge.toString(this.width), ", Height=", Bridge.toString(this.height), "}"], System.String);
+                return System.String.concat(textArray1);
             },
             $clone: function (to) {
                 var s = to || new System.Drawing.Size();
-                s.Width = this.Width;
-                s.Height = this.Height;
+                s.width = this.width;
+                s.height = this.height;
                 return s;
             }
         }
@@ -2000,39 +4142,113 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
     Bridge.define("System.Drawing.SizeF", {
         $kind: "struct",
         statics: {
+            fields: {
+                Empty: null
+            },
+            ctors: {
+                init: function () {
+                    this.Empty = new System.Drawing.SizeF();
+                },
+                ctor: function () {
+                }
+            },
             methods: {
+                Add: function (sz1, sz2) {
+                    return new System.Drawing.SizeF.$ctor3(sz1.Width + sz2.Width, sz1.Height + sz2.Height);
+                },
+                Subtract: function (sz1, sz2) {
+                    return new System.Drawing.SizeF.$ctor3(sz1.Width - sz2.Width, sz1.Height - sz2.Height);
+                },
+                op_Addition: function (sz1, sz2) {
+                    return System.Drawing.SizeF.Add(sz1.$clone(), sz2.$clone());
+                },
+                op_Subtraction: function (sz1, sz2) {
+                    return System.Drawing.SizeF.Subtract(sz1.$clone(), sz2.$clone());
+                },
+                op_Equality: function (sz1, sz2) {
+                    return ((sz1.Width === sz2.Width) && (sz1.Height === sz2.Height));
+                },
+                op_Inequality: function (sz1, sz2) {
+                    return !(System.Drawing.SizeF.op_Equality(sz1.$clone(), sz2.$clone()));
+                },
+                op_Explicit: function (size) {
+                    return new System.Drawing.PointF.$ctor1(size.Width, size.Height);
+                },
                 getDefaultValue: function () { return new System.Drawing.SizeF(); }
             }
         },
         fields: {
-            Width: 0,
-            Height: 0
+            width: 0,
+            height: 0
+        },
+        props: {
+            IsEmpty: {
+                get: function () {
+                    return ((this.width === 0.0) && (this.height === 0.0));
+                }
+            },
+            Width: {
+                get: function () {
+                    return this.width;
+                },
+                set: function (value) {
+                    this.width = value;
+                }
+            },
+            Height: {
+                get: function () {
+                    return this.height;
+                },
+                set: function (value) {
+                    this.height = value;
+                }
+            }
         },
         ctors: {
-            $ctor1: function (width, height) {
+            $ctor2: function (size) {
                 this.$initialize();
-                this.Width = width;
-                this.Height = height;
+                this.width = size.width;
+                this.height = size.height;
+            },
+            $ctor1: function (pt) {
+                this.$initialize();
+                this.width = pt.X;
+                this.height = pt.Y;
+            },
+            $ctor3: function (width, height) {
+                this.$initialize();
+                this.width = width;
+                this.height = height;
             },
             ctor: function () {
                 this.$initialize();
             }
         },
         methods: {
-            getHashCode: function () {
-                var h = Bridge.addHash([1702521241, this.Width, this.Height]);
-                return h;
-            },
-            equals: function (o) {
-                if (!Bridge.is(o, System.Drawing.SizeF)) {
+            equals: function (obj) {
+                if (!(Bridge.is(obj, System.Drawing.SizeF))) {
                     return false;
                 }
-                return Bridge.equals(this.Width, o.Width) && Bridge.equals(this.Height, o.Height);
+                var ef = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj), System.Drawing.SizeF));
+                return (((ef.Width === this.Width) && (ef.Height === this.Height)) && Bridge.equals(System.Drawing.SizeF, Bridge.getType(this)));
+            },
+            getHashCode: function () {
+                return Bridge.getHashCode(this);
+            },
+            ToPointF: function () {
+                return System.Drawing.SizeF.op_Explicit(this);
+            },
+            ToSize: function () {
+                return System.Drawing.Size.Truncate(this);
+            },
+            toString: function () {
+                var textArray1 = System.Array.init(["{Width=", System.Single.format(this.width, "G", System.Globalization.CultureInfo.getCurrentCulture()), ", Height=", System.Single.format(this.height, "G", System.Globalization.CultureInfo.getCurrentCulture()), "}"], System.String);
+                return System.String.concat(textArray1);
             },
             $clone: function (to) {
                 var s = to || new System.Drawing.SizeF();
-                s.Width = this.Width;
-                s.Height = this.Height;
+                s.width = this.width;
+                s.height = this.height;
                 return s;
             }
         }
@@ -2210,6 +4426,242 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.EnvironmentV2", {
+        statics: {
+            methods: {
+                GetResourceString: function (source, args) {
+                    if (args === void 0) { args = []; }
+                    return source;
+                }
+            }
+        }
+    });
+
+    Bridge.define("System.IWellKnownStringEqualityComparer", {
+        $kind: "interface"
+    });
+
+    Bridge.define("System.StringComparer", {
+        inherits: [System.Collections.IComparer,System.Collections.IEqualityComparer,System.Collections.Generic.IComparer$1(System.String),System.Collections.Generic.IEqualityComparer$1(System.String)],
+        statics: {
+            fields: {
+                _ordinal: null,
+                _ordinalIgnoreCase: null
+            },
+            props: {
+                InvariantCulture: {
+                    get: function () {
+                        return null;
+                    }
+                },
+                InvariantCultureIgnoreCase: {
+                    get: function () {
+                        return null;
+                    }
+                },
+                Ordinal: {
+                    get: function () {
+                        return System.StringComparer._ordinal;
+                    }
+                },
+                OrdinalIgnoreCase: {
+                    get: function () {
+                        return System.StringComparer._ordinalIgnoreCase;
+                    }
+                }
+            },
+            ctors: {
+                init: function () {
+                    this._ordinal = new System.OrdinalComparer(false);
+                    this._ordinalIgnoreCase = new System.OrdinalComparer(true);
+                }
+            },
+            methods: {
+                Create: function (culture, ignoreCase) {
+                    if (culture == null) {
+                        throw new System.ArgumentNullException.$ctor1("culture");
+                    }
+                    throw new System.NotImplementedException.ctor();
+                    //return new CultureAwareComparer(culture, ignoreCase);
+                }
+            }
+        },
+        alias: [
+            "compare", "System$Collections$IComparer$compare",
+            "equals", "System$Collections$IEqualityComparer$equals",
+            "getHashCode", "System$Collections$IEqualityComparer$getHashCode"
+        ],
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            compare: function (x, y) {
+                if (Bridge.referenceEquals(x, y)) {
+                    return 0;
+                }
+                if (x == null) {
+                    return -1;
+                }
+                if (y == null) {
+                    return 1;
+                }
+                var str = Bridge.as(x, System.String);
+                if (str != null) {
+                    var str2 = Bridge.as(y, System.String);
+                    if (str2 != null) {
+                        return this.compare$1(str, str2);
+                    }
+                }
+                var comparable = Bridge.as(x, System.IComparable);
+                if (comparable == null) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_ImplementIComparable"));
+                }
+                return Bridge.compare(comparable, y);
+            },
+            equals: function (x, y) {
+                if (Bridge.referenceEquals(x, y)) {
+                    return true;
+                }
+                if ((x == null) || (y == null)) {
+                    return false;
+                }
+                var str = Bridge.as(x, System.String);
+                if (str != null) {
+                    var str2 = Bridge.as(y, System.String);
+                    if (str2 != null) {
+                        return this.equals2(str, str2);
+                    }
+                }
+                return Bridge.equals(x, y);
+            },
+            getHashCode: function (obj) {
+                if (obj == null) {
+                    throw new System.ArgumentNullException.$ctor1("obj");
+                }
+                var str = Bridge.as(obj, System.String);
+                if (str != null) {
+                    return this.getHashCode2(str);
+                }
+                return Bridge.getHashCode(obj);
+            }
+        }
+    });
+
+    Bridge.define("System.StringUtils", {
+        statics: {
+            methods: {
+                CompareOrdinal: function (strA, strB) {
+                    if (Bridge.referenceEquals(strA, strB)) {
+                        return 0;
+                    }
+                    if (strA == null) {
+                        return -1;
+                    }
+                    if (strB == null) {
+                        return 1;
+                    }
+                    if ((((System.Linq.Enumerable.from(strA).first() - System.Linq.Enumerable.from(strB).first()) | 0)) !== 0) {
+                        return (((System.Linq.Enumerable.from(strA).first() - System.Linq.Enumerable.from(strB).first()) | 0));
+                    }
+                    return System.StringUtils.CompareOrdinalHelper(strA, strB);
+                },
+                CompareOrdinalHelper: function (strA, strB) {
+                    return System.String.compare(strA, strB, false);
+                    //int num = Math.Min(strA.Length, strB.Length);
+                    //int num2 = -1;
+                    //char m_firstChar1 = strA[0];
+                    //char m_firstChar2 = strB[0];
+
+                    //int chPtr = 0;
+                    //int chPtr2 = 0;
+                    //while (num >= 10)
+                    //{
+                    //    if (strA[chPtr] != strB[chPtr2])
+                    //    {
+                    //        num2 = 0;
+                    //        break;
+                    //    }
+                    //    if (strA[chPtr + 1] != strB[chPtr2 + 1])
+                    //    {
+                    //        num2 = 2;
+                    //        break;
+                    //    }
+                    //    if (strA[chPtr + 2] != strB[chPtr2 + 2])
+                    //    {
+                    //        num2 = 4;
+                    //        break;
+                    //    }
+                    //    if (strA[chPtr + 3] != strB[chPtr2 + 3])
+                    //    {
+                    //        num2 = 6;
+                    //        break;
+                    //    }
+                    //    if (strA[chPtr + 4] != strB[chPtr2 + 4])
+                    //    {
+                    //        num2 = 8;
+                    //        break;
+                    //    }
+                    //    chPtr += 5;
+                    //    chPtr2 += 5;
+                    //    num -= 5;
+                    //}
+                    //if (num2 == -1)
+                    //{
+                    //    goto Label_0100;
+                    //}
+                    //chPtr += num2;
+                    //chPtr2 += num2;
+                    //int num3 = strA[0] - strB[0];
+                    //if (num3 != 0)
+                    //{
+                    //    return num3;
+                    //}
+                    //return (strA[1] - strB[1]);
+                    //Label_00E2:
+                    //if ((strA[0] != *(((int*)chPtr2)))
+                    //{
+                    //    goto Label_0104;
+                    //}
+                    //chPtr += 1;
+                    //chPtr2 += 1;
+                    //num -= 1;
+                    //Label_0100:
+                    //if (num > 0)
+                    //{
+                    //    goto Label_00E2;
+                    //}
+                    //Label_0104:
+                    //if (num <= 0)
+                    //{
+                    //    return (strA.Length - strB.Length);
+                    //}
+                    //int num4 = strA[0] - strB[0];
+                    //if (num4 != 0)
+                    //{
+                    //    return num4;
+                    //}
+                    //return (strA[1] - strB[1]);
+                }
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.AnchorStyles", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                None: 0,
+                Top: 1,
+                Bottom: 2,
+                Left: 4,
+                Right: 8
+            }
+        },
+        $flags: true
+    });
+
     Bridge.define("System.Windows.Forms.AutoScaleMode", {
         $kind: "enum",
         statics: {
@@ -2222,380 +4674,40 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
-    Bridge.define("System.Windows.Forms.Control", {
+    Bridge.define("System.Windows.Forms.AutoSizeMode", {
+        $kind: "enum",
         statics: {
             fields: {
-                ClickedOnControl: null
-            },
-            ctors: {
-                ctor: function () {
-                    window.onmousemove = function (ev) {
-                        if (System.Windows.Forms.Control.ClickedOnControl != null) {
-                            ev.stopPropagation();
+                GrowAndShrink: 0,
+                GrowOnly: 1
+            }
+        }
+    });
 
-                            System.Windows.Forms.Control.ClickedOnControl.OnMouseMove(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, System.Windows.Forms.Control.ClickedOnControl));
-                        }
-                        return null;
-                    };
-
-                    window.onmouseup = function (ev) {
-                        if (System.Windows.Forms.Control.ClickedOnControl != null) {
-                            ev.stopPropagation();
-
-                            System.Windows.Forms.Control.ClickedOnControl.OnMouseUp(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, System.Windows.Forms.Control.ClickedOnControl));
-
-                            System.Windows.Forms.Control.ClickedOnControl = null;
-                        }
-                        return null;
-                    };
-
-                }
+    Bridge.define("System.Windows.Forms.BoundsSpecified", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                All: 15,
+                Height: 8,
+                Location: 3,
+                None: 0,
+                Size: 12,
+                Width: 4,
+                X: 1,
+                Y: 2
             }
         },
-        fields: {
-            _location: null,
-            _visible: false,
-            _parent: null,
-            _size: null,
-            _tabStop: false,
-            _tabIndex: 0,
-            Text: null,
-            _backColor: null,
-            _enabled: false,
-            _readonly: false,
-            ForeColor: null,
-            _tag: null,
-            Controls: null,
-            _font: null,
-            _autoSize: false,
-            _init: false,
-            Element: null,
-            Margin: null,
-            Padding: null,
-            layoutSuspended: false
-        },
-        events: {
-            Load: null,
-            Click: null,
-            MouseDown: null,
-            MouseMove: null,
-            MouseUp: null
-        },
-        props: {
-            Name: {
-                get: function () {
-                    return this.Element.getAttribute("Name");
-                },
-                set: function (value) {
-                    this.Element.setAttribute("Name", value);
-                }
-            },
-            Location: {
-                get: function () {
-                    return this._location.$clone();
-                },
-                set: function (value) {
-                    this._location = value.$clone();
+        $flags: true
+    });
 
-                    this.Element.style.left = this._location.X + "px";
-                    this.Element.style.top = this._location.Y + "px";
-
-                }
-            },
-            Visible: {
-                get: function () {
-                    return this._visible;
-                },
-                set: function (value) {
-                    this._visible = value;
-                    this.Element.style.visibility = this._visible ? "inherit" : "hidden";
-                }
-            },
-            Parent: {
-                get: function () {
-                    return this._parent;
-                }
-            },
-            Size: {
-                get: function () {
-                    return this._size.$clone();
-                },
-                set: function (value) {
-                    this._size = value.$clone();
-                    if (this._autoSize) {
-                        this.Element.style.width = "auto";
-                        this.Element.style.height = "auto";
-                    } else {
-                        this.Element.style.width = this._size.Width + "px";
-                        this.Element.style.height = this._size.Height + "px";
-                    }
-                }
-            },
-            TabStop: {
-                get: function () {
-                    return this._tabStop;
-                },
-                set: function (value) {
-                    this._tabStop = value;
-                    this.TabIndex = this._tabIndex;
-                }
-            },
-            TabIndex: {
-                get: function () {
-                    return this._tabIndex;
-                },
-                set: function (value) {
-                    this._tabIndex = value;
-                    if (this.TabStop) {
-                        this.Element.tabIndex = value;
-                    } else {
-                        this.Element.removeAttribute("TabIndex");
-                    }
-                }
-            },
-            BackColor: {
-                get: function () {
-                    return this._backColor.$clone();
-                },
-                set: function (value) {
-                    this._backColor = value.$clone();
-                    this.Element.style.backgroundColor = this._backColor.ToHtml();
-                }
-            },
-            Enabled: {
-                get: function () {
-                    return this._enabled;
-                },
-                set: function (value) {
-                    this._enabled = value;
-                    this.ApplyDisabled();
-                }
-            },
-            ReadOnly: {
-                get: function () {
-                    return this._readonly;
-                },
-                set: function (value) {
-                    this._readonly = value;
-                    this.ApplyReadonly();
-                }
-            },
-            /**
-             * Use Tag as Class Name
-             *
-             * @instance
-             * @public
-             * @memberof System.Windows.Forms.Control
-             * @function Tag
-             * @type System.Object
-             */
-            Tag: {
-                get: function () {
-                    return this._tag;
-                },
-                set: function (value) {
-                    this._tag = value;
-                    if (Bridge.is(this._tag, System.String)) {
-                        this.Element.className = (System.String.concat(this._tag, ""));
-                    } else {
-                        this.Element.className = "";
-                    }
-                    this.ApplyDisabled();
-                }
-            },
-            Font: {
-                get: function () {
-                    return this._font;
-                },
-                set: function (value) {
-                    this._font = value;
-                    if (this._font == null) {
-                        this.Element.style.fontSize = "inherit";
-                        this.Element.style.fontFamily = "inherit";
-                    } else {
-                        this.Element.style.fontSize = (System.Single.format(this._font.EmSize) || "") + "pt";
-                        this.Element.style.fontFamily = this._font.FamilyName;
-                    }
-
-                }
-            },
-            AutoSize: {
-                get: function () {
-                    return this._autoSize;
-                },
-                set: function (value) {
-                    if (this._init) {
-                        this._autoSize = value;
-
-                        this.Size = this._size.$clone();
-                    }
+    Bridge.define("System.Windows.Forms.ClientUtils", {
+        statics: {
+            methods: {
+                IsEnumValid: function (enumValue, value, minValue, maxValue) {
+                    return ((value >= minValue) && (value <= maxValue));
                 }
             }
-        },
-        ctors: {
-            init: function () {
-                this._location = new System.Drawing.Point();
-                this._size = new System.Drawing.Size();
-                this._backColor = new System.Drawing.Color();
-                this.ForeColor = new System.Drawing.Color();
-                this.Margin = new System.Windows.Forms.Padding();
-                this.Padding = new System.Windows.Forms.Padding();
-                this._enabled = true;
-                this._readonly = false;
-                this.layoutSuspended = false;
-            },
-            ctor: function (element) {
-                this.$initialize();
-                this.Element = element;
-
-                this.Controls = new System.Windows.Forms.ControlCollection(this);
-
-                this.Element.style.position = "absolute";
-                this.Element.style.boxSizing = "borderbox";
-
-                this.Element.style.padding = "0";
-
-
-                this.Element.style.fontSize = "inherit";
-                this.Element.style.fontFamily = "inherit";
-
-                this.Visible = true;
-
-                this.TabStop = true;
-
-                this.Element.onclick = Bridge.fn.bind(this, function (ev) {
-                    this.OnClick({ });
-                    return null;
-                });
-
-                this.Element.onmousedown = Bridge.fn.bind(this, function (ev) {
-                    System.Windows.Forms.Control.ClickedOnControl = this;
-                    ev.stopPropagation();
-
-                    this.OnMouseDown(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this));
-
-                    return null;
-                });
-
-                this.Element.onmousemove = Bridge.fn.bind(this, function (ev) {
-                    if (System.Windows.Forms.Control.ClickedOnControl == null) {
-                        ev.stopPropagation();
-
-                        this.OnMouseMove(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this));
-                    }
-
-                    return null;
-                });
-
-                this._init = true;
-            }
-        },
-        methods: {
-            OnControlAdded: function (control) {
-
-            },
-            OnControlRemoved: function (control) {
-
-            },
-            GetForm: function () {
-                if (this.Parent == null) {
-                    return null;
-                }
-
-                if (Bridge.is(this.Parent, System.Windows.Forms.Form)) {
-                    return this.Parent;
-                } else {
-                    return this.Parent.GetForm();
-                }
-            },
-            ApplyDisabled: function (element) {
-                if (element === void 0) { element = null; }
-                if (element == null) {
-                    element = this.Element;
-                }
-                if (this.Enabled) {
-                    if (element.classList.contains("disabled")) {
-                        element.classList.remove("disabled");
-                        element.removeAttribute("disabled");
-                    }
-                } else {
-                    if (!element.classList.contains("disabled")) {
-                        element.classList.add("disabled");
-                        element.setAttribute("disabled", "");
-                    }
-                }
-            },
-            ApplyReadonly: function (element) {
-                if (element === void 0) { element = null; }
-                if (element == null) {
-                    element = this.Element;
-                }
-                if (this.ReadOnly) {
-                    if (!element.classList.contains("readonly")) {
-                        element.classList.add("readonly");
-                        element.setAttribute("readonly", "");
-                    }
-                } else {
-                    if (element.classList.contains("readonly")) {
-                        element.classList.remove("readonly");
-                        element.removeAttribute("readonly");
-                    }
-                }
-            },
-            OnClick: function (e) {
-                if (!Bridge.staticEquals(this.Click, null)) {
-                    this.Click(this, e);
-                }
-            },
-            OnMouseDown: function (e) {
-                if (!Bridge.staticEquals(this.MouseDown, null)) {
-                    this.MouseDown(this, e);
-                }
-            },
-            OnMouseMove: function (e) {
-                if (!Bridge.staticEquals(this.MouseMove, null)) {
-                    this.MouseMove(this, e);
-                }
-            },
-            InvokeLoad: function () {
-                this.OnLoad({ });
-            },
-            OnLoad: function (e) {
-                if (!Bridge.staticEquals(this.Load, null)) {
-                    this.Load(this, e);
-                }
-            },
-            OnMouseUp: function (e) {
-                if (!Bridge.staticEquals(this.MouseUp, null)) {
-                    this.MouseUp(this, e);
-                }
-            },
-            SuspendLayout: function () {
-                this.layoutSuspended = true;
-            },
-            ResumeLayout: function (performLayout) {
-                this.layoutSuspended = false;
-                if (performLayout) {
-                    this.PerformLayout();
-                }
-            },
-            PerformLayout: function () {
-                var $t;
-                if (this.layoutSuspended) {
-                    return;
-                }
-
-                $t = Bridge.getEnumerator(this.Controls);
-                try {
-                    while ($t.moveNext()) {
-                        var item = $t.Current;
-                        item.PerformLayout();
-                    }
-                } finally {
-                    if (Bridge.is($t, System.IDisposable)) {
-                        $t.System$IDisposable$dispose();
-                    }
-                }}
         }
     });
 
@@ -2681,6 +4793,28 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.Windows.Forms.DockStyle", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                None: 0,
+                Top: 1,
+                Bottom: 2,
+                Left: 3,
+                Right: 4,
+                Fill: 5
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.DpiHelper", {
+        statics: {
+            fields: {
+                EnableAnchorLayoutHighDpiImprovements: false
+            }
+        }
+    });
+
     Bridge.define("System.Windows.Forms.DrawMode", {
         $kind: "enum",
         statics: {
@@ -2730,6 +4864,1289 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 Sizable: 4,
                 FixedToolWindow: 5,
                 SizableToolWindow: 6
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.ArrangedElementCollection", {
+        inherits: [System.Collections.IList,System.Collections.ICollection,System.Collections.IEnumerable],
+        statics: {
+            fields: {
+                Empty: null
+            },
+            ctors: {
+                init: function () {
+                    this.Empty = new System.Windows.Forms.Layout.ArrangedElementCollection.$ctor2(0);
+                }
+            },
+            methods: {
+                Copy: function (sourceList, sourceIndex, destinationList, destinationIndex, length) {
+                    if (sourceIndex < destinationIndex) {
+                        sourceIndex = (sourceIndex + length) | 0;
+                        destinationIndex = (destinationIndex + length) | 0;
+                        while (length > 0) {
+                            destinationList.InnerList.setItem(((destinationIndex = (destinationIndex - 1) | 0)), sourceList.InnerList.getItem(((sourceIndex = (sourceIndex - 1) | 0))));
+                            length = (length - 1) | 0;
+                        }
+                    } else {
+                        while (length > 0) {
+                            destinationList.InnerList.setItem(Bridge.identity(destinationIndex, (destinationIndex = (destinationIndex + 1) | 0)), sourceList.InnerList.getItem(Bridge.identity(sourceIndex, (sourceIndex = (sourceIndex + 1) | 0))));
+                            length = (length - 1) | 0;
+                        }
+                    }
+                }
+            }
+        },
+        fields: {
+            _innerList: null
+        },
+        props: {
+            Count: {
+                get: function () {
+                    return this.InnerList.Count;
+                }
+            },
+            InnerList: {
+                get: function () {
+                    return this._innerList;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return this.InnerList.IsReadOnly;
+                }
+            },
+            System$Collections$ICollection$IsSynchronized: {
+                get: function () {
+                    return this.InnerList.IsSynchronized;
+                }
+            },
+            System$Collections$ICollection$SyncRoot: {
+                get: function () {
+                    return this.InnerList.SyncRoot;
+                }
+            },
+            System$Collections$IList$IsFixedSize: {
+                get: function () {
+                    return this.InnerList.IsFixedSize;
+                }
+            }
+        },
+        alias: [
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", "System$Collections$IEnumerable$GetEnumerator",
+            "Count", "System$Collections$ICollection$Count",
+            "IsReadOnly", "System$Collections$IList$IsReadOnly"
+        ],
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+                this._innerList = new System.Collections.ArrayList.$ctor3(4);
+            },
+            $ctor1: function (innerList) {
+                this.$initialize();
+                this._innerList = innerList;
+            },
+            $ctor2: function (size) {
+                this.$initialize();
+                this._innerList = new System.Collections.ArrayList.$ctor3(size);
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                return Bridge.cast(this.InnerList.getItem(index), System.Windows.Forms.Layout.IArrangedElement);
+            },
+            System$Collections$IList$getItem: function (index) {
+                return this.InnerList.getItem(index);
+            },
+            System$Collections$IList$setItem: function (index, value) {
+                throw new System.NotSupportedException.ctor();
+            },
+            copyTo: function (array, index) {
+                this.InnerList.copyTo(array, index);
+            },
+            equals: function (obj) {
+                var elements = Bridge.as(obj, System.Windows.Forms.Layout.ArrangedElementCollection);
+                if ((elements == null) || (this.Count !== elements.Count)) {
+                    return false;
+                }
+                for (var i = 0; i < this.Count; i = (i + 1) | 0) {
+                    if (!Bridge.referenceEquals(this.InnerList.getItem(i), elements.InnerList.getItem(i))) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+            GetEnumerator: function () {
+                return this.InnerList.GetEnumerator();
+            },
+            getHashCode: function () {
+                return Bridge.getHashCode(this);
+            },
+            MoveElement: function (element, fromIndex, toIndex) {
+                var length = (toIndex - fromIndex) | 0;
+                switch (length) {
+                    case -1: 
+                    case 1: 
+                        this.InnerList.setItem(fromIndex, this.InnerList.getItem(toIndex));
+                        break;
+                    default: 
+                        {
+                            var sourceIndex = 0;
+                            var destinationIndex = 0;
+                            if (length > 0) {
+                                sourceIndex = (fromIndex + 1) | 0;
+                                destinationIndex = fromIndex;
+                            } else {
+                                sourceIndex = toIndex;
+                                destinationIndex = (toIndex + 1) | 0;
+                                length = (-length) | 0;
+                            }
+                            System.Windows.Forms.Layout.ArrangedElementCollection.Copy(this, sourceIndex, this, destinationIndex, length);
+                            break;
+                        }
+                }
+                this.InnerList.setItem(toIndex, element);
+            },
+            System$Collections$IList$add: function (value) {
+                return this.InnerList.add(value);
+            },
+            System$Collections$IList$clear: function () {
+                this.InnerList.clear();
+            },
+            System$Collections$IList$contains: function (value) {
+                return this.InnerList.contains(value);
+            },
+            System$Collections$IList$indexOf: function (value) {
+                return this.InnerList.indexOf(value);
+            },
+            System$Collections$IList$insert: function (index, value) {
+                throw new System.NotSupportedException.ctor();
+            },
+            System$Collections$IList$remove: function (value) {
+                this.InnerList.remove(value);
+            },
+            System$Collections$IList$removeAt: function (index) {
+                this.InnerList.removeAt(index);
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.CommonProperties", {
+        statics: {
+            fields: {
+                _anchorNeverShrinksSection: null,
+                _autoSizeModeSection: null,
+                _autoSizeSection: null,
+                _BoxStretchInternalSection: null,
+                _dockAndAnchorNeedsLayoutSection: null,
+                _dockAndAnchorSection: null,
+                _dockModeSection: null,
+                _flowBreakSection: null,
+                _layoutBoundsProperty: 0,
+                _layoutStateProperty: 0,
+                _marginProperty: 0,
+                _maximumSizeProperty: 0,
+                _minimumSizeProperty: 0,
+                _paddingProperty: 0,
+                _preferredSizeCacheProperty: 0,
+                _selfAutoSizingSection: null,
+                _specifiedBoundsProperty: 0,
+                DefaultAlignment: 0,
+                DefaultAnchor: 0,
+                DefaultAutoSize: false,
+                DefaultDock: 0,
+                DefaultMargin: null,
+                DefaultMaximumSize: null,
+                DefaultMinimumSize: null
+            },
+            ctors: {
+                init: function () {
+                    this._anchorNeverShrinksSection = new System.Collections.Specialized.BitVector32.Section();
+                    this._autoSizeModeSection = new System.Collections.Specialized.BitVector32.Section();
+                    this._autoSizeSection = new System.Collections.Specialized.BitVector32.Section();
+                    this._BoxStretchInternalSection = new System.Collections.Specialized.BitVector32.Section();
+                    this._dockAndAnchorNeedsLayoutSection = new System.Collections.Specialized.BitVector32.Section();
+                    this._dockAndAnchorSection = new System.Collections.Specialized.BitVector32.Section();
+                    this._dockModeSection = new System.Collections.Specialized.BitVector32.Section();
+                    this._flowBreakSection = new System.Collections.Specialized.BitVector32.Section();
+                    this._selfAutoSizingSection = new System.Collections.Specialized.BitVector32.Section();
+                    this.DefaultMargin = new System.Windows.Forms.Padding();
+                    this.DefaultMaximumSize = new System.Drawing.Size();
+                    this.DefaultMinimumSize = new System.Drawing.Size();
+                    this._anchorNeverShrinksSection = System.Collections.Specialized.BitVector32.CreateSection$1(1, System.Windows.Forms.Layout.CommonProperties._BoxStretchInternalSection);
+                    this._autoSizeModeSection = System.Collections.Specialized.BitVector32.CreateSection$1(1, System.Windows.Forms.Layout.CommonProperties._selfAutoSizingSection);
+                    this._autoSizeSection = System.Collections.Specialized.BitVector32.CreateSection$1(1, System.Windows.Forms.Layout.CommonProperties._dockModeSection);
+                    this._BoxStretchInternalSection = System.Collections.Specialized.BitVector32.CreateSection$1(3, System.Windows.Forms.Layout.CommonProperties._autoSizeSection);
+                    this._dockAndAnchorNeedsLayoutSection = System.Collections.Specialized.BitVector32.CreateSection(127);
+                    this._dockAndAnchorSection = System.Collections.Specialized.BitVector32.CreateSection(15);
+                    this._dockModeSection = System.Collections.Specialized.BitVector32.CreateSection$1(1, System.Windows.Forms.Layout.CommonProperties._dockAndAnchorSection);
+                    this._flowBreakSection = System.Collections.Specialized.BitVector32.CreateSection$1(1, System.Windows.Forms.Layout.CommonProperties._anchorNeverShrinksSection);
+                    this._layoutBoundsProperty = System.Windows.Forms.PropertyStore.CreateKey();
+                    this._layoutStateProperty = System.Windows.Forms.PropertyStore.CreateKey();
+                    this._marginProperty = System.Windows.Forms.PropertyStore.CreateKey();
+                    this._maximumSizeProperty = System.Windows.Forms.PropertyStore.CreateKey();
+                    this._minimumSizeProperty = System.Windows.Forms.PropertyStore.CreateKey();
+                    this._paddingProperty = System.Windows.Forms.PropertyStore.CreateKey();
+                    this._preferredSizeCacheProperty = System.Windows.Forms.PropertyStore.CreateKey();
+                    this._selfAutoSizingSection = System.Collections.Specialized.BitVector32.CreateSection$1(1, System.Windows.Forms.Layout.CommonProperties._flowBreakSection);
+                    this._specifiedBoundsProperty = System.Windows.Forms.PropertyStore.CreateKey();
+                    this.DefaultAlignment = System.Drawing.ContentAlignment.TopLeft;
+                    this.DefaultAnchor = (5);
+                    this.DefaultAutoSize = false;
+                    this.DefaultDock = System.Windows.Forms.DockStyle.None;
+                    this.DefaultMargin = new System.Windows.Forms.Padding.$ctor1(3);
+                    this.DefaultMaximumSize = new System.Drawing.Size.$ctor2(0, 0);
+                    this.DefaultMinimumSize = new System.Drawing.Size.$ctor2(0, 0);
+                }
+            },
+            methods: {
+                ClearMaximumSize: function (element) {
+                    if (element.System$Windows$Forms$Layout$IArrangedElement$Properties.ContainsObject(System.Windows.Forms.Layout.CommonProperties._maximumSizeProperty)) {
+                        element.System$Windows$Forms$Layout$IArrangedElement$Properties.RemoveObject(System.Windows.Forms.Layout.CommonProperties._maximumSizeProperty);
+                    }
+                },
+                GetAutoSize: function (element) {
+                    var num = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element).getItem$1(System.Windows.Forms.Layout.CommonProperties._autoSizeSection);
+                    return (num > 0);
+                },
+                GetAutoSizeMode: function (element) {
+                    if (System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element).getItem$1(System.Windows.Forms.Layout.CommonProperties._autoSizeModeSection) !== 0) {
+                        return System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+                    }
+                    return System.Windows.Forms.AutoSizeMode.GrowOnly;
+                },
+                GetFlowBreak: function (element) {
+                    var num = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element).getItem$1(System.Windows.Forms.Layout.CommonProperties._flowBreakSection);
+                    return (num === 1);
+                },
+                GetLayoutBounds: function (element) {
+                    var flag = { };
+                    var size = element.System$Windows$Forms$Layout$IArrangedElement$Properties.GetSize(System.Windows.Forms.Layout.CommonProperties._layoutBoundsProperty, flag);
+                    if (flag.v) {
+                        return size.$clone();
+                    }
+                    return System.Drawing.Size.Empty.$clone();
+                },
+                GetLayoutState: function (element) {
+                    return new System.Collections.Specialized.BitVector32.$ctor2(element.System$Windows$Forms$Layout$IArrangedElement$Properties.GetInteger(System.Windows.Forms.Layout.CommonProperties._layoutStateProperty));
+                },
+                GetMargin: function (element) {
+                    var flag = { };
+                    var padding = element.System$Windows$Forms$Layout$IArrangedElement$Properties.GetPadding$1(System.Windows.Forms.Layout.CommonProperties._marginProperty, flag);
+                    if (flag.v) {
+                        return padding.$clone();
+                    }
+                    return System.Windows.Forms.Layout.CommonProperties.DefaultMargin.$clone();
+                },
+                GetMaximumSize: function (element, defaultMaximumSize) {
+                    var flag = { };
+                    var size = element.System$Windows$Forms$Layout$IArrangedElement$Properties.GetSize(System.Windows.Forms.Layout.CommonProperties._maximumSizeProperty, flag);
+                    if (flag.v) {
+                        return size.$clone();
+                    }
+                    return defaultMaximumSize.$clone();
+                },
+                GetMinimumSize: function (element, defaultMinimumSize) {
+                    var flag = { };
+                    var size = element.System$Windows$Forms$Layout$IArrangedElement$Properties.GetSize(System.Windows.Forms.Layout.CommonProperties._minimumSizeProperty, flag);
+                    if (flag.v) {
+                        return size.$clone();
+                    }
+                    return defaultMinimumSize.$clone();
+                },
+                GetNeedsAnchorLayout: function (element) {
+                    var layoutState = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element);
+                    return ((layoutState.getItem$1(System.Windows.Forms.Layout.CommonProperties._dockAndAnchorNeedsLayoutSection) !== 0) && (layoutState.getItem$1(System.Windows.Forms.Layout.CommonProperties._dockModeSection) === 0));
+                },
+                GetNeedsDockAndAnchorLayout: function (element) {
+                    return (System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element).getItem$1(System.Windows.Forms.Layout.CommonProperties._dockAndAnchorNeedsLayoutSection) > 0);
+                },
+                GetNeedsDockLayout: function (element) {
+                    return ((System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element).getItem$1(System.Windows.Forms.Layout.CommonProperties._dockModeSection) === 1) && element.System$Windows$Forms$Layout$IArrangedElement$ParticipatesInLayout);
+                },
+                GetPadding: function (element, defaultPadding) {
+                    var flag = { };
+                    var padding = element.System$Windows$Forms$Layout$IArrangedElement$Properties.GetPadding$1(System.Windows.Forms.Layout.CommonProperties._paddingProperty, flag);
+                    if (flag.v) {
+                        return padding.$clone();
+                    }
+                    return defaultPadding.$clone();
+                },
+                GetSelfAutoSizeInDefaultLayout: function (element) {
+                    var num = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element).getItem$1(System.Windows.Forms.Layout.CommonProperties._selfAutoSizingSection);
+                    return (num === 1);
+                },
+                GetSpecifiedBounds: function (element) {
+                    var flag = { };
+                    var rectangle = element.System$Windows$Forms$Layout$IArrangedElement$Properties.GetRectangle$1(System.Windows.Forms.Layout.CommonProperties._specifiedBoundsProperty, flag);
+                    if (flag.v && (System.Drawing.Rectangle.op_Inequality(rectangle.$clone(), System.Windows.Forms.Layout.LayoutUtils.MaxRectangle.$clone()))) {
+                        return rectangle.$clone();
+                    }
+                    return element.System$Windows$Forms$Layout$IArrangedElement$Bounds.$clone();
+                },
+                HasLayoutBounds: function (element) {
+                    var flag = { };
+                    element.System$Windows$Forms$Layout$IArrangedElement$Properties.GetSize(System.Windows.Forms.Layout.CommonProperties._layoutBoundsProperty, flag);
+                    return flag.v;
+                },
+                ResetPadding: function (element) {
+                    if (element.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.CommonProperties._paddingProperty) != null) {
+                        element.System$Windows$Forms$Layout$IArrangedElement$Properties.RemoveObject(System.Windows.Forms.Layout.CommonProperties._paddingProperty);
+                    }
+                },
+                SetAutoSize: function (element, value) {
+                    var layoutState = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element);
+                    layoutState.setItem$1(System.Windows.Forms.Layout.CommonProperties._autoSizeSection, value ? 1 : 0);
+                    System.Windows.Forms.Layout.CommonProperties.SetLayoutState(element, layoutState.$clone());
+                    if (!value) {
+                        element.System$Windows$Forms$Layout$IArrangedElement$SetBounds(System.Windows.Forms.Layout.CommonProperties.GetSpecifiedBounds(element), System.Windows.Forms.BoundsSpecified.None);
+                    }
+                },
+                SetAutoSizeMode: function (element, mode) {
+                    var layoutState = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element);
+                    layoutState.setItem$1(System.Windows.Forms.Layout.CommonProperties._autoSizeModeSection, (mode === System.Windows.Forms.AutoSizeMode.GrowAndShrink) ? 1 : 0);
+                    System.Windows.Forms.Layout.CommonProperties.SetLayoutState(element, layoutState.$clone());
+                },
+                SetFlowBreak: function (element, value) {
+                    var layoutState = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element);
+                    layoutState.setItem$1(System.Windows.Forms.Layout.CommonProperties._flowBreakSection, value ? 1 : 0);
+                    System.Windows.Forms.Layout.CommonProperties.SetLayoutState(element, layoutState.$clone());
+                    System.Windows.Forms.Layout.LayoutTransaction.DoLayout(element.System$Windows$Forms$Layout$IArrangedElement$Container, element, System.Windows.Forms.Layout.PropertyNames.FlowBreak);
+                },
+                SetLayoutBounds: function (element, value) {
+                    element.System$Windows$Forms$Layout$IArrangedElement$Properties.SetSize(System.Windows.Forms.Layout.CommonProperties._layoutBoundsProperty, value.$clone());
+                },
+                SetLayoutState: function (element, state) {
+                    element.System$Windows$Forms$Layout$IArrangedElement$Properties.SetInteger(System.Windows.Forms.Layout.CommonProperties._layoutStateProperty, state.Data);
+                },
+                SetMargin: function (element, value) {
+                    element.System$Windows$Forms$Layout$IArrangedElement$Properties.SetPadding(System.Windows.Forms.Layout.CommonProperties._marginProperty, value.$clone());
+                    System.Windows.Forms.Layout.LayoutTransaction.DoLayout(element.System$Windows$Forms$Layout$IArrangedElement$Container, element, System.Windows.Forms.Layout.PropertyNames.Margin);
+                },
+                SetMaximumSize: function (element, value) {
+                    element.System$Windows$Forms$Layout$IArrangedElement$Properties.SetSize(System.Windows.Forms.Layout.CommonProperties._maximumSizeProperty, value.$clone());
+                    var bounds = element.System$Windows$Forms$Layout$IArrangedElement$Bounds.$clone();
+                    bounds.Width = Math.min(bounds.Width, value.Width);
+                    bounds.Height = Math.min(bounds.Height, value.Height);
+                    element.System$Windows$Forms$Layout$IArrangedElement$SetBounds(bounds.$clone(), System.Windows.Forms.BoundsSpecified.Size);
+                    System.Windows.Forms.Layout.LayoutTransaction.DoLayout(element.System$Windows$Forms$Layout$IArrangedElement$Container, element, System.Windows.Forms.Layout.PropertyNames.MaximumSize);
+                },
+                SetMinimumSize: function (element, value) {
+                    var $t;
+                    element.System$Windows$Forms$Layout$IArrangedElement$Properties.SetSize(System.Windows.Forms.Layout.CommonProperties._minimumSizeProperty, value.$clone());
+                    $t = new System.Windows.Forms.Layout.LayoutTransaction.ctor(Bridge.as(element.System$Windows$Forms$Layout$IArrangedElement$Container, System.Windows.Forms.Control), element, System.Windows.Forms.Layout.PropertyNames.MinimumSize);
+                    try {
+                        var bounds = element.System$Windows$Forms$Layout$IArrangedElement$Bounds.$clone();
+                        bounds.Width = Math.max(bounds.Width, value.Width);
+                        bounds.Height = Math.max(bounds.Height, value.Height);
+                        element.System$Windows$Forms$Layout$IArrangedElement$SetBounds(bounds.$clone(), System.Windows.Forms.BoundsSpecified.Size);
+                    }
+                    finally {
+                        if (Bridge.hasValue($t)) {
+                            $t.System$IDisposable$Dispose();
+                        }
+                    }
+                },
+                SetPadding: function (element, value) {
+                    value = System.Windows.Forms.Layout.LayoutUtils.ClampNegativePaddingToZero(value.$clone());
+                    element.System$Windows$Forms$Layout$IArrangedElement$Properties.SetPadding(System.Windows.Forms.Layout.CommonProperties._paddingProperty, value.$clone());
+                },
+                SetSelfAutoSizeInDefaultLayout: function (element, value) {
+                    var layoutState = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element);
+                    layoutState.setItem$1(System.Windows.Forms.Layout.CommonProperties._selfAutoSizingSection, value ? 1 : 0);
+                    System.Windows.Forms.Layout.CommonProperties.SetLayoutState(element, layoutState.$clone());
+                },
+                ShouldSelfSize: function (element) {
+                    return (!System.Windows.Forms.Layout.CommonProperties.GetAutoSize(element) || (((Bridge.is(element.System$Windows$Forms$Layout$IArrangedElement$Container, System.Windows.Forms.Control)) && (Bridge.hasValue(Bridge.cast(element.System$Windows$Forms$Layout$IArrangedElement$Container, System.Windows.Forms.Control).LayoutEngine))) && System.Windows.Forms.Layout.CommonProperties.GetSelfAutoSizeInDefaultLayout(element)));
+                },
+                UpdateSpecifiedBounds: function (element, x, y, width, height) {
+                    var rectangle = new System.Drawing.Rectangle.$ctor2(x, y, width, height);
+                    element.System$Windows$Forms$Layout$IArrangedElement$Properties.SetRectangle(System.Windows.Forms.Layout.CommonProperties._specifiedBoundsProperty, rectangle.$clone());
+                },
+                UpdateSpecifiedBounds$1: function (element, x, y, width, height, specified) {
+                    var specifiedBounds = System.Windows.Forms.Layout.CommonProperties.GetSpecifiedBounds(element);
+                    var flag = !!(((specified & System.Windows.Forms.BoundsSpecified.X) === System.Windows.Forms.BoundsSpecified.None) & (x !== specifiedBounds.X));
+                    var flag2 = !!(((specified & System.Windows.Forms.BoundsSpecified.Y) === System.Windows.Forms.BoundsSpecified.None) & (y !== specifiedBounds.Y));
+                    var flag3 = !!(((specified & System.Windows.Forms.BoundsSpecified.Width) === System.Windows.Forms.BoundsSpecified.None) & (width !== specifiedBounds.Width));
+                    var flag4 = !!(((specified & System.Windows.Forms.BoundsSpecified.Height) === System.Windows.Forms.BoundsSpecified.None) & (height !== specifiedBounds.Height));
+                    if (!!((!!((!!(flag | flag2)) | flag3)) | flag4)) {
+                        if (!flag) {
+                            specifiedBounds.X = x;
+                        }
+                        if (!flag2) {
+                            specifiedBounds.Y = y;
+                        }
+                        if (!flag3) {
+                            specifiedBounds.Width = width;
+                        }
+                        if (!flag4) {
+                            specifiedBounds.Height = height;
+                        }
+                        element.System$Windows$Forms$Layout$IArrangedElement$Properties.SetRectangle(System.Windows.Forms.Layout.CommonProperties._specifiedBoundsProperty, specifiedBounds.$clone());
+                    } else if (element.System$Windows$Forms$Layout$IArrangedElement$Properties.ContainsObject(System.Windows.Forms.Layout.CommonProperties._specifiedBoundsProperty)) {
+                        element.System$Windows$Forms$Layout$IArrangedElement$Properties.SetRectangle(System.Windows.Forms.Layout.CommonProperties._specifiedBoundsProperty, System.Windows.Forms.Layout.LayoutUtils.MaxRectangle.$clone());
+                    }
+                },
+                xClearAllPreferredSizeCaches: function (start) {
+                    System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(start);
+                    var children = start.System$Windows$Forms$Layout$IArrangedElement$Children;
+                    for (var i = 0; i < children.Count; i = (i + 1) | 0) {
+                        System.Windows.Forms.Layout.CommonProperties.xClearAllPreferredSizeCaches(children.getItem(i));
+                    }
+                },
+                xClearPreferredSizeCache: function (element) {
+                    element.System$Windows$Forms$Layout$IArrangedElement$Properties.SetSize(System.Windows.Forms.Layout.CommonProperties._preferredSizeCacheProperty, System.Windows.Forms.Layout.LayoutUtils.InvalidSize.$clone());
+                },
+                xGetAnchor: function (element) {
+                    var layoutState = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element);
+                    var anchor = layoutState.getItem$1(System.Windows.Forms.Layout.CommonProperties._dockAndAnchorSection);
+                    return ((layoutState.getItem$1(System.Windows.Forms.Layout.CommonProperties._dockModeSection) === 0) ? System.Windows.Forms.Layout.CommonProperties.xTranslateAnchorValue(anchor) : (5));
+                },
+                xGetAutoSizedAndAnchored: function (element) {
+                    var layoutState = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element);
+                    if (layoutState.getItem$1(System.Windows.Forms.Layout.CommonProperties._selfAutoSizingSection) !== 0) {
+                        return false;
+                    }
+                    return ((layoutState.getItem$1(System.Windows.Forms.Layout.CommonProperties._autoSizeSection) !== 0) && (layoutState.getItem$1(System.Windows.Forms.Layout.CommonProperties._dockModeSection) === 0));
+                },
+                xGetDock: function (element) {
+                    var layoutState = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element);
+                    var style = layoutState.getItem$1(System.Windows.Forms.Layout.CommonProperties._dockAndAnchorSection);
+                    var mode = layoutState.getItem$1(System.Windows.Forms.Layout.CommonProperties._dockModeSection);
+                    return ((mode === System.Windows.Forms.Layout.CommonProperties.DockAnchorMode.Dock) ? style : System.Windows.Forms.DockStyle.None);
+                },
+                xGetPreferredSizeCache: function (element) {
+                    var flag = { };
+                    var size = element.System$Windows$Forms$Layout$IArrangedElement$Properties.GetSize(System.Windows.Forms.Layout.CommonProperties._preferredSizeCacheProperty, flag);
+                    if (flag.v && (System.Drawing.Size.op_Inequality(size.$clone(), System.Windows.Forms.Layout.LayoutUtils.InvalidSize.$clone()))) {
+                        return size.$clone();
+                    }
+                    return System.Drawing.Size.Empty.$clone();
+                },
+                xSetAnchor: function (element, value) {
+                    var layoutState = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element);
+                    layoutState.setItem$1(System.Windows.Forms.Layout.CommonProperties._dockAndAnchorSection, System.Windows.Forms.Layout.CommonProperties.xTranslateAnchorValue(value));
+                    layoutState.setItem$1(System.Windows.Forms.Layout.CommonProperties._dockModeSection, 0);
+                    System.Windows.Forms.Layout.CommonProperties.SetLayoutState(element, layoutState.$clone());
+                },
+                xSetDock: function (element, value) {
+                    var layoutState = System.Windows.Forms.Layout.CommonProperties.GetLayoutState(element);
+                    layoutState.setItem$1(System.Windows.Forms.Layout.CommonProperties._dockAndAnchorSection, value);
+                    layoutState.setItem$1(System.Windows.Forms.Layout.CommonProperties._dockModeSection, (value === System.Windows.Forms.DockStyle.None) ? 0 : 1);
+                    System.Windows.Forms.Layout.CommonProperties.SetLayoutState(element, layoutState.$clone());
+                },
+                xSetPreferredSizeCache: function (element, value) {
+                    element.System$Windows$Forms$Layout$IArrangedElement$Properties.SetSize(System.Windows.Forms.Layout.CommonProperties._preferredSizeCacheProperty, value.$clone());
+                },
+                xTranslateAnchorValue: function (anchor) {
+                    if (anchor !== System.Windows.Forms.AnchorStyles.None) {
+                        if (anchor === (5)) {
+                            return System.Windows.Forms.AnchorStyles.None;
+                        }
+                        return anchor;
+                    }
+                    return (5);
+                }
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.CommonProperties.DockAnchorMode", {
+        $kind: "nested enum",
+        statics: {
+            fields: {
+                Anchor: 0,
+                Dock: 1
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.LayoutEngine", {
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            CastToArrangedElement: function (obj) {
+                var element = Bridge.as(obj, System.Windows.Forms.Layout.IArrangedElement);
+                if (obj == null) {
+                    var args = System.Array.init([Bridge.getType(obj)], System.Object);
+                    throw new System.NotSupportedException.$ctor1(System.Windows.Forms.SR.GetString("LayoutEngineUnsupportedType", args));
+                }
+                return element;
+            },
+            GetPreferredSize: function (container, proposedConstraints) {
+                return System.Drawing.Size.Empty.$clone();
+            },
+            InitLayout: function (child, specified) {
+                this.InitLayoutCore(this.CastToArrangedElement(child), specified);
+            },
+            InitLayoutCore: function (element, bounds) { },
+            Layout: function (container, layoutEventArgs) {
+                return this.LayoutCore(this.CastToArrangedElement(container), layoutEventArgs);
+            },
+            LayoutCore: function (container, layoutEventArgs) {
+                return false;
+            },
+            ProcessSuspendedLayoutEventArgs: function (container, args) { }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.DefaultLayout.AnchorInfo", {
+        $kind: "nested class",
+        fields: {
+            Bottom: 0,
+            Left: 0,
+            Right: 0,
+            Top: 0
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.DefaultLayout.GrowthDirection", {
+        $kind: "nested enum",
+        statics: {
+            fields: {
+                Downward: 2,
+                Left: 4,
+                None: 0,
+                Right: 8,
+                Upward: 1
+            }
+        },
+        $flags: true
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.LayoutTransaction", {
+        inherits: [System.IDisposable],
+        statics: {
+            methods: {
+                CreateTransactionIf: function (condition, controlToLayout, elementCausingLayout, property) {
+                    if (condition) {
+                        return new System.Windows.Forms.Layout.LayoutTransaction.ctor(controlToLayout, elementCausingLayout, property);
+                    }
+                    System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(elementCausingLayout);
+                    return null;
+                },
+                DoLayout: function (elementToLayout, elementCausingLayout, property) {
+                    if (elementCausingLayout != null) {
+                        System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(elementCausingLayout);
+                        if (elementToLayout != null) {
+                            System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(elementToLayout);
+                            elementToLayout.System$Windows$Forms$Layout$IArrangedElement$PerformLayout(elementCausingLayout, property);
+                        }
+                    }
+                },
+                DoLayoutIf: function (condition, elementToLayout, elementCausingLayout, property) {
+                    if (!condition) {
+                        if (elementCausingLayout != null) {
+                            System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(elementCausingLayout);
+                        }
+                    } else {
+                        System.Windows.Forms.Layout.LayoutTransaction.DoLayout(elementToLayout, elementCausingLayout, property);
+                    }
+                }
+            }
+        },
+        fields: {
+            _controlToLayout: null,
+            _resumeLayout: false
+        },
+        alias: ["Dispose", "System$IDisposable$Dispose"],
+        ctors: {
+            ctor: function (controlToLayout, controlCausingLayout, property) {
+                System.Windows.Forms.Layout.LayoutTransaction.$ctor1.call(this, controlToLayout, controlCausingLayout, property, true);
+            },
+            $ctor1: function (controlToLayout, controlCausingLayout, property, resumeLayout) {
+                this.$initialize();
+                System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(controlCausingLayout);
+                this._controlToLayout = controlToLayout;
+                this._resumeLayout = resumeLayout;
+                if (this._controlToLayout != null) {
+                    this._controlToLayout.SuspendLayout();
+                    System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(this._controlToLayout);
+                    if (resumeLayout) {
+                        this._controlToLayout.PerformLayout$2(new System.Windows.Forms.LayoutEventArgs.ctor(controlCausingLayout, property));
+                    }
+                }
+            }
+        },
+        methods: {
+            Dispose: function () {
+                if (this._controlToLayout != null) {
+                    this._controlToLayout.ResumeLayout$1(this._resumeLayout);
+                }
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.LayoutUtils", {
+        statics: {
+            fields: {
+                AnyBottom: 0,
+                AnyCenter: 0,
+                AnyLeft: 0,
+                AnyMiddle: 0,
+                AnyRight: 0,
+                AnyTop: 0,
+                dockingToAnchor: null,
+                HorizontalAnchorStyles: 0,
+                InvalidSize: null,
+                MaxRectangle: null,
+                MaxSize: null,
+                TestString: null,
+                VerticalAnchorStyles: 0
+            },
+            ctors: {
+                init: function () {
+                    this.InvalidSize = new System.Drawing.Size();
+                    this.MaxRectangle = new System.Drawing.Rectangle();
+                    this.MaxSize = new System.Drawing.Size();
+                    this.AnyBottom = (1792);
+                    this.AnyCenter = (546);
+                    this.AnyLeft = (273);
+                    this.AnyMiddle = (112);
+                    this.AnyRight = (1092);
+                    this.AnyTop = (7);
+                    this.dockingToAnchor = System.Array.init([(5)], System.Windows.Forms.AnchorStyles);
+                    this.HorizontalAnchorStyles = (12);
+                    this.InvalidSize = new System.Drawing.Size.$ctor2(-2147483648, -2147483648);
+                    this.MaxRectangle = new System.Drawing.Rectangle.$ctor2(0, 0, 2147483647, 2147483647);
+                    this.MaxSize = new System.Drawing.Size.$ctor2(2147483647, 2147483647);
+                    this.TestString = "j^";
+                    this.VerticalAnchorStyles = (3);
+                }
+            },
+            methods: {
+                AddAlignedRegion: function (textSize, imageSize, relation) {
+                    return System.Windows.Forms.Layout.LayoutUtils.AddAlignedRegionCore(textSize.$clone(), imageSize.$clone(), System.Windows.Forms.Layout.LayoutUtils.IsVerticalRelation(relation));
+                },
+                AddAlignedRegionCore: function (currentSize, contentSize, vertical) {
+                    if (vertical) {
+                        currentSize.Width = Math.max(currentSize.Width, contentSize.Width);
+                        currentSize.Height = (currentSize.Height + contentSize.Height) | 0;
+                        return currentSize.$clone();
+                    }
+                    currentSize.Width = (currentSize.Width + contentSize.Width) | 0;
+                    currentSize.Height = Math.max(currentSize.Height, contentSize.Height);
+                    return currentSize.$clone();
+                },
+                Align: function (alignThis, withinThis, align) {
+                    return System.Windows.Forms.Layout.LayoutUtils.VAlign(alignThis.$clone(), System.Windows.Forms.Layout.LayoutUtils.HAlign$1(alignThis.$clone(), withinThis.$clone(), align), align);
+                },
+                Align$1: function (alignThis, withinThis, anchorStyles) {
+                    return System.Windows.Forms.Layout.LayoutUtils.VAlign$1(alignThis.$clone(), System.Windows.Forms.Layout.LayoutUtils.HAlign(alignThis.$clone(), withinThis.$clone(), anchorStyles), anchorStyles);
+                },
+                AlignAndStretch: function (fitThis, withinThis, anchorStyles) {
+                    return System.Windows.Forms.Layout.LayoutUtils.Align$1(System.Windows.Forms.Layout.LayoutUtils.Stretch(fitThis.$clone(), withinThis.Size.$clone(), anchorStyles), withinThis.$clone(), anchorStyles);
+                },
+                AreWidthAndHeightLarger: function (size1, size2) {
+                    return ((size1.Width >= size2.Width) && (size1.Height >= size2.Height));
+                },
+                ClampNegativePaddingToZero: function (padding) {
+                    if (padding.All < 0) {
+                        padding.Left = Math.max(0, padding.Left);
+                        padding.Top = Math.max(0, padding.Top);
+                        padding.Right = Math.max(0, padding.Right);
+                        padding.Bottom = Math.max(0, padding.Bottom);
+                    }
+                    return padding.$clone();
+                },
+                ContentAlignmentToIndex: function (alignment) {
+                    var num = System.Windows.Forms.Layout.LayoutUtils.xContentAlignmentToIndex(alignment & 15);
+                    var num2 = System.Windows.Forms.Layout.LayoutUtils.xContentAlignmentToIndex((alignment >> 4) & 15);
+                    var num3 = System.Windows.Forms.Layout.LayoutUtils.xContentAlignmentToIndex((alignment >> 8) & 15);
+                    var num4 = (((((num2 !== 0) ? 4 : 0) | ((num3 !== 0) ? 8 : 0)) | num) | num2) | num3;
+                    num4 = (num4 - 1) | 0;
+                    return num4;
+                },
+                ConvertZeroToUnbounded: function (size) {
+                    if (size.Width === 0) {
+                        size.Width = 2147483647;
+                    }
+                    if (size.Height === 0) {
+                        size.Height = 2147483647;
+                    }
+                    return size.$clone();
+                },
+                DeflateRect: function (rect, padding) {
+                    rect.X = (rect.X + padding.Left) | 0;
+                    rect.Y = (rect.Y + padding.Top) | 0;
+                    rect.Width = (rect.Width - padding.Horizontal) | 0;
+                    rect.Height = (rect.Height - padding.Vertical) | 0;
+                    return rect.$clone();
+                },
+                ExpandRegionsToFillBounds: function (bounds, region1Align, region1, region2) {
+                    switch (region1Align) {
+                        case System.Windows.Forms.AnchorStyles.Top: 
+                            region1.v = System.Windows.Forms.Layout.LayoutUtils.SubstituteSpecifiedBounds(bounds.$clone(), region1.v.$clone(), System.Windows.Forms.AnchorStyles.Bottom);
+                            region2.v = System.Windows.Forms.Layout.LayoutUtils.SubstituteSpecifiedBounds(bounds.$clone(), region2.v.$clone(), System.Windows.Forms.AnchorStyles.Top);
+                            return;
+                        case System.Windows.Forms.AnchorStyles.Bottom: 
+                            region1.v = System.Windows.Forms.Layout.LayoutUtils.SubstituteSpecifiedBounds(bounds.$clone(), region1.v.$clone(), System.Windows.Forms.AnchorStyles.Top);
+                            region2.v = System.Windows.Forms.Layout.LayoutUtils.SubstituteSpecifiedBounds(bounds.$clone(), region2.v.$clone(), System.Windows.Forms.AnchorStyles.Bottom);
+                            break;
+                        case (3): 
+                            break;
+                        case System.Windows.Forms.AnchorStyles.Left: 
+                            region1.v = System.Windows.Forms.Layout.LayoutUtils.SubstituteSpecifiedBounds(bounds.$clone(), region1.v.$clone(), System.Windows.Forms.AnchorStyles.Right);
+                            region2.v = System.Windows.Forms.Layout.LayoutUtils.SubstituteSpecifiedBounds(bounds.$clone(), region2.v.$clone(), System.Windows.Forms.AnchorStyles.Left);
+                            return;
+                        case System.Windows.Forms.AnchorStyles.Right: 
+                            region1.v = System.Windows.Forms.Layout.LayoutUtils.SubstituteSpecifiedBounds(bounds.$clone(), region1.v.$clone(), System.Windows.Forms.AnchorStyles.Left);
+                            region2.v = System.Windows.Forms.Layout.LayoutUtils.SubstituteSpecifiedBounds(bounds.$clone(), region2.v.$clone(), System.Windows.Forms.AnchorStyles.Right);
+                            return;
+                        default: 
+                            return;
+                    }
+                },
+                FlipPadding: function (padding) {
+                    if (padding.All === -1) {
+                        var top = padding.Top;
+                        padding.Top = padding.Left;
+                        padding.Left = top;
+                        top = padding.Bottom;
+                        padding.Bottom = padding.Right;
+                        padding.Right = top;
+                    }
+                    return padding.$clone();
+                },
+                FlipPoint: function (point) {
+                    var x = point.X;
+                    point.X = point.Y;
+                    point.Y = x;
+                    return point.$clone();
+                },
+                FlipRectangle: function (rect) {
+                    rect.Location = System.Windows.Forms.Layout.LayoutUtils.FlipPoint(rect.Location.$clone());
+                    rect.Size = System.Windows.Forms.Layout.LayoutUtils.FlipSize(rect.Size.$clone());
+                    return rect.$clone();
+                },
+                FlipRectangleIf: function (condition, rect) {
+                    if (!condition) {
+                        return rect.$clone();
+                    }
+                    return System.Windows.Forms.Layout.LayoutUtils.FlipRectangle(rect.$clone());
+                },
+                FlipSize: function (size) {
+                    var width = size.Width;
+                    size.Width = size.Height;
+                    size.Height = width;
+                    return size.$clone();
+                },
+                FlipSizeIf: function (condition, size) {
+                    if (!condition) {
+                        return size.$clone();
+                    }
+                    return System.Windows.Forms.Layout.LayoutUtils.FlipSize(size.$clone());
+                },
+                GetOppositeAnchor: function (anchor) {
+                    var none = System.Windows.Forms.AnchorStyles.None;
+                    if (anchor !== System.Windows.Forms.AnchorStyles.None) {
+                        for (var i = 1; i <= 8; i = i << 1) {
+                            switch (anchor & i) {
+                                case System.Windows.Forms.AnchorStyles.Top: 
+                                    none |= System.Windows.Forms.AnchorStyles.Bottom;
+                                    break;
+                                case System.Windows.Forms.AnchorStyles.Bottom: 
+                                    none |= System.Windows.Forms.AnchorStyles.Top;
+                                    break;
+                                case System.Windows.Forms.AnchorStyles.Left: 
+                                    none |= System.Windows.Forms.AnchorStyles.Right;
+                                    break;
+                                case System.Windows.Forms.AnchorStyles.Right: 
+                                    none |= System.Windows.Forms.AnchorStyles.Left;
+                                    break;
+                            }
+                        }
+                    }
+                    return none;
+                },
+                GetOppositeTextImageRelation: function (relation) {
+                    return System.Windows.Forms.Layout.LayoutUtils.GetOppositeAnchor(relation);
+                },
+                GetUnifiedAnchor: function (element) {
+                    var dock = System.Windows.Forms.Layout.DefaultLayout.GetDock(element);
+                    if (dock !== System.Windows.Forms.DockStyle.None) {
+                        return System.Windows.Forms.Layout.LayoutUtils.dockingToAnchor[System.Array.index(dock, System.Windows.Forms.Layout.LayoutUtils.dockingToAnchor)];
+                    }
+                    return System.Windows.Forms.Layout.DefaultLayout.GetAnchor(element);
+                },
+                HAlign$1: function (alignThis, withinThis, align) {
+                    if ((align & (1092)) !== (0)) {
+                        withinThis.X = (withinThis.X + (((withinThis.Width - alignThis.Width) | 0))) | 0;
+                    } else if ((align & (546)) !== (0)) {
+                        withinThis.X = (withinThis.X + (((Bridge.Int.div((((withinThis.Width - alignThis.Width) | 0)), 2)) | 0))) | 0;
+                    }
+                    withinThis.Width = alignThis.Width;
+                    return withinThis.$clone();
+                },
+                HAlign: function (alignThis, withinThis, anchorStyles) {
+                    if ((anchorStyles & System.Windows.Forms.AnchorStyles.Right) !== System.Windows.Forms.AnchorStyles.None) {
+                        withinThis.X = (withinThis.X + (((withinThis.Width - alignThis.Width) | 0))) | 0;
+                    } else if ((anchorStyles === System.Windows.Forms.AnchorStyles.None) || ((anchorStyles & (12)) === System.Windows.Forms.AnchorStyles.None)) {
+                        withinThis.X = (withinThis.X + (((Bridge.Int.div((((withinThis.Width - alignThis.Width) | 0)), 2)) | 0))) | 0;
+                    }
+                    withinThis.Width = alignThis.Width;
+                    return withinThis.$clone();
+                },
+                InflateRect: function (rect, padding) {
+                    rect.X = (rect.X - padding.Left) | 0;
+                    rect.Y = (rect.Y - padding.Top) | 0;
+                    rect.Width = (rect.Width + padding.Horizontal) | 0;
+                    rect.Height = (rect.Height + padding.Vertical) | 0;
+                    return rect.$clone();
+                },
+                IntersectSizes: function (a, b) {
+                    return new System.Drawing.Size.$ctor2(Math.min(a.Width, b.Width), Math.min(a.Height, b.Height));
+                },
+                IsHorizontalAlignment: function (align) {
+                    return !System.Windows.Forms.Layout.LayoutUtils.IsVerticalAlignment(align);
+                },
+                IsHorizontalRelation: function (relation) {
+                    return ((relation & (12)) > System.Windows.Forms.TextImageRelation.Overlay);
+                },
+                IsIntersectHorizontally: function (rect1, rect2) {
+                    if (!rect1.IntersectsWith(rect2.$clone())) {
+                        return false;
+                    }
+                    return (((rect1.X <= rect2.X) && ((((rect1.X + rect1.Width) | 0)) >= (((rect2.X + rect2.Width) | 0)))) || ((rect2.X <= rect1.X) && ((((rect2.X + rect2.Width) | 0)) >= (((rect1.X + rect1.Width) | 0)))));
+                },
+                IsIntersectVertically: function (rect1, rect2) {
+                    if (!rect1.IntersectsWith(rect2.$clone())) {
+                        return false;
+                    }
+                    return (((rect1.Y <= rect2.Y) && ((((rect1.Y + rect1.Width) | 0)) >= (((rect2.Y + rect2.Width) | 0)))) || ((rect2.Y <= rect1.Y) && ((((rect2.Y + rect2.Width) | 0)) >= (((rect1.Y + rect1.Width) | 0)))));
+                },
+                IsVerticalAlignment: function (align) {
+                    return ((align & (514)) > (0));
+                },
+                IsVerticalRelation: function (relation) {
+                    return ((relation & (3)) > System.Windows.Forms.TextImageRelation.Overlay);
+                },
+                IsZeroWidthOrHeight: function (rectangle) {
+                    if (rectangle.Width !== 0) {
+                        return (rectangle.Height === 0);
+                    }
+                    return true;
+                },
+                IsZeroWidthOrHeight$1: function (size) {
+                    if (size.Width !== 0) {
+                        return (size.Height === 0);
+                    }
+                    return true;
+                },
+                OldGetLargestStringSizeInCollection: function (font, objects) {
+                    var $t;
+                    var empty = System.Drawing.Size.Empty.$clone();
+                    if (objects != null) {
+                        $t = Bridge.getEnumerator(objects);
+                        try {
+                            while ($t.moveNext()) {
+                                var obj2 = $t.Current;
+                                var size2 = System.Windows.Forms.TextRenderer.MeasureText(Bridge.toString(obj2), font, new System.Drawing.Size.$ctor2(32767, 32767), System.Windows.Forms.TextFormatFlags.SingleLine);
+                                empty.Width = Math.max(empty.Width, size2.Width);
+                                empty.Height = Math.max(empty.Height, size2.Height);
+                            }
+                        } finally {
+                            if (Bridge.is($t, System.IDisposable)) {
+                                $t.System$IDisposable$Dispose();
+                            }
+                        }}
+                    return empty.$clone();
+                },
+                RTLTranslate: function (bounds, withinBounds) {
+                    bounds.X = (withinBounds.Width - bounds.Right) | 0;
+                    return bounds.$clone();
+                },
+                SplitRegion: function (bounds, specifiedContent, region1Align, region1, region2) {
+                    region1.v = (region2.v = bounds.$clone());
+                    switch (region1Align) {
+                        case System.Windows.Forms.AnchorStyles.Top: 
+                            region1.v.Height = specifiedContent.Height;
+                            region2.v.Y = (region2.v.Y + specifiedContent.Height) | 0;
+                            region2.v.Height = (region2.v.Height - specifiedContent.Height) | 0;
+                            return;
+                        case System.Windows.Forms.AnchorStyles.Bottom: 
+                            region1.v.Y = (region1.v.Y + (((bounds.Height - specifiedContent.Height) | 0))) | 0;
+                            region1.v.Height = specifiedContent.Height;
+                            region2.v.Height = (region2.v.Height - specifiedContent.Height) | 0;
+                            break;
+                        case (3): 
+                            break;
+                        case System.Windows.Forms.AnchorStyles.Left: 
+                            region1.v.Width = specifiedContent.Width;
+                            region2.v.X = (region2.v.X + specifiedContent.Width) | 0;
+                            region2.v.Width = (region2.v.Width - specifiedContent.Width) | 0;
+                            return;
+                        case System.Windows.Forms.AnchorStyles.Right: 
+                            region1.v.X = (region1.v.X + (((bounds.Width - specifiedContent.Width) | 0))) | 0;
+                            region1.v.Width = specifiedContent.Width;
+                            region2.v.Width = (region2.v.Width - specifiedContent.Width) | 0;
+                            return;
+                        default: 
+                            return;
+                    }
+                },
+                Stretch: function (stretchThis, withinThis, anchorStyles) {
+                    var size = new System.Drawing.Size.$ctor2(((anchorStyles & (12)) === (12)) ? withinThis.Width : stretchThis.Width, ((anchorStyles & (3)) === (3)) ? withinThis.Height : stretchThis.Height);
+                    if (size.Width > withinThis.Width) {
+                        size.Width = withinThis.Width;
+                    }
+                    if (size.Height > withinThis.Height) {
+                        size.Height = withinThis.Height;
+                    }
+                    return size.$clone();
+                },
+                SubAlignedRegion: function (currentSize, contentSize, relation) {
+                    return System.Windows.Forms.Layout.LayoutUtils.SubAlignedRegionCore(currentSize.$clone(), contentSize.$clone(), System.Windows.Forms.Layout.LayoutUtils.IsVerticalRelation(relation));
+                },
+                SubAlignedRegionCore: function (currentSize, contentSize, vertical) {
+                    if (vertical) {
+                        currentSize.Height = (currentSize.Height - contentSize.Height) | 0;
+                        return currentSize.$clone();
+                    }
+                    currentSize.Width = (currentSize.Width - contentSize.Width) | 0;
+                    return currentSize.$clone();
+                },
+                SubstituteSpecifiedBounds: function (originalBounds, substitutionBounds, specified) {
+                    var left = ((specified & System.Windows.Forms.AnchorStyles.Left) !== System.Windows.Forms.AnchorStyles.None) ? substitutionBounds.Left : originalBounds.Left;
+                    var top = ((specified & System.Windows.Forms.AnchorStyles.Top) !== System.Windows.Forms.AnchorStyles.None) ? substitutionBounds.Top : originalBounds.Top;
+                    var right = ((specified & System.Windows.Forms.AnchorStyles.Right) !== System.Windows.Forms.AnchorStyles.None) ? substitutionBounds.Right : originalBounds.Right;
+                    var bottom = ((specified & System.Windows.Forms.AnchorStyles.Bottom) !== System.Windows.Forms.AnchorStyles.None) ? substitutionBounds.Bottom : originalBounds.Bottom;
+                    return System.Drawing.Rectangle.FromLTRB(left, top, right, bottom);
+                },
+                UnionSizes: function (a, b) {
+                    return new System.Drawing.Size.$ctor2(Math.max(a.Width, b.Width), Math.max(a.Height, b.Height));
+                },
+                VAlign: function (alignThis, withinThis, align) {
+                    if ((align & (1792)) !== (0)) {
+                        withinThis.Y = (withinThis.Y + (((withinThis.Height - alignThis.Height) | 0))) | 0;
+                    } else if ((align & (112)) !== (0)) {
+                        withinThis.Y = (withinThis.Y + (((Bridge.Int.div((((withinThis.Height - alignThis.Height) | 0)), 2)) | 0))) | 0;
+                    }
+                    withinThis.Height = alignThis.Height;
+                    return withinThis.$clone();
+                },
+                VAlign$1: function (alignThis, withinThis, anchorStyles) {
+                    if ((anchorStyles & System.Windows.Forms.AnchorStyles.Bottom) !== System.Windows.Forms.AnchorStyles.None) {
+                        withinThis.Y = (withinThis.Y + (((withinThis.Height - alignThis.Height) | 0))) | 0;
+                    } else if ((anchorStyles === System.Windows.Forms.AnchorStyles.None) || ((anchorStyles & (3)) === System.Windows.Forms.AnchorStyles.None)) {
+                        withinThis.Y = (withinThis.Y + (((Bridge.Int.div((((withinThis.Height - alignThis.Height) | 0)), 2)) | 0))) | 0;
+                    }
+                    withinThis.Height = alignThis.Height;
+                    return withinThis.$clone();
+                },
+                xContentAlignmentToIndex: function (threeBitFlag) {
+                    return ((threeBitFlag === 4) ? (3) : (threeBitFlag & 255));
+                }
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.LayoutUtils.MeasureTextCache", {
+        $kind: "nested class",
+        statics: {
+            fields: {
+                MaxCacheSize: 0
+            },
+            ctors: {
+                init: function () {
+                    this.MaxCacheSize = 6;
+                }
+            }
+        },
+        fields: {
+            nextCacheEntry: 0,
+            sizeCacheList: null,
+            unconstrainedPreferredSize: null
+        },
+        ctors: {
+            init: function () {
+                this.unconstrainedPreferredSize = new System.Drawing.Size();
+                this.nextCacheEntry = -1;
+                this.unconstrainedPreferredSize = System.Windows.Forms.Layout.LayoutUtils.InvalidSize.$clone();
+            }
+        },
+        methods: {
+            GetTextSize: function (text, font, proposedConstraints, flags) {
+                var $t;
+                if (!this.TextRequiresWordBreak(text, font, proposedConstraints.$clone(), flags)) {
+                    return this.unconstrainedPreferredSize.$clone();
+                }
+                if (this.sizeCacheList == null) {
+                    this.sizeCacheList = System.Array.init(6, function (){
+                        return new System.Windows.Forms.Layout.LayoutUtils.MeasureTextCache.PreferredSizeCache();
+                    }, System.Windows.Forms.Layout.LayoutUtils.MeasureTextCache.PreferredSizeCache);
+                }
+                $t = Bridge.getEnumerator(this.sizeCacheList);
+                try {
+                    while ($t.moveNext()) {
+                        var cache = $t.Current.$clone();
+                        if (System.Drawing.Size.op_Equality(cache.ConstrainingSize.$clone(), proposedConstraints.$clone())) {
+                            return cache.PreferredSize.$clone();
+                        }
+                        if ((cache.ConstrainingSize.Width === proposedConstraints.Width) && (cache.PreferredSize.Height <= proposedConstraints.Height)) {
+                            return cache.PreferredSize.$clone();
+                        }
+                    }
+                } finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$Dispose();
+                    }
+                }var preferredSize = System.Windows.Forms.TextRenderer.MeasureText(text, font, proposedConstraints.$clone(), flags);
+                this.nextCacheEntry = (((this.nextCacheEntry + 1) | 0)) % 6;
+                this.sizeCacheList[System.Array.index(this.nextCacheEntry, this.sizeCacheList)] = new System.Windows.Forms.Layout.LayoutUtils.MeasureTextCache.PreferredSizeCache.$ctor1(proposedConstraints.$clone(), preferredSize.$clone());
+                return preferredSize.$clone();
+            },
+            GetUnconstrainedSize: function (text, font, flags) {
+                if (System.Drawing.Size.op_Equality(this.unconstrainedPreferredSize.$clone(), System.Windows.Forms.Layout.LayoutUtils.InvalidSize.$clone())) {
+                    flags &= -17;
+                    this.unconstrainedPreferredSize = System.Windows.Forms.TextRenderer.MeasureText(text, font, System.Windows.Forms.Layout.LayoutUtils.MaxSize.$clone(), flags);
+                }
+                return this.unconstrainedPreferredSize.$clone();
+            },
+            InvalidateCache: function () {
+                this.unconstrainedPreferredSize = System.Windows.Forms.Layout.LayoutUtils.InvalidSize.$clone();
+                this.sizeCacheList = null;
+            },
+            TextRequiresWordBreak: function (text, font, size, flags) {
+                return (this.GetUnconstrainedSize(text, font, flags).Width > size.Width);
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.LayoutUtils.MeasureTextCache.PreferredSizeCache", {
+        $kind: "nested struct",
+        statics: {
+            methods: {
+                getDefaultValue: function () { return new System.Windows.Forms.Layout.LayoutUtils.MeasureTextCache.PreferredSizeCache(); }
+            }
+        },
+        fields: {
+            ConstrainingSize: null,
+            PreferredSize: null
+        },
+        ctors: {
+            init: function () {
+                this.ConstrainingSize = new System.Drawing.Size();
+                this.PreferredSize = new System.Drawing.Size();
+            },
+            $ctor1: function (constrainingSize, preferredSize) {
+                this.$initialize();
+                this.ConstrainingSize = constrainingSize.$clone();
+                this.PreferredSize = preferredSize.$clone();
+            },
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            getHashCode: function () {
+                var h = Bridge.addHash([7140991206, this.ConstrainingSize, this.PreferredSize]);
+                return h;
+            },
+            equals: function (o) {
+                if (!Bridge.is(o, System.Windows.Forms.Layout.LayoutUtils.MeasureTextCache.PreferredSizeCache)) {
+                    return false;
+                }
+                return Bridge.equals(this.ConstrainingSize, o.ConstrainingSize) && Bridge.equals(this.PreferredSize, o.PreferredSize);
+            },
+            $clone: function (to) {
+                var s = to || new System.Windows.Forms.Layout.LayoutUtils.MeasureTextCache.PreferredSizeCache();
+                s.ConstrainingSize = this.ConstrainingSize.$clone();
+                s.PreferredSize = this.PreferredSize.$clone();
+                return s;
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.PropertyNames", {
+        statics: {
+            fields: {
+                Alignment: null,
+                Anchor: null,
+                Appearance: null,
+                AutoEllipsis: null,
+                AutoScroll: null,
+                AutoSize: null,
+                BorderStyle: null,
+                Bounds: null,
+                CellBorderStyle: null,
+                CheckAlign: null,
+                ChildIndex: null,
+                ColumnHeadersHeight: null,
+                ColumnHeadersVisible: null,
+                Columns: null,
+                ColumnSpan: null,
+                ColumnStyles: null,
+                Controls: null,
+                DisplayRectangle: null,
+                DisplayStyle: null,
+                Dock: null,
+                DrawMode: null,
+                DropDownButtonWidth: null,
+                FlatAppearanceBorderSize: null,
+                FlatStyle: null,
+                FlowBreak: null,
+                FlowDirection: null,
+                Font: null,
+                GripStyle: null,
+                GrowStyle: null,
+                Image: null,
+                ImageAlign: null,
+                ImageIndex: null,
+                ImageKey: null,
+                ImageScaling: null,
+                ImageScalingSize: null,
+                Items: null,
+                LayoutSettings: null,
+                LayoutStyle: null,
+                LinkArea: null,
+                Links: null,
+                Location: null,
+                Margin: null,
+                MaximumSize: null,
+                MinimumSize: null,
+                Multiline: null,
+                Orientation: null,
+                Padding: null,
+                Parent: null,
+                PreferredSize: null,
+                Renderer: null,
+                RightToLeft: null,
+                RightToLeftLayout: null,
+                RowHeadersVisible: null,
+                RowHeadersWidth: null,
+                Rows: null,
+                RowSpan: null,
+                RowStyles: null,
+                ScrollBars: null,
+                ShowCheckMargin: null,
+                ShowDropDownArrow: null,
+                ShowImageMargin: null,
+                Size: null,
+                Spring: null,
+                Style: null,
+                TableIndex: null,
+                Text: null,
+                TextAlign: null,
+                TextImageRelation: null,
+                UseCompatibleTextRendering: null,
+                Visible: null,
+                WordWrap: null,
+                WrapContents: null
+            },
+            ctors: {
+                init: function () {
+                    this.Alignment = "Alignment";
+                    this.Anchor = "Anchor";
+                    this.Appearance = "Appearance";
+                    this.AutoEllipsis = "AutoEllipsis";
+                    this.AutoScroll = "AutoScroll";
+                    this.AutoSize = "AutoSize";
+                    this.BorderStyle = "BorderStyle";
+                    this.Bounds = "Bounds";
+                    this.CellBorderStyle = "CellBorderStyle";
+                    this.CheckAlign = "CheckAlign";
+                    this.ChildIndex = "ChildIndex";
+                    this.ColumnHeadersHeight = "ColumnHeadersHeight";
+                    this.ColumnHeadersVisible = "ColumnHeadersVisible";
+                    this.Columns = "Columns";
+                    this.ColumnSpan = "ColumnSpan";
+                    this.ColumnStyles = "ColumnStyles";
+                    this.Controls = "Controls";
+                    this.DisplayRectangle = "DisplayRectangle";
+                    this.DisplayStyle = "DisplayStyle";
+                    this.Dock = "Dock";
+                    this.DrawMode = "DrawMode";
+                    this.DropDownButtonWidth = "DropDownButtonWidth";
+                    this.FlatAppearanceBorderSize = "FlatAppearance.BorderSize";
+                    this.FlatStyle = "FlatStyle";
+                    this.FlowBreak = "FlowBreak";
+                    this.FlowDirection = "FlowDirection";
+                    this.Font = "Font";
+                    this.GripStyle = "GripStyle";
+                    this.GrowStyle = "GrowStyle";
+                    this.Image = "Image";
+                    this.ImageAlign = "ImageAlign";
+                    this.ImageIndex = "ImageIndex";
+                    this.ImageKey = "ImageKey";
+                    this.ImageScaling = "ImageScaling";
+                    this.ImageScalingSize = "ImageScalingSize";
+                    this.Items = "Items";
+                    this.LayoutSettings = "LayoutSettings";
+                    this.LayoutStyle = "LayoutStyle";
+                    this.LinkArea = "LinkArea";
+                    this.Links = "Links";
+                    this.Location = "Location";
+                    this.Margin = "Margin";
+                    this.MaximumSize = "MaximumSize";
+                    this.MinimumSize = "MinimumSize";
+                    this.Multiline = "Multiline";
+                    this.Orientation = "Orientation";
+                    this.Padding = "Padding";
+                    this.Parent = "Parent";
+                    this.PreferredSize = "PreferredSize";
+                    this.Renderer = "Renderer";
+                    this.RightToLeft = "RightToLeft";
+                    this.RightToLeftLayout = "RightToLeftLayout";
+                    this.RowHeadersVisible = "RowHeadersVisible";
+                    this.RowHeadersWidth = "RowHeadersWidth";
+                    this.Rows = "Rows";
+                    this.RowSpan = "RowSpan";
+                    this.RowStyles = "RowStyles";
+                    this.ScrollBars = "ScrollBars";
+                    this.ShowCheckMargin = "ShowCheckMargin";
+                    this.ShowDropDownArrow = "ShowDropDownArrow";
+                    this.ShowImageMargin = "ShowCheckMargin";
+                    this.Size = "Size";
+                    this.Spring = "Spring";
+                    this.Style = "Style";
+                    this.TableIndex = "TableIndex";
+                    this.Text = "Text";
+                    this.TextAlign = "TextAlign";
+                    this.TextImageRelation = "TextImageRelation";
+                    this.UseCompatibleTextRendering = "UseCompatibleTextRendering";
+                    this.Visible = "Visible";
+                    this.WordWrap = "WordWrap";
+                    this.WrapContents = "WrapContents";
+                }
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.LayoutEventArgs", {
+        fields: {
+            affectedComponent: null,
+            affectedProperty: null
+        },
+        props: {
+            AffectedComponent: {
+                get: function () {
+                    return this.affectedComponent;
+                }
+            },
+            AffectedControl: {
+                get: function () {
+                    return (Bridge.as(this.affectedComponent, System.Windows.Forms.Control));
+                }
+            },
+            AffectedProperty: {
+                get: function () {
+                    return this.affectedProperty;
+                }
+            }
+        },
+        ctors: {
+            ctor: function (affectedComponent, affectedProperty) {
+                this.$initialize();
+                this.affectedComponent = affectedComponent;
+                this.affectedProperty = affectedProperty;
+            },
+            $ctor1: function (affectedControl, affectedProperty) {
+                System.Windows.Forms.LayoutEventArgs.ctor.call(this, Bridge.cast(affectedControl, System.ComponentModel.IComponent), affectedProperty);
             }
         }
     });
@@ -2869,7 +6286,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             SyncRoot: {
                 get: function () {
-                    throw new System.NotImplementedException();
+                    throw new System.NotImplementedException.ctor();
                 }
             },
             Count: {
@@ -2896,7 +6313,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             "contains", "System$Collections$Generic$ICollection$1$System$Object$contains",
             "copyTo$1", "System$Collections$Generic$ICollection$1$System$Object$copyTo",
             "copyTo", "System$Collections$ICollection$copyTo",
-            "getEnumerator", ["System$Collections$Generic$IEnumerable$1$System$Object$getEnumerator", "System$Collections$Generic$IEnumerable$1$getEnumerator"],
+            "GetEnumerator", ["System$Collections$Generic$IEnumerable$1$System$Object$GetEnumerator", "System$Collections$Generic$IEnumerable$1$GetEnumerator"],
             "indexOf", "System$Collections$Generic$IList$1$System$Object$indexOf",
             "insert", "System$Collections$Generic$IList$1$System$Object$insert",
             "remove", "System$Collections$Generic$ICollection$1$System$Object$remove",
@@ -2951,18 +6368,18 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             copyTo: function (array, arrayIndex) {
                 this._controls.copyTo(Bridge.cast(array, System.Array.type(System.Object)), arrayIndex);
             },
-            getEnumerator: function () {
-                return this._controls.getEnumerator().$clone();
+            GetEnumerator: function () {
+                return this._controls.GetEnumerator().$clone();
             },
-            System$Collections$IEnumerable$getEnumerator: function () {
-                return this._controls.getEnumerator().$clone();
+            System$Collections$IEnumerable$GetEnumerator: function () {
+                return this._controls.GetEnumerator().$clone();
             },
             indexOf: function (item) {
                 return this._controls.indexOf(item);
             },
             insert: function (index, item) {
                 var $t;
-                this._owner.Element.insertBefore(($t = document.createElement("option"), $t.value = Bridge.toString(this._controls.Count), $t.textContent = (System.String.concat(item, "")), $t), this._owner.Element.childNodes[index]);
+                this._owner.Element.insertBefore(($t = document.createElement("option"), $t.value = Bridge.toString(this._controls.Count), $t.textContent = (System.String.concat(item, "")), $t), Bridge.cast(this._owner.Element.childNodes[index], Node));
                 this._controls.insert(index, item);
             },
             remove: function (item) {
@@ -2979,53 +6396,951 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
     Bridge.define("System.Windows.Forms.Padding", {
         $kind: "struct",
         statics: {
+            fields: {
+                Empty: null
+            },
+            ctors: {
+                init: function () {
+                    this.Empty = new System.Windows.Forms.Padding();
+                },
+                ctor: function () {
+                    System.Windows.Forms.Padding.Empty = new System.Windows.Forms.Padding.$ctor1(0);
+                }
+            },
             methods: {
+                Add: function (p1, p2) {
+                    return (System.Windows.Forms.Padding.op_Addition(p1.$clone(), p2.$clone()));
+                },
+                Subtract: function (p1, p2) {
+                    return (System.Windows.Forms.Padding.op_Subtraction(p1.$clone(), p2.$clone()));
+                },
+                op_Addition: function (p1, p2) {
+                    return new System.Windows.Forms.Padding.$ctor2(((p1.Left + p2.Left) | 0), ((p1.Top + p2.Top) | 0), ((p1.Right + p2.Right) | 0), ((p1.Bottom + p2.Bottom) | 0));
+                },
+                op_Subtraction: function (p1, p2) {
+                    return new System.Windows.Forms.Padding.$ctor2(((p1.Left - p2.Left) | 0), ((p1.Top - p2.Top) | 0), ((p1.Right - p2.Right) | 0), ((p1.Bottom - p2.Bottom) | 0));
+                },
+                op_Equality: function (p1, p2) {
+                    return ((((p1.Left === p2.Left) && (p1.Top === p2.Top)) && (p1.Right === p2.Right)) && (p1.Bottom === p2.Bottom));
+                },
+                op_Inequality: function (p1, p2) {
+                    return !(System.Windows.Forms.Padding.op_Equality(p1.$clone(), p2.$clone()));
+                },
                 getDefaultValue: function () { return new System.Windows.Forms.Padding(); }
             }
         },
         fields: {
-            Left: 0,
-            Top: 0,
-            Right: 0,
-            Bottom: 0
+            _all: false,
+            _top: 0,
+            _left: 0,
+            _right: 0,
+            _bottom: 0
+        },
+        props: {
+            All: {
+                get: function () {
+                    if (!this._all) {
+                        return -1;
+                    }
+                    return this._top;
+                },
+                set: function (value) {
+                    if (!this._all || (this._top !== value)) {
+                        this._all = true;
+                        this._top = (this._left = (this._right = (this._bottom = value)));
+                    }
+                }
+            },
+            Bottom: {
+                get: function () {
+                    if (this._all) {
+                        return this._top;
+                    }
+                    return this._bottom;
+                },
+                set: function (value) {
+                    if (this._all || (this._bottom !== value)) {
+                        this._all = false;
+                        this._bottom = value;
+                    }
+                }
+            },
+            Left: {
+                get: function () {
+                    if (this._all) {
+                        return this._top;
+                    }
+                    return this._left;
+                },
+                set: function (value) {
+                    if (this._all || (this._left !== value)) {
+                        this._all = false;
+                        this._left = value;
+                    }
+                }
+            },
+            Right: {
+                get: function () {
+                    if (this._all) {
+                        return this._top;
+                    }
+                    return this._right;
+                },
+                set: function (value) {
+                    if (this._all || (this._right !== value)) {
+                        this._all = false;
+                        this._right = value;
+                    }
+                }
+            },
+            Top: {
+                get: function () {
+                    return this._top;
+                },
+                set: function (value) {
+                    if (this._all || (this._top !== value)) {
+                        this._all = false;
+                        this._top = value;
+                    }
+                }
+            },
+            Horizontal: {
+                get: function () {
+                    return (((this.Left + this.Right) | 0));
+                }
+            },
+            Vertical: {
+                get: function () {
+                    return (((this.Top + this.Bottom) | 0));
+                }
+            },
+            Size: {
+                get: function () {
+                    return new System.Drawing.Size.$ctor2(this.Horizontal, this.Vertical);
+                }
+            }
         },
         ctors: {
-            $ctor2: function (left, top, right, bottom) {
-                this.$initialize();
-                this.Left = left;
-                this.Top = top;
-                this.Right = right;
-                this.Bottom = bottom;
-            },
             $ctor1: function (all) {
                 this.$initialize();
-                this.Left = all;
-                this.Top = all;
-                this.Right = all;
-                this.Bottom = all;
+                this._all = true;
+                this._top = (this._left = (this._right = (this._bottom = all)));
+            },
+            $ctor2: function (left, top, right, bottom) {
+                this.$initialize();
+                this._top = top;
+                this._left = left;
+                this._right = right;
+                this._bottom = bottom;
+                this._all = ((this._top === this._left) && (this._top === this._right)) && (this._top === this._bottom);
             },
             ctor: function () {
                 this.$initialize();
             }
         },
         methods: {
-            getHashCode: function () {
-                var h = Bridge.addHash([1691078585, this.Left, this.Top, this.Right, this.Bottom]);
-                return h;
+            equals: function (other) {
+                return ((Bridge.is(other, System.Windows.Forms.Padding)) && (System.Windows.Forms.Padding.op_Equality(System.Nullable.getValue(Bridge.cast(Bridge.unbox(other), System.Windows.Forms.Padding)), this)));
             },
-            equals: function (o) {
-                if (!Bridge.is(o, System.Windows.Forms.Padding)) {
-                    return false;
-                }
-                return Bridge.equals(this.Left, o.Left) && Bridge.equals(this.Top, o.Top) && Bridge.equals(this.Right, o.Right) && Bridge.equals(this.Bottom, o.Bottom);
+            getHashCode: function () {
+                return (((this.Left ^ System.Windows.Forms.WindowsFormsUtils.RotateLeft(this.Top, 8)) ^ System.Windows.Forms.WindowsFormsUtils.RotateLeft(this.Right, 16)) ^ System.Windows.Forms.WindowsFormsUtils.RotateLeft(this.Bottom, 24));
+            },
+            toString: function () {
+                var textArray1 = System.Array.init(["{Left=", Bridge.toString(this.Left), ",Top=", Bridge.toString(this.Top), ",Right=", Bridge.toString(this.Right), ",Bottom=", Bridge.toString(this.Bottom), "}"], System.String);
+                return System.String.concat(textArray1);
+            },
+            ResetAll: function () {
+                this.All = 0;
+            },
+            ResetBottom: function () {
+                this.Bottom = 0;
+            },
+            ResetLeft: function () {
+                this.Left = 0;
+            },
+            ResetRight: function () {
+                this.Right = 0;
+            },
+            ResetTop: function () {
+                this.Top = 0;
+            },
+            Scale: function (dx, dy) {
+                this._top = Bridge.Int.clip32(this._top * dy);
+                this._left = Bridge.Int.clip32(this._left * dx);
+                this._right = Bridge.Int.clip32(this._right * dx);
+                this._bottom = Bridge.Int.clip32(this._bottom * dy);
+            },
+            ShouldSerializeAll: function () {
+                return this._all;
+            },
+            Debug_SanityCheck: function () {
+                var flag1 = this._all;
             },
             $clone: function (to) {
                 var s = to || new System.Windows.Forms.Padding();
-                s.Left = this.Left;
-                s.Top = this.Top;
-                s.Right = this.Right;
-                s.Bottom = this.Bottom;
+                s._all = this._all;
+                s._top = this._top;
+                s._left = this._left;
+                s._right = this._right;
+                s._bottom = this._bottom;
                 return s;
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.PropertyStore", {
+        statics: {
+            fields: {
+                currentKey: 0
+            },
+            methods: {
+                CreateKey: function () {
+                    var $t;
+                    return Bridge.identity(System.Windows.Forms.PropertyStore.currentKey, ($t = (System.Windows.Forms.PropertyStore.currentKey + 1) | 0, System.Windows.Forms.PropertyStore.currentKey = $t, $t));
+                }
+            }
+        },
+        fields: {
+            intEntries: null,
+            objEntries: null
+        },
+        methods: {
+            ContainsInteger: function (key) {
+                var flag = { };
+                this.GetInteger$1(key, flag);
+                return flag.v;
+            },
+            ContainsObject: function (key) {
+                var flag = { };
+                this.GetObject$1(key, flag);
+                return flag.v;
+            },
+            Debug_VerifyLocateIntegerEntry: function (index, entryKey, length) {
+                var num = (length - 1) | 0;
+                var num2 = 0;
+                var num3 = 0;
+                do {
+                    num3 = (Bridge.Int.div((((num + num2) | 0)), 2)) | 0;
+                    var key = this.intEntries[System.Array.index(num3, this.intEntries)].Key;
+                    if (key !== entryKey) {
+                        if (entryKey < key) {
+                            num = (num3 - 1) | 0;
+                        } else {
+                            num2 = (num3 + 1) | 0;
+                        }
+                    }
+                } while (num >= num2);
+                if (entryKey > this.intEntries[System.Array.index(num3, this.intEntries)].Key) {
+                    num3 = (num3 + 1) | 0;
+                }
+            },
+            Debug_VerifyLocateObjectEntry: function (index, entryKey, length) {
+                var num = (length - 1) | 0;
+                var num2 = 0;
+                var num3 = 0;
+                do {
+                    num3 = (Bridge.Int.div((((num + num2) | 0)), 2)) | 0;
+                    var key = this.objEntries[System.Array.index(num3, this.objEntries)].Key;
+                    if (key !== entryKey) {
+                        if (entryKey < key) {
+                            num = (num3 - 1) | 0;
+                        } else {
+                            num2 = (num3 + 1) | 0;
+                        }
+                    }
+                } while (num >= num2);
+                if (entryKey > this.objEntries[System.Array.index(num3, this.objEntries)].Key) {
+                    num3 = (num3 + 1) | 0;
+                }
+            },
+            GetColor: function (key) {
+                var flag = { };
+                return this.GetColor$1(key, flag);
+            },
+            GetColor$1: function (key, found) {
+                var obj2 = this.GetObject$1(key, found);
+                if (found.v) {
+                    var wrapper = Bridge.as(obj2, System.Windows.Forms.PropertyStore.ColorWrapper);
+                    if (wrapper != null) {
+                        return wrapper.Color.$clone();
+                    }
+                }
+                found.v = false;
+                return System.Drawing.Color.Empty.$clone();
+            },
+            GetInteger: function (key) {
+                var flag = { };
+                return this.GetInteger$1(key, flag);
+            },
+            GetInteger$1: function (key, found) {
+                var num2 = { };
+                var num3 = { };
+                var entryKey = this.SplitKey(key, num3);
+                found.v = false;
+                if (this.LocateIntegerEntry(entryKey, num2) && ((((1) << num3.v) & this.intEntries[System.Array.index(num2.v, this.intEntries)].Mask) !== 0)) {
+                    found.v = true;
+                    switch (num3.v) {
+                        case 0: 
+                            return this.intEntries[System.Array.index(num2.v, this.intEntries)].Value1;
+                        case 1: 
+                            return this.intEntries[System.Array.index(num2.v, this.intEntries)].Value2;
+                        case 2: 
+                            return this.intEntries[System.Array.index(num2.v, this.intEntries)].Value3;
+                        case 3: 
+                            return this.intEntries[System.Array.index(num2.v, this.intEntries)].Value4;
+                    }
+                }
+                return 0;
+            },
+            GetObject: function (key) {
+                var flag = { };
+                return this.GetObject$1(key, flag);
+            },
+            GetObject$1: function (key, found) {
+                var num = { };
+                var num2 = { };
+                var entryKey = this.SplitKey(key, num2);
+                found.v = false;
+                if (this.LocateObjectEntry(entryKey, num) && ((((1) << num2.v) & this.objEntries[System.Array.index(num.v, this.objEntries)].Mask) !== 0)) {
+                    found.v = true;
+                    switch (num2.v) {
+                        case 0: 
+                            return this.objEntries[System.Array.index(num.v, this.objEntries)].Value1;
+                        case 1: 
+                            return this.objEntries[System.Array.index(num.v, this.objEntries)].Value2;
+                        case 2: 
+                            return this.objEntries[System.Array.index(num.v, this.objEntries)].Value3;
+                        case 3: 
+                            return this.objEntries[System.Array.index(num.v, this.objEntries)].Value4;
+                    }
+                }
+                return null;
+            },
+            GetPadding: function (key) {
+                var flag = { };
+                return this.GetPadding$1(key, flag);
+            },
+            GetPadding$1: function (key, found) {
+                var obj2 = this.GetObject$1(key, found);
+                if (found.v) {
+                    var wrapper = Bridge.as(obj2, System.Windows.Forms.PropertyStore.PaddingWrapper);
+                    if (wrapper != null) {
+                        return wrapper.Padding.$clone();
+                    }
+                }
+                found.v = false;
+                return System.Windows.Forms.Padding.Empty.$clone();
+            },
+            GetRectangle: function (key) {
+                var flag = { };
+                return this.GetRectangle$1(key, flag);
+            },
+            GetRectangle$1: function (key, found) {
+                var obj2 = this.GetObject$1(key, found);
+                if (found.v) {
+                    var wrapper = Bridge.as(obj2, System.Windows.Forms.PropertyStore.RectangleWrapper);
+                    if (wrapper != null) {
+                        return wrapper.Rectangle.$clone();
+                    }
+                }
+                found.v = false;
+                return System.Drawing.Rectangle.Empty.$clone();
+            },
+            GetSize: function (key, found) {
+                var obj2 = this.GetObject$1(key, found);
+                if (found.v) {
+                    var wrapper = Bridge.as(obj2, System.Windows.Forms.PropertyStore.SizeWrapper);
+                    if (wrapper != null) {
+                        return wrapper.Size.$clone();
+                    }
+                }
+                found.v = false;
+                return System.Drawing.Size.Empty.$clone();
+            },
+            LocateIntegerEntry: function (entryKey, index) {
+                if (this.intEntries != null) {
+                    var length = this.intEntries.length;
+                    if (length <= 16) {
+                        index.v = 0;
+                        var num2 = (Bridge.Int.div(length, 2)) | 0;
+                        if (this.intEntries[System.Array.index(num2, this.intEntries)].Key <= entryKey) {
+                            index.v = num2;
+                        }
+                        if (this.intEntries[System.Array.index(index.v, this.intEntries)].Key === entryKey) {
+                            return true;
+                        }
+                        num2 = (Bridge.Int.div((((length + 1) | 0)), 4)) | 0;
+                        if (this.intEntries[System.Array.index(((index.v + num2) | 0), this.intEntries)].Key <= entryKey) {
+                            index.v = (index.v + num2) | 0;
+                            if (this.intEntries[System.Array.index(index.v, this.intEntries)].Key === entryKey) {
+                                return true;
+                            }
+                        }
+                        num2 = (Bridge.Int.div((((length + 3) | 0)), 8)) | 0;
+                        if (this.intEntries[System.Array.index(((index.v + num2) | 0), this.intEntries)].Key <= entryKey) {
+                            index.v = (index.v + num2) | 0;
+                            if (this.intEntries[System.Array.index(index.v, this.intEntries)].Key === entryKey) {
+                                return true;
+                            }
+                        }
+                        num2 = (Bridge.Int.div((((length + 7) | 0)), 16)) | 0;
+                        if (this.intEntries[System.Array.index(((index.v + num2) | 0), this.intEntries)].Key <= entryKey) {
+                            index.v = (index.v + num2) | 0;
+                            if (this.intEntries[System.Array.index(index.v, this.intEntries)].Key === entryKey) {
+                                return true;
+                            }
+                        }
+                        if (entryKey > this.intEntries[System.Array.index(index.v, this.intEntries)].Key) {
+                            index.v = (index.v + 1) | 0;
+                        }
+                        return false;
+                    }
+                    var num3 = (length - 1) | 0;
+                    var num4 = 0;
+                    var num5 = 0;
+                    do {
+                        num5 = (Bridge.Int.div((((num3 + num4) | 0)), 2)) | 0;
+                        var key = this.intEntries[System.Array.index(num5, this.intEntries)].Key;
+                        if (key === entryKey) {
+                            index.v = num5;
+                            return true;
+                        }
+                        if (entryKey < key) {
+                            num3 = (num5 - 1) | 0;
+                        } else {
+                            num4 = (num5 + 1) | 0;
+                        }
+                    } while (num3 >= num4);
+                    index.v = num5;
+                    if (entryKey > this.intEntries[System.Array.index(num5, this.intEntries)].Key) {
+                        index.v = (index.v + 1) | 0;
+                    }
+                    return false;
+                }
+                index.v = 0;
+                return false;
+            },
+            LocateObjectEntry: function (entryKey, index) {
+                if (this.objEntries != null) {
+                    var length = this.objEntries.length;
+                    if (length <= 16) {
+                        index.v = 0;
+                        var num2 = (Bridge.Int.div(length, 2)) | 0;
+                        if (this.objEntries[System.Array.index(num2, this.objEntries)].Key <= entryKey) {
+                            index.v = num2;
+                        }
+                        if (this.objEntries[System.Array.index(index.v, this.objEntries)].Key === entryKey) {
+                            return true;
+                        }
+                        num2 = (Bridge.Int.div((((length + 1) | 0)), 4)) | 0;
+                        if (this.objEntries[System.Array.index(((index.v + num2) | 0), this.objEntries)].Key <= entryKey) {
+                            index.v = (index.v + num2) | 0;
+                            if (this.objEntries[System.Array.index(index.v, this.objEntries)].Key === entryKey) {
+                                return true;
+                            }
+                        }
+                        num2 = (Bridge.Int.div((((length + 3) | 0)), 8)) | 0;
+                        if (this.objEntries[System.Array.index(((index.v + num2) | 0), this.objEntries)].Key <= entryKey) {
+                            index.v = (index.v + num2) | 0;
+                            if (this.objEntries[System.Array.index(index.v, this.objEntries)].Key === entryKey) {
+                                return true;
+                            }
+                        }
+                        num2 = (Bridge.Int.div((((length + 7) | 0)), 16)) | 0;
+                        if (this.objEntries[System.Array.index(((index.v + num2) | 0), this.objEntries)].Key <= entryKey) {
+                            index.v = (index.v + num2) | 0;
+                            if (this.objEntries[System.Array.index(index.v, this.objEntries)].Key === entryKey) {
+                                return true;
+                            }
+                        }
+                        if (entryKey > this.objEntries[System.Array.index(index.v, this.objEntries)].Key) {
+                            index.v = (index.v + 1) | 0;
+                        }
+                        return false;
+                    }
+                    var num3 = (length - 1) | 0;
+                    var num4 = 0;
+                    var num5 = 0;
+                    do {
+                        num5 = (Bridge.Int.div((((num3 + num4) | 0)), 2)) | 0;
+                        var key = this.objEntries[System.Array.index(num5, this.objEntries)].Key;
+                        if (key === entryKey) {
+                            index.v = num5;
+                            return true;
+                        }
+                        if (entryKey < key) {
+                            num3 = (num5 - 1) | 0;
+                        } else {
+                            num4 = (num5 + 1) | 0;
+                        }
+                    } while (num3 >= num4);
+                    index.v = num5;
+                    if (entryKey > this.objEntries[System.Array.index(num5, this.objEntries)].Key) {
+                        index.v = (index.v + 1) | 0;
+                    }
+                    return false;
+                }
+                index.v = 0;
+                return false;
+            },
+            RemoveInteger: function (key) {
+                var num = { };
+                var num2 = { };
+                var entryKey = this.SplitKey(key, num2);
+                if (this.LocateIntegerEntry(entryKey, num) && ((((1) << num2.v) & this.intEntries[System.Array.index(num.v, this.intEntries)].Mask) !== 0)) {
+                    this.intEntries[System.Array.index(num.v, this.intEntries)].Mask = Bridge.Int.sxs((this.intEntries[System.Array.index(num.v, this.intEntries)].Mask & ~(Bridge.Int.sxs(((1) << num2.v) & 65535))) & 65535);
+                    if (this.intEntries[System.Array.index(num.v, this.intEntries)].Mask === 0) {
+                        var destinationArray = System.Array.init(((this.intEntries.length - 1) | 0), function (){
+                            return new System.Windows.Forms.PropertyStore.IntegerEntry();
+                        }, System.Windows.Forms.PropertyStore.IntegerEntry);
+                        if (num.v > 0) {
+                            System.Array.copy(this.intEntries, 0, destinationArray, 0, num.v);
+                        }
+                        if (num.v < destinationArray.length) {
+                            System.Array.copy(this.intEntries, ((num.v + 1) | 0), destinationArray, num.v, (((((this.intEntries.length - num.v) | 0)) - 1) | 0));
+                        }
+                        this.intEntries = destinationArray;
+                    } else {
+                        switch (num2.v) {
+                            case 0: 
+                                this.intEntries[System.Array.index(num.v, this.intEntries)].Value1 = 0;
+                                return;
+                            case 1: 
+                                this.intEntries[System.Array.index(num.v, this.intEntries)].Value2 = 0;
+                                return;
+                            case 2: 
+                                this.intEntries[System.Array.index(num.v, this.intEntries)].Value3 = 0;
+                                return;
+                            case 3: 
+                                this.intEntries[System.Array.index(num.v, this.intEntries)].Value4 = 0;
+                                return;
+                        }
+                    }
+                }
+            },
+            RemoveObject: function (key) {
+                var num = { };
+                var num2 = { };
+                var entryKey = this.SplitKey(key, num2);
+                if (this.LocateObjectEntry(entryKey, num) && ((((1) << num2.v) & this.objEntries[System.Array.index(num.v, this.objEntries)].Mask) !== 0)) {
+                    this.objEntries[System.Array.index(num.v, this.objEntries)].Mask = Bridge.Int.sxs((this.objEntries[System.Array.index(num.v, this.objEntries)].Mask & ~(Bridge.Int.sxs(((1) << num2.v) & 65535))) & 65535);
+                    if (this.objEntries[System.Array.index(num.v, this.objEntries)].Mask === 0) {
+                        if (this.objEntries.length === 1) {
+                            this.objEntries = null;
+                        } else {
+                            var destinationArray = System.Array.init(((this.objEntries.length - 1) | 0), function (){
+                                return new System.Windows.Forms.PropertyStore.ObjectEntry();
+                            }, System.Windows.Forms.PropertyStore.ObjectEntry);
+                            if (num.v > 0) {
+                                System.Array.copy(this.objEntries, 0, destinationArray, 0, num.v);
+                            }
+                            if (num.v < destinationArray.length) {
+                                System.Array.copy(this.objEntries, ((num.v + 1) | 0), destinationArray, num.v, (((((this.objEntries.length - num.v) | 0)) - 1) | 0));
+                            }
+                            this.objEntries = destinationArray;
+                        }
+                    } else {
+                        switch (num2.v) {
+                            case 0: 
+                                this.objEntries[System.Array.index(num.v, this.objEntries)].Value1 = null;
+                                return;
+                            case 1: 
+                                this.objEntries[System.Array.index(num.v, this.objEntries)].Value2 = null;
+                                return;
+                            case 2: 
+                                this.objEntries[System.Array.index(num.v, this.objEntries)].Value3 = null;
+                                return;
+                            case 3: 
+                                this.objEntries[System.Array.index(num.v, this.objEntries)].Value4 = null;
+                                return;
+                        }
+                    }
+                }
+            },
+            SetColor: function (key, value) {
+                var flag = { };
+                var obj2 = this.GetObject$1(key, flag);
+                if (!flag.v) {
+                    this.SetObject(key, new System.Windows.Forms.PropertyStore.ColorWrapper(value.$clone()));
+                } else {
+                    var wrapper = Bridge.as(obj2, System.Windows.Forms.PropertyStore.ColorWrapper);
+                    if (wrapper != null) {
+                        wrapper.Color = value.$clone();
+                    } else {
+                        this.SetObject(key, new System.Windows.Forms.PropertyStore.ColorWrapper(value.$clone()));
+                    }
+                }
+            },
+            SetInteger: function (key, value) {
+                var num = { };
+                var num2 = { };
+                var entryKey = this.SplitKey(key, num2);
+                if (!this.LocateIntegerEntry(entryKey, num)) {
+                    if (this.intEntries != null) {
+                        var destinationArray = System.Array.init(((this.intEntries.length + 1) | 0), function (){
+                            return new System.Windows.Forms.PropertyStore.IntegerEntry();
+                        }, System.Windows.Forms.PropertyStore.IntegerEntry);
+                        if (num.v > 0) {
+                            System.Array.copy(this.intEntries, 0, destinationArray, 0, num.v);
+                        }
+                        if ((((this.intEntries.length - num.v) | 0)) > 0) {
+                            System.Array.copy(this.intEntries, num.v, destinationArray, ((num.v + 1) | 0), ((this.intEntries.length - num.v) | 0));
+                        }
+                        this.intEntries = destinationArray;
+                    } else {
+                        this.intEntries = System.Array.init(1, function (){
+                            return new System.Windows.Forms.PropertyStore.IntegerEntry();
+                        }, System.Windows.Forms.PropertyStore.IntegerEntry);
+                    }
+                    this.intEntries[System.Array.index(num.v, this.intEntries)].Key = entryKey;
+                }
+                switch (num2.v) {
+                    case 0: 
+                        this.intEntries[System.Array.index(num.v, this.intEntries)].Value1 = value;
+                        break;
+                    case 1: 
+                        this.intEntries[System.Array.index(num.v, this.intEntries)].Value2 = value;
+                        break;
+                    case 2: 
+                        this.intEntries[System.Array.index(num.v, this.intEntries)].Value3 = value;
+                        break;
+                    case 3: 
+                        this.intEntries[System.Array.index(num.v, this.intEntries)].Value4 = value;
+                        break;
+                }
+                this.intEntries[System.Array.index(num.v, this.intEntries)].Mask = Bridge.Int.sxs((((1) << num2.v) | ((this.intEntries[System.Array.index(num.v, this.intEntries)].Mask) & 65535)) & 65535);
+            },
+            SetObject: function (key, value) {
+                var num = { };
+                var num2 = { };
+                var entryKey = this.SplitKey(key, num2);
+                if (!this.LocateObjectEntry(entryKey, num)) {
+                    if (this.objEntries != null) {
+                        var destinationArray = System.Array.init(((this.objEntries.length + 1) | 0), function (){
+                            return new System.Windows.Forms.PropertyStore.ObjectEntry();
+                        }, System.Windows.Forms.PropertyStore.ObjectEntry);
+                        if (num.v > 0) {
+                            System.Array.copy(this.objEntries, 0, destinationArray, 0, num.v);
+                        }
+                        if ((((this.objEntries.length - num.v) | 0)) > 0) {
+                            System.Array.copy(this.objEntries, num.v, destinationArray, ((num.v + 1) | 0), ((this.objEntries.length - num.v) | 0));
+                        }
+                        this.objEntries = destinationArray;
+                    } else {
+                        this.objEntries = System.Array.init(1, function (){
+                            return new System.Windows.Forms.PropertyStore.ObjectEntry();
+                        }, System.Windows.Forms.PropertyStore.ObjectEntry);
+                    }
+                    this.objEntries[System.Array.index(num.v, this.objEntries)].Key = entryKey;
+                }
+                switch (num2.v) {
+                    case 0: 
+                        this.objEntries[System.Array.index(num.v, this.objEntries)].Value1 = value;
+                        break;
+                    case 1: 
+                        this.objEntries[System.Array.index(num.v, this.objEntries)].Value2 = value;
+                        break;
+                    case 2: 
+                        this.objEntries[System.Array.index(num.v, this.objEntries)].Value3 = value;
+                        break;
+                    case 3: 
+                        this.objEntries[System.Array.index(num.v, this.objEntries)].Value4 = value;
+                        break;
+                }
+                this.objEntries[System.Array.index(num.v, this.objEntries)].Mask = Bridge.Int.sxs((((this.objEntries[System.Array.index(num.v, this.objEntries)].Mask) & 65535) | ((1) << num2.v)) & 65535);
+            },
+            SetPadding: function (key, value) {
+                var flag = { };
+                var obj2 = this.GetObject$1(key, flag);
+                if (!flag.v) {
+                    this.SetObject(key, new System.Windows.Forms.PropertyStore.PaddingWrapper(value.$clone()));
+                } else {
+                    var wrapper = Bridge.as(obj2, System.Windows.Forms.PropertyStore.PaddingWrapper);
+                    if (wrapper != null) {
+                        wrapper.Padding = value.$clone();
+                    } else {
+                        this.SetObject(key, new System.Windows.Forms.PropertyStore.PaddingWrapper(value.$clone()));
+                    }
+                }
+            },
+            SetRectangle: function (key, value) {
+                var flag = { };
+                var obj2 = this.GetObject$1(key, flag);
+                if (!flag.v) {
+                    this.SetObject(key, new System.Windows.Forms.PropertyStore.RectangleWrapper(value.$clone()));
+                } else {
+                    var wrapper = Bridge.as(obj2, System.Windows.Forms.PropertyStore.RectangleWrapper);
+                    if (wrapper != null) {
+                        wrapper.Rectangle = value.$clone();
+                    } else {
+                        this.SetObject(key, new System.Windows.Forms.PropertyStore.RectangleWrapper(value.$clone()));
+                    }
+                }
+            },
+            SetSize: function (key, value) {
+                var flag = { };
+                var obj2 = this.GetObject$1(key, flag);
+                if (!flag.v) {
+                    this.SetObject(key, new System.Windows.Forms.PropertyStore.SizeWrapper(value.$clone()));
+                } else {
+                    var wrapper = Bridge.as(obj2, System.Windows.Forms.PropertyStore.SizeWrapper);
+                    if (wrapper != null) {
+                        wrapper.Size = value.$clone();
+                    } else {
+                        this.SetObject(key, new System.Windows.Forms.PropertyStore.SizeWrapper(value.$clone()));
+                    }
+                }
+            },
+            SplitKey: function (key, element) {
+                element.v = Bridge.Int.sxs((key & 3) & 65535);
+                return System.Int64.clip16(System.Int64(key).and(System.Int64([-4,0])));
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.PropertyStore.ColorWrapper", {
+        $kind: "nested class",
+        fields: {
+            Color: null
+        },
+        ctors: {
+            init: function () {
+                this.Color = new System.Drawing.Color();
+            },
+            ctor: function (color) {
+                this.$initialize();
+                this.Color = color.$clone();
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.PropertyStore.IntegerEntry", {
+        $kind: "nested struct",
+        statics: {
+            methods: {
+                getDefaultValue: function () { return new System.Windows.Forms.PropertyStore.IntegerEntry(); }
+            }
+        },
+        fields: {
+            Key: 0,
+            Mask: 0,
+            Value1: 0,
+            Value2: 0,
+            Value3: 0,
+            Value4: 0
+        },
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            getHashCode: function () {
+                var h = Bridge.addHash([4904798238, this.Key, this.Mask, this.Value1, this.Value2, this.Value3, this.Value4]);
+                return h;
+            },
+            equals: function (o) {
+                if (!Bridge.is(o, System.Windows.Forms.PropertyStore.IntegerEntry)) {
+                    return false;
+                }
+                return Bridge.equals(this.Key, o.Key) && Bridge.equals(this.Mask, o.Mask) && Bridge.equals(this.Value1, o.Value1) && Bridge.equals(this.Value2, o.Value2) && Bridge.equals(this.Value3, o.Value3) && Bridge.equals(this.Value4, o.Value4);
+            },
+            $clone: function (to) {
+                var s = to || new System.Windows.Forms.PropertyStore.IntegerEntry();
+                s.Key = this.Key;
+                s.Mask = this.Mask;
+                s.Value1 = this.Value1;
+                s.Value2 = this.Value2;
+                s.Value3 = this.Value3;
+                s.Value4 = this.Value4;
+                return s;
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.PropertyStore.ObjectEntry", {
+        $kind: "nested struct",
+        statics: {
+            methods: {
+                getDefaultValue: function () { return new System.Windows.Forms.PropertyStore.ObjectEntry(); }
+            }
+        },
+        fields: {
+            Key: 0,
+            Mask: 0,
+            Value1: null,
+            Value2: null,
+            Value3: null,
+            Value4: null
+        },
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            getHashCode: function () {
+                var h = Bridge.addHash([3559475494, this.Key, this.Mask, this.Value1, this.Value2, this.Value3, this.Value4]);
+                return h;
+            },
+            equals: function (o) {
+                if (!Bridge.is(o, System.Windows.Forms.PropertyStore.ObjectEntry)) {
+                    return false;
+                }
+                return Bridge.equals(this.Key, o.Key) && Bridge.equals(this.Mask, o.Mask) && Bridge.equals(this.Value1, o.Value1) && Bridge.equals(this.Value2, o.Value2) && Bridge.equals(this.Value3, o.Value3) && Bridge.equals(this.Value4, o.Value4);
+            },
+            $clone: function (to) {
+                var s = to || new System.Windows.Forms.PropertyStore.ObjectEntry();
+                s.Key = this.Key;
+                s.Mask = this.Mask;
+                s.Value1 = this.Value1;
+                s.Value2 = this.Value2;
+                s.Value3 = this.Value3;
+                s.Value4 = this.Value4;
+                return s;
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.PropertyStore.PaddingWrapper", {
+        $kind: "nested class",
+        fields: {
+            Padding: null
+        },
+        ctors: {
+            init: function () {
+                this.Padding = new System.Windows.Forms.Padding();
+            },
+            ctor: function (padding) {
+                this.$initialize();
+                this.Padding = padding.$clone();
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.PropertyStore.RectangleWrapper", {
+        $kind: "nested class",
+        fields: {
+            Rectangle: null
+        },
+        ctors: {
+            init: function () {
+                this.Rectangle = new System.Drawing.Rectangle();
+            },
+            ctor: function (rectangle) {
+                this.$initialize();
+                this.Rectangle = rectangle.$clone();
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.PropertyStore.SizeWrapper", {
+        $kind: "nested class",
+        fields: {
+            Size: null
+        },
+        ctors: {
+            init: function () {
+                this.Size = new System.Drawing.Size();
+            },
+            ctor: function (size) {
+                this.$initialize();
+                this.Size = size.$clone();
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.SR", {
+        statics: {
+            methods: {
+                GetString: function (name, args) {
+                    if (args === void 0) { args = []; }
+                    return name;
+                }
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.TextFormatFlags", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                Bottom: 8,
+                Default: 0,
+                EndEllipsis: 32768,
+                ExpandTabs: 64,
+                ExternalLeading: 512,
+                GlyphOverhangPadding: 0,
+                HidePrefix: 1048576,
+                HorizontalCenter: 1,
+                Internal: 4096,
+                Left: 0,
+                LeftAndRightPadding: 536870912,
+                ModifyString: 65536,
+                NoClipping: 256,
+                NoFullWidthCharacterBreak: 524288,
+                NoPadding: 268435456,
+                NoPrefix: 2048,
+                PathEllipsis: 16384,
+                PrefixOnly: 2097152,
+                PreserveGraphicsClipping: 16777216,
+                PreserveGraphicsTranslateTransform: 33554432,
+                Right: 2,
+                RightToLeft: 131072,
+                SingleLine: 32,
+                TextBoxControl: 8192,
+                Top: 0,
+                VerticalCenter: 4,
+                WordBreak: 16,
+                WordEllipsis: 262144
+            }
+        },
+        $flags: true
+    });
+
+    Bridge.define("System.Windows.Forms.TextImageRelation", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                ImageAboveText: 1,
+                ImageBeforeText: 4,
+                Overlay: 0,
+                TextAboveImage: 2,
+                TextBeforeImage: 8
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.TextRenderer", {
+        statics: {
+            methods: {
+                MeasureText: function (text, font, proposedSize, flags) {
+                    throw new System.NotImplementedException.ctor();
+                    //if (string.IsNullOrEmpty(text))
+                    //{
+                    //    return Size.Empty;
+                    //}
+                    //using (WindowsFont font2 = WindowsGraphicsCacheManager.GetWindowsFont(font))
+                    //{
+                    //    return WindowsGraphicsCacheManager.MeasurementGraphics.MeasureText(text, font2, proposedSize, GetIntTextFormatFlags(flags));
+                    //}
+                }
+            }
+        },
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.WindowsFormsUtils", {
+        statics: {
+            methods: {
+                RotateLeft: function (value, nBits) {
+                    nBits = nBits % 32;
+                    return ((value << nBits) | (value >> (((32 - nBits) | 0))));
+                }
             }
         }
     });
@@ -3041,13 +7356,3843 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.Collections.ArrayList.FixedSizeArrayList", {
+        inherits: [System.Collections.ArrayList],
+        $kind: "nested class",
+        fields: {
+            _list: null
+        },
+        props: {
+            Capacity: {
+                get: function () {
+                    return this._list.Capacity;
+                },
+                set: function (value) {
+                    throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+                }
+            },
+            Count: {
+                get: function () {
+                    return this._list.Count;
+                }
+            },
+            IsFixedSize: {
+                get: function () {
+                    return true;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return this._list.IsReadOnly;
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return this._list.IsSynchronized;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    return this._list.SyncRoot;
+                }
+            }
+        },
+        alias: [
+            "add", "System$Collections$IList$add",
+            "clear", "System$Collections$IList$clear",
+            "clone", "System$ICloneable$clone",
+            "contains", "System$Collections$IList$contains",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", "System$Collections$IEnumerable$GetEnumerator",
+            "indexOf", "System$Collections$IList$indexOf",
+            "insert", "System$Collections$IList$insert",
+            "remove", "System$Collections$IList$remove",
+            "removeAt", "System$Collections$IList$removeAt",
+            "Count", "System$Collections$ICollection$Count",
+            "IsFixedSize", "System$Collections$IList$IsFixedSize",
+            "IsReadOnly", "System$Collections$IList$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "getItem", "System$Collections$IList$getItem",
+            "setItem", "System$Collections$IList$setItem",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot"
+        ],
+        ctors: {
+            ctor: function (l) {
+                this.$initialize();
+                System.Collections.ArrayList.ctor.call(this);
+                this._list = l;
+                this._version = this._list._version;
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                return this._list.getItem(index);
+            },
+            setItem: function (index, value) {
+                this._list.setItem(index, value);
+                this._version = this._list._version;
+            },
+            add: function (obj) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            },
+            AddRange: function (c) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            },
+            BinarySearch: function (index, count, value, comparer) {
+                return this._list.BinarySearch(index, count, value, comparer);
+            },
+            clear: function () {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            },
+            clone: function () {
+                var $t;
+                return ($t = new System.Collections.ArrayList.FixedSizeArrayList(this._list), $t._list = Bridge.cast(this._list.clone(), System.Collections.ArrayList), $t);
+            },
+            contains: function (obj) {
+                return this._list.contains(obj);
+            },
+            copyTo: function (array, index) {
+                this._list.copyTo(array, index);
+            },
+            CopyTo$1: function (index, array, arrayIndex, count) {
+                this._list.CopyTo$1(index, array, arrayIndex, count);
+            },
+            GetEnumerator: function () {
+                return this._list.GetEnumerator();
+            },
+            GetEnumerator$1: function (index, count) {
+                return this._list.GetEnumerator$1(index, count);
+            },
+            GetRange: function (index, count) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this.Count - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                return new System.Collections.ArrayList.Range(this, index, count);
+            },
+            indexOf: function (value) {
+                return this._list.indexOf(value);
+            },
+            IndexOf: function (value, startIndex) {
+                return this._list.IndexOf(value, startIndex);
+            },
+            IndexOf$1: function (value, startIndex, count) {
+                return this._list.IndexOf$1(value, startIndex, count);
+            },
+            insert: function (index, obj) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            },
+            InsertRange: function (index, c) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            },
+            LastIndexOf: function (value) {
+                return this._list.LastIndexOf(value);
+            },
+            LastIndexOf$1: function (value, startIndex) {
+                return this._list.LastIndexOf$1(value, startIndex);
+            },
+            LastIndexOf$2: function (value, startIndex, count) {
+                return this._list.LastIndexOf$2(value, startIndex, count);
+            },
+            remove: function (value) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            },
+            removeAt: function (index) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            },
+            RemoveRange: function (index, count) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            },
+            Reverse$1: function (index, count) {
+                this._list.Reverse$1(index, count);
+                this._version = this._list._version;
+            },
+            SetRange: function (index, c) {
+                this._list.SetRange(index, c);
+                this._version = this._list._version;
+            },
+            Sort$2: function (index, count, comparer) {
+                this._list.Sort$2(index, count, comparer);
+                this._version = this._list._version;
+            },
+            ToArray$1: function () {
+                return this._list.ToArray$1();
+            },
+            ToArray: function (type) {
+                return this._list.ToArray(type);
+            },
+            TrimToSize: function () {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.ArrayList.IListWrapper", {
+        inherits: [System.Collections.ArrayList],
+        $kind: "nested class",
+        fields: {
+            _list: null
+        },
+        props: {
+            Capacity: {
+                get: function () {
+                    return System.Array.getCount(this._list);
+                },
+                set: function (value) {
+                    if (value < this.Count) {
+                        throw new System.ArgumentOutOfRangeException.$ctor4("value", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_SmallCapacity"));
+                    }
+                }
+            },
+            Count: {
+                get: function () {
+                    return System.Array.getCount(this._list);
+                }
+            },
+            IsFixedSize: {
+                get: function () {
+                    return this._list.System$Collections$IList$IsFixedSize;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return System.Array.getIsReadOnly(this._list);
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return this._list.System$Collections$ICollection$IsSynchronized;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    return this._list.System$Collections$ICollection$SyncRoot;
+                }
+            }
+        },
+        alias: [
+            "add", "System$Collections$IList$add",
+            "clear", "System$Collections$IList$clear",
+            "clone", "System$ICloneable$clone",
+            "contains", "System$Collections$IList$contains",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", "System$Collections$IEnumerable$GetEnumerator",
+            "indexOf", "System$Collections$IList$indexOf",
+            "insert", "System$Collections$IList$insert",
+            "remove", "System$Collections$IList$remove",
+            "removeAt", "System$Collections$IList$removeAt",
+            "Count", "System$Collections$ICollection$Count",
+            "IsFixedSize", "System$Collections$IList$IsFixedSize",
+            "IsReadOnly", "System$Collections$IList$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "getItem", "System$Collections$IList$getItem",
+            "setItem", "System$Collections$IList$setItem",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot"
+        ],
+        ctors: {
+            ctor: function (list) {
+                this.$initialize();
+                System.Collections.ArrayList.ctor.call(this);
+                this._list = list;
+                this._version = 0;
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                return System.Array.getItem(this._list, index);
+            },
+            setItem: function (index, value) {
+                System.Array.setItem(this._list, index, value);
+                this._version = (this._version + 1) | 0;
+            },
+            add: function (obj) {
+                var num = System.Array.add(this._list, obj);
+                this._version = (this._version + 1) | 0;
+                return num;
+            },
+            AddRange: function (c) {
+                this.InsertRange(this.Count, c);
+            },
+            BinarySearch: function (index, count, value, comparer) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this.Count - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                if (comparer == null) {
+                    comparer = new (System.Collections.Generic.Comparer$1(System.Object))(System.Collections.Generic.Comparer$1.$default.fn);
+                }
+                var num = index;
+                var num2 = ((((index + count) | 0)) - 1) | 0;
+                while (num <= num2) {
+                    var num3 = (Bridge.Int.div((((num + num2) | 0)), 2)) | 0;
+                    var num4 = comparer[Bridge.geti(comparer, "System$Collections$Generic$IComparer$1$System$Object$compare", "System$Collections$Generic$IComparer$1$compare")](value, System.Array.getItem(this._list, num3));
+                    if (num4 === 0) {
+                        return num3;
+                    }
+                    if (num4 < 0) {
+                        num2 = (num3 - 1) | 0;
+                    } else {
+                        num = (num3 + 1) | 0;
+                    }
+                }
+                return ~num;
+            },
+            clear: function () {
+                if (this._list.System$Collections$IList$IsFixedSize) {
+                    throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
+                }
+                System.Array.clear(this._list);
+                this._version = (this._version + 1) | 0;
+            },
+            clone: function () {
+                return new System.Collections.ArrayList.IListWrapper(this._list);
+            },
+            contains: function (obj) {
+                return System.Array.contains(this._list, obj);
+            },
+            copyTo: function (array, index) {
+                System.Array.copyTo(this._list, array, index);
+            },
+            CopyTo$1: function (index, array, arrayIndex, count) {
+                if (array == null) {
+                    throw new System.ArgumentNullException.$ctor1("array");
+                }
+                if ((index < 0) || (arrayIndex < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "arrayIndex", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if (count < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((array.length - arrayIndex) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                if (System.Array.getRank(array) !== 1) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Arg_RankMultiDimNotSupported"));
+                }
+                if ((((System.Array.getCount(this._list) - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                for (var i = index; i < (((index + count) | 0)); i = (i + 1) | 0) {
+                    System.Array.set(array, System.Array.getItem(this._list, i), Bridge.identity(arrayIndex, (arrayIndex = (arrayIndex + 1) | 0)));
+                }
+            },
+            GetEnumerator: function () {
+                return Bridge.getEnumerator(this._list);
+            },
+            GetEnumerator$1: function (index, count) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((System.Array.getCount(this._list) - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                return new System.Collections.ArrayList.IListWrapper.IListWrapperEnumWrapper.$ctor1(this, index, count);
+            },
+            GetRange: function (index, count) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((System.Array.getCount(this._list) - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                return new System.Collections.ArrayList.Range(this, index, count);
+            },
+            indexOf: function (value) {
+                return System.Array.indexOf(this._list, value, 0, null);
+            },
+            IndexOf: function (value, startIndex) {
+                return this.IndexOf$1(value, startIndex, ((System.Array.getCount(this._list) - startIndex) | 0));
+            },
+            IndexOf$1: function (value, startIndex, count) {
+                if ((startIndex < 0) || (startIndex > this.Count)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("startIndex", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                if ((count < 0) || (startIndex > (((this.Count - count) | 0)))) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Count"));
+                }
+                var num = (startIndex + count) | 0;
+                if (value == null) {
+                    for (var j = startIndex; j < num; j = (j + 1) | 0) {
+                        if (System.Array.getItem(this._list, j) == null) {
+                            return j;
+                        }
+                    }
+                    return -1;
+                }
+                for (var i = startIndex; i < num; i = (i + 1) | 0) {
+                    if ((System.Array.getItem(this._list, i) != null) && Bridge.equals(System.Array.getItem(this._list, i), value)) {
+                        return i;
+                    }
+                }
+                return -1;
+            },
+            insert: function (index, obj) {
+                System.Array.insert(this._list, index, obj);
+                this._version = (this._version + 1) | 0;
+            },
+            InsertRange: function (index, c) {
+                if (c == null) {
+                    throw new System.ArgumentNullException.$ctor3("c", System.EnvironmentV2.GetResourceString("ArgumentNull_Collection"));
+                }
+                if ((index < 0) || (index > this.Count)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                if (System.Array.getCount(c) > 0) {
+                    var list = Bridge.as(this._list, System.Collections.ArrayList);
+                    if (list != null) {
+                        list.InsertRange(index, c);
+                    } else {
+                        var enumerator = Bridge.getEnumerator(c);
+                        while (enumerator.System$Collections$IEnumerator$moveNext()) {
+                            System.Array.insert(this._list, Bridge.identity(index, (index = (index + 1) | 0)), enumerator.System$Collections$IEnumerator$Current);
+                        }
+                    }
+                    this._version = (this._version + 1) | 0;
+                }
+            },
+            LastIndexOf: function (value) {
+                return this.LastIndexOf$2(value, ((System.Array.getCount(this._list) - 1) | 0), System.Array.getCount(this._list));
+            },
+            LastIndexOf$1: function (value, startIndex) {
+                return this.LastIndexOf$2(value, startIndex, ((startIndex + 1) | 0));
+            },
+            LastIndexOf$2: function (value, startIndex, count) {
+                if (System.Array.getCount(this._list) !== 0) {
+                    if ((startIndex < 0) || (startIndex >= System.Array.getCount(this._list))) {
+                        throw new System.ArgumentOutOfRangeException.$ctor4("startIndex", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                    }
+                    if ((count < 0) || (count > (((startIndex + 1) | 0)))) {
+                        throw new System.ArgumentOutOfRangeException.$ctor4("count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Count"));
+                    }
+                    var num = ((((startIndex - count) | 0)) + 1) | 0;
+                    if (value == null) {
+                        for (var j = startIndex; j >= num; j = (j - 1) | 0) {
+                            if (System.Array.getItem(this._list, j) == null) {
+                                return j;
+                            }
+                        }
+                        return -1;
+                    }
+                    for (var i = startIndex; i >= num; i = (i - 1) | 0) {
+                        if ((System.Array.getItem(this._list, i) != null) && Bridge.equals(System.Array.getItem(this._list, i), value)) {
+                            return i;
+                        }
+                    }
+                }
+                return -1;
+            },
+            remove: function (value) {
+                var index = this.indexOf(value);
+                if (index >= 0) {
+                    this.removeAt(index);
+                }
+            },
+            removeAt: function (index) {
+                this._list.System$Collections$IList$removeAt(index);
+                this._version = (this._version + 1) | 0;
+            },
+            RemoveRange: function (index, count) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((System.Array.getCount(this._list) - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                if (count > 0) {
+                    this._version = (this._version + 1) | 0;
+                }
+                while (count > 0) {
+                    this._list.System$Collections$IList$removeAt(index);
+                    count = (count - 1) | 0;
+                }
+            },
+            Reverse$1: function (index, count) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((System.Array.getCount(this._list) - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                var num = index;
+                var num2 = ((((index + count) | 0)) - 1) | 0;
+                while (num < num2) {
+                    var obj2 = System.Array.getItem(this._list, num);
+                    System.Array.setItem(this._list, Bridge.identity(num, (num = (num + 1) | 0)), System.Array.getItem(this._list, num2));
+                    System.Array.setItem(this._list, Bridge.identity(num2, (num2 = (num2 - 1) | 0)), obj2);
+                }
+                this._version = (this._version + 1) | 0;
+            },
+            SetRange: function (index, c) {
+                if (c == null) {
+                    throw new System.ArgumentNullException.$ctor3("c", System.EnvironmentV2.GetResourceString("ArgumentNull_Collection"));
+                }
+                if ((index < 0) || (index > (((System.Array.getCount(this._list) - System.Array.getCount(c)) | 0)))) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                if (System.Array.getCount(c) > 0) {
+                    var enumerator = Bridge.getEnumerator(c);
+                    while (enumerator.System$Collections$IEnumerator$moveNext()) {
+                        System.Array.setItem(this._list, Bridge.identity(index, (index = (index + 1) | 0)), enumerator.System$Collections$IEnumerator$Current);
+                    }
+                    this._version = (this._version + 1) | 0;
+                }
+            },
+            Sort$2: function (index, count, comparer) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((System.Array.getCount(this._list) - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                var array = System.Array.init(count, null, System.Object);
+                this.CopyTo$1(index, array, 0, count);
+                System.Array.sort(array, 0, count, comparer);
+                for (var i = 0; i < count; i = (i + 1) | 0) {
+                    System.Array.setItem(this._list, ((i + index) | 0), array[System.Array.index(i, array)]);
+                }
+                this._version = (this._version + 1) | 0;
+            },
+            ToArray$1: function () {
+                var array = System.Array.init(this.Count, null, System.Object);
+                System.Array.copyTo(this._list, array, 0);
+                return array;
+            },
+            ToArray: function (type) {
+                if (type == null) {
+                    throw new System.ArgumentNullException.$ctor1("type");
+                }
+                var array = System.Array.init(System.Array.getCount(this._list), Bridge.getDefaultValue(type), type);
+                System.Array.copyTo(this._list, array, 0);
+                return array;
+            },
+            TrimToSize: function () { }
+        }
+    });
+
+    Bridge.define("System.Collections.ArrayList.Range", {
+        inherits: [System.Collections.ArrayList],
+        $kind: "nested class",
+        fields: {
+            _baseIndex: 0,
+            _baseList: null,
+            _baseSize: 0,
+            _baseVersion: 0
+        },
+        props: {
+            Capacity: {
+                get: function () {
+                    return this._baseList.Capacity;
+                },
+                set: function (value) {
+                    if (value < this.Count) {
+                        throw new System.ArgumentOutOfRangeException.$ctor4("value", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_SmallCapacity"));
+                    }
+                }
+            },
+            Count: {
+                get: function () {
+                    this.InternalUpdateRange();
+                    return this._baseSize;
+                }
+            },
+            IsFixedSize: {
+                get: function () {
+                    return this._baseList.IsFixedSize;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return this._baseList.IsReadOnly;
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return this._baseList.IsSynchronized;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    return this._baseList.SyncRoot;
+                }
+            }
+        },
+        alias: [
+            "add", "System$Collections$IList$add",
+            "clear", "System$Collections$IList$clear",
+            "clone", "System$ICloneable$clone",
+            "contains", "System$Collections$IList$contains",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", "System$Collections$IEnumerable$GetEnumerator",
+            "indexOf", "System$Collections$IList$indexOf",
+            "insert", "System$Collections$IList$insert",
+            "removeAt", "System$Collections$IList$removeAt",
+            "Count", "System$Collections$ICollection$Count",
+            "IsFixedSize", "System$Collections$IList$IsFixedSize",
+            "IsReadOnly", "System$Collections$IList$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "getItem", "System$Collections$IList$getItem",
+            "setItem", "System$Collections$IList$setItem",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot"
+        ],
+        ctors: {
+            ctor: function (list, index, count) {
+                this.$initialize();
+                System.Collections.ArrayList.$ctor1.call(this, false);
+                this._baseList = list;
+                this._baseIndex = index;
+                this._baseSize = count;
+                this._baseVersion = list._version;
+                this._version = list._version;
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                this.InternalUpdateRange();
+                if ((index < 0) || (index >= this._baseSize)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                return this._baseList.getItem(((this._baseIndex + index) | 0));
+            },
+            setItem: function (index, value) {
+                this.InternalUpdateRange();
+                if ((index < 0) || (index >= this._baseSize)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                this._baseList.setItem(((this._baseIndex + index) | 0), value);
+                this.InternalUpdateVersion();
+            },
+            add: function (value) {
+                this.InternalUpdateRange();
+                this._baseList.insert(((this._baseIndex + this._baseSize) | 0), value);
+                this.InternalUpdateVersion();
+                var num = this._baseSize;
+                this._baseSize = (num + 1) | 0;
+                return num;
+            },
+            AddRange: function (c) {
+                if (c == null) {
+                    throw new System.ArgumentNullException.$ctor1("c");
+                }
+                this.InternalUpdateRange();
+                var count = System.Array.getCount(c);
+                if (count > 0) {
+                    this._baseList.InsertRange(((this._baseIndex + this._baseSize) | 0), c);
+                    this.InternalUpdateVersion();
+                    this._baseSize = (this._baseSize + count) | 0;
+                }
+            },
+            BinarySearch: function (index, count, value, comparer) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this._baseSize - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                this.InternalUpdateRange();
+                var num = this._baseList.BinarySearch(((this._baseIndex + index) | 0), count, value, comparer);
+                if (num >= 0) {
+                    return (((num - this._baseIndex) | 0));
+                }
+                return (((num + this._baseIndex) | 0));
+            },
+            clear: function () {
+                this.InternalUpdateRange();
+                if (this._baseSize !== 0) {
+                    this._baseList.RemoveRange(this._baseIndex, this._baseSize);
+                    this.InternalUpdateVersion();
+                    this._baseSize = 0;
+                }
+            },
+            clone: function () {
+                var $t;
+                this.InternalUpdateRange();
+                return ($t = new System.Collections.ArrayList.Range(this._baseList, this._baseIndex, this._baseSize), $t._baseList = Bridge.cast(this._baseList.clone(), System.Collections.ArrayList), $t);
+            },
+            contains: function (item) {
+                this.InternalUpdateRange();
+                if (item == null) {
+                    for (var j = 0; j < this._baseSize; j = (j + 1) | 0) {
+                        if (this._baseList.getItem(((this._baseIndex + j) | 0)) == null) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                for (var i = 0; i < this._baseSize; i = (i + 1) | 0) {
+                    if ((this._baseList.getItem(((this._baseIndex + i) | 0)) != null) && Bridge.equals(this._baseList.getItem(((this._baseIndex + i) | 0)), item)) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            copyTo: function (array, index) {
+                if (array == null) {
+                    throw new System.ArgumentNullException.$ctor1("array");
+                }
+                if (System.Array.getRank(array) !== 1) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Arg_RankMultiDimNotSupported"));
+                }
+                if (index < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((array.length - index) | 0)) < this._baseSize) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                this.InternalUpdateRange();
+                this._baseList.CopyTo$1(this._baseIndex, array, index, this._baseSize);
+            },
+            CopyTo$1: function (index, array, arrayIndex, count) {
+                if (array == null) {
+                    throw new System.ArgumentNullException.$ctor1("array");
+                }
+                if (System.Array.getRank(array) !== 1) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Arg_RankMultiDimNotSupported"));
+                }
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((array.length - arrayIndex) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                if ((((this._baseSize - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                this.InternalUpdateRange();
+                this._baseList.CopyTo$1(((this._baseIndex + index) | 0), array, arrayIndex, count);
+            },
+            GetEnumerator: function () {
+                return this.GetEnumerator$1(0, this._baseSize);
+            },
+            GetEnumerator$1: function (index, count) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this._baseSize - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                this.InternalUpdateRange();
+                return this._baseList.GetEnumerator$1(((this._baseIndex + index) | 0), count);
+            },
+            GetRange: function (index, count) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this._baseSize - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                this.InternalUpdateRange();
+                return new System.Collections.ArrayList.Range(this, index, count);
+            },
+            indexOf: function (value) {
+                this.InternalUpdateRange();
+                var num = this._baseList.IndexOf$1(value, this._baseIndex, this._baseSize);
+                if (num >= 0) {
+                    return (((num - this._baseIndex) | 0));
+                }
+                return -1;
+            },
+            IndexOf: function (value, startIndex) {
+                if (startIndex < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("startIndex", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if (startIndex > this._baseSize) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("startIndex", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                this.InternalUpdateRange();
+                var num = this._baseList.IndexOf$1(value, ((this._baseIndex + startIndex) | 0), ((this._baseSize - startIndex) | 0));
+                if (num >= 0) {
+                    return (((num - this._baseIndex) | 0));
+                }
+                return -1;
+            },
+            IndexOf$1: function (value, startIndex, count) {
+                if ((startIndex < 0) || (startIndex > this._baseSize)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("startIndex", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                if ((count < 0) || (startIndex > (((this._baseSize - count) | 0)))) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Count"));
+                }
+                this.InternalUpdateRange();
+                var num = this._baseList.IndexOf$1(value, ((this._baseIndex + startIndex) | 0), count);
+                if (num >= 0) {
+                    return (((num - this._baseIndex) | 0));
+                }
+                return -1;
+            },
+            insert: function (index, value) {
+                if ((index < 0) || (index > this._baseSize)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                this.InternalUpdateRange();
+                this._baseList.insert(((this._baseIndex + index) | 0), value);
+                this.InternalUpdateVersion();
+                this._baseSize = (this._baseSize + 1) | 0;
+            },
+            InsertRange: function (index, c) {
+                if ((index < 0) || (index > this._baseSize)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                if (c == null) {
+                    throw new System.ArgumentNullException.$ctor1("c");
+                }
+                this.InternalUpdateRange();
+                var count = System.Array.getCount(c);
+                if (count > 0) {
+                    this._baseList.InsertRange(((this._baseIndex + index) | 0), c);
+                    this._baseSize = (this._baseSize + count) | 0;
+                    this.InternalUpdateVersion();
+                }
+            },
+            InternalUpdateRange: function () {
+                if (this._baseVersion !== this._baseList._version) {
+                    throw new System.InvalidOperationException.$ctor1(System.EnvironmentV2.GetResourceString("InvalidOperation_UnderlyingArrayListChanged"));
+                }
+            },
+            InternalUpdateVersion: function () {
+                this._baseVersion = (this._baseVersion + 1) | 0;
+                this._version = (this._version + 1) | 0;
+            },
+            LastIndexOf: function (value) {
+                this.InternalUpdateRange();
+                var num = this._baseList.LastIndexOf$2(value, (((((this._baseIndex + this._baseSize) | 0)) - 1) | 0), this._baseSize);
+                if (num >= 0) {
+                    return (((num - this._baseIndex) | 0));
+                }
+                return -1;
+            },
+            LastIndexOf$1: function (value, startIndex) {
+                return this.LastIndexOf$2(value, startIndex, ((startIndex + 1) | 0));
+            },
+            LastIndexOf$2: function (value, startIndex, count) {
+                this.InternalUpdateRange();
+                if (this._baseSize !== 0) {
+                    if (startIndex >= this._baseSize) {
+                        throw new System.ArgumentOutOfRangeException.$ctor4("startIndex", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                    }
+                    if (startIndex < 0) {
+                        throw new System.ArgumentOutOfRangeException.$ctor4("startIndex", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                    }
+                    var num = this._baseList.LastIndexOf$2(value, ((this._baseIndex + startIndex) | 0), count);
+                    if (num >= 0) {
+                        return (((num - this._baseIndex) | 0));
+                    }
+                }
+                return -1;
+            },
+            removeAt: function (index) {
+                if ((index < 0) || (index >= this._baseSize)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                this.InternalUpdateRange();
+                this._baseList.removeAt(((this._baseIndex + index) | 0));
+                this.InternalUpdateVersion();
+                this._baseSize = (this._baseSize - 1) | 0;
+            },
+            RemoveRange: function (index, count) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this._baseSize - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                this.InternalUpdateRange();
+                if (count > 0) {
+                    this._baseList.RemoveRange(((this._baseIndex + index) | 0), count);
+                    this.InternalUpdateVersion();
+                    this._baseSize = (this._baseSize - count) | 0;
+                }
+            },
+            Reverse$1: function (index, count) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this._baseSize - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                this.InternalUpdateRange();
+                this._baseList.Reverse$1(((this._baseIndex + index) | 0), count);
+                this.InternalUpdateVersion();
+            },
+            SetRange: function (index, c) {
+                this.InternalUpdateRange();
+                if ((index < 0) || (index >= this._baseSize)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_Index"));
+                }
+                this._baseList.SetRange(((this._baseIndex + index) | 0), c);
+                if (System.Array.getCount(c) > 0) {
+                    this.InternalUpdateVersion();
+                }
+            },
+            Sort$2: function (index, count, comparer) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this._baseSize - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                this.InternalUpdateRange();
+                this._baseList.Sort$2(((this._baseIndex + index) | 0), count, comparer);
+                this.InternalUpdateVersion();
+            },
+            ToArray$1: function () {
+                this.InternalUpdateRange();
+                var destinationArray = System.Array.init(this._baseSize, null, System.Object);
+                System.Array.copy(this._baseList._items, this._baseIndex, destinationArray, 0, this._baseSize);
+                return destinationArray;
+            },
+            ToArray: function (type) {
+                if (type == null) {
+                    throw new System.ArgumentNullException.$ctor1("type");
+                }
+                this.InternalUpdateRange();
+                var array = System.Array.init(this._baseSize, Bridge.getDefaultValue(type), type);
+                this._baseList.CopyTo$1(this._baseIndex, array, 0, this._baseSize);
+                return array;
+            },
+            TrimToSize: function () {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_RangeCollection"));
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.ArrayList.ReadOnlyArrayList", {
+        inherits: [System.Collections.ArrayList],
+        $kind: "nested class",
+        fields: {
+            _list: null
+        },
+        props: {
+            Capacity: {
+                get: function () {
+                    return this._list.Capacity;
+                },
+                set: function (value) {
+                    throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+                }
+            },
+            Count: {
+                get: function () {
+                    return this._list.Count;
+                }
+            },
+            IsFixedSize: {
+                get: function () {
+                    return true;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return true;
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return this._list.IsSynchronized;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    return this._list.SyncRoot;
+                }
+            }
+        },
+        alias: [
+            "add", "System$Collections$IList$add",
+            "clear", "System$Collections$IList$clear",
+            "clone", "System$ICloneable$clone",
+            "contains", "System$Collections$IList$contains",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", "System$Collections$IEnumerable$GetEnumerator",
+            "indexOf", "System$Collections$IList$indexOf",
+            "insert", "System$Collections$IList$insert",
+            "remove", "System$Collections$IList$remove",
+            "removeAt", "System$Collections$IList$removeAt",
+            "Count", "System$Collections$ICollection$Count",
+            "IsFixedSize", "System$Collections$IList$IsFixedSize",
+            "IsReadOnly", "System$Collections$IList$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "getItem", "System$Collections$IList$getItem",
+            "setItem", "System$Collections$IList$setItem",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot"
+        ],
+        ctors: {
+            ctor: function (l) {
+                this.$initialize();
+                System.Collections.ArrayList.ctor.call(this);
+                this._list = l;
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                return this._list.getItem(index);
+            },
+            setItem: function (index, value) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            add: function (obj) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            AddRange: function (c) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            BinarySearch: function (index, count, value, comparer) {
+                return this._list.BinarySearch(index, count, value, comparer);
+            },
+            clear: function () {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            clone: function () {
+                var $t;
+                return ($t = new System.Collections.ArrayList.ReadOnlyArrayList(this._list), $t._list = Bridge.cast(this._list.clone(), System.Collections.ArrayList), $t);
+            },
+            contains: function (obj) {
+                return this._list.contains(obj);
+            },
+            copyTo: function (array, index) {
+                this._list.copyTo(array, index);
+            },
+            CopyTo$1: function (index, array, arrayIndex, count) {
+                this._list.CopyTo$1(index, array, arrayIndex, count);
+            },
+            GetEnumerator: function () {
+                return this._list.GetEnumerator();
+            },
+            GetEnumerator$1: function (index, count) {
+                return this._list.GetEnumerator$1(index, count);
+            },
+            GetRange: function (index, count) {
+                if ((index < 0) || (count < 0)) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4((index < 0) ? "index" : "count", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((this.Count - index) | 0)) < count) {
+                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_InvalidOffLen"));
+                }
+                return new System.Collections.ArrayList.Range(this, index, count);
+            },
+            indexOf: function (value) {
+                return this._list.indexOf(value);
+            },
+            IndexOf: function (value, startIndex) {
+                return this._list.IndexOf(value, startIndex);
+            },
+            IndexOf$1: function (value, startIndex, count) {
+                return this._list.IndexOf$1(value, startIndex, count);
+            },
+            insert: function (index, obj) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            InsertRange: function (index, c) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            LastIndexOf: function (value) {
+                return this._list.LastIndexOf(value);
+            },
+            LastIndexOf$1: function (value, startIndex) {
+                return this._list.LastIndexOf$1(value, startIndex);
+            },
+            LastIndexOf$2: function (value, startIndex, count) {
+                return this._list.LastIndexOf$2(value, startIndex, count);
+            },
+            remove: function (value) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            removeAt: function (index) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            RemoveRange: function (index, count) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            Reverse$1: function (index, count) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            SetRange: function (index, c) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            Sort$2: function (index, count, comparer) {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            },
+            ToArray$1: function () {
+                return this._list.ToArray$1();
+            },
+            ToArray: function (type) {
+                return this._list.ToArray(type);
+            },
+            TrimToSize: function () {
+                throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_ReadOnlyCollection"));
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.ArrayList.SyncArrayList", {
+        inherits: [System.Collections.ArrayList],
+        $kind: "nested class",
+        fields: {
+            _list: null,
+            _root: null
+        },
+        props: {
+            Capacity: {
+                get: function () {
+                    var obj2 = this._root;
+                    obj2;
+                    {
+                        return this._list.Capacity;
+                    }
+                },
+                set: function (value) {
+                    var obj2 = this._root;
+                    obj2;
+                    {
+                        this._list.Capacity = value;
+                    }
+                }
+            },
+            Count: {
+                get: function () {
+                    var obj2 = this._root;
+                    obj2;
+                    {
+                        return this._list.Count;
+                    }
+                }
+            },
+            IsFixedSize: {
+                get: function () {
+                    return this._list.IsFixedSize;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return this._list.IsReadOnly;
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return true;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    return this._root;
+                }
+            }
+        },
+        alias: [
+            "add", "System$Collections$IList$add",
+            "clear", "System$Collections$IList$clear",
+            "clone", "System$ICloneable$clone",
+            "contains", "System$Collections$IList$contains",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", "System$Collections$IEnumerable$GetEnumerator",
+            "indexOf", "System$Collections$IList$indexOf",
+            "insert", "System$Collections$IList$insert",
+            "remove", "System$Collections$IList$remove",
+            "removeAt", "System$Collections$IList$removeAt",
+            "Count", "System$Collections$ICollection$Count",
+            "IsFixedSize", "System$Collections$IList$IsFixedSize",
+            "IsReadOnly", "System$Collections$IList$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "getItem", "System$Collections$IList$getItem",
+            "setItem", "System$Collections$IList$setItem",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot"
+        ],
+        ctors: {
+            ctor: function (list) {
+                this.$initialize();
+                System.Collections.ArrayList.$ctor1.call(this, false);
+                this._list = list;
+                this._root = list.SyncRoot;
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.getItem(index);
+                }
+            },
+            setItem: function (index, value) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.setItem(index, value);
+                }
+            },
+            add: function (value) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.add(value);
+                }
+            },
+            AddRange: function (c) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.AddRange(c);
+                }
+            },
+            BinarySearch$1: function (value) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.BinarySearch$1(value);
+                }
+            },
+            BinarySearch$2: function (value, comparer) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.BinarySearch$2(value, comparer);
+                }
+            },
+            BinarySearch: function (index, count, value, comparer) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.BinarySearch(index, count, value, comparer);
+                }
+            },
+            clear: function () {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.clear();
+                }
+            },
+            clone: function () {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return new System.Collections.ArrayList.SyncArrayList(Bridge.cast(this._list.clone(), System.Collections.ArrayList));
+                }
+            },
+            contains: function (item) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.contains(item);
+                }
+            },
+            CopyTo: function (array) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.CopyTo(array);
+                }
+            },
+            copyTo: function (array, index) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.copyTo(array, index);
+                }
+            },
+            CopyTo$1: function (index, array, arrayIndex, count) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.CopyTo$1(index, array, arrayIndex, count);
+                }
+            },
+            GetEnumerator: function () {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.GetEnumerator();
+                }
+            },
+            GetEnumerator$1: function (index, count) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.GetEnumerator$1(index, count);
+                }
+            },
+            GetRange: function (index, count) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.GetRange(index, count);
+                }
+            },
+            indexOf: function (value) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.indexOf(value);
+                }
+            },
+            IndexOf: function (value, startIndex) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.IndexOf(value, startIndex);
+                }
+            },
+            IndexOf$1: function (value, startIndex, count) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.IndexOf$1(value, startIndex, count);
+                }
+            },
+            insert: function (index, value) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.insert(index, value);
+                }
+            },
+            InsertRange: function (index, c) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.InsertRange(index, c);
+                }
+            },
+            LastIndexOf: function (value) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.LastIndexOf(value);
+                }
+            },
+            LastIndexOf$1: function (value, startIndex) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.LastIndexOf$1(value, startIndex);
+                }
+            },
+            LastIndexOf$2: function (value, startIndex, count) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.LastIndexOf$2(value, startIndex, count);
+                }
+            },
+            remove: function (value) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.remove(value);
+                }
+            },
+            removeAt: function (index) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.removeAt(index);
+                }
+            },
+            RemoveRange: function (index, count) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.RemoveRange(index, count);
+                }
+            },
+            Reverse$1: function (index, count) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.Reverse$1(index, count);
+                }
+            },
+            SetRange: function (index, c) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.SetRange(index, c);
+                }
+            },
+            Sort: function () {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.Sort();
+                }
+            },
+            Sort$1: function (comparer) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.Sort$1(comparer);
+                }
+            },
+            Sort$2: function (index, count, comparer) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.Sort$2(index, count, comparer);
+                }
+            },
+            ToArray$1: function () {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.ToArray$1();
+                }
+            },
+            ToArray: function (type) {
+                var obj2 = this._root;
+                obj2;
+                {
+                    return this._list.ToArray(type);
+                }
+            },
+            TrimToSize: function () {
+                var obj2 = this._root;
+                obj2;
+                {
+                    this._list.TrimToSize();
+                }
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.Specialized.HybridDictionary", {
+        inherits: [System.Collections.IDict,System.Collections.ICollection,System.Collections.IEnumerable],
+        statics: {
+            fields: {
+                CutoverPoint: 0,
+                FixedSizeCutoverPoint: 0,
+                InitialHashtableSize: 0
+            },
+            ctors: {
+                init: function () {
+                    this.CutoverPoint = 9;
+                    this.FixedSizeCutoverPoint = 6;
+                    this.InitialHashtableSize = 13;
+                }
+            }
+        },
+        fields: {
+            caseInsensitive: false,
+            hashtable: null,
+            list: null
+        },
+        props: {
+            Count: {
+                get: function () {
+                    var list = this.list;
+                    if (this.hashtable != null) {
+                        return this.hashtable.count;
+                    }
+                    if (list != null) {
+                        return list.Count;
+                    }
+                    return 0;
+                }
+            },
+            IsFixedSize: {
+                get: function () {
+                    return false;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return false;
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return false;
+                }
+            },
+            Keys: {
+                get: function () {
+                    if (this.hashtable != null) {
+                        return this.hashtable.getKeys();
+                    }
+                    return this.List.Keys;
+                }
+            },
+            List: {
+                get: function () {
+                    if (this.list == null) {
+                        this.list = new System.Collections.Specialized.ListDictionary.$ctor1(this.caseInsensitive ? System.StringComparer.OrdinalIgnoreCase : null);
+                    }
+                    return this.list;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    return this;
+                }
+            },
+            Values: {
+                get: function () {
+                    if (this.hashtable != null) {
+                        return this.hashtable.getValues();
+                    }
+                    return this.List.Values;
+                }
+            }
+        },
+        alias: [
+            "add", "System$Collections$IDict$add",
+            "clear", "System$Collections$IDict$clear",
+            "contains", "System$Collections$IDict$contains",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "remove", "System$Collections$IDict$remove",
+            "Count", "System$Collections$ICollection$Count",
+            "IsFixedSize", "System$Collections$IDict$IsFixedSize",
+            "IsReadOnly", "System$Collections$IDict$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "getItem", "System$Collections$IDict$getItem",
+            "setItem", "System$Collections$IDict$setItem",
+            "Keys", "System$Collections$IDict$Keys",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot",
+            "Values", "System$Collections$IDict$Values"
+        ],
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+            },
+            $ctor1: function (caseInsensitive) {
+                this.$initialize();
+                this.caseInsensitive = caseInsensitive;
+            },
+            $ctor2: function (initialSize) {
+                System.Collections.Specialized.HybridDictionary.$ctor3.call(this, initialSize, false);
+            },
+            $ctor3: function (initialSize, caseInsensitive) {
+                this.$initialize();
+                this.caseInsensitive = caseInsensitive;
+                if (initialSize >= 6) {
+                    if (caseInsensitive) {
+                        this.hashtable = new (System.Collections.Generic.Dictionary$2(System.String, System.Object))(null, System.StringComparer.OrdinalIgnoreCase);
+                    } else {
+                        this.hashtable = new (System.Collections.Generic.Dictionary$2(System.String, System.Object))();
+                    }
+                }
+            }
+        },
+        methods: {
+            getItem: function (key) {
+                var list = this.list;
+                if (this.hashtable != null) {
+                    return this.hashtable.get(Bridge.as(key, System.String));
+                }
+                if (list != null) {
+                    return list.getItem(key);
+                }
+                if (key == null) {
+                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
+                }
+                return null;
+            },
+            setItem: function (key, value) {
+                if (this.hashtable != null) {
+                    this.hashtable.set(Bridge.as(key, System.String), value);
+                } else if (this.list != null) {
+                    if (this.list.Count >= 8) {
+                        this.ChangeOver();
+                        this.hashtable.set(Bridge.as(key, System.String), value);
+                    } else {
+                        this.list.setItem(key, value);
+                    }
+                } else {
+                    this.list = new System.Collections.Specialized.ListDictionary.$ctor1(this.caseInsensitive ? System.StringComparer.OrdinalIgnoreCase : null);
+                    this.list.setItem(key, value);
+                }
+            },
+            add: function (key, value) {
+                if (this.hashtable != null) {
+                    this.hashtable.add(Bridge.as(key, System.String), value);
+                } else if (this.list == null) {
+                    this.list = new System.Collections.Specialized.ListDictionary.$ctor1(this.caseInsensitive ? System.StringComparer.OrdinalIgnoreCase : null);
+                    this.list.add(key, value);
+                } else if ((((this.list.Count + 1) | 0)) >= 9) {
+                    this.ChangeOver();
+                    this.hashtable.add(Bridge.as(key, System.String), value);
+                } else {
+                    this.list.add(key, value);
+                }
+            },
+            ChangeOver: function () {
+                var hashtable;
+                var enumerator = Bridge.cast(this.list.GetEnumerator(), System.Collections.IDictEnumrator);
+                if (this.caseInsensitive) {
+                    hashtable = new (System.Collections.Generic.Dictionary$2(System.String, System.Object))(null, System.StringComparer.OrdinalIgnoreCase);
+                } else {
+                    hashtable = new (System.Collections.Generic.Dictionary$2(System.String, System.Object))();
+                }
+                while (enumerator.System$Collections$IEnumerator$moveNext()) {
+                    hashtable.add(Bridge.as(enumerator.System$Collections$IDictEnumrator$Key, System.String), enumerator.System$Collections$IDictEnumrator$Value);
+                }
+                this.hashtable = hashtable;
+                this.list = null;
+            },
+            clear: function () {
+                if (this.hashtable != null) {
+                    var hashtable = this.hashtable;
+                    this.hashtable = null;
+                    hashtable.clear();
+                }
+                if (this.list != null) {
+                    var list = this.list;
+                    this.list = null;
+                    list.clear();
+                }
+            },
+            contains: function (key) {
+                var list = this.list;
+                if (this.hashtable != null) {
+                    return this.hashtable.containsKey(Bridge.as(key, System.String));
+                }
+                if (list != null) {
+                    return list.contains(key);
+                }
+                if (key == null) {
+                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
+                }
+                return false;
+            },
+            copyTo: function (array, index) {
+                var $t;
+                if (this.hashtable != null) {
+                    ($t = this.hashtable.getValues(), System.Array.copy($t, 0, array, index, $t.length));
+                } else {
+                    this.List.copyTo(array, index);
+                }
+            },
+            GetEnumerator: function () {
+                if (this.hashtable != null) {
+                    return this.hashtable.GetEnumerator();
+                }
+                if (this.list == null) {
+                    this.list = new System.Collections.Specialized.ListDictionary.$ctor1(this.caseInsensitive ? System.StringComparer.OrdinalIgnoreCase : null);
+                }
+                return Bridge.cast(this.list.GetEnumerator(), System.Collections.IDictEnumrator);
+            },
+            System$Collections$IEnumerable$GetEnumerator: function () {
+                if (this.hashtable != null) {
+                    return this.hashtable.GetEnumerator();
+                }
+                if (this.list == null) {
+                    this.list = new System.Collections.Specialized.ListDictionary.$ctor1(this.caseInsensitive ? System.StringComparer.OrdinalIgnoreCase : null);
+                }
+                return this.list.GetEnumerator();
+            },
+            remove: function (key) {
+                if (this.hashtable != null) {
+                    this.hashtable.remove(Bridge.as(key, System.String));
+                } else if (this.list != null) {
+                    this.list.remove(key);
+                } else if (key == null) {
+                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
+                }
+                return true;
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.Specialized.ListDictionary", {
+        inherits: [System.Collections.IDict],
+        fields: {
+            _syncRoot: null,
+            comparer: null,
+            count: 0,
+            head: null,
+            version: 0
+        },
+        props: {
+            Count: {
+                get: function () {
+                    return this.count;
+                }
+            },
+            IsFixedSize: {
+                get: function () {
+                    return false;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return false;
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return false;
+                }
+            },
+            Keys: {
+                get: function () {
+                    return new System.Collections.Specialized.ListDictionary.NodeKeyValueCollection(this, true);
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    if (this._syncRoot == null) {
+                        this._syncRoot = { };
+                        //Interlocked.CompareExchange(ref this._syncRoot, new object(), null);
+                    }
+                    return this._syncRoot;
+                }
+            },
+            Values: {
+                get: function () {
+                    return new System.Collections.Specialized.ListDictionary.NodeKeyValueCollection(this, false);
+                }
+            }
+        },
+        alias: [
+            "add", "System$Collections$IDict$add",
+            "clear", "System$Collections$IDict$clear",
+            "contains", "System$Collections$IDict$contains",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", "System$Collections$IEnumerable$GetEnumerator",
+            "remove", "System$Collections$IDict$remove",
+            "Count", "System$Collections$ICollection$Count",
+            "IsFixedSize", "System$Collections$IDict$IsFixedSize",
+            "IsReadOnly", "System$Collections$IDict$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "getItem", "System$Collections$IDict$getItem",
+            "setItem", "System$Collections$IDict$setItem",
+            "Keys", "System$Collections$IDict$Keys",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot",
+            "Values", "System$Collections$IDict$Values"
+        ],
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+            },
+            $ctor1: function (comparer) {
+                this.$initialize();
+                this.comparer = comparer;
+            }
+        },
+        methods: {
+            getItem: function (key) {
+                if (key == null) {
+                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
+                }
+                var head = this.head;
+                if (this.comparer != null) {
+                    while (head != null) {
+                        var x = head.key;
+                        if ((x != null) && (this.comparer.System$Collections$IComparer$compare(x, key) === 0)) {
+                            return head.value;
+                        }
+                        head = head.next;
+                    }
+                } else {
+                    while (head != null) {
+                        var obj2 = head.key;
+                        if ((obj2 != null) && Bridge.equals(obj2, key)) {
+                            return head.value;
+                        }
+                        head = head.next;
+                    }
+                }
+                return null;
+            },
+            setItem: function (key, value) {
+                var $t;
+                if (key == null) {
+                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
+                }
+                this.version = (this.version + 1) | 0;
+                var node = null;
+                var head = this.head;
+                while (head != null) {
+                    var x = head.key;
+                    if ((this.comparer == null) ? Bridge.equals(x, key) : (this.comparer.System$Collections$IComparer$compare(x, key) === 0)) {
+                        break;
+                    }
+                    node = head;
+                    head = head.next;
+                }
+                if (head != null) {
+                    head.value = value;
+                } else {
+                    var node3 = ($t = new System.Collections.Specialized.ListDictionary.DictionaryNode(), $t.key = key, $t.value = value, $t);
+                    if (node != null) {
+                        node.next = node3;
+                    } else {
+                        this.head = node3;
+                    }
+                    this.count = (this.count + 1) | 0;
+                }
+            },
+            add: function (key, value) {
+                var $t;
+                if (key == null) {
+                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
+                }
+                this.version = (this.version + 1) | 0;
+                var node = null;
+                for (var node2 = this.head; node2 != null; node2 = node2.next) {
+                    var x = node2.key;
+                    if ((this.comparer == null) ? Bridge.equals(x, key) : (this.comparer.System$Collections$IComparer$compare(x, key) === 0)) {
+                        throw new System.ArgumentException.$ctor1(System.Windows.Forms.SR.GetString("Argument_AddingDuplicate"));
+                    }
+                    node = node2;
+                }
+                var node3 = ($t = new System.Collections.Specialized.ListDictionary.DictionaryNode(), $t.key = key, $t.value = value, $t);
+                if (node != null) {
+                    node.next = node3;
+                } else {
+                    this.head = node3;
+                }
+                this.count = (this.count + 1) | 0;
+            },
+            clear: function () {
+                this.count = 0;
+                this.head = null;
+                this.version = (this.version + 1) | 0;
+            },
+            contains: function (key) {
+                if (key == null) {
+                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
+                }
+                for (var node = this.head; node != null; node = node.next) {
+                    var x = node.key;
+                    if ((this.comparer == null) ? Bridge.equals(x, key) : (this.comparer.System$Collections$IComparer$compare(x, key) === 0)) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            copyTo: function (array, index) {
+                if (array == null) {
+                    throw new System.ArgumentNullException.$ctor1("array");
+                }
+                if (index < 0) {
+                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.Windows.Forms.SR.GetString("ArgumentOutOfRange_NeedNonNegNum"));
+                }
+                if ((((array.length - index) | 0)) < this.count) {
+                    throw new System.ArgumentException.$ctor1(System.Windows.Forms.SR.GetString("Arg_InsufficientSpace"));
+                }
+                for (var node = this.head; node != null; node = node.next) {
+                    System.Array.set(array, new System.Collections.DictionaryEntry.$ctor1(node.key, node.value).$clone(), index);
+                    index = (index + 1) | 0;
+                }
+            },
+            GetEnumerator: function () {
+                return new System.Collections.Specialized.ListDictionary.NodeEnumerator(this);
+            },
+            remove: function (key) {
+                if (key == null) {
+                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
+                }
+                this.version = (this.version + 1) | 0;
+                var node = null;
+                var head = this.head;
+                while (head != null) {
+                    var x = head.key;
+                    if ((this.comparer == null) ? Bridge.equals(x, key) : (this.comparer.System$Collections$IComparer$compare(x, key) === 0)) {
+                        break;
+                    }
+                    node = head;
+                    head = head.next;
+                }
+                if (head != null) {
+                    if (Bridge.referenceEquals(head, this.head)) {
+                        this.head = head.next;
+                    } else {
+                        node.next = head.next;
+                    }
+                    this.count = (this.count - 1) | 0;
+                }
+                return true;
+            }
+        }
+    });
+
+    Bridge.define("System.Collections.Specialized.ListDictionary.NodeEnumerator", {
+        inherits: [System.Collections.IDictEnumrator],
+        $kind: "nested class",
+        fields: {
+            current: null,
+            list: null,
+            start: false,
+            version: 0
+        },
+        props: {
+            Current: {
+                get: function () {
+                    return this.Entry.$clone();
+                }
+            },
+            Entry: {
+                get: function () {
+                    if (this.current == null) {
+                        throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumOpCantHappen"));
+                    }
+                    return new System.Collections.DictionaryEntryV2.$ctor1(this.current.key, this.current.value);
+                }
+            },
+            Key: {
+                get: function () {
+                    if (this.current == null) {
+                        throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumOpCantHappen"));
+                    }
+                    return this.current.key;
+                }
+            },
+            Value: {
+                get: function () {
+                    if (this.current == null) {
+                        throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumOpCantHappen"));
+                    }
+                    return this.current.value;
+                }
+            }
+        },
+        alias: [
+            "moveNext", "System$Collections$IEnumerator$moveNext",
+            "reset", "System$Collections$IEnumerator$reset",
+            "Current", "System$Collections$IEnumerator$Current",
+            "Entry", "System$Collections$IDictEnumrator$Entry",
+            "Key", "System$Collections$IDictEnumrator$Key",
+            "Value", "System$Collections$IDictEnumrator$Value"
+        ],
+        ctors: {
+            ctor: function (list) {
+                this.$initialize();
+                this.list = list;
+                this.version = list.version;
+                this.start = true;
+                this.current = null;
+            }
+        },
+        methods: {
+            moveNext: function () {
+                if (this.version !== this.list.version) {
+                    throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumFailedVersion"));
+                }
+                if (this.start) {
+                    this.current = this.list.head;
+                    this.start = false;
+                } else if (this.current != null) {
+                    this.current = this.current.next;
+                }
+                return (this.current != null);
+            },
+            reset: function () {
+                if (this.version !== this.list.version) {
+                    throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumFailedVersion"));
+                }
+                this.start = true;
+                this.current = null;
+            }
+        }
+    });
+
     Bridge.define("System.ComponentModel.Container", {
         inherits: [System.ComponentModel.IContainer],
-        alias: ["dispose", "System$IDisposable$dispose"],
+        alias: ["Dispose", "System$IDisposable$Dispose"],
         methods: {
-            dispose: function () {
+            Dispose: function () {
 
             }
+        }
+    });
+
+    Bridge.define("System.ComponentModel.ISite", {
+        inherits: [System.IServiceProviderV2],
+        $kind: "interface"
+    });
+
+    Bridge.define("System.OrdinalComparer", {
+        inherits: [System.StringComparer,System.IWellKnownStringEqualityComparer],
+        fields: {
+            _ignoreCase: false
+        },
+        alias: [
+            "compare$1", ["System$Collections$Generic$IComparer$1$System$String$compare", "System$Collections$Generic$IComparer$1$compare"],
+            "equals2", ["System$Collections$Generic$IEqualityComparer$1$System$String$equals2", "System$Collections$Generic$IEqualityComparer$1$equals2"],
+            "getHashCode2", ["System$Collections$Generic$IEqualityComparer$1$System$String$getHashCode2", "System$Collections$Generic$IEqualityComparer$1$getHashCode2"]
+        ],
+        ctors: {
+            ctor: function (ignoreCase) {
+                this.$initialize();
+                System.StringComparer.ctor.call(this);
+                this._ignoreCase = ignoreCase;
+            }
+        },
+        methods: {
+            compare$1: function (x, y) {
+                if (Bridge.referenceEquals(x, y)) {
+                    return 0;
+                }
+                if (x == null) {
+                    return -1;
+                }
+                if (y == null) {
+                    return 1;
+                }
+                if (this._ignoreCase) {
+                    return System.String.compare(x, y, 5);
+                }
+                return System.StringUtils.CompareOrdinal(x, y);
+            },
+            equals$1: function (obj) {
+                var comparer = Bridge.as(obj, System.OrdinalComparer);
+                if (comparer == null) {
+                    return false;
+                }
+                return (this._ignoreCase === comparer._ignoreCase);
+            },
+            equals2: function (x, y) {
+                if (Bridge.referenceEquals(x, y)) {
+                    return true;
+                }
+                if ((x == null) || (y == null)) {
+                    return false;
+                }
+                if (!this._ignoreCase) {
+                    return System.String.equals(x, y);
+                }
+                if (x.length !== y.length) {
+                    return false;
+                }
+                return (System.String.compare(x, y, 5) === 0);
+            },
+            getHashCode$1: function () {
+                var hashCode = Bridge.getHashCode(("OrdinalComparer"));
+                if (!this._ignoreCase) {
+                    return hashCode;
+                }
+                return ~hashCode;
+            },
+            getHashCode2: function (obj) {
+                if (obj == null) {
+                    throw new System.ArgumentNullException.$ctor1("obj");
+                }
+                if (this._ignoreCase) {
+                    return 0; // TODO: TextInfo.GetHashCodeOrdinalIgnoreCase(obj);
+                }
+                return Bridge.getHashCode(obj);
+            },
+            System$IWellKnownStringEqualityComparer$GetEqualityComparerForSerialization: function () {
+                return this;
+            },
+            System$IWellKnownStringEqualityComparer$GetRandomizedEqualityComparer: function () {
+                return new System.OrdinalRandomizedComparer(this._ignoreCase);
+            }
+        }
+    });
+
+    Bridge.define("System.OrdinalRandomizedComparer", {
+        inherits: [System.StringComparer,System.IWellKnownStringEqualityComparer],
+        fields: {
+            _entropy: System.Int64(0),
+            _ignoreCase: false
+        },
+        alias: [
+            "compare$1", ["System$Collections$Generic$IComparer$1$System$String$compare", "System$Collections$Generic$IComparer$1$compare"],
+            "equals2", ["System$Collections$Generic$IEqualityComparer$1$System$String$equals2", "System$Collections$Generic$IEqualityComparer$1$equals2"],
+            "getHashCode2", ["System$Collections$Generic$IEqualityComparer$1$System$String$getHashCode2", "System$Collections$Generic$IEqualityComparer$1$getHashCode2"]
+        ],
+        ctors: {
+            init: function () {
+                this._entropy = System.Int64(0);
+            },
+            ctor: function (ignoreCase) {
+                this.$initialize();
+                System.StringComparer.ctor.call(this);
+                this._ignoreCase = ignoreCase;
+                //TODO : this._entropy = HashHelpers.GetEntropy();
+            }
+        },
+        methods: {
+            compare$1: function (x, y) {
+                if (Bridge.referenceEquals(x, y)) {
+                    return 0;
+                }
+                if (x == null) {
+                    return -1;
+                }
+                if (y == null) {
+                    return 1;
+                }
+                if (this._ignoreCase) {
+                    return System.String.compare(x, y, 5);
+                }
+                return System.StringUtils.CompareOrdinal(x, y);
+            },
+            equals$1: function (obj) {
+                var comparer = Bridge.as(obj, System.OrdinalRandomizedComparer);
+                if (comparer == null) {
+                    return false;
+                }
+                return ((this._ignoreCase === comparer._ignoreCase) && (this._entropy.equals(comparer._entropy)));
+            },
+            equals2: function (x, y) {
+                if (Bridge.referenceEquals(x, y)) {
+                    return true;
+                }
+                if ((x == null) || (y == null)) {
+                    return false;
+                }
+                if (!this._ignoreCase) {
+                    return System.String.equals(x, y);
+                }
+                if (x.length !== y.length) {
+                    return false;
+                }
+                return (System.String.compare(x, y, 5) === 0);
+            },
+            getHashCode$1: function () {
+                var hashCode = Bridge.getHashCode(("OrdinalRandomizedComparer"));
+                return ((this._ignoreCase ? ~hashCode : hashCode) ^ (System.Int64.clip32(this._entropy.and(System.Int64(2147483647)))));
+            },
+            getHashCode2: function (obj) {
+                if (obj == null) {
+                    throw new System.ArgumentNullException.$ctor1("obj");
+                }
+                if (this._ignoreCase) {
+                    return 0; //TODO TextInfo.GetHashCodeOrdinalIgnoreCase(obj, true, this._entropy);
+                }
+                return 0; // TODO string.InternalMarvin32HashString(obj, obj.Length, this._entropy);
+            },
+            System$IWellKnownStringEqualityComparer$GetEqualityComparerForSerialization: function () {
+                return new System.OrdinalComparer(this._ignoreCase);
+            },
+            System$IWellKnownStringEqualityComparer$GetRandomizedEqualityComparer: function () {
+                return new System.OrdinalRandomizedComparer(this._ignoreCase);
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.IArrangedElement", {
+        inherits: [System.ComponentModel.IComponent,System.IDisposable],
+        $kind: "interface"
+    });
+
+    /** @namespace System.Windows.Forms */
+
+    /**
+     * TODO - add controls via html....
+     *
+     * @public
+     * @class System.Windows.Forms.DataGridViewColumnCollection
+     * @implements  System.Collections.Generic.IList$1
+     * @implements  System.Collections.ICollection
+     * @implements  System.Collections.IEnumerable
+     */
+    Bridge.define("System.Windows.Forms.DataGridViewColumnCollection", {
+        inherits: [System.Collections.Generic.IList$1(System.Windows.Forms.DataGridViewColumn),System.Collections.ICollection,System.Collections.IEnumerable],
+        fields: {
+            _owner: null,
+            header: null,
+            _controls: null
+        },
+        props: {
+            Owner: {
+                get: function () {
+                    return this._owner;
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return false;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    throw new System.NotImplementedException.ctor();
+                }
+            },
+            Count: {
+                get: function () {
+                    return this._controls.Count;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return false;
+                }
+            }
+        },
+        alias: [
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot",
+            "getItem", "System$Collections$Generic$IList$1$System$Windows$Forms$DataGridViewColumn$getItem",
+            "setItem", "System$Collections$Generic$IList$1$System$Windows$Forms$DataGridViewColumn$setItem",
+            "Count", "System$Collections$ICollection$Count",
+            "Count", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$Count",
+            "IsReadOnly", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$IsReadOnly",
+            "add", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$add",
+            "clear", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$clear",
+            "contains", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$contains",
+            "copyTo$1", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$copyTo",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", ["System$Collections$Generic$IEnumerable$1$System$Windows$Forms$DataGridViewColumn$GetEnumerator", "System$Collections$Generic$IEnumerable$1$GetEnumerator"],
+            "indexOf", "System$Collections$Generic$IList$1$System$Windows$Forms$DataGridViewColumn$indexOf",
+            "insert", "System$Collections$Generic$IList$1$System$Windows$Forms$DataGridViewColumn$insert",
+            "remove", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$remove",
+            "removeAt", "System$Collections$Generic$IList$1$System$Windows$Forms$DataGridViewColumn$removeAt"
+        ],
+        ctors: {
+            ctor: function (owner, table) {
+                this.$initialize();
+                this._owner = owner;
+                this._controls = new (System.Collections.Generic.List$1(System.Windows.Forms.DataGridViewColumn)).ctor();
+
+                this.header = table.createTHead();
+                table.appendChild(this.header);
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                return this._controls.getItem(index);
+            },
+            setItem: function (index, value) {
+                this._controls.setItem(index, value);
+            },
+            add: function (item) {
+
+                this.header.appendChild(item.Element);
+                this._controls.add(item);
+            },
+            AddRange: function (item) {
+                if (item == null || item.length === 0) {
+                    return;
+                }
+                var frag = document.createDocumentFragment();
+                for (var i = 0; i < item.length; i = (i + 1) | 0) {
+                    frag.appendChild(item[System.Array.index(i, item)].Element);
+                    this._controls.add(item[System.Array.index(i, item)]);
+                }
+                this.header.appendChild(frag);
+            },
+            clear: function () {
+                			var len = header.childNodes.length;
+                			while(len--)
+                			{
+                				header.removeChild(header.lastChild);
+                			};
+                			
+                this._controls.clear();
+            },
+            contains: function (item) {
+                return this._controls.contains(item);
+            },
+            copyTo$1: function (array, arrayIndex) {
+                this._controls.copyTo(array, arrayIndex);
+            },
+            copyTo: function (array, arrayIndex) {
+                this._controls.copyTo(Bridge.cast(array, System.Array.type(System.Windows.Forms.DataGridViewColumn)), arrayIndex);
+            },
+            GetEnumerator: function () {
+                return this._controls.GetEnumerator().$clone();
+            },
+            System$Collections$IEnumerable$GetEnumerator: function () {
+                return this._controls.GetEnumerator().$clone();
+            },
+            indexOf: function (item) {
+                return this._controls.indexOf(item);
+            },
+            insert: function (index, item) {
+                this.header.insertBefore(item.Element, Bridge.cast(this.header.childNodes[index], Node));
+                this._controls.insert(index, item);
+            },
+            remove: function (item) {
+                this.header.removeChild(item.Element);
+                return this._controls.remove(item);
+            },
+            removeAt: function (index) {
+                this.header.removeChild(this.header.childNodes[index]);
+                this._controls.removeAt(index);
+            }
+        }
+    });
+
+    /**
+     * TODO - add controls via html....
+     *
+     * @public
+     * @class System.Windows.Forms.DataGridViewRowCollection
+     * @implements  System.Collections.Generic.IList$1
+     * @implements  System.Collections.ICollection
+     * @implements  System.Collections.IEnumerable
+     */
+    Bridge.define("System.Windows.Forms.DataGridViewRowCollection", {
+        inherits: [System.Collections.Generic.IList$1(System.Data.DataRow),System.Collections.ICollection,System.Collections.IEnumerable],
+        fields: {
+            _owner: null,
+            body: null,
+            _controls: null
+        },
+        props: {
+            Owner: {
+                get: function () {
+                    return this._owner;
+                }
+            },
+            Count: {
+                get: function () {
+                    return this._controls.Count;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return false;
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return false;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    throw new System.NotImplementedException.ctor();
+                }
+            }
+        },
+        alias: [
+            "getItem", "System$Collections$Generic$IList$1$System$Data$DataRow$getItem",
+            "setItem", "System$Collections$Generic$IList$1$System$Data$DataRow$setItem",
+            "Count", "System$Collections$ICollection$Count",
+            "Count", "System$Collections$Generic$ICollection$1$System$Data$DataRow$Count",
+            "IsReadOnly", "System$Collections$Generic$ICollection$1$System$Data$DataRow$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot",
+            "add", "System$Collections$Generic$ICollection$1$System$Data$DataRow$add",
+            "clear", "System$Collections$Generic$ICollection$1$System$Data$DataRow$clear",
+            "contains", "System$Collections$Generic$ICollection$1$System$Data$DataRow$contains",
+            "copyTo$1", "System$Collections$Generic$ICollection$1$System$Data$DataRow$copyTo",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", ["System$Collections$Generic$IEnumerable$1$System$Data$DataRow$GetEnumerator", "System$Collections$Generic$IEnumerable$1$GetEnumerator"],
+            "indexOf", "System$Collections$Generic$IList$1$System$Data$DataRow$indexOf",
+            "insert", "System$Collections$Generic$IList$1$System$Data$DataRow$insert",
+            "remove", "System$Collections$Generic$ICollection$1$System$Data$DataRow$remove",
+            "removeAt", "System$Collections$Generic$IList$1$System$Data$DataRow$removeAt"
+        ],
+        ctors: {
+            ctor: function (owner, table) {
+                this.$initialize();
+                this._owner = owner;
+                this._controls = new (System.Collections.Generic.List$1(System.Data.DataRow)).ctor();
+
+                this.body = table.createTBody();
+                table.appendChild(this.body);
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                return this._controls.getItem(index);
+            },
+            setItem: function (index, value) {
+                this._controls.setItem(index, value);
+            },
+            add: function (item) {
+                this.body.appendChild(item.Element);
+                this._controls.add(item);
+            },
+            AddRange: function (item) {
+                if (item == null || item.length === 0) {
+                    return;
+                }
+                var frag = document.createDocumentFragment();
+                for (var i = 0; i < item.length; i = (i + 1) | 0) {
+                    frag.appendChild(item[System.Array.index(i, item)].Element);
+                    this._controls.add(item[System.Array.index(i, item)]);
+                }
+                this.body.appendChild(frag);
+            },
+            clear: function () {
+                			var len = body.childNodes.length;
+                			while(len--)
+                			{
+                				body.removeChild(body.lastChild);
+                			};
+                			
+                this._controls.clear();
+            },
+            contains: function (item) {
+                return this._controls.contains(item);
+            },
+            copyTo$1: function (array, arrayIndex) {
+                this._controls.copyTo(array, arrayIndex);
+            },
+            copyTo: function (array, arrayIndex) {
+                this._controls.copyTo(Bridge.cast(array, System.Array.type(System.Data.DataRow)), arrayIndex);
+            },
+            GetEnumerator: function () {
+                return this._controls.GetEnumerator().$clone();
+            },
+            System$Collections$IEnumerable$GetEnumerator: function () {
+                return this._controls.GetEnumerator().$clone();
+            },
+            indexOf: function (item) {
+                return this._controls.indexOf(item);
+            },
+            insert: function (index, item) {
+                this.body.insertBefore(item.Element, Bridge.cast(this.body.childNodes[index], Node));
+                this._controls.insert(index, item);
+            },
+            remove: function (item) {
+                this.body.removeChild(item.Element);
+                return this._controls.remove(item);
+            },
+            removeAt: function (index) {
+                this.body.removeChild(this.body.childNodes[index]);
+                this._controls.removeAt(index);
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.DataGridViewTextBoxColumn", {
+        inherits: [System.Windows.Forms.DataGridViewColumn]
+    });
+
+    Bridge.define("System.Windows.Forms.Layout.DefaultLayout", {
+        inherits: [System.Windows.Forms.Layout.LayoutEngine],
+        statics: {
+            fields: {
+                _cachedBoundsProperty: 0,
+                _layoutInfoProperty: 0,
+                Instance: null
+            },
+            ctors: {
+                init: function () {
+                    this._cachedBoundsProperty = System.Windows.Forms.PropertyStore.CreateKey();
+                    this._layoutInfoProperty = System.Windows.Forms.PropertyStore.CreateKey();
+                    this.Instance = new System.Windows.Forms.Layout.DefaultLayout();
+                }
+            },
+            methods: {
+                ApplyCachedBounds: function (container) {
+                    var $t;
+                    if (System.Windows.Forms.Layout.CommonProperties.GetAutoSize(container)) {
+                        var displayRectangle = container.System$Windows$Forms$Layout$IArrangedElement$DisplayRectangle.$clone();
+                        if ((displayRectangle.Width === 0) || (displayRectangle.Height === 0)) {
+                            System.Windows.Forms.Layout.DefaultLayout.ClearCachedBounds(container);
+                            return;
+                        }
+                    }
+                    var dictionary = Bridge.cast(container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty), System.Collections.IDict);
+                    if (dictionary != null) {
+                        $t = Bridge.getEnumerator(dictionary);
+                        try {
+                            while ($t.moveNext()) {
+                                var entry = Bridge.cast($t.Current, System.Object);
+                                var key = Bridge.cast(entry.Key, System.Windows.Forms.Layout.IArrangedElement);
+                                var bounds = Bridge.cast(entry.Value, System.Drawing.Rectangle);
+                                key.System$Windows$Forms$Layout$IArrangedElement$SetBounds(bounds.$clone(), System.Windows.Forms.BoundsSpecified.None);
+                            }
+                        } finally {
+                            if (Bridge.is($t, System.IDisposable)) {
+                                $t.System$IDisposable$Dispose();
+                            }
+                        }System.Windows.Forms.Layout.DefaultLayout.ClearCachedBounds(container);
+                    }
+                },
+                ClearCachedBounds: function (container) {
+                    container.System$Windows$Forms$Layout$IArrangedElement$Properties.SetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty, null);
+                },
+                GetAnchor: function (element) {
+                    return System.Windows.Forms.Layout.CommonProperties.xGetAnchor(element);
+                },
+                GetAnchorDestination: function (element, displayRect, measureOnly) {
+                    var anchorInfo = System.Windows.Forms.Layout.DefaultLayout.GetAnchorInfo(element);
+                    var num = (anchorInfo.Left + displayRect.X) | 0;
+                    var num2 = (anchorInfo.Top + displayRect.Y) | 0;
+                    var num3 = (anchorInfo.Right + displayRect.X) | 0;
+                    var num4 = (anchorInfo.Bottom + displayRect.Y) | 0;
+                    var anchor = System.Windows.Forms.Layout.DefaultLayout.GetAnchor(element);
+                    if (System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Right)) {
+                        num3 = (num3 + displayRect.Width) | 0;
+                        if (!System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Left)) {
+                            num = (num + displayRect.Width) | 0;
+                        }
+                    } else if (!System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Left)) {
+                        num3 = (num3 + (((Bridge.Int.div(displayRect.Width, 2)) | 0))) | 0;
+                        num = (num + (((Bridge.Int.div(displayRect.Width, 2)) | 0))) | 0;
+                    }
+                    if (System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Bottom)) {
+                        num4 = (num4 + displayRect.Height) | 0;
+                        if (!System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Top)) {
+                            num2 = (num2 + displayRect.Height) | 0;
+                        }
+                    } else if (!System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Top)) {
+                        num4 = (num4 + (((Bridge.Int.div(displayRect.Height, 2)) | 0))) | 0;
+                        num2 = (num2 + (((Bridge.Int.div(displayRect.Height, 2)) | 0))) | 0;
+                    }
+                    if (!measureOnly) {
+                        if (num3 < num) {
+                            num3 = num;
+                        }
+                        if (num4 < num2) {
+                            num4 = num2;
+                        }
+                    } else {
+                        var cachedBounds = System.Windows.Forms.Layout.DefaultLayout.GetCachedBounds(element);
+                        if (((num3 < num) || (cachedBounds.Width !== element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Width)) || (cachedBounds.X !== element.System$Windows$Forms$Layout$IArrangedElement$Bounds.X)) {
+                            if (System.Drawing.Rectangle.op_Inequality(cachedBounds.$clone(), element.System$Windows$Forms$Layout$IArrangedElement$Bounds.$clone())) {
+                                num = Math.max(Math.abs(num), Math.abs(cachedBounds.Left));
+                            }
+                            num3 = ((((num + Math.max(element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Width, cachedBounds.Width)) | 0)) + Math.abs(num3)) | 0;
+                        } else {
+                            num = (num > 0) ? num : element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Left;
+                            num3 = (num3 > 0) ? num3 : (((element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Right + Math.abs(num3)) | 0));
+                        }
+                        if (((num4 < num2) || (cachedBounds.Height !== element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Height)) || (cachedBounds.Y !== element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Y)) {
+                            if (System.Drawing.Rectangle.op_Inequality(cachedBounds.$clone(), element.System$Windows$Forms$Layout$IArrangedElement$Bounds.$clone())) {
+                                num2 = Math.max(Math.abs(num2), Math.abs(cachedBounds.Top));
+                            }
+                            num4 = ((((num2 + Math.max(element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Height, cachedBounds.Height)) | 0)) + Math.abs(num4)) | 0;
+                        } else {
+                            num2 = (num2 > 0) ? num2 : element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Top;
+                            num4 = (num4 > 0) ? num4 : (((element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Bottom + Math.abs(num4)) | 0));
+                        }
+                    }
+                    return new System.Drawing.Rectangle.$ctor2(num, num2, ((num3 - num) | 0), ((num4 - num2) | 0));
+                },
+                GetAnchorInfo: function (element) {
+                    return Bridge.cast(element.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._layoutInfoProperty), System.Windows.Forms.Layout.DefaultLayout.AnchorInfo);
+                },
+                GetAnchorPreferredSize: function (container) {
+                    var empty = System.Drawing.Size.Empty.$clone();
+                    for (var i = (container.System$Windows$Forms$Layout$IArrangedElement$Children.Count - 1) | 0; i >= 0; i = (i - 1) | 0) {
+                        var element = container.System$Windows$Forms$Layout$IArrangedElement$Children.getItem(i);
+                        if (!System.Windows.Forms.Layout.CommonProperties.GetNeedsDockLayout(element) && element.System$Windows$Forms$Layout$IArrangedElement$ParticipatesInLayout) {
+                            var anchor = System.Windows.Forms.Layout.DefaultLayout.GetAnchor(element);
+                            var margin = System.Windows.Forms.Layout.CommonProperties.GetMargin(element);
+                            var rectangle = System.Windows.Forms.Layout.LayoutUtils.InflateRect(System.Windows.Forms.Layout.DefaultLayout.GetCachedBounds(element), margin.$clone());
+                            if (System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Left) && !System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Right)) {
+                                empty.Width = Math.max(empty.Width, rectangle.Right);
+                            }
+                            if (!System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Bottom)) {
+                                empty.Height = Math.max(empty.Height, rectangle.Bottom);
+                            }
+                            if (System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Right)) {
+                                var rectangle2 = System.Windows.Forms.Layout.DefaultLayout.GetAnchorDestination(element, System.Drawing.Rectangle.Empty.$clone(), true);
+                                if (rectangle2.Width < 0) {
+                                    empty.Width = Math.max(empty.Width, ((rectangle.Right + rectangle2.Width) | 0));
+                                } else {
+                                    empty.Width = Math.max(empty.Width, rectangle2.Right);
+                                }
+                            }
+                            if (System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Bottom)) {
+                                var rectangle3 = System.Windows.Forms.Layout.DefaultLayout.GetAnchorDestination(element, System.Drawing.Rectangle.Empty.$clone(), true);
+                                if (rectangle3.Height < 0) {
+                                    empty.Height = Math.max(empty.Height, ((rectangle.Bottom + rectangle3.Height) | 0));
+                                } else {
+                                    empty.Height = Math.max(empty.Height, rectangle3.Bottom);
+                                }
+                            }
+                        }
+                    }
+                    return empty.$clone();
+                },
+                GetCachedBounds: function (element) {
+                    if (element.System$Windows$Forms$Layout$IArrangedElement$Container != null) {
+                        var dictionary = Bridge.cast(element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty), System.Collections.IDict);
+                        if (dictionary != null) {
+                            var obj2 = dictionary.System$Collections$IDict$getItem(element);
+                            if (obj2 != null) {
+                                return System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj2), System.Drawing.Rectangle));
+                            }
+                        }
+                    }
+                    return element.System$Windows$Forms$Layout$IArrangedElement$Bounds.$clone();
+                },
+                GetDock: function (element) {
+                    return System.Windows.Forms.Layout.CommonProperties.xGetDock(element);
+                },
+                GetGrowthBounds: function (element, newSize) {
+                    var growthDirection = System.Windows.Forms.Layout.DefaultLayout.GetGrowthDirection(element);
+                    var cachedBounds = System.Windows.Forms.Layout.DefaultLayout.GetCachedBounds(element);
+                    var location = cachedBounds.Location.$clone();
+                    if ((growthDirection & System.Windows.Forms.Layout.DefaultLayout.GrowthDirection.Left) !== System.Windows.Forms.Layout.DefaultLayout.GrowthDirection.None) {
+                        location.X = (location.X - (((newSize.Width - cachedBounds.Width) | 0))) | 0;
+                    }
+                    if ((growthDirection & System.Windows.Forms.Layout.DefaultLayout.GrowthDirection.Upward) !== System.Windows.Forms.Layout.DefaultLayout.GrowthDirection.None) {
+                        location.Y = (location.Y - (((newSize.Height - cachedBounds.Height) | 0))) | 0;
+                    }
+                    return new System.Drawing.Rectangle.$ctor1(location.$clone(), newSize.$clone());
+                },
+                GetGrowthDirection: function (element) {
+                    var anchor = System.Windows.Forms.Layout.DefaultLayout.GetAnchor(element);
+                    var none = System.Windows.Forms.Layout.DefaultLayout.GrowthDirection.None;
+                    if (((anchor & System.Windows.Forms.AnchorStyles.Right) !== System.Windows.Forms.AnchorStyles.None) && ((anchor & System.Windows.Forms.AnchorStyles.Left) === System.Windows.Forms.AnchorStyles.None)) {
+                        none |= System.Windows.Forms.Layout.DefaultLayout.GrowthDirection.Left;
+                    } else {
+                        none |= System.Windows.Forms.Layout.DefaultLayout.GrowthDirection.Right;
+                    }
+                    if (((anchor & System.Windows.Forms.AnchorStyles.Bottom) !== System.Windows.Forms.AnchorStyles.None) && ((anchor & System.Windows.Forms.AnchorStyles.Top) === System.Windows.Forms.AnchorStyles.None)) {
+                        return (none | System.Windows.Forms.Layout.DefaultLayout.GrowthDirection.Upward);
+                    }
+                    return (none | System.Windows.Forms.Layout.DefaultLayout.GrowthDirection.Downward);
+                },
+                GetHorizontalDockedSize: function (element, remainingSize, measureOnly) {
+                    var size = System.Windows.Forms.Layout.DefaultLayout.xGetDockedSize(element, remainingSize.$clone(), new System.Drawing.Size.$ctor2(1, remainingSize.Height), measureOnly);
+                    if (!measureOnly) {
+                        size.Height = remainingSize.Height;
+                        return size.$clone();
+                    }
+                    size.Height = Math.max(size.Height, remainingSize.Height);
+                    return size.$clone();
+                },
+                GetVerticalDockedSize: function (element, remainingSize, measureOnly) {
+                    var size = System.Windows.Forms.Layout.DefaultLayout.xGetDockedSize(element, remainingSize.$clone(), new System.Drawing.Size.$ctor2(remainingSize.Width, 1), measureOnly);
+                    if (!measureOnly) {
+                        size.Width = remainingSize.Width;
+                        return size.$clone();
+                    }
+                    size.Width = Math.max(size.Width, remainingSize.Width);
+                    return size.$clone();
+                },
+                HasCachedBounds: function (container) {
+                    return ((container != null) && (container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty) != null));
+                },
+                IsAnchored: function (anchor, desiredAnchor) {
+                    return ((anchor & desiredAnchor) === desiredAnchor);
+                },
+                LayoutAnchoredControls: function (container) {
+                    var displayRectangle = container.System$Windows$Forms$Layout$IArrangedElement$DisplayRectangle.$clone();
+                    if (!System.Windows.Forms.Layout.CommonProperties.GetAutoSize(container) || ((displayRectangle.Width !== 0) && (displayRectangle.Height !== 0))) {
+                        var children = container.System$Windows$Forms$Layout$IArrangedElement$Children;
+                        for (var i = (children.Count - 1) | 0; i >= 0; i = (i - 1) | 0) {
+                            var element = children.getItem(i);
+                            if (System.Windows.Forms.Layout.CommonProperties.GetNeedsAnchorLayout(element)) {
+                                System.Windows.Forms.Layout.DefaultLayout.SetCachedBounds(element, System.Windows.Forms.Layout.DefaultLayout.GetAnchorDestination(element, displayRectangle.$clone(), false));
+                            }
+                        }
+                    }
+                },
+                LayoutAutoSizedControls: function (container) {
+                    var children = container.System$Windows$Forms$Layout$IArrangedElement$Children;
+                    for (var i = (children.Count - 1) | 0; i >= 0; i = (i - 1) | 0) {
+                        var element = children.getItem(i);
+                        if (System.Windows.Forms.Layout.CommonProperties.xGetAutoSizedAndAnchored(element)) {
+                            var cachedBounds = System.Windows.Forms.Layout.DefaultLayout.GetCachedBounds(element);
+                            var anchor = System.Windows.Forms.Layout.DefaultLayout.GetAnchor(element);
+                            var maxSize = System.Windows.Forms.Layout.LayoutUtils.MaxSize.$clone();
+                            if ((anchor & (12)) === (12)) {
+                                maxSize.Width = cachedBounds.Width;
+                            }
+                            if ((anchor & (3)) === (3)) {
+                                maxSize.Height = cachedBounds.Height;
+                            }
+                            var preferredSize = element.System$Windows$Forms$Layout$IArrangedElement$GetPreferredSize(maxSize.$clone());
+                            var bounds = cachedBounds.$clone();
+                            if (System.Windows.Forms.Layout.CommonProperties.GetAutoSizeMode(element) === System.Windows.Forms.AutoSizeMode.GrowAndShrink) {
+                                bounds = System.Windows.Forms.Layout.DefaultLayout.GetGrowthBounds(element, preferredSize.$clone());
+                            } else if ((cachedBounds.Width < preferredSize.Width) || (cachedBounds.Height < preferredSize.Height)) {
+                                var newSize = System.Windows.Forms.Layout.LayoutUtils.UnionSizes(cachedBounds.Size.$clone(), preferredSize.$clone());
+                                bounds = System.Windows.Forms.Layout.DefaultLayout.GetGrowthBounds(element, newSize.$clone());
+                            }
+                            if (System.Drawing.Rectangle.op_Inequality(bounds.$clone(), cachedBounds.$clone())) {
+                                System.Windows.Forms.Layout.DefaultLayout.SetCachedBounds(element, bounds.$clone());
+                            }
+                        }
+                    }
+                },
+                LayoutDockedControls: function (container, measureOnly) {
+                    var $step = 0,
+                        $jumpFromFinally, 
+                        remainingBounds, 
+                        empty, 
+                        element, 
+                        children, 
+                        i, 
+                        size6, 
+                        element2, 
+                        size2, 
+                        rectangle2, 
+                        size3, 
+                        rectangle4, 
+                        size4, 
+                        rectangle5, 
+                        size5, 
+                        rectangle6, 
+                        $asyncBody = Bridge.fn.bind(this, function () {
+                            for (;;) {
+                                $step = System.Array.min([0,1,2,3,4,5], $step);
+                                switch ($step) {
+                                    case 0: {
+                                        remainingBounds = { v : measureOnly ? System.Drawing.Rectangle.Empty.$clone() : container.System$Windows$Forms$Layout$IArrangedElement$DisplayRectangle };
+                                        empty = { v : System.Drawing.Size.Empty.$clone() };
+                                        element = null;
+                                        children = container.System$Windows$Forms$Layout$IArrangedElement$Children;
+                                        i = (children.Count - 1) | 0;
+                                        $step = 1;
+                                        continue;
+                                    }
+                                    case 1: {
+                                        if ( i >= 0 ) {
+                                            $step = 2;
+                                            continue;
+                                        }
+                                        $step = 5;
+                                        continue;
+                                    }
+                                    case 2: {
+                                        size6 = new System.Drawing.Size();
+                                        element2 = children.getItem(i);
+                                        if (System.Windows.Forms.Layout.CommonProperties.GetNeedsDockLayout(element2)) {
+                                            switch (System.Windows.Forms.Layout.DefaultLayout.GetDock(element2)) {
+                                                case System.Windows.Forms.DockStyle.Top: 
+                                                    {
+                                                        size2 = System.Windows.Forms.Layout.DefaultLayout.GetVerticalDockedSize(element2, remainingBounds.v.Size.$clone(), measureOnly);
+                                                        rectangle2 = new System.Drawing.Rectangle.$ctor2(remainingBounds.v.X, remainingBounds.v.Y, size2.Width, size2.Height);
+                                                        System.Windows.Forms.Layout.DefaultLayout.xLayoutDockedControl(element2, rectangle2.$clone(), measureOnly, empty, remainingBounds);
+                                                        remainingBounds.v.Y = (remainingBounds.v.Y + element2.System$Windows$Forms$Layout$IArrangedElement$Bounds.Height) | 0;
+                                                        remainingBounds.v.Height = (remainingBounds.v.Height - element2.System$Windows$Forms$Layout$IArrangedElement$Bounds.Height) | 0;
+                                                        break;
+                                                    }
+                                                case System.Windows.Forms.DockStyle.Bottom: 
+                                                    {
+                                                        size3 = System.Windows.Forms.Layout.DefaultLayout.GetVerticalDockedSize(element2, remainingBounds.v.Size.$clone(), measureOnly);
+                                                        rectangle4 = new System.Drawing.Rectangle.$ctor2(remainingBounds.v.X, ((remainingBounds.v.Bottom - size3.Height) | 0), size3.Width, size3.Height);
+                                                        System.Windows.Forms.Layout.DefaultLayout.xLayoutDockedControl(element2, rectangle4.$clone(), measureOnly, empty, remainingBounds);
+                                                        remainingBounds.v.Height = (remainingBounds.v.Height - element2.System$Windows$Forms$Layout$IArrangedElement$Bounds.Height) | 0;
+                                                        break;
+                                                    }
+                                                case System.Windows.Forms.DockStyle.Left: 
+                                                    {
+                                                        size4 = System.Windows.Forms.Layout.DefaultLayout.GetHorizontalDockedSize(element2, remainingBounds.v.Size.$clone(), measureOnly);
+                                                        rectangle5 = new System.Drawing.Rectangle.$ctor2(remainingBounds.v.X, remainingBounds.v.Y, size4.Width, size4.Height);
+                                                        System.Windows.Forms.Layout.DefaultLayout.xLayoutDockedControl(element2, rectangle5.$clone(), measureOnly, empty, remainingBounds);
+                                                        remainingBounds.v.X = (remainingBounds.v.X + element2.System$Windows$Forms$Layout$IArrangedElement$Bounds.Width) | 0;
+                                                        remainingBounds.v.Width = (remainingBounds.v.Width - element2.System$Windows$Forms$Layout$IArrangedElement$Bounds.Width) | 0;
+                                                        break;
+                                                    }
+                                                case System.Windows.Forms.DockStyle.Right: 
+                                                    {
+                                                        size5 = System.Windows.Forms.Layout.DefaultLayout.GetHorizontalDockedSize(element2, remainingBounds.v.Size.$clone(), measureOnly);
+                                                        rectangle6 = new System.Drawing.Rectangle.$ctor2(((remainingBounds.v.Right - size5.Width) | 0), remainingBounds.v.Y, size5.Width, size5.Height);
+                                                        System.Windows.Forms.Layout.DefaultLayout.xLayoutDockedControl(element2, rectangle6.$clone(), measureOnly, empty, remainingBounds);
+                                                        remainingBounds.v.Width = (remainingBounds.v.Width - element2.System$Windows$Forms$Layout$IArrangedElement$Bounds.Width) | 0;
+                                                        break;
+                                                    }
+                                                case System.Windows.Forms.DockStyle.Fill: 
+                                                    //if (!(element2 is MdiClient))
+                                                    //{
+                                                    //    goto Label_025B;
+                                                    //}
+                                                    element = element2;
+                                                    break;
+                                            }
+                                        }
+                                        $step = 3;
+                                        continue;// MDI SUPPORT.... Not Sure... #TODO - MDIClient#
+                                        //   Label_025B:
+                                        //size6 = remainingBounds.Size;
+                                        //Rectangle newElementBounds = new Rectangle(remainingBounds.X, remainingBounds.Y, size6.Width, size6.Height);
+                                        //xLayoutDockedControl(element2, newElementBounds, measureOnly, ref empty, ref remainingBounds);
+                                    }
+                                    case 3: {
+                                        if (element != null) {
+                                            System.Windows.Forms.Layout.DefaultLayout.SetCachedBounds(element, remainingBounds.v.$clone());
+                                        }
+                                        $step = 4;
+                                        continue;
+                                    }
+                                    case 4: {
+                                        i = (i - 1) | 0;
+                                        $step = 1;
+                                        continue;
+                                    }
+                                    case 5: {
+                                        return empty.v.$clone();
+                                    }
+                                    default: {
+                                        return;
+                                    }
+                                }
+                            }
+                        }, arguments);
+
+                    return $asyncBody();
+                },
+                ScaleAnchorInfo: function (element, factor) {
+                    var anchorInfo = System.Windows.Forms.Layout.DefaultLayout.GetAnchorInfo(element);
+                    if (anchorInfo != null) {
+                        anchorInfo.Left = Bridge.Int.clip32(anchorInfo.Left * factor.Width);
+                        anchorInfo.Top = Bridge.Int.clip32(anchorInfo.Top * factor.Height);
+                        anchorInfo.Right = Bridge.Int.clip32(anchorInfo.Right * factor.Width);
+                        anchorInfo.Bottom = Bridge.Int.clip32(anchorInfo.Bottom * factor.Height);
+                        System.Windows.Forms.Layout.DefaultLayout.SetAnchorInfo(element, anchorInfo);
+                    }
+                },
+                SetAnchor: function (container, element, value) {
+                    var anchor = System.Windows.Forms.Layout.DefaultLayout.GetAnchor(element);
+                    if (anchor !== value) {
+                        if (System.Windows.Forms.Layout.CommonProperties.GetNeedsDockLayout(element)) {
+                            System.Windows.Forms.Layout.DefaultLayout.SetDock(element, System.Windows.Forms.DockStyle.None);
+                        }
+                        System.Windows.Forms.Layout.CommonProperties.xSetAnchor(element, value);
+                        if (System.Windows.Forms.Layout.CommonProperties.GetNeedsAnchorLayout(element)) {
+                            System.Windows.Forms.Layout.DefaultLayout.UpdateAnchorInfo(element);
+                        } else {
+                            System.Windows.Forms.Layout.DefaultLayout.SetAnchorInfo(element, null);
+                        }
+                        if (element.System$Windows$Forms$Layout$IArrangedElement$Container != null) {
+                            var flag = System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Right) && !System.Windows.Forms.Layout.DefaultLayout.IsAnchored(value, System.Windows.Forms.AnchorStyles.Right);
+                            var flag2 = System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Bottom) && !System.Windows.Forms.Layout.DefaultLayout.IsAnchored(value, System.Windows.Forms.AnchorStyles.Bottom);
+                            if ((element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Container != null) && (!!(flag | flag2))) {
+                                System.Windows.Forms.Layout.LayoutTransaction.DoLayout(element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Container, element, System.Windows.Forms.Layout.PropertyNames.Anchor);
+                            }
+                            System.Windows.Forms.Layout.LayoutTransaction.DoLayout(element.System$Windows$Forms$Layout$IArrangedElement$Container, element, System.Windows.Forms.Layout.PropertyNames.Anchor);
+                        }
+                    }
+                },
+                SetAnchorInfo: function (element, value) {
+                    element.System$Windows$Forms$Layout$IArrangedElement$Properties.SetObject(System.Windows.Forms.Layout.DefaultLayout._layoutInfoProperty, value);
+                },
+                SetCachedBounds: function (element, bounds) {
+                    if (System.Drawing.Rectangle.op_Inequality(bounds.$clone(), System.Windows.Forms.Layout.DefaultLayout.GetCachedBounds(element))) {
+                        var dictionary = Bridge.cast(element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty), System.Collections.IDict);
+                        if (dictionary == null) {
+                            dictionary = new System.Collections.Specialized.HybridDictionary.ctor();
+                            element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Properties.SetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty, dictionary);
+                        }
+                        dictionary.System$Collections$IDict$setItem(element, bounds.$clone());
+                    }
+                },
+                SetDock: function (element, value) {
+                    var $t;
+                    if (System.Windows.Forms.Layout.DefaultLayout.GetDock(element) !== value) {
+                        if (!System.Windows.Forms.ClientUtils.IsEnumValid(Bridge.box(value, System.Windows.Forms.DockStyle, System.Enum.toStringFn(System.Windows.Forms.DockStyle)), value, 0, 5)) {
+                            throw new System.ComponentModel.InvalidEnumArgumentException.$ctor3("value", value, System.Windows.Forms.DockStyle);
+                        }
+                        var needsDockLayout = System.Windows.Forms.Layout.CommonProperties.GetNeedsDockLayout(element);
+                        System.Windows.Forms.Layout.CommonProperties.xSetDock(element, value);
+                        $t = new System.Windows.Forms.Layout.LayoutTransaction.ctor(Bridge.as(element.System$Windows$Forms$Layout$IArrangedElement$Container, System.Windows.Forms.Control), element, System.Windows.Forms.Layout.PropertyNames.Dock);
+                        try {
+                            if (value === System.Windows.Forms.DockStyle.None) {
+                                if (needsDockLayout) {
+                                    element.System$Windows$Forms$Layout$IArrangedElement$SetBounds(System.Windows.Forms.Layout.CommonProperties.GetSpecifiedBounds(element), System.Windows.Forms.BoundsSpecified.None);
+                                    System.Windows.Forms.Layout.DefaultLayout.UpdateAnchorInfo(element);
+                                }
+                            } else {
+                                element.System$Windows$Forms$Layout$IArrangedElement$SetBounds(System.Windows.Forms.Layout.CommonProperties.GetSpecifiedBounds(element), System.Windows.Forms.BoundsSpecified.All);
+                            }
+                        }
+                        finally {
+                            if (Bridge.hasValue($t)) {
+                                $t.System$IDisposable$Dispose();
+                            }
+                        }
+                    }
+                },
+                UpdateAnchorInfo: function (element) {
+                    var $t;
+                    var anchorInfo = System.Windows.Forms.Layout.DefaultLayout.GetAnchorInfo(element);
+                    if (anchorInfo == null) {
+                        anchorInfo = new System.Windows.Forms.Layout.DefaultLayout.AnchorInfo();
+                        System.Windows.Forms.Layout.DefaultLayout.SetAnchorInfo(element, anchorInfo);
+                    }
+                    if (System.Windows.Forms.Layout.CommonProperties.GetNeedsAnchorLayout(element) && (element.System$Windows$Forms$Layout$IArrangedElement$Container != null)) {
+                        var cachedBounds = System.Windows.Forms.Layout.DefaultLayout.GetCachedBounds(element);
+                        var info2 = ($t = new System.Windows.Forms.Layout.DefaultLayout.AnchorInfo(), $t.Left = anchorInfo.Left, $t.Top = anchorInfo.Top, $t.Right = anchorInfo.Right, $t.Bottom = anchorInfo.Bottom, $t);
+                        anchorInfo.Left = element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Left;
+                        anchorInfo.Top = element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Top;
+                        anchorInfo.Right = element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Right;
+                        anchorInfo.Bottom = element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Bottom;
+                        var displayRectangle = element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$DisplayRectangle.$clone();
+                        var width = displayRectangle.Width;
+                        var height = displayRectangle.Height;
+                        anchorInfo.Left = (anchorInfo.Left - displayRectangle.X) | 0;
+                        anchorInfo.Top = (anchorInfo.Top - displayRectangle.Y) | 0;
+                        anchorInfo.Right = (anchorInfo.Right - displayRectangle.X) | 0;
+                        anchorInfo.Bottom = (anchorInfo.Bottom - displayRectangle.Y) | 0;
+                        var anchor = System.Windows.Forms.Layout.DefaultLayout.GetAnchor(element);
+                        if (System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Right)) {
+                            if ((System.Windows.Forms.DpiHelper.EnableAnchorLayoutHighDpiImprovements && ((((anchorInfo.Right - width) | 0)) > 0)) && (info2.Right < 0)) {
+                                anchorInfo.Right = info2.Right;
+                                anchorInfo.Left = (info2.Right - cachedBounds.Width) | 0;
+                            } else {
+                                anchorInfo.Right = (anchorInfo.Right - width) | 0;
+                                if (!System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Left)) {
+                                    anchorInfo.Left = (anchorInfo.Left - width) | 0;
+                                }
+                            }
+                        } else if (!System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Left)) {
+                            anchorInfo.Right = (anchorInfo.Right - (((Bridge.Int.div(width, 2)) | 0))) | 0;
+                            anchorInfo.Left = (anchorInfo.Left - (((Bridge.Int.div(width, 2)) | 0))) | 0;
+                        }
+                        if (System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Bottom)) {
+                            if ((System.Windows.Forms.DpiHelper.EnableAnchorLayoutHighDpiImprovements && ((((anchorInfo.Bottom - height) | 0)) > 0)) && (info2.Bottom < 0)) {
+                                anchorInfo.Bottom = info2.Bottom;
+                                anchorInfo.Top = (info2.Bottom - cachedBounds.Height) | 0;
+                            } else {
+                                anchorInfo.Bottom = (anchorInfo.Bottom - height) | 0;
+                                if (!System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Top)) {
+                                    anchorInfo.Top = (anchorInfo.Top - height) | 0;
+                                }
+                            }
+                        } else if (!System.Windows.Forms.Layout.DefaultLayout.IsAnchored(anchor, System.Windows.Forms.AnchorStyles.Top)) {
+                            anchorInfo.Bottom = (anchorInfo.Bottom - (((Bridge.Int.div(height, 2)) | 0))) | 0;
+                            anchorInfo.Top = (anchorInfo.Top - (((Bridge.Int.div(height, 2)) | 0))) | 0;
+                        }
+                    }
+                },
+                xGetDockedSize: function (element, remainingSize, constraints, measureOnly) {
+                    if (System.Windows.Forms.Layout.CommonProperties.GetAutoSize(element)) {
+                        return element.System$Windows$Forms$Layout$IArrangedElement$GetPreferredSize(constraints.$clone());
+                    }
+                    return element.System$Windows$Forms$Layout$IArrangedElement$Bounds.Size.$clone();
+                },
+                xLayout: function (container, measureOnly, preferredSize) {
+                    var children = container.System$Windows$Forms$Layout$IArrangedElement$Children;
+                    preferredSize.v = new System.Drawing.Size.$ctor2(-7103, -7105);
+                    if (measureOnly || (children.Count !== 0)) {
+                        var flag = false;
+                        var flag2 = false;
+                        var flag3 = false;
+                        for (var i = (children.Count - 1) | 0; i >= 0; i = (i - 1) | 0) {
+                            var element = children.getItem(i);
+                            if (System.Windows.Forms.Layout.CommonProperties.GetNeedsDockAndAnchorLayout(element)) {
+                                if (!flag && System.Windows.Forms.Layout.CommonProperties.GetNeedsDockLayout(element)) {
+                                    flag = true;
+                                }
+                                if (!flag2 && System.Windows.Forms.Layout.CommonProperties.GetNeedsAnchorLayout(element)) {
+                                    flag2 = true;
+                                }
+                                if (!flag3 && System.Windows.Forms.Layout.CommonProperties.xGetAutoSizedAndAnchored(element)) {
+                                    flag3 = true;
+                                }
+                            }
+                        }
+                        var empty = System.Drawing.Size.Empty.$clone();
+                        var b = System.Drawing.Size.Empty.$clone();
+                        if (flag) {
+                            empty = System.Windows.Forms.Layout.DefaultLayout.LayoutDockedControls(container, measureOnly);
+                        }
+                        if (flag2 && !measureOnly) {
+                            System.Windows.Forms.Layout.DefaultLayout.LayoutAnchoredControls(container);
+                        }
+                        if (flag3) {
+                            System.Windows.Forms.Layout.DefaultLayout.LayoutAutoSizedControls(container);
+                        }
+                        if (!measureOnly) {
+                            System.Windows.Forms.Layout.DefaultLayout.ApplyCachedBounds(container);
+                        } else {
+                            b = System.Windows.Forms.Layout.DefaultLayout.GetAnchorPreferredSize(container);
+                            var padding = System.Windows.Forms.Padding.Empty.$clone();
+                            var control = Bridge.as(container, System.Windows.Forms.Control);
+                            if (control != null) {
+                                padding = control.Padding.$clone();
+                            } else {
+                                padding = System.Windows.Forms.Layout.CommonProperties.GetPadding(container, System.Windows.Forms.Padding.Empty.$clone());
+                            }
+                            b.Width = (b.Width - padding.Left) | 0;
+                            b.Height = (b.Height - padding.Top) | 0;
+                            System.Windows.Forms.Layout.DefaultLayout.ClearCachedBounds(container);
+                            preferredSize.v = System.Windows.Forms.Layout.LayoutUtils.UnionSizes(empty.$clone(), b.$clone());
+                        }
+                    }
+                    return System.Windows.Forms.Layout.CommonProperties.GetAutoSize(container);
+                },
+                xLayoutDockedControl: function (element, newElementBounds, measureOnly, preferredSize, remainingBounds) {
+                    if (measureOnly) {
+                        var proposedSize = new System.Drawing.Size.$ctor2(Math.max(0, ((newElementBounds.Width - remainingBounds.v.Width) | 0)), Math.max(0, ((newElementBounds.Height - remainingBounds.v.Height) | 0)));
+                        var dock = System.Windows.Forms.Layout.DefaultLayout.GetDock(element);
+                        switch (dock) {
+                            case System.Windows.Forms.DockStyle.Top: 
+                            case System.Windows.Forms.DockStyle.Bottom: 
+                                proposedSize.Width = 0;
+                                break;
+                        }
+                        if ((dock === System.Windows.Forms.DockStyle.Left) || (dock === System.Windows.Forms.DockStyle.Right)) {
+                            proposedSize.Height = 0;
+                        }
+                        if (dock !== System.Windows.Forms.DockStyle.Fill) {
+                            preferredSize.v = System.Drawing.Size.op_Addition(preferredSize.v.$clone(), proposedSize.$clone());
+                            remainingBounds.v.Size = System.Drawing.Size.op_Addition(remainingBounds.v.Size.$clone(), proposedSize.$clone());
+                        } else if ((dock === System.Windows.Forms.DockStyle.Fill) && System.Windows.Forms.Layout.CommonProperties.GetAutoSize(element)) {
+                            var size2 = element.System$Windows$Forms$Layout$IArrangedElement$GetPreferredSize(proposedSize.$clone());
+                            remainingBounds.v.Size = System.Drawing.Size.op_Addition(remainingBounds.v.Size.$clone(), size2.$clone());
+                            preferredSize.v = System.Drawing.Size.op_Addition(preferredSize.v.$clone(), size2.$clone());
+                        }
+                    } else {
+                        element.System$Windows$Forms$Layout$IArrangedElement$SetBounds(newElementBounds.$clone(), System.Windows.Forms.BoundsSpecified.None);
+                    }
+                }
+            }
+        },
+        methods: {
+            GetPreferredSize: function (container, proposedBounds) {
+                var size = { v : new System.Drawing.Size() };
+                System.Windows.Forms.Layout.DefaultLayout.xLayout(container, true, size);
+                return size.v.$clone();
+            },
+            InitLayoutCore: function (element, specified) {
+                if ((specified !== System.Windows.Forms.BoundsSpecified.None) && System.Windows.Forms.Layout.CommonProperties.GetNeedsAnchorLayout(element)) {
+                    System.Windows.Forms.Layout.DefaultLayout.UpdateAnchorInfo(element);
+                }
+            },
+            LayoutCore: function (container, args) {
+                var size = { v : new System.Drawing.Size() };
+                return System.Windows.Forms.Layout.DefaultLayout.xLayout(container, false, size);
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.Control", {
+        inherits: [System.Windows.Forms.Layout.IArrangedElement,System.ComponentModel.IComponent],
+        statics: {
+            fields: {
+                ClickedOnControl: null,
+                PropControlsCollection: 0
+            },
+            ctors: {
+                init: function () {
+                    this.PropControlsCollection = System.Windows.Forms.PropertyStore.CreateKey();
+                },
+                ctor: function () {
+                    window.onmousemove = function (ev) {
+                        if (System.Windows.Forms.Control.ClickedOnControl != null) {
+                            ev.stopPropagation();
+
+                            System.Windows.Forms.Control.ClickedOnControl.OnMouseMove(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, System.Windows.Forms.Control.ClickedOnControl));
+                        }
+                        return null;
+                    };
+
+                    window.onmouseup = function (ev) {
+                        if (System.Windows.Forms.Control.ClickedOnControl != null) {
+                            ev.stopPropagation();
+
+                            System.Windows.Forms.Control.ClickedOnControl.OnMouseUp(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, System.Windows.Forms.Control.ClickedOnControl));
+
+                            System.Windows.Forms.Control.ClickedOnControl = null;
+                        }
+                        return null;
+                    };
+
+                }
+            }
+        },
+        fields: {
+            _location: null,
+            MaximumSize: null,
+            MinimumSize: null,
+            RenderTransparent: false,
+            _visible: false,
+            _parent: null,
+            _size: null,
+            _tabStop: false,
+            _tabIndex: 0,
+            Text: null,
+            _backColor: null,
+            _enabled: false,
+            _readonly: false,
+            ForeColor: null,
+            _tag: null,
+            Controls: null,
+            _font: null,
+            _autoSize: false,
+            _init: false,
+            Element: null,
+            Margin: null,
+            Padding: null,
+            _participatesInLayout: false,
+            _properties: null,
+            layoutSuspendCount: 0,
+            LayoutEngine: null,
+            LayoutChanged: null,
+            _disposing: false,
+            CacheTextInternal: false,
+            cachedLayoutEventArgs: null,
+            state: 0,
+            state2: 0
+        },
+        events: {
+            Load: null,
+            Click: null,
+            Resize: null,
+            LocationChanged: null,
+            Move: null,
+            DockChanged: null,
+            MouseDown: null,
+            MouseMove: null,
+            MouseUp: null,
+            Disposed: null
+        },
+        props: {
+            Name: {
+                get: function () {
+                    return this.Element.getAttribute("Name");
+                },
+                set: function (value) {
+                    this.Element.setAttribute("Name", value);
+                }
+            },
+            Location: {
+                get: function () {
+                    return this._location.$clone();
+                },
+                set: function (value) {
+                    var prev = this._location.$clone();
+                    this._location = value.$clone();
+
+                    this.Element.style.left = this._location.X + "px";
+                    this.Element.style.top = this._location.Y + "px";
+
+                    if (prev.X !== value.X || prev.Y !== value.Y) {
+                        this.OnLocationChanged({ });
+                    }
+
+                }
+            },
+            Width: {
+                get: function () {
+                    return this.Size.Width;
+                },
+                set: function (value) {
+                    this.Size = new System.Drawing.Size.$ctor2(value, this.Size.Height);
+                }
+            },
+            Height: {
+                get: function () {
+                    return this.Size.Height;
+                },
+                set: function (value) {
+                    this.Size = new System.Drawing.Size.$ctor2(this.Size.Width, value);
+                }
+            },
+            ParentInternal: {
+                get: function () {
+                    return this._parent;
+                },
+                set: function (value) {
+                    if (!Bridge.referenceEquals(this._parent, value)) {
+                        if (value != null) {
+                            value.Controls.add(this);
+                        } else {
+                            this._parent.Controls.remove(this);
+                        }
+                    }
+                }
+            },
+            Anchor: {
+                get: function () {
+                    return System.Windows.Forms.Layout.DefaultLayout.GetAnchor(this);
+                },
+                set: function (value) {
+                    System.Windows.Forms.Layout.DefaultLayout.SetAnchor(this.ParentInternal, this, value);
+                }
+            },
+            Visible: {
+                get: function () {
+                    return this._visible;
+                },
+                set: function (value) {
+                    this._visible = value;
+                    this.Element.style.visibility = this._visible ? "inherit" : "hidden";
+                }
+            },
+            Dock: {
+                get: function () {
+                    return System.Windows.Forms.Layout.DefaultLayout.GetDock(this);
+                },
+                set: function (value) {
+                    if (value !== this.Dock) {
+                        this.SuspendLayout();
+                        try {
+                            System.Windows.Forms.Layout.DefaultLayout.SetDock(this, value);
+                            this.OnDockChanged({ });
+                        }
+                        finally {
+                            this.ResumeLayout();
+                        }
+                    }
+                }
+            },
+            Parent: {
+                get: function () {
+                    //IntSecurity.GetParent.Demand();
+                    return this.ParentInternal;
+                },
+                set: function (value) {
+                    this.ParentInternal = value;
+                }
+            },
+            Size: {
+                get: function () {
+                    return this._size.$clone();
+                },
+                set: function (value) {
+                    var prev = this._size.$clone();
+                    this._size = value.$clone();
+                    if (this._autoSize) {
+                        this.Element.style.width = "auto";
+                        this.Element.style.height = "auto";
+                    } else {
+                        //Resize
+                        this.Element.style.width = this._size.Width + "px";
+                        this.Element.style.height = this._size.Height + "px";
+
+                        if (System.Drawing.Size.op_Inequality(value.$clone(), prev.$clone())) {
+                            this.OnResize({ });
+                        }
+                    }
+                }
+            },
+            TabStop: {
+                get: function () {
+                    return this._tabStop;
+                },
+                set: function (value) {
+                    this._tabStop = value;
+                    this.TabIndex = this._tabIndex;
+                }
+            },
+            TabIndex: {
+                get: function () {
+                    return this._tabIndex;
+                },
+                set: function (value) {
+                    this._tabIndex = value;
+                    if (this.TabStop) {
+                        this.Element.tabIndex = value;
+                    } else {
+                        this.Element.removeAttribute("TabIndex");
+                    }
+                }
+            },
+            BackColor: {
+                get: function () {
+                    return this._backColor.$clone();
+                },
+                set: function (value) {
+                    this._backColor = value.$clone();
+                    this.Element.style.backgroundColor = this._backColor.ToHtml();
+                }
+            },
+            Enabled: {
+                get: function () {
+                    return this._enabled;
+                },
+                set: function (value) {
+                    this._enabled = value;
+                    this.ApplyDisabled();
+                }
+            },
+            ReadOnly: {
+                get: function () {
+                    return this._readonly;
+                },
+                set: function (value) {
+                    this._readonly = value;
+                    this.ApplyReadonly();
+                }
+            },
+            /**
+             * Use Tag as Class Name
+             *
+             * @instance
+             * @public
+             * @memberof System.Windows.Forms.Control
+             * @function Tag
+             * @type System.Object
+             */
+            Tag: {
+                get: function () {
+                    return this._tag;
+                },
+                set: function (value) {
+                    this._tag = value;
+                    if (Bridge.is(this._tag, System.String)) {
+                        this.Element.className = (System.String.concat(this._tag, ""));
+                    } else {
+                        this.Element.className = "";
+                    }
+                    this.ApplyDisabled();
+                }
+            },
+            Font: {
+                get: function () {
+                    return this._font;
+                },
+                set: function (value) {
+                    this._font = value;
+                    if (this._font == null) {
+                        this.Element.style.fontSize = "inherit";
+                        this.Element.style.fontFamily = "inherit";
+                    } else {
+                        this.Element.style.fontSize = (System.Single.format(this._font.EmSize) || "") + "pt";
+                        this.Element.style.fontFamily = this._font.FamilyName;
+                    }
+
+                }
+            },
+            AutoSize: {
+                get: function () {
+                    return this._autoSize;
+                },
+                set: function (value) {
+                    if (this._init) {
+                        this._autoSize = value;
+
+                        this.Size = this._size.$clone();
+                    }
+                }
+            },
+            Bounds: {
+                get: function () {
+                    return new System.Drawing.Rectangle.$ctor1(this.Location.$clone(), this.Size.$clone());
+                }
+            },
+            Children: {
+                get: function () {
+                    return new System.Windows.Forms.Layout.ArrangedElementCollection.$ctor1(new System.Collections.ArrayList.$ctor2(this.Controls._items));
+                }
+            },
+            Container: {
+                get: function () {
+                    return this.Parent;
+                }
+            },
+            DisplayRectangle: {
+                get: function () {
+                    return new System.Drawing.Rectangle.$ctor2(0, 0, this.ClientSize.Width, this.ClientSize.Height);
+                }
+            },
+            ClientSize: {
+                get: function () {
+                    return this.Size.$clone();
+                },
+                set: function (value) {
+                    this.Size = value.$clone();
+                }
+            },
+            ParticipatesInLayout: {
+                get: function () {
+                    return this._participatesInLayout;
+                }
+            },
+            Properties: {
+                get: function () {
+                    return this._properties;
+                }
+            },
+            Site: {
+                get: function () {
+                    return function () {
+                        throw new System.NotImplementedException.ctor();
+                    }();
+                },
+                set: function (value) {
+                    throw new System.NotImplementedException.ctor();
+                }
+            },
+            Disposing: {
+                get: function () {
+                    return this._disposing;
+                }
+            }
+        },
+        alias: [
+            "Bounds", "System$Windows$Forms$Layout$IArrangedElement$Bounds",
+            "Children", "System$Windows$Forms$Layout$IArrangedElement$Children",
+            "Container", "System$Windows$Forms$Layout$IArrangedElement$Container",
+            "DisplayRectangle", "System$Windows$Forms$Layout$IArrangedElement$DisplayRectangle",
+            "ParticipatesInLayout", "System$Windows$Forms$Layout$IArrangedElement$ParticipatesInLayout",
+            "Properties", "System$Windows$Forms$Layout$IArrangedElement$Properties",
+            "Site", "System$ComponentModel$IComponent$Site",
+            "addDisposed", "System$ComponentModel$IComponent$addDisposed",
+            "removeDisposed", "System$ComponentModel$IComponent$removeDisposed",
+            "GetPreferredSize", "System$Windows$Forms$Layout$IArrangedElement$GetPreferredSize",
+            "PerformLayout", "System$Windows$Forms$Layout$IArrangedElement$PerformLayout",
+            "Dispose", "System$IDisposable$Dispose"
+        ],
+        ctors: {
+            init: function () {
+                this._location = new System.Drawing.Point();
+                this.MaximumSize = new System.Drawing.Size();
+                this.MinimumSize = new System.Drawing.Size();
+                this._size = new System.Drawing.Size();
+                this._backColor = new System.Drawing.Color();
+                this.ForeColor = new System.Drawing.Color();
+                this.Margin = new System.Windows.Forms.Padding();
+                this.Padding = new System.Windows.Forms.Padding();
+                this._enabled = true;
+                this._readonly = false;
+                this._participatesInLayout = true;
+                this._properties = new System.Windows.Forms.PropertyStore();
+                this.LayoutEngine = new System.Windows.Forms.Layout.DefaultLayout();
+                this._disposing = false;
+            },
+            ctor: function (element) {
+                this.$initialize();
+                this.Element = element;
+
+                this.Controls = new System.Windows.Forms.ControlCollection(this);
+
+                this.Element.style.position = "absolute";
+                this.Element.style.boxSizing = "borderbox";
+
+                this.Element.style.padding = "0";
+
+
+                this.Element.style.fontSize = "inherit";
+                this.Element.style.fontFamily = "inherit";
+
+                this.Visible = true;
+
+                this.TabStop = true;
+
+                this.Element.onclick = Bridge.fn.bind(this, function (ev) {
+                    this.OnClick({ });
+                    return null;
+                });
+
+                this.Element.onmousedown = Bridge.fn.bind(this, function (ev) {
+                    System.Windows.Forms.Control.ClickedOnControl = this;
+                    ev.stopPropagation();
+
+                    this.OnMouseDown(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this));
+
+                    return null;
+                });
+
+                this.Element.onmousemove = Bridge.fn.bind(this, function (ev) {
+                    if (System.Windows.Forms.Control.ClickedOnControl == null) {
+                        ev.stopPropagation();
+
+                        this.OnMouseMove(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this));
+                    }
+
+                    return null;
+                });
+
+                this._init = true;
+            }
+        },
+        methods: {
+            Invalidate: function () {
+                // TODO: Paint.. Support.
+            },
+            OnMove: function (e) {
+                if (!Bridge.staticEquals(this.Move, null)) {
+                    this.Move(this, e);
+                }
+                if (this.RenderTransparent) {
+                    this.Invalidate();
+                }
+            },
+            OnLocationChanged: function (e) {
+                this.OnMove({ });
+                if (!Bridge.staticEquals(this.LocationChanged, null)) {
+                    this.LocationChanged(this, e);
+                }
+            },
+            OnResize: function (e) {
+                // TODO: if (((this.controlStyle & ControlStyles.ResizeRedraw) == ControlStyles.ResizeRedraw) || this.GetState(0x400000))
+                //{
+                //    this.Invalidate();
+                //}
+                System.Windows.Forms.Layout.LayoutTransaction.DoLayout(this, this, System.Windows.Forms.Layout.PropertyNames.Bounds);
+                if (!Bridge.staticEquals(this.Resize, null)) {
+                    this.Resize(this, e);
+                }
+            },
+            OnControlAdded: function (control) {
+
+            },
+            OnControlRemoved: function (control) {
+
+            },
+            OnDockChanged: function (e) {
+                if (!Bridge.staticEquals(this.DockChanged, null)) {
+                    this.DockChanged(this, e);
+                }
+            },
+            GetForm: function () {
+                if (this.Parent == null) {
+                    return null;
+                }
+
+                if (Bridge.is(this.Parent, System.Windows.Forms.Form)) {
+                    return this.Parent;
+                } else {
+                    return this.Parent.GetForm();
+                }
+            },
+            ApplyDisabled: function (element) {
+                if (element === void 0) { element = null; }
+                if (element == null) {
+                    element = this.Element;
+                }
+                if (this.Enabled) {
+                    if (element.classList.contains("disabled")) {
+                        element.classList.remove("disabled");
+                        element.removeAttribute("disabled");
+                    }
+                } else {
+                    if (!element.classList.contains("disabled")) {
+                        element.classList.add("disabled");
+                        element.setAttribute("disabled", "");
+                    }
+                }
+            },
+            ApplyReadonly: function (element) {
+                if (element === void 0) { element = null; }
+                if (element == null) {
+                    element = this.Element;
+                }
+                if (this.ReadOnly) {
+                    if (!element.classList.contains("readonly")) {
+                        element.classList.add("readonly");
+                        element.setAttribute("readonly", "");
+                    }
+                } else {
+                    if (element.classList.contains("readonly")) {
+                        element.classList.remove("readonly");
+                        element.removeAttribute("readonly");
+                    }
+                }
+            },
+            OnClick: function (e) {
+                if (!Bridge.staticEquals(this.Click, null)) {
+                    this.Click(this, e);
+                }
+            },
+            OnMouseDown: function (e) {
+                if (!Bridge.staticEquals(this.MouseDown, null)) {
+                    this.MouseDown(this, e);
+                }
+            },
+            OnMouseMove: function (e) {
+                if (!Bridge.staticEquals(this.MouseMove, null)) {
+                    this.MouseMove(this, e);
+                }
+            },
+            InvokeLoad: function () {
+                this.OnLoad({ });
+            },
+            OnLoad: function (e) {
+                if (!Bridge.staticEquals(this.Load, null)) {
+                    this.Load(this, e);
+                }
+            },
+            OnMouseUp: function (e) {
+                if (!Bridge.staticEquals(this.MouseUp, null)) {
+                    this.MouseUp(this, e);
+                }
+            },
+            SuspendLayout: function () {
+                this.layoutSuspendCount = (((this.layoutSuspendCount + 1) | 0)) & 255;
+                if (this.layoutSuspendCount === 1) {
+                    this.OnLayoutSuspended();
+                }
+            },
+            OnLayoutSuspended: function () { },
+            ResumeLayout: function () {
+                this.ResumeLayout$1(true);
+            },
+            ResumeLayout$1: function (performLayout) {
+                var flag = false;
+                if (this.layoutSuspendCount > 0) {
+                    if (this.layoutSuspendCount === 1) {
+                        this.layoutSuspendCount = (((this.layoutSuspendCount + 1) | 0)) & 255;
+                        try {
+                            this.OnLayoutResuming(performLayout);
+                        }
+                        finally {
+                            this.layoutSuspendCount = (((this.layoutSuspendCount - 1) | 0)) & 255;
+                        }
+                    }
+                    this.layoutSuspendCount = (((this.layoutSuspendCount - 1) | 0)) & 255;
+                    if (!!(((this.layoutSuspendCount === 0) && this.GetState(512)) & performLayout)) {
+                        this.PerformLayout$1();
+                        flag = true;
+                    }
+                }
+                if (!flag) {
+                    this.SetState2(64, true);
+                }
+                if (!performLayout) {
+                    System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(this);
+                    var controls = this.Controls;
+                    if (controls != null) {
+                        for (var i = 0; i < controls.Count; i = (i + 1) | 0) {
+                            this.LayoutEngine.InitLayout(controls.getItem(i), System.Windows.Forms.BoundsSpecified.All);
+                            System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(controls.getItem(i));
+                        }
+                    }
+                }
+            },
+            OnLayoutResuming: function (performLayout) {
+                if (this.ParentInternal != null) {
+                    this.ParentInternal.OnChildLayoutResuming(this, performLayout);
+                }
+            },
+            OnChildLayoutResuming: function (child, performLayout) {
+                if (this.ParentInternal != null) {
+                    this.ParentInternal.OnChildLayoutResuming(child, performLayout);
+                }
+            },
+            SetState2: function (flag, value) {
+                this.state2 = value ? (this.state2 | flag) : (this.state2 & ~flag);
+            },
+            OnLayout: function (levent) {
+                //if (this.IsActiveX)
+                //{
+                //    this.ActiveXViewChanged();
+                //}
+                // LayoutEventHandler handler = (LayoutEventHandler)base.Events[EventLayout];
+                if (!Bridge.staticEquals(this.LayoutChanged, null)) {
+                    this.LayoutChanged(this, levent);
+                }
+                if (this.LayoutEngine.Layout(this, levent) && (this.ParentInternal != null)) {
+                    this.ParentInternal.SetState(8388608, true);
+                }
+            },
+            SetState: function (flag, value) {
+                this.state = value ? (this.state | flag) : (this.state & ~flag);
+            },
+            GetAnyDisposingInHierarchy: function () {
+                var parent = this;
+                while (parent != null) {
+                    if (parent.Disposing) {
+                        return true;
+                    }
+                    parent = parent.Parent;
+                }
+                return false;
+            },
+            PerformLayout$2: function (args) {
+                if (!this.GetAnyDisposingInHierarchy()) {
+                    if (this.layoutSuspendCount > 0) {
+                        this.SetState(512, true);
+                        if ((this.cachedLayoutEventArgs == null) || (this.GetState2(64) && (args != null))) {
+                            this.cachedLayoutEventArgs = args;
+                            if (this.GetState2(64)) {
+                                this.SetState2(64, false);
+                            }
+                        }
+                        this.LayoutEngine.ProcessSuspendedLayoutEventArgs(this, args);
+                    } else {
+                        this.layoutSuspendCount = 1;
+                        try {
+                            this.CacheTextInternal = true;
+                            this.OnLayout(args);
+                        }
+                        finally {
+                            this.CacheTextInternal = false;
+                            this.SetState(8389120, false);
+                            this.layoutSuspendCount = 0;
+                            if ((this.ParentInternal != null) && this.ParentInternal.GetState(8388608)) {
+                                System.Windows.Forms.Layout.LayoutTransaction.DoLayout(this.ParentInternal, this, System.Windows.Forms.Layout.PropertyNames.PreferredSize);
+                            }
+                        }
+                    }
+                }
+            },
+            PerformLayout$1: function () {
+                if (this.cachedLayoutEventArgs != null) {
+                    this.PerformLayout$2(this.cachedLayoutEventArgs);
+                    this.cachedLayoutEventArgs = null;
+                    this.SetState2(64, false);
+                } else {
+                    this.PerformLayout(null, null);
+                }
+            },
+            PerformLayout: function (affectedElement, propertyName) {
+                this.PerformLayout$2(new System.Windows.Forms.LayoutEventArgs.ctor(affectedElement, propertyName));
+            },
+            GetState: function (flag) {
+                return ((this.state & flag) > 0);
+            },
+            GetState2: function (flag) {
+                return ((this.state2 & flag) > 0);
+            },
+            ApplySizeConstraints: function (proposedSize) {
+                return this.ApplyBoundsConstraints(0, 0, proposedSize.Width, proposedSize.Height).Size.$clone();
+            },
+            GetPreferredSizeCore: function (proposedSize) {
+                return System.Windows.Forms.Layout.CommonProperties.GetSpecifiedBounds(this).Size.$clone();
+            },
+            GetPreferredSize: function (proposedSize) {
+                var preferredSizeCore = new System.Drawing.Size();
+                if (this.GetState(6144)) {
+                    return System.Windows.Forms.Layout.CommonProperties.xGetPreferredSizeCache(this);
+                }
+                proposedSize = System.Windows.Forms.Layout.LayoutUtils.ConvertZeroToUnbounded(proposedSize.$clone());
+                proposedSize = this.ApplySizeConstraints(proposedSize.$clone());
+                if (this.GetState2(2048)) {
+                    var size2 = System.Windows.Forms.Layout.CommonProperties.xGetPreferredSizeCache(this);
+                    if (!size2.IsEmpty && (System.Drawing.Size.op_Equality(proposedSize.$clone(), System.Windows.Forms.Layout.LayoutUtils.MaxSize.$clone()))) {
+                        return size2.$clone();
+                    }
+                }
+                try {
+                    preferredSizeCore = this.GetPreferredSizeCore(proposedSize.$clone());
+                }
+                finally {
+                    //   this.CacheTextInternal = false;
+                }
+                preferredSizeCore = this.ApplySizeConstraints(preferredSizeCore.$clone());
+                if (this.GetState2(2048) && (System.Drawing.Size.op_Equality(proposedSize.$clone(), System.Windows.Forms.Layout.LayoutUtils.MaxSize.$clone()))) {
+                    System.Windows.Forms.Layout.CommonProperties.xSetPreferredSizeCache(this, preferredSizeCore.$clone());
+                }
+                return preferredSizeCore.$clone();
+            },
+            ApplyBoundsConstraints: function (suggestedX, suggestedY, proposedWidth, proposedHeight) {
+                var $t;
+                if (!(System.Drawing.Size.op_Inequality(this.MaximumSize.$clone(), System.Drawing.Size.Empty.$clone())) && !(System.Drawing.Size.op_Inequality(this.MinimumSize.$clone(), System.Drawing.Size.Empty.$clone()))) {
+                    return new System.Drawing.Rectangle.$ctor2(suggestedX, suggestedY, proposedWidth, proposedHeight);
+                }
+                var b = System.Windows.Forms.Layout.LayoutUtils.ConvertZeroToUnbounded(this.MaximumSize.$clone());
+                var rectangle = ($t = new System.Drawing.Rectangle.$ctor2(suggestedX, suggestedY, 0, 0), $t.Size = System.Windows.Forms.Layout.LayoutUtils.IntersectSizes(new System.Drawing.Size.$ctor2(proposedWidth, proposedHeight), b.$clone()), $t);
+                rectangle.Size = System.Windows.Forms.Layout.LayoutUtils.UnionSizes(rectangle.Size.$clone(), this.MinimumSize.$clone());
+                return rectangle.$clone();
+            },
+            SetBoundsCore: function (x, y, width, height, specified) {
+                if (this.ParentInternal != null) {
+                    this.ParentInternal.SuspendLayout();
+                }
+                try {
+                    if (((this.Location.X !== x) || (this.Location.Y !== y)) || ((this.Width !== width) || (this.Height !== height))) {
+                        System.Windows.Forms.Layout.CommonProperties.UpdateSpecifiedBounds$1(this, x, y, width, height, specified);
+                        var rectangle = this.ApplyBoundsConstraints(x, y, width, height);
+
+
+
+                        //y = rectangle.Y;
+                        //if (!this.IsHandleCreated)
+                        //{
+                        //    this.UpdateBounds(x, y, width, height);
+                        //}
+                        if (!this.GetState(65536)) {
+                            this.Location = rectangle.Location.$clone();
+                            this.Size = rectangle.Size.$clone();
+
+
+                            //int flags = 20;
+                            //if ((this.x == x) && (this.y == y))
+                            //{
+                            //    flags |= 2;
+                            //}
+                            //if ((this.width == width) && (this.height == height))
+                            //{
+                            //    flags |= 1;
+                            //}
+                            this.OnBoundsUpdate(this.Location.X, this.Location.Y, this.Size.Width, this.Size.Height);
+                            //SafeNativeMethods.SetWindowPos(new HandleRef(this.window, this.Handle), NativeMethods.NullHandleRef, x, y, width, height, flags);
+                        }
+                    }
+                }
+                finally {
+                    //  this.InitScaling(specified);
+                    if (this.ParentInternal != null) {
+                        System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(this.ParentInternal);
+                        this.ParentInternal.LayoutEngine.InitLayout(this, specified);
+                        this.ParentInternal.ResumeLayout$1(true);
+                    }
+                }
+            },
+            OnBoundsUpdate: function (x, y, width, height) { },
+            System$Windows$Forms$Layout$IArrangedElement$SetBounds: function (bounds, specified) {
+                //ISite site = this.Site;
+                //IComponentChangeService service = null;
+                //PropertyDescriptor member = null;
+                //PropertyDescriptor descriptor2 = null;
+                //bool flag = false;
+                //bool flag2 = false;
+                //if ((site != null) && site.DesignMode)
+                //{
+                //    service = (IComponentChangeService)site.GetService(typeof(IComponentChangeService));
+                //    if (service != null)
+                //    {
+                //        member = TypeDescriptor.GetProperties(this)[PropertyNames.Size];
+                //        descriptor2 = TypeDescriptor.GetProperties(this)[PropertyNames.Location];
+                //        try
+                //        {
+                //            if (((member != null) && !member.IsReadOnly) && ((bounds.Width != this.Width) || (bounds.Height != this.Height)))
+                //            {
+                //                //if (!(site is INestedSite))
+                //                //{
+                //                //    service.OnComponentChanging(this, member);
+                //                //}
+                //                flag = true;
+                //            }
+                //            if (((descriptor2 != null) && !descriptor2.IsReadOnly) && ((bounds.X != this.x) || (bounds.Y != this.y)))
+                //            {
+                //                //if (!(site is INestedSite))
+                //                //{
+                //                //    service.OnComponentChanging(this, descriptor2);
+                //                //}
+                //                flag2 = true;
+                //            }
+                //        }
+                //        catch (InvalidOperationException)
+                //        {
+                //        }
+                //    }
+                //}
+                this.SetBoundsCore(bounds.X, bounds.Y, bounds.Width, bounds.Height, specified);
+                //if ((site != null) && (service != null))
+                //{
+                //    try
+                //    {
+                //        if (flag)
+                //        {
+                //            service.OnComponentChanged(this, member, null, null);
+                //        }
+                //        if (flag2)
+                //        {
+                //            service.OnComponentChanged(this, descriptor2, null, null);
+                //        }
+                //    }
+                //    catch (InvalidOperationException)
+                //    {
+                //    }
+                //}
+            },
+            SetBounds: function (x, y, width, height, specified) {
+                if ((specified & System.Windows.Forms.BoundsSpecified.X) === System.Windows.Forms.BoundsSpecified.None) {
+                    x = this.Location.X;
+                }
+                if ((specified & System.Windows.Forms.BoundsSpecified.Y) === System.Windows.Forms.BoundsSpecified.None) {
+                    y = this.Location.Y;
+                }
+                if ((specified & System.Windows.Forms.BoundsSpecified.Width) === System.Windows.Forms.BoundsSpecified.None) {
+                    width = this.Size.Width;
+                }
+                if ((specified & System.Windows.Forms.BoundsSpecified.Height) === System.Windows.Forms.BoundsSpecified.None) {
+                    height = this.Size.Height;
+                }
+                if (((this.Location.X !== x) || (this.Location.Y !== y)) || ((this.Size.Width !== width) || (this.Size.Height !== height))) {
+                    this.SetBoundsCore(x, y, width, height, specified);
+                    System.Windows.Forms.Layout.LayoutTransaction.DoLayout(this.ParentInternal, this, System.Windows.Forms.Layout.PropertyNames.Bounds);
+                } else {
+                    //this.InitScaling(specified);
+                }
+            },
+            Dispose: function () {
+                var $t;
+                if (this._disposing) {
+                    return;
+                }
+
+                this._disposing = true;
+                if (!Bridge.staticEquals(this.Disposed, null)) {
+                    this.Disposed(this, { });
+                }
+
+                $t = Bridge.getEnumerator(this.Controls);
+                try {
+                    while ($t.moveNext()) {
+                        var item = { v : $t.Current };
+                        item.v != null ? item.v.Dispose() : null;
+                    }
+                } finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$Dispose();
+                    }
+                }}
         }
     });
 
@@ -3084,11 +11229,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             FormattingEnabled: false,
             ItemHeight: 0,
             DrawMode: 0,
-            MinimumSize: null
+            MinimumSize$1: null
         },
         ctors: {
             init: function () {
-                this.MinimumSize = new System.Drawing.Size();
+                this.MinimumSize$1 = new System.Drawing.Size();
             },
             ctor: function () {
                 this.$initialize();
@@ -3121,8 +11266,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
-    /** @namespace System.Windows.Forms */
-
     /**
      * TODO - add controls via html....
      *
@@ -3136,7 +11279,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         inherits: [System.Collections.Generic.IList$1(System.Windows.Forms.Control),System.Collections.ICollection,System.Collections.IEnumerable],
         fields: {
             _owner: null,
-            _controls: null
+            _items: null
         },
         props: {
             Owner: {
@@ -3146,7 +11289,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             Count: {
                 get: function () {
-                    return this._controls.Count;
+                    return this._items.Count;
                 }
             },
             IsReadOnly: {
@@ -3161,7 +11304,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             SyncRoot: {
                 get: function () {
-                    throw new System.NotImplementedException();
+                    throw new System.NotImplementedException.ctor();
                 }
             }
         },
@@ -3178,7 +11321,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             "contains", "System$Collections$Generic$ICollection$1$System$Windows$Forms$Control$contains",
             "copyTo$1", "System$Collections$Generic$ICollection$1$System$Windows$Forms$Control$copyTo",
             "copyTo", "System$Collections$ICollection$copyTo",
-            "getEnumerator", ["System$Collections$Generic$IEnumerable$1$System$Windows$Forms$Control$getEnumerator", "System$Collections$Generic$IEnumerable$1$getEnumerator"],
+            "GetEnumerator", ["System$Collections$Generic$IEnumerable$1$System$Windows$Forms$Control$GetEnumerator", "System$Collections$Generic$IEnumerable$1$GetEnumerator"],
             "indexOf", "System$Collections$Generic$IList$1$System$Windows$Forms$Control$indexOf",
             "insert", "System$Collections$Generic$IList$1$System$Windows$Forms$Control$insert",
             "remove", "System$Collections$Generic$ICollection$1$System$Windows$Forms$Control$remove",
@@ -3188,21 +11331,21 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             ctor: function (owner) {
                 this.$initialize();
                 this._owner = owner;
-                this._controls = new (System.Collections.Generic.List$1(System.Windows.Forms.Control)).ctor();
+                this._items = new (System.Collections.Generic.List$1(System.Windows.Forms.Control)).ctor();
             }
         },
         methods: {
             getItem: function (index) {
-                return this._controls.getItem(index);
+                return this._items.getItem(index);
             },
             setItem: function (index, value) {
-                this._controls.setItem(index, value);
+                this._items.setItem(index, value);
             },
             add: function (item) {
                 this._owner.Element.appendChild(item.Element);
                 item._parent = this.Owner;
                 item.InvokeLoad();
-                this._controls.add(item);
+                this._items.add(item);
                 this._owner.OnControlAdded(item);
             },
             AddRange: function (item) {
@@ -3214,7 +11357,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     frag.appendChild(item[System.Array.index(i, item)].Element);
                     item[System.Array.index(i, item)]._parent = this.Owner;
                     item[System.Array.index(i, item)].InvokeLoad();
-                    this._controls.add(item[System.Array.index(i, item)]);
+                    this._items.add(item[System.Array.index(i, item)]);
                     this._owner.OnControlAdded(item[System.Array.index(i, item)]);
                 }
                 this._owner.Element.appendChild(frag);
@@ -3226,29 +11369,29 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 				_owner.Element.removeChild(_owner.Element.lastChild);
                 			};
                 			
-                this._controls.clear();
+                this._items.clear();
             },
             contains: function (item) {
-                return this._controls.contains(item);
+                return this._items.contains(item);
             },
             copyTo$1: function (array, arrayIndex) {
-                this._controls.copyTo(array, arrayIndex);
+                this._items.copyTo(array, arrayIndex);
             },
             copyTo: function (array, arrayIndex) {
-                this._controls.copyTo(Bridge.cast(array, System.Array.type(System.Windows.Forms.Control)), arrayIndex);
+                this._items.copyTo(Bridge.cast(array, System.Array.type(System.Windows.Forms.Control)), arrayIndex);
             },
-            getEnumerator: function () {
-                return this._controls.getEnumerator().$clone();
+            GetEnumerator: function () {
+                return this._items.GetEnumerator().$clone();
             },
-            System$Collections$IEnumerable$getEnumerator: function () {
-                return this._controls.getEnumerator().$clone();
+            System$Collections$IEnumerable$GetEnumerator: function () {
+                return this._items.GetEnumerator().$clone();
             },
             indexOf: function (item) {
-                return this._controls.indexOf(item);
+                return this._items.indexOf(item);
             },
             insert: function (index, item) {
-                this._owner.Element.insertBefore(item.Element, this._owner.Element.childNodes[index]);
-                this._controls.insert(index, item);
+                this._owner.Element.insertBefore(item.Element, Bridge.cast(this._owner.Element.childNodes[index], Node));
+                this._items.insert(index, item);
                 this._owner.OnControlAdded(item);
             },
             remove: function (item) {
@@ -3256,14 +11399,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 this._owner.OnControlRemoved(item);
 
-                return this._controls.remove(item);
+                return this._items.remove(item);
             },
             removeAt: function (index) {
                 this._owner.Element.removeChild(this._owner.Element.childNodes[index]);
 
-                this._owner.OnControlRemoved(this._controls.getItem(index));
+                this._owner.OnControlRemoved(this._items.getItem(index));
 
-                this._controls.removeAt(index);
+                this._items.removeAt(index);
             }
         }
     });
@@ -3287,7 +11430,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Bridge.is(this._tag, System.String)) {
                         var str = (System.String.concat(this._tag, ""));
                         if (System.String.contains(str,",")) {
-                            var arry = System.String.split(str, [44].map(function(i) {{ return String.fromCharCode(i); }}));
+                            var arry = System.String.split(str, [44].map(function (i) {{ return String.fromCharCode(i); }}));
                             this.Element.className = arry[System.Array.index(0, arry)];
                             if (arry.length >= 2) {
                                 this.table.className = arry[System.Array.index(1, arry)];
@@ -3371,283 +11514,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
-    /**
-     * TODO - add controls via html....
-     *
-     * @public
-     * @class System.Windows.Forms.DataGridViewColumnCollection
-     * @implements  System.Collections.Generic.IList$1
-     * @implements  System.Collections.ICollection
-     * @implements  System.Collections.IEnumerable
-     */
-    Bridge.define("System.Windows.Forms.DataGridViewColumnCollection", {
-        inherits: [System.Collections.Generic.IList$1(System.Windows.Forms.DataGridViewColumn),System.Collections.ICollection,System.Collections.IEnumerable],
-        fields: {
-            _owner: null,
-            header: null,
-            _controls: null
-        },
-        props: {
-            Owner: {
-                get: function () {
-                    return this._owner;
-                }
-            },
-            IsSynchronized: {
-                get: function () {
-                    return false;
-                }
-            },
-            SyncRoot: {
-                get: function () {
-                    throw new System.NotImplementedException();
-                }
-            },
-            Count: {
-                get: function () {
-                    return this._controls.Count;
-                }
-            },
-            IsReadOnly: {
-                get: function () {
-                    return false;
-                }
-            }
-        },
-        alias: [
-            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
-            "SyncRoot", "System$Collections$ICollection$SyncRoot",
-            "getItem", "System$Collections$Generic$IList$1$System$Windows$Forms$DataGridViewColumn$getItem",
-            "setItem", "System$Collections$Generic$IList$1$System$Windows$Forms$DataGridViewColumn$setItem",
-            "Count", "System$Collections$ICollection$Count",
-            "Count", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$Count",
-            "IsReadOnly", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$IsReadOnly",
-            "add", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$add",
-            "clear", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$clear",
-            "contains", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$contains",
-            "copyTo$1", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$copyTo",
-            "copyTo", "System$Collections$ICollection$copyTo",
-            "getEnumerator", ["System$Collections$Generic$IEnumerable$1$System$Windows$Forms$DataGridViewColumn$getEnumerator", "System$Collections$Generic$IEnumerable$1$getEnumerator"],
-            "indexOf", "System$Collections$Generic$IList$1$System$Windows$Forms$DataGridViewColumn$indexOf",
-            "insert", "System$Collections$Generic$IList$1$System$Windows$Forms$DataGridViewColumn$insert",
-            "remove", "System$Collections$Generic$ICollection$1$System$Windows$Forms$DataGridViewColumn$remove",
-            "removeAt", "System$Collections$Generic$IList$1$System$Windows$Forms$DataGridViewColumn$removeAt"
-        ],
-        ctors: {
-            ctor: function (owner, table) {
-                this.$initialize();
-                this._owner = owner;
-                this._controls = new (System.Collections.Generic.List$1(System.Windows.Forms.DataGridViewColumn)).ctor();
-
-                this.header = table.createTHead();
-                table.appendChild(this.header);
-            }
-        },
-        methods: {
-            getItem: function (index) {
-                return this._controls.getItem(index);
-            },
-            setItem: function (index, value) {
-                this._controls.setItem(index, value);
-            },
-            add: function (item) {
-
-                this.header.appendChild(item.Element);
-                this._controls.add(item);
-            },
-            AddRange: function (item) {
-                if (item == null || item.length === 0) {
-                    return;
-                }
-                var frag = document.createDocumentFragment();
-                for (var i = 0; i < item.length; i = (i + 1) | 0) {
-                    frag.appendChild(item[System.Array.index(i, item)].Element);
-                    this._controls.add(item[System.Array.index(i, item)]);
-                }
-                this.header.appendChild(frag);
-            },
-            clear: function () {
-                			var len = header.childNodes.length;
-                			while(len--)
-                			{
-                				header.removeChild(header.lastChild);
-                			};
-                			
-                this._controls.clear();
-            },
-            contains: function (item) {
-                return this._controls.contains(item);
-            },
-            copyTo$1: function (array, arrayIndex) {
-                this._controls.copyTo(array, arrayIndex);
-            },
-            copyTo: function (array, arrayIndex) {
-                this._controls.copyTo(Bridge.cast(array, System.Array.type(System.Windows.Forms.DataGridViewColumn)), arrayIndex);
-            },
-            getEnumerator: function () {
-                return this._controls.getEnumerator().$clone();
-            },
-            System$Collections$IEnumerable$getEnumerator: function () {
-                return this._controls.getEnumerator().$clone();
-            },
-            indexOf: function (item) {
-                return this._controls.indexOf(item);
-            },
-            insert: function (index, item) {
-                this.header.insertBefore(item.Element, this.header.childNodes[index]);
-                this._controls.insert(index, item);
-            },
-            remove: function (item) {
-                this.header.removeChild(item.Element);
-                return this._controls.remove(item);
-            },
-            removeAt: function (index) {
-                this.header.removeChild(this.header.childNodes[index]);
-                this._controls.removeAt(index);
-            }
-        }
-    });
-
-    /**
-     * TODO - add controls via html....
-     *
-     * @public
-     * @class System.Windows.Forms.DataGridViewRowCollection
-     * @implements  System.Collections.Generic.IList$1
-     * @implements  System.Collections.ICollection
-     * @implements  System.Collections.IEnumerable
-     */
-    Bridge.define("System.Windows.Forms.DataGridViewRowCollection", {
-        inherits: [System.Collections.Generic.IList$1(System.Data.DataRow),System.Collections.ICollection,System.Collections.IEnumerable],
-        fields: {
-            _owner: null,
-            body: null,
-            _controls: null
-        },
-        props: {
-            Owner: {
-                get: function () {
-                    return this._owner;
-                }
-            },
-            Count: {
-                get: function () {
-                    return this._controls.Count;
-                }
-            },
-            IsReadOnly: {
-                get: function () {
-                    return false;
-                }
-            },
-            IsSynchronized: {
-                get: function () {
-                    return false;
-                }
-            },
-            SyncRoot: {
-                get: function () {
-                    throw new System.NotImplementedException();
-                }
-            }
-        },
-        alias: [
-            "getItem", "System$Collections$Generic$IList$1$System$Data$DataRow$getItem",
-            "setItem", "System$Collections$Generic$IList$1$System$Data$DataRow$setItem",
-            "Count", "System$Collections$ICollection$Count",
-            "Count", "System$Collections$Generic$ICollection$1$System$Data$DataRow$Count",
-            "IsReadOnly", "System$Collections$Generic$ICollection$1$System$Data$DataRow$IsReadOnly",
-            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
-            "SyncRoot", "System$Collections$ICollection$SyncRoot",
-            "add", "System$Collections$Generic$ICollection$1$System$Data$DataRow$add",
-            "clear", "System$Collections$Generic$ICollection$1$System$Data$DataRow$clear",
-            "contains", "System$Collections$Generic$ICollection$1$System$Data$DataRow$contains",
-            "copyTo$1", "System$Collections$Generic$ICollection$1$System$Data$DataRow$copyTo",
-            "copyTo", "System$Collections$ICollection$copyTo",
-            "getEnumerator", ["System$Collections$Generic$IEnumerable$1$System$Data$DataRow$getEnumerator", "System$Collections$Generic$IEnumerable$1$getEnumerator"],
-            "indexOf", "System$Collections$Generic$IList$1$System$Data$DataRow$indexOf",
-            "insert", "System$Collections$Generic$IList$1$System$Data$DataRow$insert",
-            "remove", "System$Collections$Generic$ICollection$1$System$Data$DataRow$remove",
-            "removeAt", "System$Collections$Generic$IList$1$System$Data$DataRow$removeAt"
-        ],
-        ctors: {
-            ctor: function (owner, table) {
-                this.$initialize();
-                this._owner = owner;
-                this._controls = new (System.Collections.Generic.List$1(System.Data.DataRow)).ctor();
-
-                this.body = table.createTBody();
-                table.appendChild(this.body);
-            }
-        },
-        methods: {
-            getItem: function (index) {
-                return this._controls.getItem(index);
-            },
-            setItem: function (index, value) {
-                this._controls.setItem(index, value);
-            },
-            add: function (item) {
-                this.body.appendChild(item.Element);
-                this._controls.add(item);
-            },
-            AddRange: function (item) {
-                if (item == null || item.length === 0) {
-                    return;
-                }
-                var frag = document.createDocumentFragment();
-                for (var i = 0; i < item.length; i = (i + 1) | 0) {
-                    frag.appendChild(item[System.Array.index(i, item)].Element);
-                    this._controls.add(item[System.Array.index(i, item)]);
-                }
-                this.body.appendChild(frag);
-            },
-            clear: function () {
-                			var len = body.childNodes.length;
-                			while(len--)
-                			{
-                				body.removeChild(body.lastChild);
-                			};
-                			
-                this._controls.clear();
-            },
-            contains: function (item) {
-                return this._controls.contains(item);
-            },
-            copyTo$1: function (array, arrayIndex) {
-                this._controls.copyTo(array, arrayIndex);
-            },
-            copyTo: function (array, arrayIndex) {
-                this._controls.copyTo(Bridge.cast(array, System.Array.type(System.Data.DataRow)), arrayIndex);
-            },
-            getEnumerator: function () {
-                return this._controls.getEnumerator().$clone();
-            },
-            System$Collections$IEnumerable$getEnumerator: function () {
-                return this._controls.getEnumerator().$clone();
-            },
-            indexOf: function (item) {
-                return this._controls.indexOf(item);
-            },
-            insert: function (index, item) {
-                this.body.insertBefore(item.Element, this.body.childNodes[index]);
-                this._controls.insert(index, item);
-            },
-            remove: function (item) {
-                this.body.removeChild(item.Element);
-                return this._controls.remove(item);
-            },
-            removeAt: function (index) {
-                this.body.removeChild(this.body.childNodes[index]);
-                this._controls.removeAt(index);
-            }
-        }
-    });
-
-    Bridge.define("System.Windows.Forms.DataGridViewTextBoxColumn", {
-        inherits: [System.Windows.Forms.DataGridViewColumn]
-    });
-
     Bridge.define("System.Windows.Forms.GroupBox", {
         inherits: [System.Windows.Forms.Control],
         fields: {
@@ -3673,7 +11539,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Bridge.is(this._tag, System.String)) {
                         var str = (System.String.concat(this._tag, ""));
                         if (System.String.contains(str,",")) {
-                            var arry = System.String.split(str, [44].map(function(i) {{ return String.fromCharCode(i); }}));
+                            var arry = System.String.split(str, [44].map(function (i) {{ return String.fromCharCode(i); }}));
                             this.Element.className = arry[System.Array.index(0, arry)];
                             if (arry.length === 3) {
                                 this.legend.className = arry[System.Array.index(1, arry)];
@@ -3834,7 +11700,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Bridge.is(this._tag, System.String)) {
                         var str = (System.String.concat(this._tag, ""));
                         if (System.String.contains(str,",")) {
-                            var arry = System.String.split(str, [44].map(function(i) {{ return String.fromCharCode(i); }}));
+                            var arry = System.String.split(str, [44].map(function (i) {{ return String.fromCharCode(i); }}));
                             this.Element.className = arry[System.Array.index(0, arry)];
                             if (arry.length === 2) {
                                 this.progressBar.className = arry[System.Array.index(1, arry)];
@@ -3884,9 +11750,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         }
                     } finally {
                         if (Bridge.is($t, System.IDisposable)) {
-                            $t.System$IDisposable$dispose();
+                            $t.System$IDisposable$Dispose();
                         }
-                    }return pages.toArray();
+                    }return pages.ToArray();
                 }
             },
             SelectedIndex: {
@@ -3896,7 +11762,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 set: function (value) {
                     if (this._selectedIndex !== value) {
                         this._selectedIndex = value;
-                        this.PerformLayout();
+                        this.PerformLayout$1();
                     }
                 }
             },
@@ -3909,7 +11775,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Bridge.is(this._tag, System.String)) {
                         var str = (System.String.concat(this._tag, ""));
                         if (System.String.contains(str,",")) {
-                            var arry = System.String.split(str, [44].map(function(i) {{ return String.fromCharCode(i); }}));
+                            var arry = System.String.split(str, [44].map(function (i) {{ return String.fromCharCode(i); }}));
                             this.Element.className = arry[System.Array.index(0, arry)];
                             if (arry.length === 2) {
                                 this.LinkTag = arry[System.Array.index(1, arry)];
@@ -3944,7 +11810,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (Bridge.is(control, System.Windows.Forms.TabPage)) {
                     this.Controls.add(control.Header);
 
-                    this.PerformLayout();
+                    this.PerformLayout$1();
                 }
             },
             OnControlRemoved: function (control) {
@@ -3953,7 +11819,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (Bridge.is(control, System.Windows.Forms.TabPage)) {
                     this.Controls.remove(control.Header);
 
-                    this.PerformLayout();
+                    this.PerformLayout$1();
                 }
             },
             ResizeTabHeaderSize: function () {
@@ -3988,15 +11854,15 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                 } finally {
                     if (Bridge.is($t, System.IDisposable)) {
-                        $t.System$IDisposable$dispose();
+                        $t.System$IDisposable$Dispose();
                     }
                 }},
-            PerformLayout: function () {
+            PerformLayout$1: function () {
                 var $t, $t1;
-                if (this.layoutSuspended) {
+                if (this.layoutSuspendCount > 0) {
                     return;
                 }
-                System.Windows.Forms.Control.prototype.PerformLayout.call(this);
+                System.Windows.Forms.Control.prototype.PerformLayout$1.call(this);
 
                 var i = 0;
                 var activePage = null;
@@ -4015,7 +11881,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                         if (!System.String.isNullOrWhiteSpace(this.LinkTag)) {
                             if (System.String.contains(this.LinkTag," ")) {
-                                var tags = System.String.split(this.LinkTag, [32].map(function(i) {{ return String.fromCharCode(i); }}));
+                                var tags = System.String.split(this.LinkTag, [32].map(function (i) {{ return String.fromCharCode(i); }}));
                                 $t1 = Bridge.getEnumerator(tags);
                                 try {
                                     while ($t1.moveNext()) {
@@ -4028,7 +11894,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                                     }
                                 } finally {
                                     if (Bridge.is($t1, System.IDisposable)) {
-                                        $t1.System$IDisposable$dispose();
+                                        $t1.System$IDisposable$Dispose();
                                     }
                                 }
                             } else {
@@ -4050,7 +11916,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             }
 
                             page.Visible = true;
-                            page.Size = new System.Drawing.Size.$ctor1(((this.Size.Width - 8) | 0), ((this.Size.Height - (26)) | 0));
+                            page.Size = new System.Drawing.Size.$ctor2(((this.Size.Width - 8) | 0), ((this.Size.Height - (26)) | 0));
                         } else {
 
                             this.Controls.remove(page.Header);
@@ -4065,7 +11931,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                 } finally {
                     if (Bridge.is($t, System.IDisposable)) {
-                        $t.System$IDisposable$dispose();
+                        $t.System$IDisposable$Dispose();
                     }
                 }
                 if (activePage != null) {
@@ -4214,7 +12080,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Bridge.is(this._tag, System.String)) {
                         var str = (System.String.concat(this._tag, ""));
                         if (System.String.contains(str,",")) {
-                            var arry = System.String.split(str, [44].map(function(i) {{ return String.fromCharCode(i); }}));
+                            var arry = System.String.split(str, [44].map(function (i) {{ return String.fromCharCode(i); }}));
                             this.Element.className = arry[System.Array.index(0, arry)];
                             if (arry.length === 3) {
                                 this.checkBox.className = arry[System.Array.index(1, arry)];
@@ -4343,6 +12209,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         }
                         return null;
                     };
+
+
 
                     document.body.appendChild(System.Windows.Forms.Form._formOverLay);
                 }
@@ -4504,7 +12372,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         }
                     } finally {
                         if (Bridge.is($t, System.IDisposable)) {
-                            $t.System$IDisposable$dispose();
+                            $t.System$IDisposable$Dispose();
                         }
                     }$t1 = Bridge.getEnumerator(RemoveList);
                     try {
@@ -4514,7 +12382,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         }
                     } finally {
                         if (Bridge.is($t1, System.IDisposable)) {
-                            $t1.System$IDisposable$dispose();
+                            $t1.System$IDisposable$Dispose();
                         }
                     }},
                 GetActiveFormCollection: function () {
@@ -4545,6 +12413,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _allowMoveChange: false,
             _mouseDownOnBorder: false,
             _formMovementModes: 0,
+            btnClose: null,
             DialogResults: null,
             _isDialog: false,
             _inClose: false,
@@ -4623,6 +12492,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this._controlBox = true;
             },
             ctor: function () {
+                var $t;
                 this.$initialize();
                 System.Windows.Forms.ContainerControl.ctor.call(this);
                 this.Element.setAttribute("scope", "form");
@@ -4630,6 +12500,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.TabStop = false;
 
                 this.Location = new System.Drawing.Point.$ctor1(0, 0);
+
+                this.btnClose = ($t = new System.Windows.Forms.Button(), $t.Tag = "Close", $t);
+                this.btnClose.Element.setAttribute("scope", "closeform");
+                this.Controls.add(this.btnClose);
 
                 this._setBorderWidth();
             }
@@ -4786,7 +12660,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this._showStartNewLevel();
 
                 if (dialogResults != null && dialogResults.length > 0) {
-                    this.DialogResults.addRange(dialogResults);
+                    this.DialogResults.AddRange(dialogResults);
                 }
             },
             _showForm: function () {
@@ -4858,6 +12732,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 }
                 System.Windows.Forms.ContainerControl.prototype.OnMouseMove.call(this, e);
+            },
+            _processWinFormCloseButton: function () {
+
             },
             _processWinFormView: function () {
                 var clientSize = this.ClientSize.$clone();
@@ -4957,12 +12834,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.Element.style.borderRightWidth = this._formRightBorder + "px";
             },
             GetClientSize: function (size) {
-                return new System.Drawing.Size.$ctor1(((size.Width - (((this._formLeftBorder + this._formRightBorder) | 0))) | 0), ((size.Height - (((this._formTopBorder + this._formBottonBorder) | 0))) | 0));
+                return new System.Drawing.Size.$ctor2(((size.Width - (((this._formLeftBorder + this._formRightBorder) | 0))) | 0), ((size.Height - (((this._formTopBorder + this._formBottonBorder) | 0))) | 0));
             },
             SetSize: function (clientSize) {
-                return new System.Drawing.Size.$ctor1(((clientSize.Width + (((this._formLeftBorder + this._formRightBorder) | 0))) | 0), ((clientSize.Height + (((this._formTopBorder + this._formBottonBorder) | 0))) | 0));
+                return new System.Drawing.Size.$ctor2(((clientSize.Width + (((this._formLeftBorder + this._formRightBorder) | 0))) | 0), ((clientSize.Height + (((this._formTopBorder + this._formBottonBorder) | 0))) | 0));
             },
-            Dispose: function (disposing) {
+            Dispose$1: function (disposing) {
 
             }
         }
@@ -5025,5 +12902,3 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 });
-
-//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAiZmlsZSI6ICJDbGFzc2ljRm9ybXMuanMiLAogICJzb3VyY2VSb290IjogIiIsCiAgInNvdXJjZXMiOiBbIkRhdGEvRGF0YUNvbHVtbi5jcyIsIkRhdGEvRGF0YUNvbHVtbkNvbGxlY3Rpb24uY3MiLCJEYXRhL0RhdGFSb3cuY3MiLCJEYXRhL0RhdGFSb3dDb2xsZWN0aW9uLmNzIiwiRGF0YS9EYXRhVGFibGUuY3MiLCJEcmF3aW5nL0NvbG9yLmNzIiwiRHJhd2luZy9Gb250LmNzIiwiRHJhd2luZy9Qb2ludC5jcyIsIkRyYXdpbmcvU2l6ZS5jcyIsIkRyYXdpbmcvU2l6ZUYuY3MiLCJEcmF3aW5nL1N5c3RlbUNvbG9ycy5jcyIsIldpbmRvd3MvRm9ybXMvQ29udHJvbC5jcyIsIldpbmRvd3MvRm9ybXMvRGF0YUdyaWRWaWV3Q29sdW1uLmNzIiwiV2luZG93cy9Gb3Jtcy9EaWFsb2dSZXN1bHQuY3MiLCJXaW5kb3dzL0Zvcm1zL0Zvcm0uY3MiLCJXaW5kb3dzL0Zvcm1zL0xpbmtMYWJlbExpbmtDbGlja2VkRXZlbnRIYW5kbGVyLmNzIiwiV2luZG93cy9Gb3Jtcy9Nb3VzZUV2ZW50QXJncy5jcyIsIldpbmRvd3MvRm9ybXMvT2JqZWN0Q29sbGVjdGlvbi5jcyIsIldpbmRvd3MvRm9ybXMvUGFkZGluZy5jcyIsIldpbmRvd3MvRm9ybXMvQnV0dG9uQmFzZS5jcyIsIldpbmRvd3MvRm9ybXMvQ29tYm9Cb3guY3MiLCJXaW5kb3dzL0Zvcm1zL0NvbnRhaW5lckNvbnRyb2wuY3MiLCJXaW5kb3dzL0Zvcm1zL0NvbnRyb2xDb2xsZWN0aW9uLmNzIiwiV2luZG93cy9Gb3Jtcy9EYXRhR3JpZFZpZXcuY3MiLCJXaW5kb3dzL0Zvcm1zL0RhdGFHcmlkVmlld0NvbHVtbkNvbGxlY3Rpb24uY3MiLCJXaW5kb3dzL0Zvcm1zL0RhdGFHcmlkVmlld1Jvd0NvbGxlY3Rpb24uY3MiLCJXaW5kb3dzL0Zvcm1zL0dyb3VwQm94LmNzIiwiV2luZG93cy9Gb3Jtcy9MYWJlbC5jcyIsIldpbmRvd3MvRm9ybXMvTGlua0xhYmVsLmNzIiwiV2luZG93cy9Gb3Jtcy9Qcm9ncmVzc0Jhci5jcyIsIldpbmRvd3MvRm9ybXMvVGFiQ29udHJvbC5jcyIsIldpbmRvd3MvRm9ybXMvVGFiUGFnZUhlYWRlci5jcyIsIldpbmRvd3MvRm9ybXMvVGV4dEJveC5jcyIsIldpbmRvd3MvRm9ybXMvQnV0dG9uLmNzIiwiV2luZG93cy9Gb3Jtcy9DaGVja0JveC5jcyIsIldpbmRvd3MvRm9ybXMvUGFuZWwuY3MiLCJXaW5kb3dzL0Zvcm1zL1RhYlBhZ2UuY3MiXSwKICAibmFtZXMiOiBbIiJdLAogICJtYXBwaW5ncyI6ICI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OzRCQVkwQkEsT0FBaUJBOztnQkFFL0JBLFlBQU9BO2dCQUNQQSxhQUFRQTs7Ozs7Ozs7Ozs7OztvQkNTVUEsT0FBT0E7Ozs7OzRCQUVDQTs7Z0JBRTFCQSxhQUFRQTtnQkFDUkEsZUFBVUEsS0FBSUE7Ozs7O3NDQWhCUUE7Z0JBRXRCQSxLQUFLQSxXQUFXQSxJQUFJQSxvQkFBZUE7b0JBRS9CQSxJQUFJQSw0Q0FBUUEsU0FBV0E7d0JBQ25CQSxPQUFPQTs7OztnQkFHZkEsT0FBT0E7OzJCQVlXQTtnQkFFbEJBLFdBQVdBLElBQUlBLHVCQUFXQSxZQUFPQTs7Z0JBRWpDQSxpQkFBWUE7O2dCQUVaQSxPQUFPQTs7Ozs7Ozs7Ozs7Ozs0QkMxQk1BOztnQkFFYkEsZUFBVUE7Z0JBQ1ZBLFlBQU9BLEtBQUlBLHlEQUFhQTtnQkFDeEJBLGVBQVVBOzs7OytCQUdTQTtnQkFDZkEsT0FBT0EsZUFBS0EsNEJBQXVCQTs7K0JBRHBCQTtnQkFHZkEsZUFBS0EsNEJBQXVCQSxhQUFlQTs7aUNBR2hDQTtnQkFDWEEsSUFBSUEsbUJBQW1CQSxjQUFjQTtvQkFDakNBLE9BQU9BOzs7Z0JBRVhBLE9BQU9BLGtCQUFLQTs7aUNBSkRBO2dCQU1YQSxJQUFJQTtvQkFDQUE7O2dCQUNKQSxJQUFJQSxjQUFjQTtvQkFDZEE7OztnQkFFSkEsSUFBSUEsY0FBY0E7b0JBRWRBLEtBQUtBLFFBQVFBLGlCQUFZQSxJQUFJQSx5QkFBaUJBO3dCQUUxQ0EsU0FBU0E7O3dCQUVUQSxJQUFJQSxNQUFLQTs0QkFFTEEsY0FBU0E7NEJBQ1RBLGVBQWVBLENBQUNBOzs0QkFFaEJBLHlCQUFrRUE7OzRCQUVsRUE7OzRCQUlBQSx5QkFBa0VBOzRCQUNsRUEsY0FBU0E7Ozs7b0JBTWpCQSxzQkFBaUJBLHlCQUF1REEsQ0FBQ0E7b0JBQ3pFQSxrQkFBS0EsYUFBZUE7Ozs7Ozs7Ozs7Ozs0QkNqRExBOztnQkFFdkJBLGFBQVFBO2dCQUNSQSxZQUFPQSxLQUFJQTs7OzsyQkFHQ0E7O2dCQUVaQSxjQUFTQTtnQkFDVEEsb0JBQWVBLFlBQU9BLFVBQUlBLGlEQUF3Q0E7Ozs7Ozs7Ozs7Ozs7Ozs7Z0JDTmxFQSxlQUFVQSxJQUFJQSxpQ0FBcUJBO2dCQUNuQ0EsWUFBT0EsSUFBSUEsOEJBQWtCQTs7Ozs7Z0JBSzdCQSxTQUFTQSxJQUFJQSxvQkFBUUE7O2dCQUVyQkEsT0FBT0E7Ozs7O2dDQVVrQkEsUUFBZUE7Z0JBRXhDQSxJQUFHQSx1Q0FBZUE7b0JBRWRBLGlCQUFZQSxRQUFRQTs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozt3QkNScEJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0EsSUFBSUEsNEJBQU1BOzs7Ozt3QkFRakJBLE9BQU9BLElBQUlBLDRCQUFNQTs7Ozs7d0JBUWpCQSxPQUFPQSxJQUFJQSw0QkFBTUE7Ozs7O3dCQVFqQkEsT0FBT0Es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QUFJQSxJQUFJQTtvQkFFSkEsSUFBSUE7O2dCQUVSQSxJQUFJQSxJQUFJQTtvQkFFSkEsSUFBSUE7O2dCQUVSQSxPQUFPQSxDQUFDQSxDQUFDQSxJQUFJQTs7O2dCQUtiQSxJQUFJQSxDQUFDQSxXQUFVQSxXQUFXQSxDQUFDQSxXQUFVQTtvQkFFakNBOztnQkFFSkEsUUFBVUEsU0FBSUE7Z0JBQ2RBLFFBQVVBLFNBQUlBO2dCQUNkQSxRQUFVQSxTQUFJQTtnQkFDZEE7Z0JBQ0FBLFFBQVVBO2dCQUNWQSxRQUFVQTtnQkFDVkEsSUFBSUEsSUFBSUE7b0JBRUpBLElBQUlBOztnQkFFUkEsSUFBSUEsSUFBSUE7b0JBRUpBLElBQUlBOztnQkFFUkEsSUFBSUEsSUFBSUE7b0JBRUpBLElBQUlBOztnQkFFUkEsSUFBSUEsSUFBSUE7b0JBRUpBLElBQUlBOztnQkFFUkEsV0FBYUEsSUFBSUE7Z0JBQ2pCQSxJQUFJQSxNQUFLQTtvQkFFTEEsSUFBSUEsQ0FBQ0EsSUFBSUEsS0FBS0E7dUJBRWJBLElBQUlBLE1BQUtBO29CQUVWQSxJQUFJQSxNQUFLQSxDQUFDQSxDQUFDQSxJQUFJQSxLQUFLQTt1QkFFbkJBLElBQUlBLE1BQUtBO29CQUVWQSxJQUFJQSxNQUFLQSxDQUFDQSxDQUFDQSxJQUFJQSxLQUFLQTs7Z0JBRXhCQTtnQkFDQUEsSUFBSUE7b0JBRUFBOztnQkFFSkEsT0FBT0E7OztnQkFPUEEsUUFBVUEsU0FBSUE7Z0JBQ2RBLFFBQVVBLFNBQUlBO2dCQUNkQSxRQUFVQSxTQUFJQTtnQkFDZEE7Z0JBQ0FBLFFBQVVBO2dCQUNWQSxRQUFVQTtnQkFDVkEsSUFBSUEsSUFBSUE7b0JBRUpBLElBQUlBOztnQkFFUkEsSUFBSUEsSUFBSUE7b0JBRUpBLElBQUlBOztnQkFFUkEsSUFBSUEsSUFBSUE7b0JBRUpBLElBQUlBOztnQkFFUkEsSUFBSUEsSUFBSUE7b0JBRUpBLElBQUlBOztnQkFFUkEsSUFBSUEsTUFBS0E7b0JBRUxBLE9BQU9BOztnQkFFWEEsUUFBVUEsQ0FBQ0EsSUFBSUE7Z0JBQ2ZBLElBQUlBO29CQUVBQSxPQUFPQSxDQUFDQSxDQUFDQSxJQUFJQSxLQUFLQSxDQUFDQSxJQUFJQTs7Z0JBRTNCQSxPQUFPQSxDQUFDQSxDQUFDQSxJQUFJQSxLQUFLQSxDQUFDQSxDQUFDQSxNQUFLQSxLQUFLQTs7O2dCQUs5QkEsT0FBT0Esb0JBQUtBOzs7Z0JBS1pBLE9BQU9BLEFBQVlBOzs7Z0JBS25CQSxjQUF3QkE7Z0JBQ3hCQSxlQUFlQTtnQkFDZkE7Z0JBQ0FBLElBQUlBLENBQUNBLGFBQWFBO29CQUVkQSxlQUFlQTt1QkFFZEEsSUFBSUEsQ0FBQ0EsYUFBYUE7b0JBRW5CQSxlQUFlQTt1QkFFZEEsSUFBSUEsQ0FBQ0EsYUFBYUE7b0JBRW5CQSxtREFBbURBLGlDQUFHQSxpQ0FBR0EsaUNBQUdBOztvQkFJNURBOztnQkFFSkE7Z0JBQ0FBLE9BQU9BOzs4QkFpQmlCQTtnQkFFeEJBLElBQUlBO29CQUVBQSxZQUFjQSxxQ0FBT0E7b0JBQ3JCQSxJQUFJQSxDQUFDQSxDQUFDQSxrQkFBY0EsaUJBQWdCQSxDQUFDQSxlQUFjQSxpQkFBaUJBLENBQUNBLG9CQUFtQkE7d0JBRXBGQSxPQUFPQSxDQUFDQSxDQUFDQSxrQ0FBYUEsZ0JBQWVBLENBQUNBLENBQUNBLENBQUNBLGFBQWFBLFNBQVNBLENBQUNBLGNBQWNBLFVBQVVBLGdDQUFpQkE7OztnQkFHaEhBOzs7Z0JBS0FBLE9BQU9BLENBQUNBLENBQUNBLGlDQUEyQkEsa0NBQTRCQTs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs4QkM1Z0R4REEsWUFBbUJBLFFBQWNBLE9BQWlCQSxNQUFtQkE7b0RBQXdCQSxZQUFZQTs7OzRCQUt6R0EsWUFBbUJBOztnQkFFM0JBLGtCQUFhQTtnQkFDYkEsY0FBU0E7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7c0NEeW9FcUJBOzs7O3dDQXZiQUE7b0JBRTlCQTtvQkFDQUEsT0FBT0EsaUVBQWVBLE9BQWZBOzs0Q0FJMEJBO29CQUVqQ0E7b0JBQ0FBLEtBQUtBLFdBQVdBLElBQUlBLGtEQUFtQkE7d0JBRW5DQSxXQUFXQSw2REFBV0EsR0FBWEE7d0JBQ1hBLElBQUlBLFNBQVFBOzRCQUVSQSxZQUFjQSxvQ0FBcUJBLEFBQVlBOzRCQUMvQ0EsSUFBSUEsQ0FBQ0E7Z0NBRURBLE9BQU9BOzs7O29CQUluQkEsT0FBT0EsOEJBQWVBOztrQ0FHQUEsT0FBV0EsS0FBU0EsT0FBV0E7b0JBRXJEQSxPQUFPQSxDQUFDQSxDQUFDQSxDQUFDQSxDQUFDQSxhQUFlQSxDQUFDQSxlQUFlQSxRQUFRQSxDQUFDQTs7O29CQUtuREEsSUFBSUEsaURBQWtCQTt3QkFFbEJBOzs7O29CQU1KQSxJQUFJQSw2Q0FBY0E7d0JBRWRBOzs7MENBSTBCQTtvQkFFOUJBLE9BQU9BLDJDQUFhQSxhQUFjQSxDQUFDQSxtQkFBb0JBLENBQUNBOzs7b0JBS3hEQSxRQUFhQTtvQkFDYkE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUE7b0JBQ0FBO29CQUNBQTtvQkFDQUEsZ0RBQWlCQTs7O29CQUtqQkEsOEdBQWdCQTtvQkFDaEJBLDhHQUFnQkE7b0JBQ2hCQSw4R0FBZ0JBO29CQUNoQkEsOEdBQWdCQTtvQkFDaEJBLGdIQUFrQkE7b0JBQ2xCQSxnSEFBa0JBO29CQUNsQkEsZ0hBQWtCQTtvQkFDbEJBLDhHQUFnQkE7b0JBQ2hCQSw4R0FBZ0JBO29CQUNoQkEsOEdBQWdCQTtvQkFDaEJBLDhHQUFnQkE7b0JBQ2hCQSw4R0FBZ0JBO29CQUNoQkEsK0dBQWlCQTtvQkFDakJBLCtHQUFpQkE7b0JBQ2pCQSxnSEFBa0JBO29CQUNsQkEsZ0hBQWtCQTtvQkFDbEJBLCtHQUFpQkE7b0JBQ2pCQSwrR0FBaUJBO29CQUNqQkEsK0dBQWlCQTtvQkFDakJBLCtHQUFpQkE7b0JBQ2pCQSwrR0FBaUJBO29CQUNqQkEsK0dBQWlCQTtvQkFDakJBLCtHQUFpQkE7b0JBQ2pCQSwrR0FBaUJBO29CQUNqQkEsK0dBQWlCQTtvQkFDakJBLCtHQUFpQkE7b0JBQ2pCQSxnSEFBa0JBO29CQUNsQkEsZ0hBQWtCQTtvQkFDbEJBLCtHQUFpQkE7b0JBQ2pCQSwrR0FBaUJBO29CQUNqQkEsK0dBQWlCQTtvQkFDakJBLCtHQUFpQkE7b0JBQ2pCQSwrR0FBaUJBOzs7b0JBTWpCQSxRQUFVQTs7b0JBRVZBO29CQUNBQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVFBO29CQUNSQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBUUE7b0JBQ1JBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFRQTtvQkFDUkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVFBO29CQUNSQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBUUE7b0JBQ1JBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFRQTtvQkFDUkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVFBO29CQUNSQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSwrQkFBVUE7b0JBQ1ZBLCtCQUFVQTtvQkFDVkEsK0JBQVVBO29CQUNWQSxnQ0FBU0E7b0JBQ1RBLGdDQUFVQTtvQkFDVkEsZ0NBQVVBO29CQUNWQSxnQ0FBVUE7b0JBQ1ZBLGdDQUFVQTtvQkFDVkEsZ0NBQVVBO29CQUNWQSxnQ0FBVUE7b0JBQ1ZBLGdDQUFVQTtvQkFDVkEsZ0NBQVVBO29CQUNWQSxnQ0FBVUE7b0JBQ1ZBLGdDQUFTQTtvQkFDVEEsZ0NBQVVBO29CQUNWQSxnQ0FBVUE7b0JBQ1ZBLGdDQUFVQTtvQkFDVkEsZ0NBQVVBO29CQUNWQSxnQ0FBVUE7b0JBQ1ZBLGdDQUFVQTtvQkFDVkEsZ0NBQVVBO29CQUNWQSxn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QUE7b0JBQ0pBLEtBQUtBO3dCQUNEQSxJQUFJQSxDQUFDQTs0QkFFREE7OzRCQUlBQTs7d0JBRUpBO3dCQUNBQTt3QkFDQUE7d0JBQ0FBO3dCQUNBQTtvQkFDSkEsS0FBS0E7d0JBQ0RBLElBQUlBLENBQUNBOzRCQUVEQTs7NEJBSUFBOzt3QkFFSkE7d0JBQ0FBO3dCQUNBQTt3QkFDQUE7d0JBQ0FBO29CQUNKQTt3QkFDSUE7OztnQkFHUkE7O2dCQUVBQSxrQkFBYUE7OztnQkFLYkEsb0NBQStCQTtnQkFDL0JBLHVDQUFrQ0E7Z0JBQ2xDQSxxQ0FBZ0NBO2dCQUNoQ0Esc0NBQWlDQTs7cUNBT1ZBO2dCQUV2QkEsT0FBT0EsSUFBSUEsMkJBQUtBLGVBQWFBLENBQUNBLHlCQUFrQkEsb0NBQW1CQSxnQkFBY0EsQ0FBQ0Esd0JBQWlCQTs7K0JBR2xGQTtnQkFFakJBLE9BQU9BLElBQUlBLDJCQUFLQSxxQkFBbUJBLENBQUNBLHlCQUFrQkEsb0NBQW1CQSxzQkFBb0JBLENBQUNBLHdCQUFpQkE7OytCQUdwRkE7Ozs7Ozs7Ozs7OztnQnFCcndCM0JBOzs7Ozs7Ozs7Ozs7OztvQkM2QklBLE9BQU9BOzs7b0JBS1BBLElBQUdBLDBDQUFlQTt3QkFFZEEsbUJBQWNBO3dCQUNkQSxJQUFHQTs0QkFFQ0E7Ozs7Ozs7Ozs7Z0JBcENaQSxjQUFTQSxJQUFJQTtnQkFDYkEscUJBQWdCQTtnQkFDaEJBOzs7O29DQUdzQkEsUUFBZUE7Z0JBRXJDQSxJQUFHQTtvQkFFQ0EsWUFBWUE7b0JBQ1pBLEtBQUtBLFdBQVdBLElBQUlBLGNBQWNBO3dCQUU5QkEsSUFBR0EsZ0RBQU1BLEdBQU5BLFNBQVlBOzRCQUVYQSw0QkFBd0NBOzRCQUN4Q0E7OztvQkFHUkEsNEJBQXdDQSIsCiAgInNvdXJjZXNDb250ZW50IjogWyJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLkRhdGFcclxue1xyXG4gICAgcHVibGljIGNsYXNzIERhdGFDb2x1bW5cclxuICAgIHtcclxuICAgICAgICBwdWJsaWMgc3RyaW5nIE5hbWUgeyBnZXQ7IHByaXZhdGUgc2V0OyB9XHJcbiAgICAgICAgcHVibGljIERhdGFUYWJsZSBUYWJsZSB7IGdldDsgcHJpdmF0ZSBzZXQ7IH1cclxuICAgICAgICBwdWJsaWMgRGF0YUNvbHVtbihEYXRhVGFibGUgdGFibGUsIHN0cmluZyBuYW1lKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgTmFtZSA9IG5hbWU7XHJcbiAgICAgICAgICAgIFRhYmxlID0gdGFibGU7XHJcbiAgICAgICAgfVxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWM7XHJcbnVzaW5nIFN5c3RlbS5MaW5xO1xyXG51c2luZyBTeXN0ZW0uVGV4dDtcclxudXNpbmcgU3lzdGVtLlRocmVhZGluZy5UYXNrcztcclxuXHJcbm5hbWVzcGFjZSBTeXN0ZW0uRGF0YVxyXG57XHJcbiAgICBwdWJsaWMgY2xhc3MgRGF0YUNvbHVtbkNvbGxlY3Rpb25cclxuICAgIHtcclxuICAgICAgICBwdWJsaWMgRGF0YVRhYmxlIFRhYmxlIHtnZXQ7cHJpdmF0ZSBzZXQ7fVxyXG4gICAgICAgIGludGVybmFsIExpc3Q8RGF0YUNvbHVtbj4gQ29sdW1ucztcclxuXHJcbiAgICAgICAgcHVibGljIGludCBHZXRDb2x1bW5JbmRleChzdHJpbmcgbmFtZSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGZvciAoaW50IGkgPSAwOyBpIDwgQ29sdW1ucy5Db3VudDsgaSsrKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBpZiAoQ29sdW1uc1tpXS5OYW1lID09IG5hbWUpXHJcbiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIGk7XHJcbiAgICAgICAgICAgIH1cclxuXHJcbiAgICAgICAgICAgIHJldHVybiAtMTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBpbnQgQ291bnQge2dldHtyZXR1cm4gQ29sdW1ucy5Db3VudDt9fVxyXG5cclxuICAgICAgICBpbnRlcm5hbCBEYXRhQ29sdW1uQ29sbGVjdGlvbihEYXRhVGFibGUgdGFibGUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBUYWJsZSA9IHRhYmxlO1xyXG4gICAgICAgICAgICBDb2x1bW5zID0gbmV3IExpc3Q8RGF0YUNvbHVtbj4oKTtcclxuXHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgRGF0YUNvbHVtbiBBZGQoc3RyaW5nIGNvbHVtbk5hbWUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICB2YXIgZGF0YSA9IG5ldyBEYXRhQ29sdW1uKFRhYmxlLCBjb2x1bW5OYW1lKTtcclxuXHJcbiAgICAgICAgICAgIENvbHVtbnMuQWRkKGRhdGEpO1xyXG5cclxuICAgICAgICAgICAgcmV0dXJuIGRhdGE7XHJcblxyXG4gICAgICAgIH1cclxuICAgIH1cclxufVxyXG5cclxuIiwidXNpbmcgU3lzdGVtO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYztcclxudXNpbmcgU3lzdGVtLkxpbnE7XHJcbnVzaW5nIFN5c3RlbS5UZXh0O1xyXG51c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzO1xyXG5cclxubmFtZXNwYWNlIFN5c3RlbS5EYXRhXHJcbntcclxuICAgIHB1YmxpYyBjbGFzcyBEYXRhUm93XHJcbiAgICB7XHJcbiAgICAgICAgaW50ZXJuYWwgUmV0eXBlZC5kb20uSFRNTFRhYmxlUm93RWxlbWVudCBFbGVtZW50OyAgICAgICAgXHJcbiAgICAgICAgaW50ZXJuYWwgTGlzdDxvYmplY3Q+IGRhdGE7XHJcbiAgICAgICAgcHVibGljIERhdGFDb2x1bW5Db2xsZWN0aW9uIENvbHVtbnMgeyBnZXQ7IHByaXZhdGUgc2V0OyB9XHJcbiAgICAgICAgaW50ZXJuYWwgRGF0YVJvdyhEYXRhQ29sdW1uQ29sbGVjdGlvbiBjb2x1bW5zKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgQ29sdW1ucyA9IGNvbHVtbnM7XHJcbiAgICAgICAgICAgIGRhdGEgPSBuZXcgTGlzdDxvYmplY3Q+KENvbHVtbnMuQ291bnQpOyAgICAgICAgICAgIFxyXG4gICAgICAgICAgICBFbGVtZW50ID0gbmV3IFJldHlwZWQuZG9tLkhUTUxUYWJsZVJvd0VsZW1lbnQoKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBuZXcgb2JqZWN0IHRoaXNbc3RyaW5nIGNvbHVtbk5hbWVdIHsgZ2V0IHtcclxuICAgICAgICAgICAgICAgIHJldHVybiB0aGlzW0NvbHVtbnMuR2V0Q29sdW1uSW5kZXgoY29sdW1uTmFtZSldO1xyXG4gICAgICAgICAgICB9IHNldCB7XHJcbiAgICAgICAgICAgICAgICB0aGlzW0NvbHVtbnMuR2V0Q29sdW1uSW5kZXgoY29sdW1uTmFtZSldID0gdmFsdWU7XHJcbiAgICAgICAgICAgIH0gfVxyXG4gICAgICAgIFxyXG4gICAgICAgIHB1YmxpYyBvYmplY3QgdGhpc1tpbnQgY29sdW1uSW5kZXhdIHsgZ2V0IHtcclxuICAgICAgICAgICAgICAgIGlmIChjb2x1bW5JbmRleCA8IDAgfHwgY29sdW1uSW5kZXggPiBDb2x1bW5zLkNvdW50IC0gMSlcclxuICAgICAgICAgICAgICAgICAgICByZXR1cm4gbnVsbDtcclxuXHJcbiAgICAgICAgICAgICAgICByZXR1cm4gZGF0YVtjb2x1bW5JbmRleF07XHJcbiAgICAgICAgICAgIH0gc2V0IHtcclxuICAgICAgICAgICAgICAgIGlmIChjb2x1bW5JbmRleCA8IDApXHJcbiAgICAgICAgICAgICAgICAgICAgcmV0dXJuO1xyXG4gICAgICAgICAgICAgICAgaWYgKGNvbHVtbkluZGV4ID4gQ29sdW1ucy5Db3VudCAtIDEpXHJcbiAgICAgICAgICAgICAgICAgICAgcmV0dXJuO1xyXG5cclxuICAgICAgICAgICAgICAgIGlmIChjb2x1bW5JbmRleCA+IGRhdGEuQ291bnQgLSAxKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIGZvciAoaW50IGkgPSBkYXRhLkNvdW50OyBpIDwgY29sdW1uSW5kZXggKyAxOyBpKyspXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICB2YXIgZGMgPSBuZXcgUmV0eXBlZC5kb20uSFRNTFRhYmxlRGF0YUNlbGxFbGVtZW50KCk7XHJcblxyXG4gICAgICAgICAgICAgICAgICAgICAgICBpZiAoaSA9PSBjb2x1bW5JbmRleClcclxuICAgICAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgZGF0YS5BZGQodmFsdWUpO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgZGMuaW5uZXJUZXh0ID0gKHZhbHVlICsgXCJcIik7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVsZW1lbnQuYXBwZW5kQ2hpbGQ8Z2xvYmFsOjpSZXR5cGVkLmRvbS5IVE1MVGFibGVEYXRhQ2VsbEVsZW1lbnQ+KGRjKTtcclxuXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICByZXR1cm47XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAgICAgICAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgRWxlbWVudC5hcHBlbmRDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLkhUTUxUYWJsZURhdGFDZWxsRWxlbWVudD4oZGMpOyAgICAgICAgICAgICAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRhdGEuQWRkKG51bGwpO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIEVsZW1lbnQuY2hpbGRyZW5bY29sdW1uSW5kZXhdLkFzPFJldHlwZWQuZG9tLkhUTUxFbGVtZW50PigpLmlubmVyVGV4dCA9ICh2YWx1ZSArIFwiXCIpO1xyXG4gICAgICAgICAgICAgICAgICAgIGRhdGFbY29sdW1uSW5kZXhdID0gdmFsdWU7XHJcbiAgICAgICAgICAgICAgICB9ICAgICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICB9IH0gICAgICAgXHJcbiAgICB9XHJcbn1cclxuIiwidXNpbmcgU3lzdGVtO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYztcclxudXNpbmcgU3lzdGVtLkxpbnE7XHJcbnVzaW5nIFN5c3RlbS5UZXh0O1xyXG51c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzO1xyXG5cclxubmFtZXNwYWNlIFN5c3RlbS5EYXRhXHJcbntcclxuICAgIHB1YmxpYyBjbGFzcyBEYXRhUm93Q29sbGVjdGlvblxyXG4gICAge1xyXG4gICAgICAgIHB1YmxpYyBEYXRhVGFibGUgVGFibGUgeyBnZXQ7IHByaXZhdGUgc2V0OyB9XHJcbiAgICAgICAgaW50ZXJuYWwgTGlzdDxEYXRhUm93PiByb3dzO1xyXG5cclxuICAgICAgICBpbnRlcm5hbCBEYXRhUm93Q29sbGVjdGlvbihEYXRhVGFibGUgdGFibGUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBUYWJsZSA9IHRhYmxlO1xyXG4gICAgICAgICAgICByb3dzID0gbmV3IExpc3Q8RGF0YVJvdz4oKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyB2b2lkIEFkZChEYXRhUm93IGRyKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgcm93cy5BZGQoZHIpO1xyXG4gICAgICAgICAgICBUYWJsZS5Pbk5ld1JvdyhUYWJsZSwgbmV3IFdpbmRvd3MuRm9ybXMuTmV3Um93RXZlbnRBcmdzKCkgeyBSb3cgPSBkciB9KTsgICAgICAgICAgICBcclxuICAgICAgICB9XHJcbiAgICB9XHJcbn1cclxuIiwidXNpbmcgU3lzdGVtO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYztcclxudXNpbmcgU3lzdGVtLkxpbnE7XHJcbnVzaW5nIFN5c3RlbS5UZXh0O1xyXG51c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzO1xyXG51c2luZyBTeXN0ZW0uV2luZG93cy5Gb3JtcztcclxuXHJcbm5hbWVzcGFjZSBTeXN0ZW0uRGF0YVxyXG57XHJcbiAgICBwdWJsaWMgY2xhc3MgRGF0YVRhYmxlXHJcbiAgICB7XHJcbiAgICAgICAgcHVibGljIERhdGFDb2x1bW5Db2xsZWN0aW9uIENvbHVtbnMgeyBnZXQ7IHByaXZhdGUgc2V0OyB9XHJcbiAgICAgICAgcHVibGljIERhdGFSb3dDb2xsZWN0aW9uIFJvd3MgeyBnZXQ7IHByaXZhdGUgc2V0OyB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBEYXRhVGFibGUoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgQ29sdW1ucyA9IG5ldyBEYXRhQ29sdW1uQ29sbGVjdGlvbih0aGlzKTtcclxuICAgICAgICAgICAgUm93cyA9IG5ldyBEYXRhUm93Q29sbGVjdGlvbih0aGlzKTtcclxuICAgICAgICB9XHJcbiAgICAgICAgXHJcbiAgICAgICAgcHVibGljIERhdGFSb3cgTmV3Um93KClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHZhciBkciA9IG5ldyBEYXRhUm93KENvbHVtbnMpO1xyXG5cclxuICAgICAgICAgICAgcmV0dXJuIGRyO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHZvaWQgQWNjZXB0Q2hhbmdlcygpXHJcbiAgICAgICAge1xyXG5cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBldmVudCBOZXdSb3dFdmVudEhhbmRsZXIgTmV3Um93RXZlbnQ7XHJcblxyXG4gICAgICAgIHB1YmxpYyB2aXJ0dWFsIHZvaWQgT25OZXdSb3cob2JqZWN0IHNlbmRlciwgTmV3Um93RXZlbnRBcmdzIGFyZ3MpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBpZihOZXdSb3dFdmVudCAhPSBudWxsKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBOZXdSb3dFdmVudChzZW5kZXIsIGFyZ3MpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIEJyaWRnZTtcclxudXNpbmcgU3lzdGVtO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYztcclxudXNpbmcgU3lzdGVtLkxpbnE7XHJcbnVzaW5nIFN5c3RlbS5UZXh0O1xyXG51c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzO1xyXG5cclxubmFtZXNwYWNlIFN5c3RlbS5EcmF3aW5nXHJcbntcclxuICAgIHB1YmxpYyBzdHJ1Y3QgQ29sb3JcclxuICAgIHtcclxuICAgICAgICBwdWJsaWMgc3RhdGljIHJlYWRvbmx5IENvbG9yIEVtcHR5O1xyXG4gICAgICAgIHByaXZhdGUgc3RhdGljIHNob3J0IFN0YXRlS25vd25Db2xvclZhbGlkO1xyXG4gICAgICAgIHByaXZhdGUgc3RhdGljIHNob3J0IFN0YXRlQVJHQlZhbHVlVmFsaWQ7XHJcbiAgICAgICAgcHJpdmF0ZSBzdGF0aWMgc2hvcnQgU3RhdGVWYWx1ZU1hc2s7XHJcbiAgICAgICAgcHJpdmF0ZSBzdGF0aWMgc2hvcnQgU3RhdGVOYW1lVmFsaWQ7XHJcbiAgICAgICAgcHJpdmF0ZSBzdGF0aWMgbG9uZyBOb3REZWZpbmVkVmFsdWU7XHJcbiAgICAgICAgcHJpdmF0ZSBjb25zdCBpbnQgQVJHQkFscGhhU2hpZnQgPSAweDE4O1xyXG4gICAgICAgIHByaXZhdGUgY29uc3QgaW50IEFSR0JSZWRTaGlmdCA9IDB4MTA7XHJcbiAgICAgICAgcHJpdmF0ZSBjb25zdCBpbnQgQVJHQkdyZWVuU2hpZnQgPSA4O1xyXG4gICAgICAgIHByaXZhdGUgY29uc3QgaW50IEFSR0JCbHVlU2hpZnQgPSAwO1xyXG4gICAgICAgIHByaXZhdGUgcmVhZG9ubHkgc3RyaW5nIG5hbWU7XHJcbiAgICAgICAgcHJpdmF0ZSByZWFkb25seSBsb25nIHZhbHVlO1xyXG4gICAgICAgIHByaXZhdGUgcmVhZG9ubHkgc2hvcnQga25vd25Db2xvcjtcclxuICAgICAgICBwcml2YXRlIHJlYWRvbmx5IHNob3J0IHN0YXRlO1xyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFRyYW5zcGFyZW50XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlRyYW5zcGFyZW50KTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBBbGljZUJsdWVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQWxpY2VCbHVlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBBbnRpcXVlV2hpdGVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQW50aXF1ZVdoaXRlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBBcXVhXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkFxdWEpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEFxdWFtYXJpbmVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQXF1YW1hcmluZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQXp1cmVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQXp1cmUpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEJlaWdlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkJlaWdlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBCaXNxdWVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQmlzcXVlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBCbGFja1xyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5CbGFjayk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQmxhbmNoZWRBbG1vbmRcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQmxhbmNoZWRBbG1vbmQpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEJsdWVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQmx1ZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQmx1ZVZpb2xldFxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5CbHVlVmlvbGV0KTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBCcm93blxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Ccm93bik7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQnVybHlXb29kXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkJ1cmx5V29vZCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQ2FkZXRCbHVlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkNhZGV0Qmx1ZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQ2hhcnRyZXVzZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5DaGFydHJldXNlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBDaG9jb2xhdGVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQ2hvY29sYXRlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBDb3JhbFxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Db3JhbCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQ29ybmZsb3dlckJsdWVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQ29ybmZsb3dlckJsdWUpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIENvcm5zaWxrXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkNvcm5zaWxrKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBDcmltc29uXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkNyaW1zb24pO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEN5YW5cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQ3lhbik7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgRGFya0JsdWVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuRGFya0JsdWUpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIERhcmtDeWFuXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkRhcmtDeWFuKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBEYXJrR29sZGVucm9kXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkRhcmtHb2xkZW5yb2QpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIERhcmtHcmF5XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkRhcmtHcmF5KTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBEYXJrR3JlZW5cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuRGFya0dyZWVuKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBEYXJrS2hha2lcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuRGFya0toYWtpKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBEYXJrTWFnZW50YVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5EYXJrTWFnZW50YSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgRGFya09saXZlR3JlZW5cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuRGFya09saXZlR3JlZW4pO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIERhcmtPcmFuZ2VcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuRGFya09yYW5nZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgRGFya09yY2hpZFxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5EYXJrT3JjaGlkKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBEYXJrUmVkXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkRhcmtSZWQpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIERhcmtTYWxtb25cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuRGFya1NhbG1vbik7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgRGFya1NlYUdyZWVuXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkRhcmtTZWFHcmVlbik7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgRGFya1NsYXRlQmx1ZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5EYXJrU2xhdGVCbHVlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBEYXJrU2xhdGVHcmF5XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkRhcmtTbGF0ZUdyYXkpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIERhcmtUdXJxdW9pc2VcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuRGFya1R1cnF1b2lzZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgRGFya1Zpb2xldFxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5EYXJrVmlvbGV0KTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBEZWVwUGlua1xyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5EZWVwUGluayk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgRGVlcFNreUJsdWVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuRGVlcFNreUJsdWUpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIERpbUdyYXlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuRGltR3JheSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgRG9kZ2VyQmx1ZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Eb2RnZXJCbHVlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBGaXJlYnJpY2tcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuRmlyZWJyaWNrKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBGbG9yYWxXaGl0ZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5GbG9yYWxXaGl0ZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgRm9yZXN0R3JlZW5cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuRm9yZXN0R3JlZW4pO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEZ1Y2hzaWFcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuRnVjaHNpYSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgR2FpbnNib3JvXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkdhaW5zYm9ybyk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgR2hvc3RXaGl0ZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5HaG9zdFdoaXRlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBHb2xkXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkdvbGQpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEdvbGRlbnJvZFxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Hb2xkZW5yb2QpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEdyYXlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuR3JheSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgR3JlZW5cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuR3JlZW4pO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEdyZWVuWWVsbG93XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkdyZWVuWWVsbG93KTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBIb25leWRld1xyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Ib25leWRldyk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgSG90UGlua1xyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Ib3RQaW5rKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBJbmRpYW5SZWRcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuSW5kaWFuUmVkKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBJbmRpZ29cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuSW5kaWdvKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBJdm9yeVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Jdm9yeSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgS2hha2lcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuS2hha2kpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIExhdmVuZGVyXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkxhdmVuZGVyKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBMYXZlbmRlckJsdXNoXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkxhdmVuZGVyQmx1c2gpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIExhd25HcmVlblxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5MYXduR3JlZW4pO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIExlbW9uQ2hpZmZvblxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5MZW1vbkNoaWZmb24pO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIExpZ2h0Qmx1ZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5MaWdodEJsdWUpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIExpZ2h0Q29yYWxcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTGlnaHRDb3JhbCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTGlnaHRDeWFuXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkxpZ2h0Q3lhbik7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTGlnaHRHb2xkZW5yb2RZZWxsb3dcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTGlnaHRHb2xkZW5yb2RZZWxsb3cpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIExpZ2h0R3JlZW5cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTGlnaHRHcmVlbik7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTGlnaHRHcmF5XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkxpZ2h0R3JheSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTGlnaHRQaW5rXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkxpZ2h0UGluayk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTGlnaHRTYWxtb25cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTGlnaHRTYWxtb24pO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIExpZ2h0U2VhR3JlZW5cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTGlnaHRTZWFHcmVlbik7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTGlnaHRTa3lCbHVlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkxpZ2h0U2t5Qmx1ZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTGlnaHRTbGF0ZUdyYXlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTGlnaHRTbGF0ZUdyYXkpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIExpZ2h0U3RlZWxCbHVlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkxpZ2h0U3RlZWxCbHVlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBMaWdodFllbGxvd1xyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5MaWdodFllbGxvdyk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTGltZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5MaW1lKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBMaW1lR3JlZW5cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTGltZUdyZWVuKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBMaW5lblxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5MaW5lbik7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTWFnZW50YVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5NYWdlbnRhKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBNYXJvb25cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTWFyb29uKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBNZWRpdW1BcXVhbWFyaW5lXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLk1lZGl1bUFxdWFtYXJpbmUpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIE1lZGl1bUJsdWVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTWVkaXVtQmx1ZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTWVkaXVtT3JjaGlkXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLk1lZGl1bU9yY2hpZCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTWVkaXVtUHVycGxlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLk1lZGl1bVB1cnBsZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTWVkaXVtU2VhR3JlZW5cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTWVkaXVtU2VhR3JlZW4pO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIE1lZGl1bVNsYXRlQmx1ZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5NZWRpdW1TbGF0ZUJsdWUpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIE1lZGl1bVNwcmluZ0dyZWVuXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLk1lZGl1bVNwcmluZ0dyZWVuKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBNZWRpdW1UdXJxdW9pc2VcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTWVkaXVtVHVycXVvaXNlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBNZWRpdW1WaW9sZXRSZWRcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTWVkaXVtVmlvbGV0UmVkKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBNaWRuaWdodEJsdWVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTWlkbmlnaHRCbHVlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBNaW50Q3JlYW1cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTWludENyZWFtKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBNaXN0eVJvc2VcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTWlzdHlSb3NlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBNb2NjYXNpblxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Nb2NjYXNpbik7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTmF2YWpvV2hpdGVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTmF2YWpvV2hpdGUpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIE5hdnlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTmF2eSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgT2xkTGFjZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5PbGRMYWNlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBPbGl2ZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5PbGl2ZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgT2xpdmVEcmFiXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLk9saXZlRHJhYik7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgT3JhbmdlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLk9yYW5nZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgT3JhbmdlUmVkXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLk9yYW5nZVJlZCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgT3JjaGlkXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLk9yY2hpZCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgUGFsZUdvbGRlbnJvZFxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5QYWxlR29sZGVucm9kKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBQYWxlR3JlZW5cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuUGFsZUdyZWVuKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBQYWxlVHVycXVvaXNlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlBhbGVUdXJxdW9pc2UpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFBhbGVWaW9sZXRSZWRcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuUGFsZVZpb2xldFJlZCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgUGFwYXlhV2hpcFxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5QYXBheWFXaGlwKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBQZWFjaFB1ZmZcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuUGVhY2hQdWZmKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBQZXJ1XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlBlcnUpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFBpbmtcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuUGluayk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgUGx1bVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5QbHVtKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBQb3dkZXJCbHVlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlBvd2RlckJsdWUpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFB1cnBsZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5QdXJwbGUpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFJlZFxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5SZWQpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFJvc3lCcm93blxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Sb3N5QnJvd24pO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFJveWFsQmx1ZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Sb3lhbEJsdWUpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFNhZGRsZUJyb3duXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlNhZGRsZUJyb3duKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBTYWxtb25cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuU2FsbW9uKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBTYW5keUJyb3duXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlNhbmR5QnJvd24pO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFNlYUdyZWVuXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlNlYUdyZWVuKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBTZWFTaGVsbFxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5TZWFTaGVsbCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgU2llbm5hXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlNpZW5uYSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgU2lsdmVyXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlNpbHZlcik7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgU2t5Qmx1ZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Ta3lCbHVlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBTbGF0ZUJsdWVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuU2xhdGVCbHVlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBTbGF0ZUdyYXlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuU2xhdGVHcmF5KTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBTbm93XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlNub3cpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFNwcmluZ0dyZWVuXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlNwcmluZ0dyZWVuKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBTdGVlbEJsdWVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuU3RlZWxCbHVlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBUYW5cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuVGFuKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBUZWFsXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlRlYWwpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFRoaXN0bGVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuVGhpc3RsZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgVG9tYXRvXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlRvbWF0byk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgVHVycXVvaXNlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlR1cnF1b2lzZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgVmlvbGV0XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlZpb2xldCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgV2hlYXRcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuV2hlYXQpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFdoaXRlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLldoaXRlKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBXaGl0ZVNtb2tlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLldoaXRlU21va2UpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFllbGxvd1xyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5ZZWxsb3cpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFllbGxvd0dyZWVuXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLlllbGxvd0dyZWVuKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgaW50ZXJuYWwgQ29sb3IoS25vd25Db2xvciBrbm93bkNvbG9yKVxyXG4gICAgICAgIHsgICAgICAgICAgICBcclxuICAgICAgICAgICAgdGhpcy52YWx1ZSA9IDBMO1xyXG4gICAgICAgICAgICB0aGlzLnN0YXRlID0gU3RhdGVLbm93bkNvbG9yVmFsaWQ7XHJcbiAgICAgICAgICAgIHRoaXMubmFtZSA9IG51bGw7XHJcbiAgICAgICAgICAgIHRoaXMua25vd25Db2xvciA9IChzaG9ydClrbm93bkNvbG9yOyAgICAgICAgICAgIFxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBDb2xvcihsb25nIHZhbHVlLCBzaG9ydCBzdGF0ZSwgc3RyaW5nIG5hbWUsIEtub3duQ29sb3Iga25vd25Db2xvcilcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHRoaXMudmFsdWUgPSB2YWx1ZTtcclxuICAgICAgICAgICAgdGhpcy5zdGF0ZSA9IHN0YXRlO1xyXG4gICAgICAgICAgICB0aGlzLm5hbWUgPSBuYW1lO1xyXG4gICAgICAgICAgICB0aGlzLmtub3duQ29sb3IgPSAoc2hvcnQpa25vd25Db2xvcjtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBieXRlIFJcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gKGJ5dGUpKCh0aGlzLlZhbHVlID4+IDB4MTApICYgMHhmZkwpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgYnl0ZSBHXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIChieXRlKSgodGhpcy5WYWx1ZSA+PiA4KSAmIDB4ZmZMKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIGJ5dGUgQlxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiAoYnl0ZSkodGhpcy5WYWx1ZSAmIDB4ZmZMKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIGJ5dGUgQVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiAoYnl0ZSkoKHRoaXMuVmFsdWUgPj4gMHgxOCkgJiAweGZmTCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBib29sIElzS25vd25Db2xvclxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiAoKHRoaXMuc3RhdGUgJiBTdGF0ZUtub3duQ29sb3JWYWxpZCkgPiAwKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIGJvb2wgSXNFbXB0eVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiAodGhpcy5zdGF0ZSA9PSAwKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIGJvb2wgSXNOYW1lZENvbG9yXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaWYgKCh0aGlzLnN0YXRlICYgU3RhdGVOYW1lVmFsaWQpID09IDApXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIHRoaXMuSXNLbm93bkNvbG9yO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgcmV0dXJuIHRydWU7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBib29sIElzU3lzdGVtQ29sb3JcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBpZiAoIXRoaXMuSXNLbm93bkNvbG9yKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIHJldHVybiBmYWxzZTtcclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIGlmICh0aGlzLmtub3duQ29sb3IgPiAweDFhKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIHJldHVybiAodGhpcy5rbm93bkNvbG9yID4gMHhhNyk7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gdHJ1ZTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBpbXBsaWNpdCBvcGVyYXRvciBzdHJpbmcoQ29sb3IgY29sb3IpICAvLyBpbXBsaWNpdCBkaWdpdCB0byBieXRlIGNvbnZlcnNpb24gb3BlcmF0b3JcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHJldHVybiBjb2xvci5Ub0h0bWwoKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgaW1wbGljaXQgb3BlcmF0b3IgQ29sb3Ioc3RyaW5nIGhleFZhbHVlKSAgLy8gaW1wbGljaXQgZGlnaXQgdG8gYnl0ZSBjb252ZXJzaW9uIG9wZXJhdG9yXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gQ29sb3IuRnJvbUhleChoZXhWYWx1ZSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcml2YXRlIHN0cmluZyBOYW1lQW5kQVJHQlZhbHVlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIHN0cmluZy5Gb3JtYXQoXCJ7e05hbWU9ezB9LCBBUkdCPSh7MX0sIHsyfSwgezN9LCB7NH0pfX1cIiwgdGhpcy5OYW1lLCB0aGlzLkEsIHRoaXMuUiwgdGhpcy5HLCB0aGlzLkIpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RyaW5nIE5hbWVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBpZiAoKHRoaXMuc3RhdGUgJiBTdGF0ZU5hbWVWYWxpZCkgIT0gMClcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICByZXR1cm4gdGhpcy5uYW1lO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgaWYgKCF0aGlzLklzS25vd25Db2xvcilcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICByZXR1cm4gQ29udmVydC5Ub1N0cmluZyh0aGlzLnZhbHVlLCAweDEwKTtcclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIHN0cmluZyBzdHIgPSBLbm93bkNvbG9yVGFibGUuS25vd25Db2xvclRvTmFtZSgoS25vd25Db2xvcil0aGlzLmtub3duQ29sb3IpO1xyXG4gICAgICAgICAgICAgICAgaWYgKHN0ciAhPSBudWxsKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIHJldHVybiBzdHI7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gdGhpcy5rbm93bkNvbG9yLlRvU3RyaW5nKCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgbG9uZyBWYWx1ZVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGlmICgodGhpcy5zdGF0ZSAmIFN0YXRlVmFsdWVNYXNrKSAhPSAwKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIHJldHVybiB0aGlzLnZhbHVlO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgaWYgKHRoaXMuSXNLbm93bkNvbG9yKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIHJldHVybiAobG9uZylLbm93bkNvbG9yVGFibGUuS25vd25Db2xvclRvQXJnYigoS25vd25Db2xvcil0aGlzLmtub3duQ29sb3IpO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgcmV0dXJuIE5vdERlZmluZWRWYWx1ZTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCBDaGVja0J5dGUoaW50IHZhbHVlKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgaWYgKCh2YWx1ZSA8IDApIHx8ICh2YWx1ZSA+IDB4ZmYpKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICB0aHJvdyBuZXcgQXJndW1lbnRFeGNlcHRpb24oXCJJbnZhbGlkRXgyQm91bmRBcmd1bWVudFwiKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBzdGF0aWMgbG9uZyBNYWtlQXJnYihieXRlIGFscGhhLCBieXRlIHJlZCwgYnl0ZSBncmVlbiwgYnl0ZSBibHVlKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgcmV0dXJuIChhbHBoYSA8PCAyNCkgfCAocmVkIDw8IDE2KSB8IChncmVlbiA8PCA4KSB8IGJsdWU7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEZyb21BcmdiKGludCBhcmdiKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgcmV0dXJuIG5ldyBDb2xvcihhcmdiICYgKChsb25nKTB4ZmZmZmZmZmZMKSwgU3RhdGVBUkdCVmFsdWVWYWxpZCwgbnVsbCwgKEtub3duQ29sb3IpMCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEZyb21BcmdiKGludCBhbHBoYSwgaW50IHJlZCwgaW50IGdyZWVuLCBpbnQgYmx1ZSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIENoZWNrQnl0ZShhbHBoYSk7XHJcbiAgICAgICAgICAgIENoZWNrQnl0ZShyZWQpO1xyXG4gICAgICAgICAgICBDaGVja0J5dGUoZ3JlZW4pO1xyXG4gICAgICAgICAgICBDaGVja0J5dGUoYmx1ZSk7XHJcbiAgICAgICAgICAgIHJldHVybiBuZXcgQ29sb3IoTWFrZUFyZ2IoKGJ5dGUpYWxwaGEsIChieXRlKXJlZCwgKGJ5dGUpZ3JlZW4sIChieXRlKWJsdWUpLCBTdGF0ZUFSR0JWYWx1ZVZhbGlkLCBudWxsLCAoS25vd25Db2xvcikwKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgRnJvbUFyZ2IoaW50IGFscGhhLCBDb2xvciBiYXNlQ29sb3IpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBDaGVja0J5dGUoYWxwaGEpO1xyXG4gICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKE1ha2VBcmdiKChieXRlKWFscGhhLCBiYXNlQ29sb3IuUiwgYmFzZUNvbG9yLkcsIGJhc2VDb2xvci5CKSwgU3RhdGVBUkdCVmFsdWVWYWxpZCwgbnVsbCwgKEtub3duQ29sb3IpMCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEZyb21BcmdiKGludCByZWQsIGludCBncmVlbiwgaW50IGJsdWUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gRnJvbUFyZ2IoMHhmZiwgcmVkLCBncmVlbiwgYmx1ZSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIGJvb2wgSXNFbnVtVmFsaWQoRW51bSBlbnVtVmFsdWUsIGludCB2YWx1ZSwgaW50IG1pblZhbHVlLCBpbnQgbWF4VmFsdWUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gKCh2YWx1ZSA+PSBtaW5WYWx1ZSkgJiYgKHZhbHVlIDw9IG1heFZhbHVlKSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEZyb21Lbm93bkNvbG9yKEtub3duQ29sb3IgY29sb3IpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gbmV3IENvbG9yKGNvbG9yKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdHJpbmcgY29tcG9uZW50VG9IZXgoYnl0ZSB2YWx1ZSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHZhciB4ID0gdmFsdWUuVG9TdHJpbmcoMTYpO1xyXG4gICAgICAgICAgICByZXR1cm4gKHguTGVuZ3RoID09IDEgPyBcIjBcIiA6IFwiXCIpICsgeDtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdHJpbmcgVG9IdG1sKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGlmKElzS25vd25Db2xvcilcclxuICAgICAgICAgICAgeyAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgIHJldHVybiBDb2xvci5Gcm9tQXJnYihLbm93bkNvbG9yVGFibGUuS25vd25Db2xvclRvQXJnYigoS25vd25Db2xvcilrbm93bkNvbG9yKSkuVG9IdG1sKCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBpZiAoQSAhPSAyNTUpXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIHN0cmluZy5Gb3JtYXQoXCIjezB9ezF9ezJ9ezN9XCIsIGNvbXBvbmVudFRvSGV4KEEpLCBjb21wb25lbnRUb0hleChSKSwgY29tcG9uZW50VG9IZXgoRyksIGNvbXBvbmVudFRvSGV4KEIpKTtcclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICByZXR1cm4gc3RyaW5nLkZvcm1hdChcIiN7MH17MX17Mn1cIiwgY29tcG9uZW50VG9IZXgoUiksIGNvbXBvbmVudFRvSGV4KEcpLCBjb21wb25lbnRUb0hleChCKSk7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIH0gICBcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgRnJvbUhleChzdHJpbmcgdmFsdWUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBpZiAodmFsdWUuU3RhcnRzV2l0aChcIiNcIikpXHJcbiAgICAgICAgICAgICAgICByZXR1cm4gRnJvbUhleCh2YWx1ZS5TdWJzdHJpbmcoMSkpO1xyXG4gICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBDb2xvci5Gcm9tQXJnYihTY3JpcHQuUGFyc2VJbnQodmFsdWUpKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIGZsb2F0IEdldEJyaWdodG5lc3MoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZmxvYXQgeiA9IFIgLyBxO1xyXG4gICAgICAgICAgICBmbG9hdCB4ID0gRyAvIHE7XHJcbiAgICAgICAgICAgIGZsb2F0IGMgPSBCIC8gcTtcclxuICAgICAgICAgICAgZmxvYXQgdiA9IHo7XHJcbiAgICAgICAgICAgIGZsb2F0IGIgPSB6O1xyXG4gICAgICAgICAgICBpZiAoeCA+IHYpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHYgPSB4O1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIGlmIChjID4gdilcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgdiA9IGM7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgaWYgKHggPCBiKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBiID0geDtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICBpZiAoYyA8IGIpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGIgPSBjO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIHJldHVybiAoKHYgKyBiKSAvIDJmKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBmbG9hdCBHZXRIdWUoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgaWYgKCh0aGlzLlIgPT0gdGhpcy5HKSAmJiAodGhpcy5HID09IHRoaXMuQikpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiAwZjtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICBmbG9hdCB6ID0gUiAvIHE7XHJcbiAgICAgICAgICAgIGZsb2F0IHggPSBHIC8gcTtcclxuICAgICAgICAgICAgZmxvYXQgYyA9IEIgLyBxO1xyXG4gICAgICAgICAgICBmbG9hdCB2ID0gMGY7XHJcbiAgICAgICAgICAgIGZsb2F0IGIgPSB6O1xyXG4gICAgICAgICAgICBmbG9hdCBuID0gejtcclxuICAgICAgICAgICAgaWYgKHggPiBiKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBiID0geDtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICBpZiAoYyA+IGIpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGIgPSBjO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIGlmICh4IDwgbilcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgbiA9IHg7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgaWYgKGMgPCBuKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBuID0gYztcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICBmbG9hdCBudW02ID0gYiAtIG47XHJcbiAgICAgICAgICAgIGlmICh6ID09IGIpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHYgPSAoeCAtIGMpIC8gbnVtNjtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICBlbHNlIGlmICh4ID09IGIpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHYgPSAyZiArICgoYyAtIHopIC8gbnVtNik7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgZWxzZSBpZiAoYyA9PSBiKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICB2ID0gNGYgKyAoKHogLSB4KSAvIG51bTYpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIHYgKj0gNjBmO1xyXG4gICAgICAgICAgICBpZiAodiA8IDBmKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICB2ICs9IDM2MGY7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgcmV0dXJuIHY7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcml2YXRlIHN0YXRpYyBmbG9hdCBxID0gMjU1ZjtcclxuXHJcbiAgICAgICAgcHVibGljIGZsb2F0IEdldFNhdHVyYXRpb24oKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZmxvYXQgeiA9IFIgLyBxO1xyXG4gICAgICAgICAgICBmbG9hdCB4ID0gRyAvIHE7XHJcbiAgICAgICAgICAgIGZsb2F0IGMgPSBCIC8gcTtcclxuICAgICAgICAgICAgZmxvYXQgdiA9IDBmO1xyXG4gICAgICAgICAgICBmbG9hdCBiID0gejtcclxuICAgICAgICAgICAgZmxvYXQgbiA9IHo7XHJcbiAgICAgICAgICAgIGlmICh4ID4gYilcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgYiA9IHg7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgaWYgKGMgPiBiKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBiID0gYztcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICBpZiAoeCA8IG4pXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIG4gPSB4O1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIGlmIChjIDwgbilcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgbiA9IGM7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgaWYgKGIgPT0gbilcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIHY7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgZmxvYXQgbSA9IChiICsgbikgLyAyZjtcclxuICAgICAgICAgICAgaWYgKG0gPD0gMC41KVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gKChiIC0gbikgLyAoYiArIG4pKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICByZXR1cm4gKChiIC0gbikgLyAoKDJmIC0gYikgLSBuKSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgaW50IFRvQXJnYigpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gKGludCl0aGlzLlZhbHVlO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIEtub3duQ29sb3IgVG9Lbm93bkNvbG9yKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHJldHVybiAoS25vd25Db2xvcil0aGlzLmtub3duQ29sb3I7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgb3ZlcnJpZGUgc3RyaW5nIFRvU3RyaW5nKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIFN0cmluZ0J1aWxkZXIgYnVpbGRlciA9IG5ldyBTdHJpbmdCdWlsZGVyKDB4MjApO1xyXG4gICAgICAgICAgICBidWlsZGVyLkFwcGVuZChiYXNlLkdldFR5cGUoKS5OYW1lKTtcclxuICAgICAgICAgICAgYnVpbGRlci5BcHBlbmQoXCIgW1wiKTtcclxuICAgICAgICAgICAgaWYgKCh0aGlzLnN0YXRlICYgU3RhdGVOYW1lVmFsaWQpICE9IDApXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGJ1aWxkZXIuQXBwZW5kKHRoaXMuTmFtZSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgZWxzZSBpZiAoKHRoaXMuc3RhdGUgJiBTdGF0ZUtub3duQ29sb3JWYWxpZCkgIT0gMClcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgYnVpbGRlci5BcHBlbmQodGhpcy5OYW1lKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICBlbHNlIGlmICgodGhpcy5zdGF0ZSAmIFN0YXRlVmFsdWVNYXNrKSAhPSAwKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBidWlsZGVyLkFwcGVuZEZvcm1hdChcIkE9ezB9LCBSPXsxfSwgRz17Mn0sIEI9ezN9XCIsIEEsIFIsIEcsIEIpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgYnVpbGRlci5BcHBlbmQoXCJFbXB0eVwiKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICBidWlsZGVyLkFwcGVuZChcIl1cIik7XHJcbiAgICAgICAgICAgIHJldHVybiBidWlsZGVyLlRvU3RyaW5nKCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIGJvb2wgb3BlcmF0b3IgPT0oQ29sb3IgbGVmdCwgQ29sb3IgcmlnaHQpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBpZiAoKChsZWZ0LnZhbHVlICE9IHJpZ2h0LnZhbHVlKSB8fCAobGVmdC5zdGF0ZSAhPSByaWdodC5zdGF0ZSkpIHx8IChsZWZ0Lmtub3duQ29sb3IgIT0gcmlnaHQua25vd25Db2xvcikpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBmYWxzZTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICByZXR1cm4gKChsZWZ0Lm5hbWUgPT0gcmlnaHQubmFtZSkgfHwgKCgobGVmdC5uYW1lICE9IG51bGwpICYmIChyaWdodC5uYW1lICE9IG51bGwpKSAmJiBsZWZ0Lm5hbWUuRXF1YWxzKHJpZ2h0Lm5hbWUpKSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIGJvb2wgb3BlcmF0b3IgIT0oQ29sb3IgbGVmdCwgQ29sb3IgcmlnaHQpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gIShsZWZ0ID09IHJpZ2h0KTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBvdmVycmlkZSBib29sIEVxdWFscyhvYmplY3Qgb2JqKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgaWYgKG9iaiBpcyBDb2xvcilcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgQ29sb3IgY29sb3IgPSAoQ29sb3Ipb2JqO1xyXG4gICAgICAgICAgICAgICAgaWYgKCgodGhpcy52YWx1ZSA9PSBjb2xvci52YWx1ZSkgJiYgKHRoaXMuc3RhdGUgPT0gY29sb3Iuc3RhdGUpKSAmJiAodGhpcy5rbm93bkNvbG9yID09IGNvbG9yLmtub3duQ29sb3IpKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIHJldHVybiAoKHRoaXMubmFtZSA9PSBjb2xvci5uYW1lKSB8fCAoKCh0aGlzLm5hbWUgIT0gbnVsbCkgJiYgKGNvbG9yLm5hbWUgIT0gbnVsbCkpICYmIHRoaXMubmFtZS5FcXVhbHModGhpcy5uYW1lKSkpO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIHJldHVybiBmYWxzZTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBvdmVycmlkZSBpbnQgR2V0SGFzaENvZGUoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgcmV0dXJuICgodGhpcy52YWx1ZS5HZXRIYXNoQ29kZSgpIF4gdGhpcy5zdGF0ZS5HZXRIYXNoQ29kZSgpKSBeIHRoaXMua25vd25Db2xvci5HZXRIYXNoQ29kZSgpKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHN0YXRpYyBDb2xvcigpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBFbXB0eSA9IG5ldyBDb2xvcigpO1xyXG4gICAgICAgICAgICBTdGF0ZUtub3duQ29sb3JWYWxpZCA9IDE7XHJcbiAgICAgICAgICAgIFN0YXRlQVJHQlZhbHVlVmFsaWQgPSAyO1xyXG4gICAgICAgICAgICBTdGF0ZVZhbHVlTWFzayA9IFN0YXRlQVJHQlZhbHVlVmFsaWQ7XHJcbiAgICAgICAgICAgIFN0YXRlTmFtZVZhbGlkID0gODtcclxuICAgICAgICAgICAgTm90RGVmaW5lZFZhbHVlID0gMEw7XHJcbiAgICAgICAgfVxyXG4gICAgfVxyXG5cclxuICAgIHB1YmxpYyBlbnVtIEtub3duQ29sb3JcclxuICAgIHtcclxuICAgICAgICBBY3RpdmVCb3JkZXIgPSAxLFxyXG4gICAgICAgIEFjdGl2ZUNhcHRpb24gPSAyLFxyXG4gICAgICAgIEFjdGl2ZUNhcHRpb25UZXh0ID0gMyxcclxuICAgICAgICBBbGljZUJsdWUgPSAweDFjLFxyXG4gICAgICAgIEFudGlxdWVXaGl0ZSA9IDB4MWQsXHJcbiAgICAgICAgQXBwV29ya3NwYWNlID0gNCxcclxuICAgICAgICBBcXVhID0gMzAsXHJcbiAgICAgICAgQXF1YW1hcmluZSA9IDB4MWYsXHJcbiAgICAgICAgQXp1cmUgPSAweDIwLFxyXG4gICAgICAgIEJlaWdlID0gMHgyMSxcclxuICAgICAgICBCaXNxdWUgPSAweDIyLFxyXG4gICAgICAgIEJsYWNrID0gMHgyMyxcclxuICAgICAgICBCbGFuY2hlZEFsbW9uZCA9IDB4MjQsXHJcbiAgICAgICAgQmx1ZSA9IDB4MjUsXHJcbiAgICAgICAgQmx1ZVZpb2xldCA9IDB4MjYsXHJcbiAgICAgICAgQnJvd24gPSAweDI3LFxyXG4gICAgICAgIEJ1cmx5V29vZCA9IDQwLFxyXG4gICAgICAgIEJ1dHRvbkZhY2UgPSAweGE4LFxyXG4gICAgICAgIEJ1dHRvbkhpZ2hsaWdodCA9IDB4YTksXHJcbiAgICAgICAgQnV0dG9uU2hhZG93ID0gMTcwLFxyXG4gICAgICAgIENhZGV0Qmx1ZSA9IDB4MjksXHJcbiAgICAgICAgQ2hhcnRyZXVzZSA9IDB4MmEsXHJcbiAgICAgICAgQ2hvY29sYXRlID0gMHgyYixcclxuICAgICAgICBDb250cm9sID0gNSxcclxuICAgICAgICBDb250cm9sRGFyayA9IDYsXHJcbiAgICAgICAgQ29udHJvbERhcmtEYXJrID0gNyxcclxuICAgICAgICBDb250cm9sTGlnaHQgPSA4LFxyXG4gICAgICAgIENvbnRyb2xMaWdodExpZ2h0ID0gOSxcclxuICAgICAgICBDb250cm9sVGV4dCA9IDEwLFxyXG4gICAgICAgIENvcmFsID0gMHgyYyxcclxuICAgICAgICBDb3JuZmxvd2VyQmx1ZSA9IDB4MmQsXHJcbiAgICAgICAgQ29ybnNpbGsgPSAweDJlLFxyXG4gICAgICAgIENyaW1zb24gPSAweDJmLFxyXG4gICAgICAgIEN5YW4gPSAweDMwLFxyXG4gICAgICAgIERhcmtCbHVlID0gMHgzMSxcclxuICAgICAgICBEYXJrQ3lhbiA9IDUwLFxyXG4gICAgICAgIERhcmtHb2xkZW5yb2QgPSAweDMzLFxyXG4gICAgICAgIERhcmtHcmF5ID0gMHgzNCxcclxuICAgICAgICBEYXJrR3JlZW4gPSAweDM1LFxyXG4gICAgICAgIERhcmtLaGFraSA9IDB4MzYsXHJcbiAgICAgICAgRGFya01hZ2VudGEgPSAweDM3LFxyXG4gICAgICAgIERhcmtPbGl2ZUdyZWVuID0gMHgzOCxcclxuICAgICAgICBEYXJrT3JhbmdlID0gMHgzOSxcclxuICAgICAgICBEYXJrT3JjaGlkID0gMHgzYSxcclxuICAgICAgICBEYXJrUmVkID0gMHgzYixcclxuICAgICAgICBEYXJrU2FsbW9uID0gNjAsXHJcbiAgICAgICAgRGFya1NlYUdyZWVuID0gMHgzZCxcclxuICAgICAgICBEYXJrU2xhdGVCbHVlID0gMHgzZSxcclxuICAgICAgICBEYXJrU2xhdGVHcmF5ID0gMHgzZixcclxuICAgICAgICBEYXJrVHVycXVvaXNlID0gMHg0MCxcclxuICAgICAgICBEYXJrVmlvbGV0ID0gMHg0MSxcclxuICAgICAgICBEZWVwUGluayA9IDB4NDIsXHJcbiAgICAgICAgRGVlcFNreUJsdWUgPSAweDQzLFxyXG4gICAgICAgIERlc2t0b3AgPSAxMSxcclxuICAgICAgICBEaW1HcmF5ID0gMHg0NCxcclxuICAgICAgICBEb2RnZXJCbHVlID0gMHg0NSxcclxuICAgICAgICBGaXJlYnJpY2sgPSA3MCxcclxuICAgICAgICBGbG9yYWxXaGl0ZSA9IDB4NDcsXHJcbiAgICAgICAgRm9yZXN0R3JlZW4gPSAweDQ4LFxyXG4gICAgICAgIEZ1Y2hzaWEgPSAweDQ5LFxyXG4gICAgICAgIEdhaW5zYm9ybyA9IDB4NGEsXHJcbiAgICAgICAgR2hvc3RXaGl0ZSA9IDB4NGIsXHJcbiAgICAgICAgR29sZCA9IDB4NGMsXHJcbiAgICAgICAgR29sZGVucm9kID0gMHg0ZCxcclxuICAgICAgICBHcmFkaWVudEFjdGl2ZUNhcHRpb24gPSAweGFiLFxyXG4gICAgICAgIEdyYWRpZW50SW5hY3RpdmVDYXB0aW9uID0gMHhhYyxcclxuICAgICAgICBHcmF5ID0gMHg0ZSxcclxuICAgICAgICBHcmF5VGV4dCA9IDEyLFxyXG4gICAgICAgIEdyZWVuID0gMHg0ZixcclxuICAgICAgICBHcmVlblllbGxvdyA9IDgwLFxyXG4gICAgICAgIEhpZ2hsaWdodCA9IDEzLFxyXG4gICAgICAgIEhpZ2hsaWdodFRleHQgPSAxNCxcclxuICAgICAgICBIb25leWRldyA9IDB4NTEsXHJcbiAgICAgICAgSG90UGluayA9IDB4NTIsXHJcbiAgICAgICAgSG90VHJhY2sgPSAxNSxcclxuICAgICAgICBJbmFjdGl2ZUJvcmRlciA9IDB4MTAsXHJcbiAgICAgICAgSW5hY3RpdmVDYXB0aW9uID0gMHgxMSxcclxuICAgICAgICBJbmFjdGl2ZUNhcHRpb25UZXh0ID0gMHgxMixcclxuICAgICAgICBJbmRpYW5SZWQgPSAweDUzLFxyXG4gICAgICAgIEluZGlnbyA9IDB4NTQsXHJcbiAgICAgICAgSW5mbyA9IDB4MTMsXHJcbiAgICAgICAgSW5mb1RleHQgPSAyMCxcclxuICAgICAgICBJdm9yeSA9IDB4NTUsXHJcbiAgICAgICAgS2hha2kgPSAweDU2LFxyXG4gICAgICAgIExhdmVuZGVyID0gMHg1NyxcclxuICAgICAgICBMYXZlbmRlckJsdXNoID0gMHg1OCxcclxuICAgICAgICBMYXduR3JlZW4gPSAweDU5LFxyXG4gICAgICAgIExlbW9uQ2hpZmZvbiA9IDkwLFxyXG4gICAgICAgIExpZ2h0Qmx1ZSA9IDB4NWIsXHJcbiAgICAgICAgTGlnaHRDb3JhbCA9IDB4NWMsXHJcbiAgICAgICAgTGlnaHRDeWFuID0gMHg1ZCxcclxuICAgICAgICBMaWdodEdvbGRlbnJvZFllbGxvdyA9IDB4NWUsXHJcbiAgICAgICAgTGlnaHRHcmF5ID0gMHg1ZixcclxuICAgICAgICBMaWdodEdyZWVuID0gMHg2MCxcclxuICAgICAgICBMaWdodFBpbmsgPSAweDYxLFxyXG4gICAgICAgIExpZ2h0U2FsbW9uID0gMHg2MixcclxuICAgICAgICBMaWdodFNlYUdyZWVuID0gMHg2MyxcclxuICAgICAgICBMaWdodFNreUJsdWUgPSAxMDAsXHJcbiAgICAgICAgTGlnaHRTbGF0ZUdyYXkgPSAweDY1LFxyXG4gICAgICAgIExpZ2h0U3RlZWxCbHVlID0gMHg2NixcclxuICAgICAgICBMaWdodFllbGxvdyA9IDB4NjcsXHJcbiAgICAgICAgTGltZSA9IDB4NjgsXHJcbiAgICAgICAgTGltZUdyZWVuID0gMHg2OSxcclxuICAgICAgICBMaW5lbiA9IDB4NmEsXHJcbiAgICAgICAgTWFnZW50YSA9IDB4NmIsXHJcbiAgICAgICAgTWFyb29uID0gMHg2YyxcclxuICAgICAgICBNZWRpdW1BcXVhbWFyaW5lID0gMHg2ZCxcclxuICAgICAgICBNZWRpdW1CbHVlID0gMTEwLFxyXG4gICAgICAgIE1lZGl1bU9yY2hpZCA9IDB4NmYsXHJcbiAgICAgICAgTWVkaXVtUHVycGxlID0gMHg3MCxcclxuICAgICAgICBNZWRpdW1TZWFHcmVlbiA9IDB4NzEsXHJcbiAgICAgICAgTWVkaXVtU2xhdGVCbHVlID0gMHg3MixcclxuICAgICAgICBNZWRpdW1TcHJpbmdHcmVlbiA9IDB4NzMsXHJcbiAgICAgICAgTWVkaXVtVHVycXVvaXNlID0gMHg3NCxcclxuICAgICAgICBNZWRpdW1WaW9sZXRSZWQgPSAweDc1LFxyXG4gICAgICAgIE1lbnUgPSAweDE1LFxyXG4gICAgICAgIE1lbnVCYXIgPSAweGFkLFxyXG4gICAgICAgIE1lbnVIaWdobGlnaHQgPSAweGFlLFxyXG4gICAgICAgIE1lbnVUZXh0ID0gMHgxNixcclxuICAgICAgICBNaWRuaWdodEJsdWUgPSAweDc2LFxyXG4gICAgICAgIE1pbnRDcmVhbSA9IDB4NzcsXHJcbiAgICAgICAgTWlzdHlSb3NlID0gMTIwLFxyXG4gICAgICAgIE1vY2Nhc2luID0gMHg3OSxcclxuICAgICAgICBOYXZham9XaGl0ZSA9IDB4N2EsXHJcbiAgICAgICAgTmF2eSA9IDB4N2IsXHJcbiAgICAgICAgT2xkTGFjZSA9IDB4N2MsXHJcbiAgICAgICAgT2xpdmUgPSAweDdkLFxyXG4gICAgICAgIE9saXZlRHJhYiA9IDB4N2UsXHJcbiAgICAgICAgT3JhbmdlID0gMHg3ZixcclxuICAgICAgICBPcmFuZ2VSZWQgPSAweDgwLFxyXG4gICAgICAgIE9yY2hpZCA9IDB4ODEsXHJcbiAgICAgICAgUGFsZUdvbGRlbnJvZCA9IDEzMCxcclxuICAgICAgICBQYWxlR3JlZW4gPSAweDgzLFxyXG4gICAgICAgIFBhbGVUdXJxdW9pc2UgPSAweDg0LFxyXG4gICAgICAgIFBhbGVWaW9sZXRSZWQgPSAweDg1LFxyXG4gICAgICAgIFBhcGF5YVdoaXAgPSAweDg2LFxyXG4gICAgICAgIFBlYWNoUHVmZiA9IDB4ODcsXHJcbiAgICAgICAgUGVydSA9IDB4ODgsXHJcbiAgICAgICAgUGluayA9IDB4ODksXHJcbiAgICAgICAgUGx1bSA9IDB4OGEsXHJcbiAgICAgICAgUG93ZGVyQmx1ZSA9IDB4OGIsXHJcbiAgICAgICAgUHVycGxlID0gMTQwLFxyXG4gICAgICAgIFJlZCA9IDB4OGQsXHJcbiAgICAgICAgUm9zeUJyb3duID0gMHg4ZSxcclxuICAgICAgICBSb3lhbEJsdWUgPSAweDhmLFxyXG4gICAgICAgIFNhZGRsZUJyb3duID0gMHg5MCxcclxuICAgICAgICBTYWxtb24gPSAweDkxLFxyXG4gICAgICAgIFNhbmR5QnJvd24gPSAweDkyLFxyXG4gICAgICAgIFNjcm9sbEJhciA9IDB4MTcsXHJcbiAgICAgICAgU2VhR3JlZW4gPSAweDkzLFxyXG4gICAgICAgIFNlYVNoZWxsID0gMHg5NCxcclxuICAgICAgICBTaWVubmEgPSAweDk1LFxyXG4gICAgICAgIFNpbHZlciA9IDE1MCxcclxuICAgICAgICBTa3lCbHVlID0gMHg5NyxcclxuICAgICAgICBTbGF0ZUJsdWUgPSAweDk4LFxyXG4gICAgICAgIFNsYXRlR3JheSA9IDB4OTksXHJcbiAgICAgICAgU25vdyA9IDB4OWEsXHJcbiAgICAgICAgU3ByaW5nR3JlZW4gPSAweDliLFxyXG4gICAgICAgIFN0ZWVsQmx1ZSA9IDB4OWMsXHJcbiAgICAgICAgVGFuID0gMHg5ZCxcclxuICAgICAgICBUZWFsID0gMHg5ZSxcclxuICAgICAgICBUaGlzdGxlID0gMHg5ZixcclxuICAgICAgICBUb21hdG8gPSAxNjAsXHJcbiAgICAgICAgVHJhbnNwYXJlbnQgPSAweDFiLFxyXG4gICAgICAgIFR1cnF1b2lzZSA9IDB4YTEsXHJcbiAgICAgICAgVmlvbGV0ID0gMHhhMixcclxuICAgICAgICBXaGVhdCA9IDB4YTMsXHJcbiAgICAgICAgV2hpdGUgPSAweGE0LFxyXG4gICAgICAgIFdoaXRlU21va2UgPSAweGE1LFxyXG4gICAgICAgIFdpbmRvdyA9IDB4MTgsXHJcbiAgICAgICAgV2luZG93RnJhbWUgPSAweDE5LFxyXG4gICAgICAgIFdpbmRvd1RleHQgPSAweDFhLFxyXG4gICAgICAgIFllbGxvdyA9IDB4YTYsXHJcbiAgICAgICAgWWVsbG93R3JlZW4gPSAweGE3XHJcbiAgICB9XHJcblxyXG4gICAgaW50ZXJuYWwgc3RhdGljIGNsYXNzIEtub3duQ29sb3JUYWJsZVxyXG4gICAge1xyXG4gICAgICAgIC8vIEZpZWxkc1xyXG4gICAgICAgIHByaXZhdGUgY29uc3QgaW50IEFscGhhU2hpZnQgPSAweDE4O1xyXG5cclxuICAgICAgICBwcml2YXRlIGNvbnN0IGludCBCbHVlU2hpZnQgPSAwO1xyXG4gICAgICAgIHByaXZhdGUgc3RhdGljIHN0cmluZ1tdIGNvbG9yTmFtZVRhYmxlO1xyXG4gICAgICAgIHByaXZhdGUgc3RhdGljIGludFtdIGNvbG9yVGFibGU7XHJcbiAgICAgICAgcHJpdmF0ZSBjb25zdCBpbnQgR3JlZW5TaGlmdCA9IDg7XHJcbiAgICAgICAgcHJpdmF0ZSBjb25zdCBpbnQgUmVkU2hpZnQgPSAweDEwO1xyXG4gICAgICAgIHByaXZhdGUgY29uc3QgaW50IFdpbjMyQmx1ZVNoaWZ0ID0gMHgxMDtcclxuICAgICAgICBwcml2YXRlIGNvbnN0IGludCBXaW4zMkdyZWVuU2hpZnQgPSA4O1xyXG4gICAgICAgIHByaXZhdGUgY29uc3QgaW50IFdpbjMyUmVkU2hpZnQgPSAwO1xyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIHN0cmluZyBHZXRDb2xvck5hbWUoaW50IGluZGV4KVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgRW5zdXJlQ29sb3JOYW1lVGFibGUoKTtcclxuICAgICAgICAgICAgcmV0dXJuIGNvbG9yTmFtZVRhYmxlW2luZGV4XTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIC8vIE1ldGhvZHNcclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEFyZ2JUb0tub3duQ29sb3IoaW50IHRhcmdldEFSR0IpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBFbnN1cmVDb2xvclRhYmxlKCk7XHJcbiAgICAgICAgICAgIGZvciAoaW50IGkgPSAwOyBpIDwgY29sb3JUYWJsZS5MZW5ndGg7IGkrKylcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaW50IG51bTIgPSBjb2xvclRhYmxlW2ldO1xyXG4gICAgICAgICAgICAgICAgaWYgKG51bTIgPT0gdGFyZ2V0QVJHQilcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBDb2xvciBjb2xvciA9IENvbG9yLkZyb21Lbm93bkNvbG9yKChLbm93bkNvbG9yKWkpO1xyXG4gICAgICAgICAgICAgICAgICAgIGlmICghY29sb3IuSXNTeXN0ZW1Db2xvcilcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiBjb2xvcjtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgcmV0dXJuIENvbG9yLkZyb21BcmdiKHRhcmdldEFSR0IpO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBzdGF0aWMgaW50IEVuY29kZShpbnQgYWxwaGEsIGludCByZWQsIGludCBncmVlbiwgaW50IGJsdWUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gKCgoKHJlZCA8PCAweDEwKSB8IChncmVlbiA8PCA4KSkgfCBibHVlKSB8IChhbHBoYSA8PCAweDE4KSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcml2YXRlIHN0YXRpYyB2b2lkIEVuc3VyZUNvbG9yTmFtZVRhYmxlKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGlmIChjb2xvck5hbWVUYWJsZSA9PSBudWxsKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBJbml0Q29sb3JOYW1lVGFibGUoKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCBFbnN1cmVDb2xvclRhYmxlKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGlmIChjb2xvclRhYmxlID09IG51bGwpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIEluaXRDb2xvclRhYmxlKCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgc3RhdGljIGludCBGcm9tV2luMzJWYWx1ZShpbnQgdmFsdWUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gRW5jb2RlKDB4ZmYsIHZhbHVlICYgMHhmZiwgKHZhbHVlID4+IDgpICYgMHhmZiwgKHZhbHVlID4+IDB4MTApICYgMHhmZik7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcml2YXRlIHN0YXRpYyB2b2lkIEluaXRDb2xvck5hbWVUYWJsZSgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBzdHJpbmdbXSBzID0gbmV3IHN0cmluZ1sweGFmXTtcclxuICAgICAgICAgICAgc1sxXSA9IFwiQWN0aXZlQm9yZGVyXCI7XHJcbiAgICAgICAgICAgIHNbMl0gPSBcIkFjdGl2ZUNhcHRpb25cIjtcclxuICAgICAgICAgICAgc1szXSA9IFwiQWN0aXZlQ2FwdGlvblRleHRcIjtcclxuICAgICAgICAgICAgc1s0XSA9IFwiQXBwV29ya3NwYWNlXCI7XHJcbiAgICAgICAgICAgIHNbMHhhOF0gPSBcIkJ1dHRvbkZhY2VcIjtcclxuICAgICAgICAgICAgc1sweGE5XSA9IFwiQnV0dG9uSGlnaGxpZ2h0XCI7XHJcbiAgICAgICAgICAgIHNbMTcwXSA9IFwiQnV0dG9uU2hhZG93XCI7XHJcbiAgICAgICAgICAgIHNbNV0gPSBcIkNvbnRyb2xcIjtcclxuICAgICAgICAgICAgc1s2XSA9IFwiQ29udHJvbERhcmtcIjtcclxuICAgICAgICAgICAgc1s3XSA9IFwiQ29udHJvbERhcmtEYXJrXCI7XHJcbiAgICAgICAgICAgIHNbOF0gPSBcIkNvbnRyb2xMaWdodFwiO1xyXG4gICAgICAgICAgICBzWzldID0gXCJDb250cm9sTGlnaHRMaWdodFwiO1xyXG4gICAgICAgICAgICBzWzEwXSA9IFwiQ29udHJvbFRleHRcIjtcclxuICAgICAgICAgICAgc1sxMV0gPSBcIkRlc2t0b3BcIjtcclxuICAgICAgICAgICAgc1sweGFiXSA9IFwiR3JhZGllbnRBY3RpdmVDYXB0aW9uXCI7XHJcbiAgICAgICAgICAgIHNbMHhhY10gPSBcIkdyYWRpZW50SW5hY3RpdmVDYXB0aW9uXCI7XHJcbiAgICAgICAgICAgIHNbMTJdID0gXCJHcmF5VGV4dFwiO1xyXG4gICAgICAgICAgICBzWzEzXSA9IFwiSGlnaGxpZ2h0XCI7XHJcbiAgICAgICAgICAgIHNbMTRdID0gXCJIaWdobGlnaHRUZXh0XCI7XHJcbiAgICAgICAgICAgIHNbMTVdID0gXCJIb3RUcmFja1wiO1xyXG4gICAgICAgICAgICBzWzB4MTBdID0gXCJJbmFjdGl2ZUJvcmRlclwiO1xyXG4gICAgICAgICAgICBzWzB4MTFdID0gXCJJbmFjdGl2ZUNhcHRpb25cIjtcclxuICAgICAgICAgICAgc1sweDEyXSA9IFwiSW5hY3RpdmVDYXB0aW9uVGV4dFwiO1xyXG4gICAgICAgICAgICBzWzB4MTNdID0gXCJJbmZvXCI7XHJcbiAgICAgICAgICAgIHNbMjBdID0gXCJJbmZvVGV4dFwiO1xyXG4gICAgICAgICAgICBzWzB4MTVdID0gXCJNZW51XCI7XHJcbiAgICAgICAgICAgIHNbMHhhZF0gPSBcIk1lbnVCYXJcIjtcclxuICAgICAgICAgICAgc1sweGFlXSA9IFwiTWVudUhpZ2hsaWdodFwiO1xyXG4gICAgICAgICAgICBzWzB4MTZdID0gXCJNZW51VGV4dFwiO1xyXG4gICAgICAgICAgICBzWzB4MTddID0gXCJTY3JvbGxCYXJcIjtcclxuICAgICAgICAgICAgc1sweDE4XSA9IFwiV2luZG93XCI7XHJcbiAgICAgICAgICAgIHNbMHgxOV0gPSBcIldpbmRvd0ZyYW1lXCI7XHJcbiAgICAgICAgICAgIHNbMHgxYV0gPSBcIldpbmRvd1RleHRcIjtcclxuICAgICAgICAgICAgc1sweDFiXSA9IFwiVHJhbnNwYXJlbnRcIjtcclxuICAgICAgICAgICAgc1sweDFjXSA9IFwiQWxpY2VCbHVlXCI7XHJcbiAgICAgICAgICAgIHNbMHgxZF0gPSBcIkFudGlxdWVXaGl0ZVwiO1xyXG4gICAgICAgICAgICBzWzMwXSA9IFwiQXF1YVwiO1xyXG4gICAgICAgICAgICBzWzB4MWZdID0gXCJBcXVhbWFyaW5lXCI7XHJcbiAgICAgICAgICAgIHNbMHgyMF0gPSBcIkF6dXJlXCI7XHJcbiAgICAgICAgICAgIHNbMHgyMV0gPSBcIkJlaWdlXCI7XHJcbiAgICAgICAgICAgIHNbMHgyMl0gPSBcIkJpc3F1ZVwiO1xyXG4gICAgICAgICAgICBzWzB4MjNdID0gXCJCbGFja1wiO1xyXG4gICAgICAgICAgICBzWzB4MjRdID0gXCJCbGFuY2hlZEFsbW9uZFwiO1xyXG4gICAgICAgICAgICBzWzB4MjVdID0gXCJCbHVlXCI7XHJcbiAgICAgICAgICAgIHNbMHgyNl0gPSBcIkJsdWVWaW9sZXRcIjtcclxuICAgICAgICAgICAgc1sweDI3XSA9IFwiQnJvd25cIjtcclxuICAgICAgICAgICAgc1s0MF0gPSBcIkJ1cmx5V29vZFwiO1xyXG4gICAgICAgICAgICBzWzB4MjldID0gXCJDYWRldEJsdWVcIjtcclxuICAgICAgICAgICAgc1sweDJhXSA9IFwiQ2hhcnRyZXVzZVwiO1xyXG4gICAgICAgICAgICBzWzB4MmJdID0gXCJDaG9jb2xhdGVcIjtcclxuICAgICAgICAgICAgc1sweDJjXSA9IFwiQ29yYWxcIjtcclxuICAgICAgICAgICAgc1sweDJkXSA9IFwiQ29ybmZsb3dlckJsdWVcIjtcclxuICAgICAgICAgICAgc1sweDJlXSA9IFwiQ29ybnNpbGtcIjtcclxuICAgICAgICAgICAgc1sweDJmXSA9IFwiQ3JpbXNvblwiO1xyXG4gICAgICAgICAgICBzWzB4MzBdID0gXCJDeWFuXCI7XHJcbiAgICAgICAgICAgIHNbMHgzMV0gPSBcIkRhcmtCbHVlXCI7XHJcbiAgICAgICAgICAgIHNbNTBdID0gXCJEYXJrQ3lhblwiO1xyXG4gICAgICAgICAgICBzWzB4MzNdID0gXCJEYXJrR29sZGVucm9kXCI7XHJcbiAgICAgICAgICAgIHNbMHgzNF0gPSBcIkRhcmtHcmF5XCI7XHJcbiAgICAgICAgICAgIHNbMHgzNV0gPSBcIkRhcmtHcmVlblwiO1xyXG4gICAgICAgICAgICBzWzB4MzZdID0gXCJEYXJrS2hha2lcIjtcclxuICAgICAgICAgICAgc1sweDM3XSA9IFwiRGFya01hZ2VudGFcIjtcclxuICAgICAgICAgICAgc1sweDM4XSA9IFwiRGFya09saXZlR3JlZW5cIjtcclxuICAgICAgICAgICAgc1sweDM5XSA9IFwiRGFya09yYW5nZVwiO1xyXG4gICAgICAgICAgICBzWzB4M2FdID0gXCJEYXJrT3JjaGlkXCI7XHJcbiAgICAgICAgICAgIHNbMHgzYl0gPSBcIkRhcmtSZWRcIjtcclxuICAgICAgICAgICAgc1s2MF0gPSBcIkRhcmtTYWxtb25cIjtcclxuICAgICAgICAgICAgc1sweDNkXSA9IFwiRGFya1NlYUdyZWVuXCI7XHJcbiAgICAgICAgICAgIHNbMHgzZV0gPSBcIkRhcmtTbGF0ZUJsdWVcIjtcclxuICAgICAgICAgICAgc1sweDNmXSA9IFwiRGFya1NsYXRlR3JheVwiO1xyXG4gICAgICAgICAgICBzWzB4NDBdID0gXCJEYXJrVHVycXVvaXNlXCI7XHJcbiAgICAgICAgICAgIHNbMHg0MV0gPSBcIkRhcmtWaW9sZXRcIjtcclxuICAgICAgICAgICAgc1sweDQyXSA9IFwiRGVlcFBpbmtcIjtcclxuICAgICAgICAgICAgc1sweDQzXSA9IFwiRGVlcFNreUJsdWVcIjtcclxuICAgICAgICAgICAgc1sweDQ0XSA9IFwiRGltR3JheVwiO1xyXG4gICAgICAgICAgICBzWzB4NDVdID0gXCJEb2RnZXJCbHVlXCI7XHJcbiAgICAgICAgICAgIHNbNzBdID0gXCJGaXJlYnJpY2tcIjtcclxuICAgICAgICAgICAgc1sweDQ3XSA9IFwiRmxvcmFsV2hpdGVcIjtcclxuICAgICAgICAgICAgc1sweDQ4XSA9IFwiRm9yZXN0R3JlZW5cIjtcclxuICAgICAgICAgICAgc1sweDQ5XSA9IFwiRnVjaHNpYVwiO1xyXG4gICAgICAgICAgICBzWzB4NGFdID0gXCJHYWluc2Jvcm9cIjtcclxuICAgICAgICAgICAgc1sweDRiXSA9IFwiR2hvc3RXaGl0ZVwiO1xyXG4gICAgICAgICAgICBzWzB4NGNdID0gXCJHb2xkXCI7XHJcbiAgICAgICAgICAgIHNbMHg0ZF0gPSBcIkdvbGRlbnJvZFwiO1xyXG4gICAgICAgICAgICBzWzB4NGVdID0gXCJHcmF5XCI7XHJcbiAgICAgICAgICAgIHNbMHg0Zl0gPSBcIkdyZWVuXCI7XHJcbiAgICAgICAgICAgIHNbODBdID0gXCJHcmVlblllbGxvd1wiO1xyXG4gICAgICAgICAgICBzWzB4NTFdID0gXCJIb25leWRld1wiO1xyXG4gICAgICAgICAgICBzWzB4NTJdID0gXCJIb3RQaW5rXCI7XHJcbiAgICAgICAgICAgIHNbMHg1M10gPSBcIkluZGlhblJlZFwiO1xyXG4gICAgICAgICAgICBzWzB4NTRdID0gXCJJbmRpZ29cIjtcclxuICAgICAgICAgICAgc1sweDU1XSA9IFwiSXZvcnlcIjtcclxuICAgICAgICAgICAgc1sweDU2XSA9IFwiS2hha2lcIjtcclxuICAgICAgICAgICAgc1sweDU3XSA9IFwiTGF2ZW5kZXJcIjtcclxuICAgICAgICAgICAgc1sweDU4XSA9IFwiTGF2ZW5kZXJCbHVzaFwiO1xyXG4gICAgICAgICAgICBzWzB4NTldID0gXCJMYXduR3JlZW5cIjtcclxuICAgICAgICAgICAgc1s5MF0gPSBcIkxlbW9uQ2hpZmZvblwiO1xyXG4gICAgICAgICAgICBzWzB4NWJdID0gXCJMaWdodEJsdWVcIjtcclxuICAgICAgICAgICAgc1sweDVjXSA9IFwiTGlnaHRDb3JhbFwiO1xyXG4gICAgICAgICAgICBzWzB4NWRdID0gXCJMaWdodEN5YW5cIjtcclxuICAgICAgICAgICAgc1sweDVlXSA9IFwiTGlnaHRHb2xkZW5yb2RZZWxsb3dcIjtcclxuICAgICAgICAgICAgc1sweDVmXSA9IFwiTGlnaHRHcmF5XCI7XHJcbiAgICAgICAgICAgIHNbMHg2MF0gPSBcIkxpZ2h0R3JlZW5cIjtcclxuICAgICAgICAgICAgc1sweDYxXSA9IFwiTGlnaHRQaW5rXCI7XHJcbiAgICAgICAgICAgIHNbMHg2Ml0gPSBcIkxpZ2h0U2FsbW9uXCI7XHJcbiAgICAgICAgICAgIHNbMHg2M10gPSBcIkxpZ2h0U2VhR3JlZW5cIjtcclxuICAgICAgICAgICAgc1sxMDBdID0gXCJMaWdodFNreUJsdWVcIjtcclxuICAgICAgICAgICAgc1sweDY1XSA9IFwiTGlnaHRTbGF0ZUdyYXlcIjtcclxuICAgICAgICAgICAgc1sweDY2XSA9IFwiTGlnaHRTdGVlbEJsdWVcIjtcclxuICAgICAgICAgICAgc1sweDY3XSA9IFwiTGlnaHRZZWxsb3dcIjtcclxuICAgICAgICAgICAgc1sweDY4XSA9IFwiTGltZVwiO1xyXG4gICAgICAgICAgICBzWzB4NjldID0gXCJMaW1lR3JlZW5cIjtcclxuICAgICAgICAgICAgc1sweDZhXSA9IFwiTGluZW5cIjtcclxuICAgICAgICAgICAgc1sweDZiXSA9IFwiTWFnZW50YVwiO1xyXG4gICAgICAgICAgICBzWzB4NmNdID0gXCJNYXJvb25cIjtcclxuICAgICAgICAgICAgc1sweDZkXSA9IFwiTWVkaXVtQXF1YW1hcmluZVwiO1xyXG4gICAgICAgICAgICBzWzExMF0gPSBcIk1lZGl1bUJsdWVcIjtcclxuICAgICAgICAgICAgc1sweDZmXSA9IFwiTWVkaXVtT3JjaGlkXCI7XHJcbiAgICAgICAgICAgIHNbMHg3MF0gPSBcIk1lZGl1bVB1cnBsZVwiO1xyXG4gICAgICAgICAgICBzWzB4NzFdID0gXCJNZWRpdW1TZWFHcmVlblwiO1xyXG4gICAgICAgICAgICBzWzB4NzJdID0gXCJNZWRpdW1TbGF0ZUJsdWVcIjtcclxuICAgICAgICAgICAgc1sweDczXSA9IFwiTWVkaXVtU3ByaW5nR3JlZW5cIjtcclxuICAgICAgICAgICAgc1sweDc0XSA9IFwiTWVkaXVtVHVycXVvaXNlXCI7XHJcbiAgICAgICAgICAgIHNbMHg3NV0gPSBcIk1lZGl1bVZpb2xldFJlZFwiO1xyXG4gICAgICAgICAgICBzWzB4NzZdID0gXCJNaWRuaWdodEJsdWVcIjtcclxuICAgICAgICAgICAgc1sweDc3XSA9IFwiTWludENyZWFtXCI7XHJcbiAgICAgICAgICAgIHNbMTIwXSA9IFwiTWlzdHlSb3NlXCI7XHJcbiAgICAgICAgICAgIHNbMHg3OV0gPSBcIk1vY2Nhc2luXCI7XHJcbiAgICAgICAgICAgIHNbMHg3YV0gPSBcIk5hdmFqb1doaXRlXCI7XHJcbiAgICAgICAgICAgIHNbMHg3Yl0gPSBcIk5hdnlcIjtcclxuICAgICAgICAgICAgc1sweDdjXSA9IFwiT2xkTGFjZVwiO1xyXG4gICAgICAgICAgICBzWzB4N2RdID0gXCJPbGl2ZVwiO1xyXG4gICAgICAgICAgICBzWzB4N2VdID0gXCJPbGl2ZURyYWJcIjtcclxuICAgICAgICAgICAgc1sweDdmXSA9IFwiT3JhbmdlXCI7XHJcbiAgICAgICAgICAgIHNbMHg4MF0gPSBcIk9yYW5nZVJlZFwiO1xyXG4gICAgICAgICAgICBzWzB4ODFdID0gXCJPcmNoaWRcIjtcclxuICAgICAgICAgICAgc1sxMzBdID0gXCJQYWxlR29sZGVucm9kXCI7XHJcbiAgICAgICAgICAgIHNbMHg4M10gPSBcIlBhbGVHcmVlblwiO1xyXG4gICAgICAgICAgICBzWzB4ODRdID0gXCJQYWxlVHVycXVvaXNlXCI7XHJcbiAgICAgICAgICAgIHNbMHg4NV0gPSBcIlBhbGVWaW9sZXRSZWRcIjtcclxuICAgICAgICAgICAgc1sweDg2XSA9IFwiUGFwYXlhV2hpcFwiO1xyXG4gICAgICAgICAgICBzWzB4ODddID0gXCJQZWFjaFB1ZmZcIjtcclxuICAgICAgICAgICAgc1sweDg4XSA9IFwiUGVydVwiO1xyXG4gICAgICAgICAgICBzWzB4ODldID0gXCJQaW5rXCI7XHJcbiAgICAgICAgICAgIHNbMHg4YV0gPSBcIlBsdW1cIjtcclxuICAgICAgICAgICAgc1sweDhiXSA9IFwiUG93ZGVyQmx1ZVwiO1xyXG4gICAgICAgICAgICBzWzE0MF0gPSBcIlB1cnBsZVwiO1xyXG4gICAgICAgICAgICBzWzB4OGRdID0gXCJSZWRcIjtcclxuICAgICAgICAgICAgc1sweDhlXSA9IFwiUm9zeUJyb3duXCI7XHJcbiAgICAgICAgICAgIHNbMHg4Zl0gPSBcIlJveWFsQmx1ZVwiO1xyXG4gICAgICAgICAgICBzWzB4OTBdID0gXCJTYWRkbGVCcm93blwiO1xyXG4gICAgICAgICAgICBzWzB4OTFdID0gXCJTYWxtb25cIjtcclxuICAgICAgICAgICAgc1sweDkyXSA9IFwiU2FuZHlCcm93blwiO1xyXG4gICAgICAgICAgICBzWzB4OTNdID0gXCJTZWFHcmVlblwiO1xyXG4gICAgICAgICAgICBzWzB4OTRdID0gXCJTZWFTaGVsbFwiO1xyXG4gICAgICAgICAgICBzWzB4OTVdID0gXCJTaWVubmFcIjtcclxuICAgICAgICAgICAgc1sxNTBdID0gXCJTaWx2ZXJcIjtcclxuICAgICAgICAgICAgc1sweDk3XSA9IFwiU2t5Qmx1ZVwiO1xyXG4gICAgICAgICAgICBzWzB4OThdID0gXCJTbGF0ZUJsdWVcIjtcclxuICAgICAgICAgICAgc1sweDk5XSA9IFwiU2xhdGVHcmF5XCI7XHJcbiAgICAgICAgICAgIHNbMHg5YV0gPSBcIlNub3dcIjtcclxuICAgICAgICAgICAgc1sweDliXSA9IFwiU3ByaW5nR3JlZW5cIjtcclxuICAgICAgICAgICAgc1sweDljXSA9IFwiU3RlZWxCbHVlXCI7XHJcbiAgICAgICAgICAgIHNbMHg5ZF0gPSBcIlRhblwiO1xyXG4gICAgICAgICAgICBzWzB4OWVdID0gXCJUZWFsXCI7XHJcbiAgICAgICAgICAgIHNbMHg5Zl0gPSBcIlRoaXN0bGVcIjtcclxuICAgICAgICAgICAgc1sxNjBdID0gXCJUb21hdG9cIjtcclxuICAgICAgICAgICAgc1sweGExXSA9IFwiVHVycXVvaXNlXCI7XHJcbiAgICAgICAgICAgIHNbMHhhMl0gPSBcIlZpb2xldFwiO1xyXG4gICAgICAgICAgICBzWzB4YTNdID0gXCJXaGVhdFwiO1xyXG4gICAgICAgICAgICBzWzB4YTRdID0gXCJXaGl0ZVwiO1xyXG4gICAgICAgICAgICBzWzB4YTVdID0gXCJXaGl0ZVNtb2tlXCI7XHJcbiAgICAgICAgICAgIHNbMHhhNl0gPSBcIlllbGxvd1wiO1xyXG4gICAgICAgICAgICBzWzB4YTddID0gXCJZZWxsb3dHcmVlblwiO1xyXG4gICAgICAgICAgICBjb2xvck5hbWVUYWJsZSA9IHM7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcml2YXRlIHN0YXRpYyB2b2lkIFVwZGF0ZVN5c3RlbUNvbG9ycygpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBjb2xvclRhYmxlWzFdID0gU3lzdGVtQ29sb3JUb0FyZ2IoMTApO1xyXG4gICAgICAgICAgICBjb2xvclRhYmxlWzJdID0gU3lzdGVtQ29sb3JUb0FyZ2IoMik7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbM10gPSBTeXN0ZW1Db2xvclRvQXJnYig5KTtcclxuICAgICAgICAgICAgY29sb3JUYWJsZVs0XSA9IFN5c3RlbUNvbG9yVG9BcmdiKDEyKTtcclxuICAgICAgICAgICAgY29sb3JUYWJsZVsxNjhdID0gU3lzdGVtQ29sb3JUb0FyZ2IoMTUpO1xyXG4gICAgICAgICAgICBjb2xvclRhYmxlWzE2OV0gPSBTeXN0ZW1Db2xvclRvQXJnYigyMCk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMTcwXSA9IFN5c3RlbUNvbG9yVG9BcmdiKDB4MTApO1xyXG4gICAgICAgICAgICBjb2xvclRhYmxlWzVdID0gU3lzdGVtQ29sb3JUb0FyZ2IoMTUpO1xyXG4gICAgICAgICAgICBjb2xvclRhYmxlWzZdID0gU3lzdGVtQ29sb3JUb0FyZ2IoMHgxMCk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbN10gPSBTeXN0ZW1Db2xvclRvQXJnYigweDE1KTtcclxuICAgICAgICAgICAgY29sb3JUYWJsZVs4XSA9IFN5c3RlbUNvbG9yVG9BcmdiKDB4MTYpO1xyXG4gICAgICAgICAgICBjb2xvclRhYmxlWzldID0gU3lzdGVtQ29sb3JUb0FyZ2IoMjApO1xyXG4gICAgICAgICAgICBjb2xvclRhYmxlWzEwXSA9IFN5c3RlbUNvbG9yVG9BcmdiKDB4MTIpO1xyXG4gICAgICAgICAgICBjb2xvclRhYmxlWzExXSA9IFN5c3RlbUNvbG9yVG9BcmdiKDEpO1xyXG4gICAgICAgICAgICBjb2xvclRhYmxlWzE3MV0gPSBTeXN0ZW1Db2xvclRvQXJnYigweDFiKTtcclxuICAgICAgICAgICAgY29sb3JUYWJsZVsxNzJdID0gU3lzdGVtQ29sb3JUb0FyZ2IoMHgxYyk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMTJdID0gU3lzdGVtQ29sb3JUb0FyZ2IoMHgxMSk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMTNdID0gU3lzdGVtQ29sb3JUb0FyZ2IoMTMpO1xyXG4gICAgICAgICAgICBjb2xvclRhYmxlWzE0XSA9IFN5c3RlbUNvbG9yVG9BcmdiKDE0KTtcclxuICAgICAgICAgICAgY29sb3JUYWJsZVsxNV0gPSBTeXN0ZW1Db2xvclRvQXJnYigweDFhKTtcclxuICAgICAgICAgICAgY29sb3JUYWJsZVsxNl0gPSBTeXN0ZW1Db2xvclRvQXJnYigxMSk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMTddID0gU3lzdGVtQ29sb3JUb0FyZ2IoMyk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMThdID0gU3lzdGVtQ29sb3JUb0FyZ2IoMHgxMyk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMTldID0gU3lzdGVtQ29sb3JUb0FyZ2IoMHgxOCk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMjBdID0gU3lzdGVtQ29sb3JUb0FyZ2IoMHgxNyk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMjFdID0gU3lzdGVtQ29sb3JUb0FyZ2IoNCk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMTczXSA9IFN5c3RlbUNvbG9yVG9BcmdiKDMwKTtcclxuICAgICAgICAgICAgY29sb3JUYWJsZVsxNzRdID0gU3lzdGVtQ29sb3JUb0FyZ2IoMHgxZCk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMjJdID0gU3lzdGVtQ29sb3JUb0FyZ2IoNyk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMjNdID0gU3lzdGVtQ29sb3JUb0FyZ2IoMCk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMjRdID0gU3lzdGVtQ29sb3JUb0FyZ2IoNSk7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMjVdID0gU3lzdGVtQ29sb3JUb0FyZ2IoNik7XHJcbiAgICAgICAgICAgIGNvbG9yVGFibGVbMjZdID0gU3lzdGVtQ29sb3JUb0FyZ2IoOCk7XHJcbiAgICAgICAgfVxyXG5cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCBJbml0Q29sb3JUYWJsZSgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBpbnRbXSBjID0gbmV3IGludFsweGFmXTtcclxuXHJcbiAgICAgICAgICAgIGNbMHgxYl0gPSAweGZmZmZmZjtcclxuICAgICAgICAgICAgY1sweDFjXSA9IC05ODQ4MzM7XHJcbiAgICAgICAgICAgIGNbMHgxZF0gPSAtMzMyODQxO1xyXG4gICAgICAgICAgICBjWzMwXSA9IC0xNjcxMTY4MTtcclxuICAgICAgICAgICAgY1sweDFmXSA9IC04Mzg4NjUyO1xyXG4gICAgICAgICAgICBjWzB4MjBdID0gLTk4MzA0MTtcclxuICAgICAgICAgICAgY1sweDIxXSA9IC02NTc5NTY7XHJcbiAgICAgICAgICAgIGNbMHgyMl0gPSAtNjk3MjtcclxuICAgICAgICAgICAgY1sweDIzXSA9IC0xNjc3NzIxNjtcclxuICAgICAgICAgICAgY1sweDI0XSA9IC01MTcxO1xyXG4gICAgICAgICAgICBjWzB4MjVdID0gLTE2Nzc2OTYxO1xyXG4gICAgICAgICAgICBjWzB4MjZdID0gLTc3MjIwMTQ7XHJcbiAgICAgICAgICAgIGNbMHgyN10gPSAtNTk1Mjk4MjtcclxuICAgICAgICAgICAgY1s0MF0gPSAtMjE4MDk4NTtcclxuICAgICAgICAgICAgY1sweDI5XSA9IC0xMDUxMDY4ODtcclxuICAgICAgICAgICAgY1sweDJhXSA9IC04Mzg4ODY0O1xyXG4gICAgICAgICAgICBjWzB4MmJdID0gLTI5ODc3NDY7XHJcbiAgICAgICAgICAgIGNbMHgyY10gPSAtMzI5NDQ7XHJcbiAgICAgICAgICAgIGNbMHgyZF0gPSAtMTAxODUyMzU7XHJcbiAgICAgICAgICAgIGNbMHgyZV0gPSAtMTgyODtcclxuICAgICAgICAgICAgY1sweDJmXSA9IC0yMzU0MTE2O1xyXG4gICAgICAgICAgICBjWzB4MzBdID0gLTE2NzExNjgxO1xyXG4gICAgICAgICAgICBjWzB4MzFdID0gLTE2Nzc3MDc3O1xyXG4gICAgICAgICAgICBjWzUwXSA9IC0xNjc0MTQ5MztcclxuICAgICAgICAgICAgY1sweDMzXSA9IC00Njg0Mjc3O1xyXG4gICAgICAgICAgICBjWzB4MzRdID0gLTU2NTgxOTk7XHJcbiAgICAgICAgICAgIGNbMHgzNV0gPSAtMTY3NTE2MTY7XHJcbiAgICAgICAgICAgIGNbMHgzNl0gPSAtNDM0Mzk1NztcclxuICAgICAgICAgICAgY1sweDM3XSA9IC03NjY3NTczO1xyXG4gICAgICAgICAgICBjWzB4MzhdID0gLTExMTc5MjE3O1xyXG4gICAgICAgICAgICBjWzB4MzldID0gLTI5Njk2O1xyXG4gICAgICAgICAgICBjWzB4M2FdID0gLTY3MzcyMDQ7XHJcbiAgICAgICAgICAgIGNbMHgzYl0gPSAtNzY2NzcxMjtcclxuICAgICAgICAgICAgY1s2MF0gPSAtMTQ2ODgwNjtcclxuICAgICAgICAgICAgY1sweDNkXSA9IC03MzU3MzAxO1xyXG4gICAgICAgICAgICBjWzB4M2VdID0gLTEyMDQyODY5O1xyXG4gICAgICAgICAgICBjWzB4M2ZdID0gLTEzNjc2NzIxO1xyXG4gICAgICAgICAgICBjWzB4NDBdID0gLTE2NzI0MjcxO1xyXG4gICAgICAgICAgICBjWzB4NDFdID0gLTcwNzc2Nzc7XHJcbiAgICAgICAgICAgIGNbMHg0Ml0gPSAtNjAyNjk7XHJcbiAgICAgICAgICAgIGNbMHg0M10gPSAtMTY3MjgwNjU7XHJcbiAgICAgICAgICAgIGNbMHg0NF0gPSAtOTg2ODk1MTtcclxuICAgICAgICAgICAgY1sweDQ1XSA9IC0xNDc3NDAxNztcclxuICAgICAgICAgICAgY1s3MF0gPSAtNTEwMzA3MDtcclxuICAgICAgICAgICAgY1sweDQ3XSA9IC0xMjk2O1xyXG4gICAgICAgICAgICBjWzB4NDhdID0gLTE0NTEzMzc0O1xyXG4gICAgICAgICAgICBjWzB4NDldID0gLTY1MjgxO1xyXG4gICAgICAgICAgICBjWzB4NGFdID0gLTIzMDI3NTY7XHJcbiAgICAgICAgICAgIGNbMHg0Yl0gPSAtNDYwNTQ1O1xyXG4gICAgICAgICAgICBjWzB4NGNdID0gLTEwNDk2O1xyXG4gICAgICAgICAgICBjWzB4NGRdID0gLTI0NDgwOTY7XHJcbiAgICAgICAgICAgIGNbMHg0ZV0gPSAtODM1NTcxMjtcclxuICAgICAgICAgICAgY1sweDRmXSA9IC0xNjc0NDQ0ODtcclxuICAgICAgICAgICAgY1s4MF0gPSAtNTM3NDE2MTtcclxuICAgICAgICAgICAgY1sweDUxXSA9IC05ODMwNTY7XHJcbiAgICAgICAgICAgIGNbMHg1Ml0gPSAtMzg0NzY7XHJcbiAgICAgICAgICAgIGNbMHg1M10gPSAtMzMxODY5MjtcclxuICAgICAgICAgICAgY1sweDU0XSA9IC0xMTg2MTg4NjtcclxuICAgICAgICAgICAgY1sweDU1XSA9IC0xNjtcclxuICAgICAgICAgICAgY1sweDU2XSA9IC05ODk1NTY7XHJcbiAgICAgICAgICAgIGNbMHg1N10gPSAtMTY0NDgwNjtcclxuICAgICAgICAgICAgY1sweDU4XSA9IC0zODUxO1xyXG4gICAgICAgICAgICBjWzB4NTldID0gLTg1ODYyNDA7XHJcbiAgICAgICAgICAgIGNbOTBdID0gLTEzMzE7XHJcbiAgICAgICAgICAgIGNbMHg1Yl0gPSAtNTM4Mzk2MjtcclxuICAgICAgICAgICAgY1sweDVjXSA9IC0xMDE1NjgwO1xyXG4gICAgICAgICAgICBjWzB4NWRdID0gLTIwMzE2MTc7XHJcbiAgICAgICAgICAgIGNbMHg1ZV0gPSAtMzI5MDA2O1xyXG4gICAgICAgICAgICBjWzB4NWZdID0gLTI4OTQ4OTM7XHJcbiAgICAgICAgICAgIGNbMHg2MF0gPSAtNzI3ODk2MDtcclxuICAgICAgICAgICAgY1sweDYxXSA9IC0xODc1MTtcclxuICAgICAgICAgICAgY1sweDYyXSA9IC0yNDQ1NDtcclxuICAgICAgICAgICAgY1sweDYzXSA9IC0xNDYzNDMyNjtcclxuICAgICAgICAgICAgY1sxMDBdID0gLTc4NzY4NzA7XHJcbiAgICAgICAgICAgIGNbMHg2NV0gPSAtODk0MzQ2MztcclxuICAgICAgICAgICAgY1sweDY2XSA9IC01MTkyNDgyO1xyXG4gICAgICAgICAgICBjWzB4NjddID0gLTMyO1xyXG4gICAgICAgICAgICBjWzB4NjhdID0gLTE2NzExOTM2O1xyXG4gICAgICAgICAgICBjWzB4NjldID0gLTEzNDQ3ODg2O1xyXG4gICAgICAgICAgICBjWzB4NmFdID0gLTMzMTU0NjtcclxuICAgICAgICAgICAgY1sweDZiXSA9IC02NTI4MTtcclxuICAgICAgICAgICAgY1sweDZjXSA9IC04Mzg4NjA4O1xyXG4gICAgICAgICAgICBjWzB4NmRdID0gLTEwMDM5ODk0O1xyXG4gICAgICAgICAgICBjWzExMF0gPSAtMTY3NzcwMTE7XHJcbiAgICAgICAgICAgIGNbMHg2Zl0gPSAtNDU2NTU0OTtcclxuICAgICAgICAgICAgY1sweDcwXSA9IC03MTE0NTMzO1xyXG4gICAgICAgICAgICBjWzB4NzFdID0gLTEyNzk5MTE5O1xyXG4gICAgICAgICAgICBjWzB4NzJdID0gLTg2ODk0MjY7XHJcbiAgICAgICAgICAgIGNbMHg3M10gPSAtMTY3MTMwNjI7XHJcbiAgICAgICAgICAgIGNbMHg3NF0gPSAtMTIwMDQ5MTY7XHJcbiAgICAgICAgICAgIGNbMHg3NV0gPSAtMzczMDA0MztcclxuICAgICAgICAgICAgY1sweDc2XSA9IC0xNTEzMjMwNDtcclxuICAgICAgICAgICAgY1sweDc3XSA9IC02NTUzNjY7XHJcbiAgICAgICAgICAgIGNbMTIwXSA9IC02OTQzO1xyXG4gICAgICAgICAgICBjWzB4NzldID0gLTY5ODc7XHJcbiAgICAgICAgICAgIGNbMHg3YV0gPSAtODUzMTtcclxuICAgICAgICAgICAgY1sweDdiXSA9IC0xNjc3NzA4ODtcclxuICAgICAgICAgICAgY1sweDdjXSA9IC0xMzM2NTg7XHJcbiAgICAgICAgICAgIGNbMHg3ZF0gPSAtODM1NTg0MDtcclxuICAgICAgICAgICAgY1sweDdlXSA9IC05NzI4NDc3O1xyXG4gICAgICAgICAgICBjWzB4N2ZdID0gLTIzMjk2O1xyXG4gICAgICAgICAgICBjWzB4ODBdID0gLTQ3ODcyO1xyXG4gICAgICAgICAgICBjWzB4ODFdID0gLTI0NjE0ODI7XHJcbiAgICAgICAgICAgIGNbMTMwXSA9IC0xMTIwMDg2O1xyXG4gICAgICAgICAgICBjWzB4ODNdID0gLTY3NTEzMzY7XHJcbiAgICAgICAgICAgIGNbMHg4NF0gPSAtNTI0NzI1MDtcclxuICAgICAgICAgICAgY1sweDg1XSA9IC0yMzk2MDEzO1xyXG4gICAgICAgICAgICBjWzB4ODZdID0gLTQxMzk7XHJcbiAgICAgICAgICAgIGNbMHg4N10gPSAtOTU0MztcclxuICAgICAgICAgICAgY1sweDg4XSA9IC0zMzA4MjI1O1xyXG4gICAgICAgICAgICBjWzB4ODldID0gLTE2MTgxO1xyXG4gICAgICAgICAgICBjWzB4OGFdID0gLTIyNTI1Nzk7XHJcbiAgICAgICAgICAgIGNbMHg4Yl0gPSAtNTE4NTMwNjtcclxuICAgICAgICAgICAgY1sxNDBdID0gLTgzODg0ODA7XHJcbiAgICAgICAgICAgIGNbMHg4ZF0gPSAtNjU1MzY7XHJcbiAgICAgICAgICAgIGNbMHg4ZV0gPSAtNDQxOTY5NztcclxuICAgICAgICAgICAgY1sweDhmXSA9IC0xMjQ5MDI3MTtcclxuICAgICAgICAgICAgY1sweDkwXSA9IC03NjUwMDI5O1xyXG4gICAgICAgICAgICBjWzB4OTFdID0gLTM2MDMzNDtcclxuICAgICAgICAgICAgY1sweDkyXSA9IC03NDQzNTI7XHJcbiAgICAgICAgICAgIGNbMHg5M10gPSAtMTM3MjY4ODk7XHJcbiAgICAgICAgICAgIGNbMHg5NF0gPSAtMjU3ODtcclxuICAgICAgICAgICAgY1sweDk1XSA9IC02MjcwNDE5O1xyXG4gICAgICAgICAgICBjWzE1MF0gPSAtNDE0NDk2MDtcclxuICAgICAgICAgICAgY1sweDk3XSA9IC03ODc2ODg1O1xyXG4gICAgICAgICAgICBjWzB4OThdID0gLTk4MDcxNTU7XHJcbiAgICAgICAgICAgIGNbMHg5OV0gPSAtOTQwNDI3MjtcclxuICAgICAgICAgICAgY1sweDlhXSA9IC0xMjg2O1xyXG4gICAgICAgICAgICBjWzB4OWJdID0gLTE2NzExODA5O1xyXG4gICAgICAgICAgICBjWzB4OWNdID0gLTEyMTU2MjM2O1xyXG4gICAgICAgICAgICBjWzB4OWRdID0gLTI5Njg0MzY7XHJcbiAgICAgICAgICAgIGNbMHg5ZV0gPSAtMTY3NDQzMjA7XHJcbiAgICAgICAgICAgIGNbMHg5Zl0gPSAtMjU3MjMyODtcclxuICAgICAgICAgICAgY1sxNjBdID0gLTQwMTIxO1xyXG4gICAgICAgICAgICBjWzB4YTFdID0gLTEyNTI1MzYwO1xyXG4gICAgICAgICAgICBjWzB4YTJdID0gLTExNDYxMzA7XHJcbiAgICAgICAgICAgIGNbMHhhM10gPSAtNjYzODg1O1xyXG4gICAgICAgICAgICBjWzB4YTRdID0gLTE7XHJcbiAgICAgICAgICAgIGNbMHhhNV0gPSAtNjU3OTMxO1xyXG4gICAgICAgICAgICBjWzB4YTZdID0gLTI1NjtcclxuICAgICAgICAgICAgY1sweGE3XSA9IC02NjMyMTQyO1xyXG4gICAgICAgICAgICBjb2xvclRhYmxlID0gYztcclxuXHJcbiAgICAgICAgICAgIFVwZGF0ZVN5c3RlbUNvbG9ycygpO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBpbnQgS25vd25Db2xvclRvQXJnYihLbm93bkNvbG9yIGNvbG9yKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgRW5zdXJlQ29sb3JUYWJsZSgpO1xyXG4gICAgICAgICAgICBpZiAoY29sb3IgPD0gS25vd25Db2xvci5NZW51SGlnaGxpZ2h0KVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gY29sb3JUYWJsZVsoaW50KWNvbG9yXTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICByZXR1cm4gMDtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgc3RyaW5nIEtub3duQ29sb3JUb05hbWUoS25vd25Db2xvciBjb2xvcilcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIEVuc3VyZUNvbG9yTmFtZVRhYmxlKCk7XHJcbiAgICAgICAgICAgIGlmIChjb2xvciA8PSBLbm93bkNvbG9yLk1lbnVIaWdobGlnaHQpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBjb2xvck5hbWVUYWJsZVsoaW50KWNvbG9yXTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICByZXR1cm4gbnVsbDtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgc3RhdGljIGludFtdIF9TeXNDb2xvcnMgPSBuZXcgaW50W10gXHJcbiAgICAgICAgICAgIHsxMTg0Mjc0MCxcclxuICAgICAgICAgICAgMTM3NDMyNTcsXHJcbiAgICAgICAgICAgIDAsXHJcbiAgICAgICAgICAgIDExMjUwNjAzLFxyXG4gICAgICAgICAgICAxNTc5MDMyMCxcclxuICAgICAgICAgICAgMTY3NzcyMTUsXHJcbiAgICAgICAgICAgIDEwNTI2ODgwLFxyXG4gICAgICAgICAgICAxNTc5MDMyMCxcclxuICAgICAgICAgICAgMTA1MjY4ODAsXHJcbiAgICAgICAgICAgIDY5MDgyNjUsXHJcbiAgICAgICAgICAgIDE0OTM1MDExLFxyXG4gICAgICAgICAgICAxNjc3NzIxNSxcclxuICAgICAgICAgICAgMCxcclxuICAgICAgICAgICAgMCxcclxuICAgICAgICAgICAgMTUzODkxMTMsXHJcbiAgICAgICAgICAgIDE1OTE4Mjk1LFxyXG4gICAgICAgICAgICA3MTcxNDM3LFxyXG4gICAgICAgICAgICAxNjc1MDg5OSxcclxuICAgICAgICAgICAgMTY3NzcyMTUsXHJcbiAgICAgICAgICAgIDEzMzk1NDU2LFxyXG4gICAgICAgICAgICAxNjU3ODU0OCxcclxuICAgICAgICAgICAgMTQ0MDUwNTUsXHJcbiAgICAgICAgICAgIDU1MjUwNTksXHJcbiAgICAgICAgICAgIDE0ODExMTM1LFxyXG4gICAgICAgICAgICAwLFxyXG4gICAgICAgICAgICAxNTc5MDMyMCxcclxuICAgICAgICAgICAgMTU3OTAzMjAsXHJcbiAgICAgICAgICAgIDE2NzUwODk5LFxyXG4gICAgICAgICAgICAwLFxyXG4gICAgICAgICAgICAxMzE1ODYwMCxcclxuICAgICAgICAgICAgMTY3NzcyMTUsXHJcbiAgICAgICAgICAgIDY1NzkzMDAsXHJcbiAgICAgICAgICAgIDB9O1xyXG5cclxuICAgICAgICBwcml2YXRlIHN0YXRpYyBpbnQgU3lzdGVtQ29sb3JUb0FyZ2IoaW50IGluZGV4KVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgcmV0dXJuIEZyb21XaW4zMlZhbHVlKF9TeXNDb2xvcnNbaW5kZXhdKTtcclxuICAgICAgICB9ICAgIFxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWM7XHJcbnVzaW5nIFN5c3RlbS5MaW5xO1xyXG51c2luZyBTeXN0ZW0uVGV4dDtcclxudXNpbmcgU3lzdGVtLlRocmVhZGluZy5UYXNrcztcclxuXHJcbm5hbWVzcGFjZSBTeXN0ZW0uRHJhd2luZ1xyXG57XHJcbiAgICBwdWJsaWMgY2xhc3MgRm9udFxyXG4gICAge1xyXG4gICAgICAgIHB1YmxpYyBzdHJpbmcgRmFtaWx5TmFtZSB7IGdldDsgcHJpdmF0ZSBzZXQ7IH1cclxuICAgICAgICBwdWJsaWMgZmxvYXQgRW1TaXplIHsgZ2V0OyBwcml2YXRlIHNldDsgfVxyXG5cclxuICAgICAgICBwdWJsaWMgRm9udChzdHJpbmcgZmFtaWx5TmFtZSwgZmxvYXQgZW1TaXplLCBGb250U3R5bGUgc3R5bGUsIEdyYXBoaWNzVW5pdCB1bml0LCBieXRlIGdkaUNoYXJTZXQpIDogdGhpcyhmYW1pbHlOYW1lLCBlbVNpemUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBGb250KHN0cmluZyBmYW1pbHlOYW1lLCBmbG9hdCBlbVNpemUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBGYW1pbHlOYW1lID0gZmFtaWx5TmFtZTtcclxuICAgICAgICAgICAgRW1TaXplID0gZW1TaXplO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICB9XHJcbn1cclxuIiwidXNpbmcgU3lzdGVtO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYztcclxudXNpbmcgU3lzdGVtLkxpbnE7XHJcbnVzaW5nIFN5c3RlbS5UZXh0O1xyXG51c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzO1xyXG5cclxubmFtZXNwYWNlIFN5c3RlbS5EcmF3aW5nXHJcbntcclxuICAgIHB1YmxpYyBzdHJ1Y3QgUG9pbnRcclxuICAgIHtcclxuICAgICAgICBwdWJsaWMgaW50IFg7XHJcbiAgICAgICAgcHVibGljIGludCBZO1xyXG4gICAgICAgIHB1YmxpYyBQb2ludChpbnQgeCwgaW50IHkpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBYID0geDtcclxuICAgICAgICAgICAgWSA9IHk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgb3ZlcnJpZGUgc3RyaW5nIFRvU3RyaW5nKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHJldHVybiBzdHJpbmcuRm9ybWF0KFwiWDp7MH0sIFk6ezF9XCIsWCxZKTtcclxuICAgICAgICB9XHJcblxyXG5cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLkRyYXdpbmdcclxue1xyXG4gICAgcHVibGljIHN0cnVjdCBTaXplXHJcbiAgICB7XHJcbiAgICAgICAgcHVibGljIGludCBXaWR0aDtcclxuICAgICAgICBwdWJsaWMgaW50IEhlaWdodDtcclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBTaXplIEVtcHR5ID0gbmV3IFNpemUoMCwgMCk7XHJcblxyXG4gICAgICAgIHB1YmxpYyBTaXplKGludCB3aWR0aCwgaW50IGhlaWdodClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIFdpZHRoID0gd2lkdGg7XHJcbiAgICAgICAgICAgIEhlaWdodCA9IGhlaWdodDtcclxuICAgICAgICB9XHJcblxyXG5cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLkRyYXdpbmdcclxue1xyXG4gICAgcHVibGljIHN0cnVjdCBTaXplRlxyXG4gICAge1xyXG4gICAgICAgIHB1YmxpYyBmbG9hdCBXaWR0aDtcclxuICAgICAgICBwdWJsaWMgZmxvYXQgSGVpZ2h0O1xyXG5cclxuICAgICAgICBwdWJsaWMgU2l6ZUYoZmxvYXQgd2lkdGgsIGZsb2F0IGhlaWdodClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIFdpZHRoID0gd2lkdGg7XHJcbiAgICAgICAgICAgIEhlaWdodCA9IGhlaWdodDtcclxuICAgICAgICB9XHJcblxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWM7XHJcbnVzaW5nIFN5c3RlbS5MaW5xO1xyXG51c2luZyBTeXN0ZW0uVGV4dDtcclxudXNpbmcgU3lzdGVtLlRocmVhZGluZy5UYXNrcztcclxuXHJcbm5hbWVzcGFjZSBTeXN0ZW0uRHJhd2luZ1xyXG57XHJcbiAgICBwdWJsaWMgc2VhbGVkIGNsYXNzIFN5c3RlbUNvbG9yc1xyXG4gICAge1xyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQWN0aXZlQm9yZGVyIHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkFjdGl2ZUJvcmRlcik7fX1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBBY3RpdmVDYXB0aW9uIHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkFjdGl2ZUNhcHRpb24pO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQWN0aXZlQ2FwdGlvblRleHQge2dldHtyZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQWN0aXZlQ2FwdGlvblRleHQpO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQXBwV29ya3NwYWNlIHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkFwcFdvcmtzcGFjZSk7fX1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBCdXR0b25GYWNlIHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkJ1dHRvbkZhY2UpO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQnV0dG9uSGlnaGxpZ2h0IHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkJ1dHRvbkhpZ2hsaWdodCk7fX1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBCdXR0b25TaGFkb3cge2dldHtyZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQnV0dG9uU2hhZG93KTt9fVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIENvbnRyb2wge2dldHtyZXR1cm4gQ29sb3IuRnJvbUFyZ2IoMjQwLCAyNDAsIDI0MCk7fX1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBDb250cm9sRGFyayB7Z2V0e3JldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Db250cm9sRGFyayk7fX1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBDb250cm9sRGFya0Rhcmsge2dldHtyZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQ29udHJvbERhcmtEYXJrKTt9fVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIENvbnRyb2xMaWdodCB7Z2V0e3JldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5Db250cm9sTGlnaHQpO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQ29udHJvbExpZ2h0TGlnaHQge2dldHtyZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQ29udHJvbExpZ2h0TGlnaHQpO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgQ29udHJvbFRleHQge2dldHtyZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuQ29udHJvbFRleHQpO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgRGVza3RvcCB7Z2V0e3JldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5EZXNrdG9wKTt9fVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEdyYWRpZW50QWN0aXZlQ2FwdGlvbiB7Z2V0e3JldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5HcmFkaWVudEFjdGl2ZUNhcHRpb24pO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgR3JhZGllbnRJbmFjdGl2ZUNhcHRpb24ge2dldHtyZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuR3JhZGllbnRJbmFjdGl2ZUNhcHRpb24pO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgR3JheVRleHQge2dldHtyZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuR3JheVRleHQpO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgSGlnaGxpZ2h0IHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkhpZ2hsaWdodCk7fX1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBIaWdobGlnaHRUZXh0IHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkhpZ2hsaWdodFRleHQpO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgSG90VHJhY2sge2dldHtyZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuSG90VHJhY2spO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgSW5hY3RpdmVCb3JkZXIge2dldHtyZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuSW5hY3RpdmVCb3JkZXIpO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgSW5hY3RpdmVDYXB0aW9uIHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkluYWN0aXZlQ2FwdGlvbik7fX1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBJbmFjdGl2ZUNhcHRpb25UZXh0IHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkluYWN0aXZlQ2FwdGlvblRleHQpO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgSW5mbyB7Z2V0e3JldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5JbmZvKTt9fVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIEluZm9UZXh0IHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLkluZm9UZXh0KTt9fVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIE1lbnUge2dldHtyZXR1cm4gbmV3IENvbG9yKEtub3duQ29sb3IuTWVudSk7fX1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBNZW51QmFyIHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLk1lbnVCYXIpO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgTWVudUhpZ2hsaWdodCB7Z2V0e3JldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5NZW51SGlnaGxpZ2h0KTt9fVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIE1lbnVUZXh0IHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLk1lbnVUZXh0KTt9fVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIENvbG9yIFNjcm9sbEJhciB7Z2V0e3JldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5TY3JvbGxCYXIpO319XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgQ29sb3IgV2luZG93IHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLldpbmRvdyk7fX1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBXaW5kb3dGcmFtZSB7Z2V0e3JldHVybiBuZXcgQ29sb3IoS25vd25Db2xvci5XaW5kb3dGcmFtZSk7fX1cclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBDb2xvciBXaW5kb3dUZXh0IHtnZXR7cmV0dXJuIG5ldyBDb2xvcihLbm93bkNvbG9yLldpbmRvd1RleHQpO319XHJcbiAgICB9XHJcbn1cclxuIiwidXNpbmcgU3lzdGVtO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYztcclxudXNpbmcgU3lzdGVtLkRyYXdpbmc7XHJcbnVzaW5nIFN5c3RlbS5MaW5xO1xyXG51c2luZyBTeXN0ZW0uVGV4dDtcclxudXNpbmcgU3lzdGVtLlRocmVhZGluZy5UYXNrcztcclxuXHJcbm5hbWVzcGFjZSBTeXN0ZW0uV2luZG93cy5Gb3Jtc1xyXG57XHJcbiAgICBwdWJsaWMgY2xhc3MgQ29udHJvbFxyXG4gICAge1xyXG4gICAgICAgIHB1YmxpYyBzdHJpbmcgTmFtZSB7IGdldCB7IHJldHVybiBFbGVtZW50LmdldEF0dHJpYnV0ZShcIk5hbWVcIik7IH0gc2V0IHsgRWxlbWVudC5zZXRBdHRyaWJ1dGUoXCJOYW1lXCIsIHZhbHVlKTsgfSB9XHJcbiAgICAgICAgcHJpdmF0ZSBQb2ludCBfbG9jYXRpb247XHJcbiAgICAgICAgcHVibGljIFBvaW50IExvY2F0aW9uXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXQgeyByZXR1cm4gX2xvY2F0aW9uOyB9XHJcbiAgICAgICAgICAgIHNldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBfbG9jYXRpb24gPSB2YWx1ZTtcclxuXHJcbiAgICAgICAgICAgICAgICBFbGVtZW50LnN0eWxlLmxlZnQgPSBfbG9jYXRpb24uWCArIFwicHhcIjtcclxuICAgICAgICAgICAgICAgIEVsZW1lbnQuc3R5bGUudG9wID0gX2xvY2F0aW9uLlkgKyBcInB4XCI7XHJcblxyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBpbnRlcm5hbCB2aXJ0dWFsIHZvaWQgT25Db250cm9sQWRkZWQoQ29udHJvbCBjb250cm9sKVxyXG4gICAgICAgIHtcclxuXHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBpbnRlcm5hbCB2aXJ0dWFsIHZvaWQgT25Db250cm9sUmVtb3ZlZChDb250cm9sIGNvbnRyb2wpXHJcbiAgICAgICAge1xyXG5cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgYm9vbCBfdmlzaWJsZTtcclxuICAgICAgICBwdWJsaWMgYm9vbCBWaXNpYmxlIHsgZ2V0IHsgcmV0dXJuIF92aXNpYmxlOyB9IHNldCB7XHJcbiAgICAgICAgICAgICAgICBfdmlzaWJsZSA9IHZhbHVlO1xyXG4gICAgICAgICAgICAgICAgRWxlbWVudC5zdHlsZS52aXNpYmlsaXR5ID0gX3Zpc2libGUgPyBcImluaGVyaXRcIiA6IFwiaGlkZGVuXCI7ICAgICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICB9IH1cclxuXHJcbiAgICAgICAgaW50ZXJuYWwgQ29udHJvbCBfcGFyZW50O1xyXG5cclxuICAgICAgICBwdWJsaWMgQ29udHJvbCBQYXJlbnQgeyBnZXQgeyByZXR1cm4gX3BhcmVudDsgfSB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBGb3JtIEdldEZvcm0oKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgaWYgKHRoaXMuUGFyZW50ID09IG51bGwpXHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbnVsbDtcclxuXHJcbiAgICAgICAgICAgIGlmKHRoaXMuUGFyZW50IGlzIEZvcm0pXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiB0aGlzLlBhcmVudC5BczxGb3JtPigpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIHRoaXMuUGFyZW50LkdldEZvcm0oKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBTaXplIF9zaXplO1xyXG4gICAgICAgIHB1YmxpYyBTaXplIFNpemUgeyBnZXQgeyByZXR1cm4gX3NpemU7IH0gc2V0IHtcclxuICAgICAgICAgICAgICAgIF9zaXplID0gdmFsdWU7XHJcbiAgICAgICAgICAgICAgICBpZihfYXV0b1NpemUpXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgRWxlbWVudC5zdHlsZS53aWR0aCA9IFwiYXV0b1wiO1xyXG4gICAgICAgICAgICAgICAgICAgIEVsZW1lbnQuc3R5bGUuaGVpZ2h0ID0gXCJhdXRvXCI7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgRWxlbWVudC5zdHlsZS53aWR0aCA9IF9zaXplLldpZHRoICsgXCJweFwiO1xyXG4gICAgICAgICAgICAgICAgICAgIEVsZW1lbnQuc3R5bGUuaGVpZ2h0ID0gX3NpemUuSGVpZ2h0ICsgXCJweFwiO1xyXG4gICAgICAgICAgICAgICAgfSAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgfSB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgYm9vbCBfdGFiU3RvcDtcclxuICAgICAgICBwdWJsaWMgYm9vbCBUYWJTdG9wIHsgZ2V0IHsgcmV0dXJuIF90YWJTdG9wOyB9IHNldCB7XHJcbiAgICAgICAgICAgICAgICBfdGFiU3RvcCA9IHZhbHVlO1xyXG4gICAgICAgICAgICAgICAgVGFiSW5kZXggPSBfdGFiSW5kZXg7XHJcbiAgICAgICAgICAgIH0gfVxyXG5cclxuICAgICAgICBwcm90ZWN0ZWQgaW50IF90YWJJbmRleDtcclxuICAgICAgICBwdWJsaWMgdmlydHVhbCBpbnQgVGFiSW5kZXggeyBnZXQgeyByZXR1cm4gX3RhYkluZGV4OyB9IHNldCB7XHJcbiAgICAgICAgICAgICAgICBfdGFiSW5kZXggPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgIGlmKFRhYlN0b3ApXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgRWxlbWVudC50YWJJbmRleCA9IHZhbHVlO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIEVsZW1lbnQucmVtb3ZlQXR0cmlidXRlKFwiVGFiSW5kZXhcIik7ICAgICAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgIH0gICAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgIH0gfVxyXG4gICAgICAgIHB1YmxpYyB2aXJ0dWFsIHN0cmluZyBUZXh0IHsgZ2V0OyBzZXQ7IH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBDb2xvciBfYmFja0NvbG9yO1xyXG4gICAgICAgIHB1YmxpYyB2aXJ0dWFsIENvbG9yIEJhY2tDb2xvclxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0IHsgcmV0dXJuIF9iYWNrQ29sb3I7IH1cclxuICAgICAgICAgICAgc2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIF9iYWNrQ29sb3IgPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgIEVsZW1lbnQuc3R5bGUuYmFja2dyb3VuZENvbG9yID0gX2JhY2tDb2xvci5Ub0h0bWwoKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBib29sIF9lbmFibGVkID0gdHJ1ZTtcclxuICAgICAgICBwdWJsaWMgdmlydHVhbCBib29sIEVuYWJsZWRcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldCB7IHJldHVybiBfZW5hYmxlZDsgfVxyXG4gICAgICAgICAgICBzZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgX2VuYWJsZWQgPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgIEFwcGx5RGlzYWJsZWQoKTsgICAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgYm9vbCBfcmVhZG9ubHkgPSBmYWxzZTtcclxuICAgICAgICBwdWJsaWMgdmlydHVhbCBib29sIFJlYWRPbmx5XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXQgeyByZXR1cm4gX3JlYWRvbmx5OyB9XHJcbiAgICAgICAgICAgIHNldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBfcmVhZG9ubHkgPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgIEFwcGx5UmVhZG9ubHkoKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJvdGVjdGVkIHZvaWQgQXBwbHlEaXNhYmxlZChSZXR5cGVkLmRvbS5IVE1MRWxlbWVudCBlbGVtZW50ID0gbnVsbClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGlmKGVsZW1lbnQgPT0gbnVsbClcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgZWxlbWVudCA9IEVsZW1lbnQ7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgaWYoRW5hYmxlZClcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaWYoZWxlbWVudC5jbGFzc0xpc3QuY29udGFpbnMoXCJkaXNhYmxlZFwiKSlcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBlbGVtZW50LmNsYXNzTGlzdC5yZW1vdmUoXCJkaXNhYmxlZFwiKTtcclxuICAgICAgICAgICAgICAgICAgICBlbGVtZW50LnJlbW92ZUF0dHJpYnV0ZShcImRpc2FibGVkXCIpO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaWYgKCFlbGVtZW50LmNsYXNzTGlzdC5jb250YWlucyhcImRpc2FibGVkXCIpKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIGVsZW1lbnQuY2xhc3NMaXN0LmFkZChcImRpc2FibGVkXCIpO1xyXG4gICAgICAgICAgICAgICAgICAgIGVsZW1lbnQuc2V0QXR0cmlidXRlKFwiZGlzYWJsZWRcIiwgXCJcIik7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcbiAgICAgICAgXHJcblxyXG4gICAgICAgIHB1YmxpYyB2aXJ0dWFsIENvbG9yIEZvcmVDb2xvciB7IGdldDsgc2V0OyB9XHJcblxyXG4gICAgICAgIHByb3RlY3RlZCB2b2lkIEFwcGx5UmVhZG9ubHkoUmV0eXBlZC5kb20uSFRNTEVsZW1lbnQgZWxlbWVudCA9IG51bGwpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBpZiAoZWxlbWVudCA9PSBudWxsKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBlbGVtZW50ID0gRWxlbWVudDtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICBpZiAoUmVhZE9ubHkpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGlmICghZWxlbWVudC5jbGFzc0xpc3QuY29udGFpbnMoXCJyZWFkb25seVwiKSlcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBlbGVtZW50LmNsYXNzTGlzdC5hZGQoXCJyZWFkb25seVwiKTtcclxuICAgICAgICAgICAgICAgICAgICBlbGVtZW50LnNldEF0dHJpYnV0ZShcInJlYWRvbmx5XCIsIFwiXCIpO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaWYoZWxlbWVudC5jbGFzc0xpc3QuY29udGFpbnMoXCJyZWFkb25seVwiKSlcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBlbGVtZW50LmNsYXNzTGlzdC5yZW1vdmUoXCJyZWFkb25seVwiKTtcclxuICAgICAgICAgICAgICAgICAgICBlbGVtZW50LnJlbW92ZUF0dHJpYnV0ZShcInJlYWRvbmx5XCIpO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcm90ZWN0ZWQgb2JqZWN0IF90YWc7XHJcblxyXG4gICAgICAgIC8vLyA8c3VtbWFyeT5cclxuICAgICAgICAvLy8gVXNlIFRhZyBhcyBDbGFzcyBOYW1lXHJcbiAgICAgICAgLy8vIDwvc3VtbWFyeT5cclxuICAgICAgICBwdWJsaWMgdmlydHVhbCBvYmplY3QgVGFnXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXQgeyByZXR1cm4gX3RhZzsgfVxyXG4gICAgICAgICAgICBzZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgX3RhZyA9IHZhbHVlO1xyXG4gICAgICAgICAgICAgICAgaWYoX3RhZyBpcyBzdHJpbmcpXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgRWxlbWVudC5jbGFzc05hbWUgPSAoX3RhZyArIFwiXCIpO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIEVsZW1lbnQuY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIEFwcGx5RGlzYWJsZWQoKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIENvbnRyb2xDb2xsZWN0aW9uIENvbnRyb2xzIHsgZ2V0OyBwcml2YXRlIHNldDsgfVxyXG4gICAgICAgIHByaXZhdGUgRm9udCBfZm9udDtcclxuICAgICAgICBwdWJsaWMgdmlydHVhbCBGb250IEZvbnQgeyBnZXQgeyByZXR1cm4gX2ZvbnQ7IH0gc2V0IHtcclxuICAgICAgICAgICAgICAgIF9mb250ID0gdmFsdWU7XHJcbiAgICAgICAgICAgICAgICBpZihfZm9udCA9PSBudWxsKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIEVsZW1lbnQuc3R5bGUuZm9udFNpemUgPSBcImluaGVyaXRcIjtcclxuICAgICAgICAgICAgICAgICAgICBFbGVtZW50LnN0eWxlLmZvbnRGYW1pbHkgPSBcImluaGVyaXRcIjtcclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBFbGVtZW50LnN0eWxlLmZvbnRTaXplID0gX2ZvbnQuRW1TaXplLlRvU3RyaW5nKCkgKyBcInB0XCI7XHJcbiAgICAgICAgICAgICAgICAgICAgRWxlbWVudC5zdHlsZS5mb250RmFtaWx5ID0gX2ZvbnQuRmFtaWx5TmFtZTtcclxuICAgICAgICAgICAgICAgIH1cclxuXHJcbiAgICAgICAgICAgIH0gfVxyXG4gICAgICAgIHByaXZhdGUgYm9vbCBfYXV0b1NpemU7XHJcbiAgICAgICAgcHJvdGVjdGVkIGJvb2wgX2luaXQ7XHJcbiAgICAgICAgcHVibGljIHZpcnR1YWwgYm9vbCBBdXRvU2l6ZSB7IGdldCB7IHJldHVybiBfYXV0b1NpemU7IH0gc2V0IHtcclxuICAgICAgICAgICAgICAgIGlmKF9pbml0KVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIF9hdXRvU2l6ZSA9IHZhbHVlO1xyXG5cclxuICAgICAgICAgICAgICAgICAgICBTaXplID0gX3NpemU7XHJcbiAgICAgICAgICAgICAgICB9ICAgICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICB9IH1cclxuXHJcbiAgICAgICAgaW50ZXJuYWwgUmV0eXBlZC5kb20uSFRNTEVsZW1lbnQgRWxlbWVudDtcclxuICAgICAgICBpbnRlcm5hbCBzdGF0aWMgQ29udHJvbCBDbGlja2VkT25Db250cm9sO1xyXG5cclxuICAgICAgICBzdGF0aWMgQ29udHJvbCgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBSZXR5cGVkLmRvbS53aW5kb3cgLm9ubW91c2Vtb3ZlID0gbmV3IFJldHlwZWQuZG9tLldpbmRvdy5vbm1vdXNlbW92ZUZuKChldikgPT5cclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaWYgKENsaWNrZWRPbkNvbnRyb2wgIT0gbnVsbClcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBldi5zdG9wUHJvcGFnYXRpb24oKTtcclxuXHJcbiAgICAgICAgICAgICAgICAgICAgQ2xpY2tlZE9uQ29udHJvbC5Pbk1vdXNlTW92ZShNb3VzZUV2ZW50QXJncy5DcmVhdGVGcm9tTW91c2VFdmVudChldiwgQ2xpY2tlZE9uQ29udHJvbCkpO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG51bGw7XHJcbiAgICAgICAgICAgIH0pO1xyXG5cclxuICAgICAgICAgICAgUmV0eXBlZC5kb20ud2luZG93IC5vbm1vdXNldXAgPSBuZXcgUmV0eXBlZC5kb20uV2luZG93Lm9ubW91c2V1cEZuKChldikgPT5cclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaWYgKENsaWNrZWRPbkNvbnRyb2wgIT0gbnVsbClcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBldi5zdG9wUHJvcGFnYXRpb24oKTtcclxuXHJcbiAgICAgICAgICAgICAgICAgICAgQ2xpY2tlZE9uQ29udHJvbC5Pbk1vdXNlVXAoTW91c2VFdmVudEFyZ3MuQ3JlYXRlRnJvbU1vdXNlRXZlbnQoZXYsIENsaWNrZWRPbkNvbnRyb2wpKTtcclxuXHJcbiAgICAgICAgICAgICAgICAgICAgQ2xpY2tlZE9uQ29udHJvbCA9IG51bGw7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbnVsbDtcclxuICAgICAgICAgICAgfSk7XHJcblxyXG4gICAgICAgIH1cclxuICAgICAgICBcclxuICAgICAgICBpbnRlcm5hbCBDb250cm9sKFJldHlwZWQuZG9tLkhUTUxFbGVtZW50IGVsZW1lbnQpXHJcbiAgICAgICAgeyAgICAgICAgICAgIFxyXG4gICAgICAgICAgICBFbGVtZW50ID0gZWxlbWVudDtcclxuXHJcbiAgICAgICAgICAgIENvbnRyb2xzID0gbmV3IENvbnRyb2xDb2xsZWN0aW9uKHRoaXMpO1xyXG5cclxuICAgICAgICAgICAgRWxlbWVudC5zdHlsZS5wb3NpdGlvbiA9IFwiYWJzb2x1dGVcIjtcclxuICAgICAgICAgICAgRWxlbWVudC5zdHlsZS5ib3hTaXppbmcgPSBcImJvcmRlcmJveFwiO1xyXG5cclxuICAgICAgICAgICAgRWxlbWVudC5zdHlsZS5wYWRkaW5nID0gXCIwXCI7XHJcblxyXG5cclxuICAgICAgICAgICAgRWxlbWVudC5zdHlsZS5mb250U2l6ZSA9IFwiaW5oZXJpdFwiO1xyXG4gICAgICAgICAgICBFbGVtZW50LnN0eWxlLmZvbnRGYW1pbHkgPSBcImluaGVyaXRcIjtcclxuXHJcbiAgICAgICAgICAgIFZpc2libGUgPSB0cnVlO1xyXG5cclxuICAgICAgICAgICAgVGFiU3RvcCA9IHRydWU7XHJcblxyXG4gICAgICAgICAgICBFbGVtZW50Lm9uY2xpY2sgPSBuZXcgUmV0eXBlZC5kb20uSFRNTEVsZW1lbnQub25jbGlja0ZuKChldikgPT5cclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgT25DbGljayhFdmVudEFyZ3MuRW1wdHkpO1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG51bGw7XHJcbiAgICAgICAgICAgIH0pO1xyXG5cclxuICAgICAgICAgICAgRWxlbWVudC5vbm1vdXNlZG93biA9IG5ldyBSZXR5cGVkLmRvbS5IVE1MRWxlbWVudC5vbm1vdXNlZG93bkZuKChldikgPT4ge1xyXG4gICAgICAgICAgICAgICAgQ2xpY2tlZE9uQ29udHJvbCA9IHRoaXM7XHJcbiAgICAgICAgICAgICAgICBldi5zdG9wUHJvcGFnYXRpb24oKTtcclxuXHJcbiAgICAgICAgICAgICAgICBPbk1vdXNlRG93bihNb3VzZUV2ZW50QXJncy5DcmVhdGVGcm9tTW91c2VFdmVudChldiwgdGhpcykpO1xyXG4gICAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbnVsbDtcclxuICAgICAgICAgICAgfSk7XHJcblxyXG4gICAgICAgICAgICBFbGVtZW50Lm9ubW91c2Vtb3ZlID0gbmV3IFJldHlwZWQuZG9tLkhUTUxFbGVtZW50Lm9ubW91c2Vtb3ZlRm4oKGV2KSA9PiB7XHJcbiAgICAgICAgICAgICAgICBpZihDbGlja2VkT25Db250cm9sID09IG51bGwpXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgZXYuc3RvcFByb3BhZ2F0aW9uKCk7XHJcblxyXG4gICAgICAgICAgICAgICAgICAgIE9uTW91c2VNb3ZlKE1vdXNlRXZlbnRBcmdzLkNyZWF0ZUZyb21Nb3VzZUV2ZW50KGV2LCB0aGlzKSk7XHJcbiAgICAgICAgICAgICAgICB9XHJcblxyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG51bGw7XHJcbiAgICAgICAgICAgIH0pO1xyXG5cclxuICAgICAgICAgICAgX2luaXQgPSB0cnVlO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJvdGVjdGVkIHZpcnR1YWwgdm9pZCBPbkNsaWNrKEV2ZW50QXJncyBlKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgaWYgKENsaWNrICE9IG51bGwpXHJcbiAgICAgICAgICAgICAgICBDbGljayh0aGlzLCBlKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByb3RlY3RlZCB2aXJ0dWFsIHZvaWQgT25Nb3VzZURvd24oTW91c2VFdmVudEFyZ3MgZSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGlmIChNb3VzZURvd24gIT0gbnVsbClcclxuICAgICAgICAgICAgICAgIE1vdXNlRG93bih0aGlzLCBlKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByb3RlY3RlZCB2aXJ0dWFsIHZvaWQgT25Nb3VzZU1vdmUoTW91c2VFdmVudEFyZ3MgZSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGlmIChNb3VzZU1vdmUgIT0gbnVsbClcclxuICAgICAgICAgICAgICAgIE1vdXNlTW92ZSh0aGlzLCBlKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIGludGVybmFsIHZvaWQgSW52b2tlTG9hZCgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBPbkxvYWQoRXZlbnRBcmdzLkVtcHR5KTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByb3RlY3RlZCB2aXJ0dWFsIHZvaWQgT25Mb2FkKEV2ZW50QXJncyBlKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgaWYgKExvYWQgIT0gbnVsbClcclxuICAgICAgICAgICAgICAgIExvYWQodGhpcywgZSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgZXZlbnQgRXZlbnRIYW5kbGVyIExvYWQ7XHJcblxyXG4gICAgICAgIHByb3RlY3RlZCB2aXJ0dWFsIHZvaWQgT25Nb3VzZVVwKE1vdXNlRXZlbnRBcmdzIGUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBpZiAoTW91c2VVcCAhPSBudWxsKVxyXG4gICAgICAgICAgICAgICAgTW91c2VVcCh0aGlzLCBlKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBQYWRkaW5nIE1hcmdpbiB7IGdldDsgc2V0OyB9XHJcbiAgICAgICAgcHVibGljIFBhZGRpbmcgUGFkZGluZyB7IGdldDsgc2V0OyB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBldmVudCBFdmVudEhhbmRsZXIgQ2xpY2s7XHJcbiAgICAgICAgcHVibGljIGV2ZW50IE1vdXNlRXZlbnRIYW5kbGVyIE1vdXNlRG93bjtcclxuICAgICAgICBwdWJsaWMgZXZlbnQgTW91c2VFdmVudEhhbmRsZXIgTW91c2VNb3ZlO1xyXG4gICAgICAgIHB1YmxpYyBldmVudCBNb3VzZUV2ZW50SGFuZGxlciBNb3VzZVVwO1xyXG4gICAgICAgIHByb3RlY3RlZCBib29sIGxheW91dFN1c3BlbmRlZCA9IGZhbHNlO1xyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBTdXNwZW5kTGF5b3V0KClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGxheW91dFN1c3BlbmRlZCA9IHRydWU7XHJcbiAgICAgICAgfVxyXG4gICAgICAgIHB1YmxpYyB2b2lkIFJlc3VtZUxheW91dChib29sIHBlcmZvcm1MYXlvdXQpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBsYXlvdXRTdXNwZW5kZWQgPSBmYWxzZTtcclxuICAgICAgICAgICAgaWYocGVyZm9ybUxheW91dClcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgUGVyZm9ybUxheW91dCgpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG4gICAgICAgIHB1YmxpYyB2aXJ0dWFsIHZvaWQgUGVyZm9ybUxheW91dCgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBpZiAobGF5b3V0U3VzcGVuZGVkKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm47XHJcbiAgICAgICAgICAgIH1cclxuXHJcbiAgICAgICAgICAgIGZvcmVhY2ggKHZhciBpdGVtIGluIENvbnRyb2xzKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBpdGVtLlBlcmZvcm1MYXlvdXQoKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLldpbmRvd3MuRm9ybXNcclxue1xyXG4gICAgcHVibGljIGNsYXNzIERhdGFHcmlkVmlld0NvbHVtblxyXG4gICAge1xyXG4gICAgICAgIGludGVybmFsIFJldHlwZWQuZG9tLkhUTUxUYWJsZUhlYWRlckNlbGxFbGVtZW50IEVsZW1lbnQ7XHJcbiAgICAgICAgcHVibGljIHN0cmluZyBIZWFkZXJUZXh0IHtcclxuICAgICAgICAgICAgZ2V0IHsgcmV0dXJuIEVsZW1lbnQudGV4dENvbnRlbnQ7IH1cclxuICAgICAgICAgICAgc2V0XHJcbiAgICAgICAgICAgIHsgICAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgICBFbGVtZW50LnRleHRDb250ZW50ID0gdmFsdWU7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcbiAgICAgICAgcHVibGljIHN0cmluZyBOYW1lIHsgZ2V0IHsgcmV0dXJuIEVsZW1lbnQuZ2V0QXR0cmlidXRlKFwiTmFtZVwiKTsgfSBzZXQgeyBFbGVtZW50LnNldEF0dHJpYnV0ZShcIk5hbWVcIiwgdmFsdWUpOyB9IH1cclxuICAgICAgICBwdWJsaWMgc3RyaW5nIERhdGFQcm9wZXJ0eU5hbWUgeyBnZXQ7IHNldDsgfVxyXG5cclxuICAgICAgICBwdWJsaWMgRGF0YUdyaWRWaWV3Q29sdW1uKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIEVsZW1lbnQgPSBuZXcgUmV0eXBlZC5kb20uSFRNTFRhYmxlSGVhZGVyQ2VsbEVsZW1lbnQoKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWM7XHJcbnVzaW5nIFN5c3RlbS5MaW5xO1xyXG51c2luZyBTeXN0ZW0uVGV4dDtcclxudXNpbmcgU3lzdGVtLlRocmVhZGluZy5UYXNrcztcclxuXHJcbm5hbWVzcGFjZSBTeXN0ZW0uV2luZG93cy5Gb3Jtc1xyXG57XHJcbiAgICBwdWJsaWMgZW51bSBEaWFsb2dSZXN1bHRcclxuICAgIHtcclxuICAgICAgICAgICAgLy9cclxuICAgICAgICAgICAgLy8gU3VtbWFyeTpcclxuICAgICAgICAgICAgLy8gICAgIE5vdGhpbmcgaXMgcmV0dXJuZWQgZnJvbSB0aGUgZGlhbG9nIGJveC4gVGhpcyBtZWFucyB0aGF0IHRoZSBtb2RhbCBkaWFsb2cgY29udGludWVzXHJcbiAgICAgICAgICAgIC8vICAgICBydW5uaW5nLlxyXG4gICAgICAgICAgICBOb25lID0gMCxcclxuICAgICAgICAgICAgLy9cclxuICAgICAgICAgICAgLy8gU3VtbWFyeTpcclxuICAgICAgICAgICAgLy8gICAgIFRoZSBkaWFsb2cgYm94IHJldHVybiB2YWx1ZSBpcyBPSyAodXN1YWxseSBzZW50IGZyb20gYSBidXR0b24gbGFiZWxlZCBPSykuXHJcbiAgICAgICAgICAgIE9LID0gMSxcclxuICAgICAgICAgICAgLy9cclxuICAgICAgICAgICAgLy8gU3VtbWFyeTpcclxuICAgICAgICAgICAgLy8gICAgIFRoZSBkaWFsb2cgYm94IHJldHVybiB2YWx1ZSBpcyBDYW5jZWwgKHVzdWFsbHkgc2VudCBmcm9tIGEgYnV0dG9uIGxhYmVsZWQgQ2FuY2VsKS5cclxuICAgICAgICAgICAgQ2FuY2VsID0gMixcclxuICAgICAgICAgICAgLy9cclxuICAgICAgICAgICAgLy8gU3VtbWFyeTpcclxuICAgICAgICAgICAgLy8gICAgIFRoZSBkaWFsb2cgYm94IHJldHVybiB2YWx1ZSBpcyBBYm9ydCAodXN1YWxseSBzZW50IGZyb20gYSBidXR0b24gbGFiZWxlZCBBYm9ydCkuXHJcbiAgICAgICAgICAgIEFib3J0ID0gMyxcclxuICAgICAgICAgICAgLy9cclxuICAgICAgICAgICAgLy8gU3VtbWFyeTpcclxuICAgICAgICAgICAgLy8gICAgIFRoZSBkaWFsb2cgYm94IHJldHVybiB2YWx1ZSBpcyBSZXRyeSAodXN1YWxseSBzZW50IGZyb20gYSBidXR0b24gbGFiZWxlZCBSZXRyeSkuXHJcbiAgICAgICAgICAgIFJldHJ5ID0gNCxcclxuICAgICAgICAgICAgLy9cclxuICAgICAgICAgICAgLy8gU3VtbWFyeTpcclxuICAgICAgICAgICAgLy8gICAgIFRoZSBkaWFsb2cgYm94IHJldHVybiB2YWx1ZSBpcyBJZ25vcmUgKHVzdWFsbHkgc2VudCBmcm9tIGEgYnV0dG9uIGxhYmVsZWQgSWdub3JlKS5cclxuICAgICAgICAgICAgSWdub3JlID0gNSxcclxuICAgICAgICAgICAgLy9cclxuICAgICAgICAgICAgLy8gU3VtbWFyeTpcclxuICAgICAgICAgICAgLy8gICAgIFRoZSBkaWFsb2cgYm94IHJldHVybiB2YWx1ZSBpcyBZZXMgKHVzdWFsbHkgc2VudCBmcm9tIGEgYnV0dG9uIGxhYmVsZWQgWWVzKS5cclxuICAgICAgICAgICAgWWVzID0gNixcclxuICAgICAgICAgICAgLy9cclxuICAgICAgICAgICAgLy8gU3VtbWFyeTpcclxuICAgICAgICAgICAgLy8gICAgIFRoZSBkaWFsb2cgYm94IHJldHVybiB2YWx1ZSBpcyBObyAodXN1YWxseSBzZW50IGZyb20gYSBidXR0b24gbGFiZWxlZCBObykuXHJcbiAgICAgICAgICAgIE5vID0gN1xyXG4gICAgfVxyXG5cclxuICAgIHB1YmxpYyBjbGFzcyBEaWFsb2dPcHRpb25cclxuICAgIHtcclxuICAgICAgICBwdWJsaWMgRGlhbG9nUmVzdWx0IFJlc3VsdEVudW0gPSBEaWFsb2dSZXN1bHQuTm9uZTtcclxuICAgICAgICBwdWJsaWMgQWN0aW9uIENhbGxCYWNrID0gbnVsbDtcclxuXHJcbiAgICAgICAgcHVibGljIERpYWxvZ09wdGlvbihEaWFsb2dSZXN1bHQgcmVzdWx0RW51bSwgQWN0aW9uIGNhbGxCYWNrKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgUmVzdWx0RW51bSA9IHJlc3VsdEVudW07XHJcbiAgICAgICAgICAgIENhbGxCYWNrID0gY2FsbEJhY2s7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBJbnZva2VJZlJlc3VsdChEaWFsb2dSZXN1bHQgcmVzdWx0RW51bSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGlmIChyZXN1bHRFbnVtID09IFJlc3VsdEVudW0gJiYgQ2FsbEJhY2sgIT0gbnVsbClcclxuICAgICAgICAgICAgICAgIENhbGxCYWNrLkludm9rZSgpO1xyXG4gICAgICAgIH1cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uRHJhd2luZztcclxudXNpbmcgU3lzdGVtLkxpbnE7XHJcbnVzaW5nIFN5c3RlbS5UZXh0O1xyXG51c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzO1xyXG5cclxubmFtZXNwYWNlIFN5c3RlbS5XaW5kb3dzLkZvcm1zXHJcbntcclxuICAgIHB1YmxpYyBjbGFzcyBGb3JtIDogQ29udGFpbmVyQ29udHJvbFxyXG4gICAge1xyXG4gICAgICAgIHByaXZhdGUgaW50IF9mb3JtVG9wQm9yZGVyID0gMzE7XHJcbiAgICAgICAgcHJpdmF0ZSBpbnQgX2Zvcm1Cb3R0b25Cb3JkZXIgPSAxO1xyXG4gICAgICAgIHByaXZhdGUgaW50IF9mb3JtTGVmdEJvcmRlciA9IDE7XHJcbiAgICAgICAgcHJpdmF0ZSBpbnQgX2Zvcm1SaWdodEJvcmRlciA9IDE7XHJcbiAgICAgICAgcHJpdmF0ZSBib29sIF9hbGxvd1NpemVDaGFuZ2UgPSB0cnVlOyAvLyBub3QgeWV0IGltcGxlbWVudGVkLlxyXG4gICAgICAgIHByaXZhdGUgYm9vbCBfYWxsb3dNb3ZlQ2hhbmdlID0gdHJ1ZTsgLy8gbm90IHlldCBpbXBsZW1lbnRlZC5cclxuICAgICAgICBwcml2YXRlIGJvb2wgX21vdXNlRG93bk9uQm9yZGVyID0gZmFsc2U7XHJcbiAgICAgICAgcHJpdmF0ZSBGb3JtTW92ZW1lbnRNb2RlcyBfZm9ybU1vdmVtZW50TW9kZXMgPSBGb3JtTW92ZW1lbnRNb2Rlcy5Ob25lO1xyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgUmV0eXBlZC5kb20uSFRNTERpdkVsZW1lbnQgX2Zvcm1PdmVyTGF5ID0gbnVsbDtcclxuICAgICAgICBcclxuICAgICAgICBzdGF0aWMgRm9ybSgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBfZm9ybU92ZXJMYXkgPSBuZXcgUmV0eXBlZC5kb20uSFRNTERpdkVsZW1lbnQoKTtcclxuXHJcbiAgICAgICAgICAgIF9mb3JtT3ZlckxheS5zdHlsZS5oZWlnaHQgPSBcIjEwMCVcIjtcclxuICAgICAgICAgICAgX2Zvcm1PdmVyTGF5LnN0eWxlLndpZHRoID0gXCIxMDAlXCI7XHJcbiAgICAgICAgICAgIF9mb3JtT3ZlckxheS5zdHlsZS50b3AgPSBcIjBcIjtcclxuICAgICAgICAgICAgX2Zvcm1PdmVyTGF5LnN0eWxlLmxlZnQgPSBcIjBcIjtcclxuICAgICAgICAgICAgX2Zvcm1PdmVyTGF5LnN0eWxlLm9wYWNpdHkgPSBcIjAuM1wiO1xyXG4gICAgICAgICAgICBfZm9ybU92ZXJMYXkuc3R5bGUuYmFja2dyb3VuZENvbG9yID0gXCJncmV5XCI7XHJcbiAgICAgICAgICAgIF9mb3JtT3ZlckxheS5zdHlsZS5wb3NpdGlvbiA9IFwiYWJzb2x1dGVcIjtcclxuICAgICAgICAgICAgX2Zvcm1PdmVyTGF5LnN0eWxlLnZpc2liaWxpdHkgPSBcInZpc2libGVcIjtcclxuXHJcbiAgICAgICAgICAgIF9mb3JtT3ZlckxheS5vbm1vdXNlZG93biA9IChldikgPT5cclxuICAgICAgICAgICAgeyAgICAgICAgXHJcbiAgICAgICAgICAgICAgICBpZiAoUmV0eXBlZC5kb20uZG9jdW1lbnQgLmFjdGl2ZUVsZW1lbnQgIT0gbnVsbClcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAvL0Zvcm1Qb3B1cFxyXG4gICAgICAgICAgICAgICAgICAgIFJldHlwZWQuZG9tLmRvY3VtZW50LmFjdGl2ZUVsZW1lbnQuQXM8UmV0eXBlZC5kb20uSFRNTEVsZW1lbnQ+KCkuZm9jdXMoKTtcclxuICAgICAgICAgICAgICAgICAgICBldi5wcmV2ZW50RGVmYXVsdCgpOyAgICAgICAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gbnVsbDtcclxuICAgICAgICAgICAgfTtcclxuXHJcbiAgICAgICAgICAgIFJldHlwZWQuZG9tLmRvY3VtZW50LmJvZHkuYXBwZW5kQ2hpbGQ8Z2xvYmFsOjpSZXR5cGVkLmRvbS5IVE1MRGl2RWxlbWVudD4oX2Zvcm1PdmVyTGF5KTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIC8vIHdoYXQgd2UgbmVlZCB0byBkbyBpcyBzdXBwb3J0IG1vZGFscyAgICAgIFxyXG4gICAgICAgIHByaXZhdGUgc3RhdGljIExpc3Q8Rm9ybUNvbGxlY3Rpb24+IF9mb3JtQ29sbGVjdGlvbnMgPSBuZXcgTGlzdDxGb3JtQ29sbGVjdGlvbj4oKTtcclxuXHJcbiAgICAgICAgcHJpdmF0ZSBjbGFzcyBGb3JtQ29sbGVjdGlvblxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgcHVibGljIEZvcm0gRm9ybU93bmVyO1xyXG4gICAgICAgICAgICBwdWJsaWMgTGlzdDxGb3JtPiBWaXNpYmxlRm9ybXMgPSBuZXcgTGlzdDxGb3JtPigpO1xyXG5cclxuICAgICAgICAgICAgcHVibGljIEZvcm1Db2xsZWN0aW9uKEZvcm0gZm9ybU93bmVyKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBGb3JtT3duZXIgPSBmb3JtT3duZXI7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcbiAgICAgICAgcHJpdmF0ZSBzdGF0aWMgRm9ybSBfQWN0aXZlRm9ybTtcclxuICAgICAgICBwcml2YXRlIHN0YXRpYyBGb3JtIF9QcmV2QWN0aXZlRm9ybTtcclxuXHJcbiAgICAgICAgcHVibGljIHN0YXRpYyBGb3JtIEFjdGl2ZUZvcm1cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldCB7IHJldHVybiBfQWN0aXZlRm9ybTsgfVxyXG4gICAgICAgICAgICBzZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaWYgKF9BY3RpdmVGb3JtICE9IHZhbHVlKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIF9QcmV2QWN0aXZlRm9ybSA9IF9BY3RpdmVGb3JtO1xyXG5cclxuICAgICAgICAgICAgICAgICAgICBpZiAoX0FjdGl2ZUZvcm0gIT0gbnVsbClcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIC8vX0FjdGl2ZUZvcm0uT25Mb3N0Rm9jdXMoKTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgaWYgKF9BY3RpdmVGb3JtLkVsZW1lbnQgIT0gbnVsbClcclxuICAgICAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgLy9pZiAoX0FjdGl2ZUZvcm0uSW5EZXNpZ24pXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAvL3tcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIC8vICAgIF9BY3RpdmVGb3JtLkJvZHlPdmVyTGF5LnN0eWxlLnZpc2liaWxpdHkgPSBcImNvbGxhcHNlXCI7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAvLyAgICByZXR1cm47XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAvL31cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIC8vX0FjdGl2ZUZvcm0uQm9keU92ZXJMYXkuc3R5bGUudmlzaWJpbGl0eSA9IFwidmlzaWJsZVwiO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgICAgIF9BY3RpdmVGb3JtID0gdmFsdWU7XHJcbiAgICAgICAgICAgICAgICAgICAgaWYgKF9BY3RpdmVGb3JtICE9IG51bGwpXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAvL19BY3RpdmVGb3JtLk9uR290Rm9jdXMoKTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgaWYgKF9BY3RpdmVGb3JtLkVsZW1lbnQgIT0gbnVsbClcclxuICAgICAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgLy9fQWN0aXZlRm9ybS5Cb2R5T3ZlckxheS5zdHlsZS52aXNpYmlsaXR5ID0gXCJjb2xsYXBzZVwiO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgX0FjdGl2ZUZvcm0uQnJpbmdUb0Zyb250KCk7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgLy9pZiAoX1ByZXZBY3RpdmVGb3JtIGlzIEZvcm1Qb3B1cCAmJiAoKF9BY3RpdmVGb3JtICE9IG51bGwgJiYgIShfQWN0aXZlRm9ybSBpcyBGb3JtUG9wdXApKSB8fCBfQWN0aXZlRm9ybSA9PSBudWxsKSlcclxuICAgICAgICAgICAgICAgICAgICAvL3tcclxuICAgICAgICAgICAgICAgICAgICAvLyAgICBDbG9zZUZvcm1Qb3B1cHMoKTtcclxuICAgICAgICAgICAgICAgICAgICAvL31cclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJvdGVjdGVkIHZpcnR1YWwgdm9pZCBPbkNsb3NpbmcoKVxyXG4gICAgICAgIHtcclxuXHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgTGlzdDxEaWFsb2dPcHRpb24+IERpYWxvZ1Jlc3VsdHMgPSBuZXcgTGlzdDxEaWFsb2dPcHRpb24+KCk7XHJcblxyXG4gICAgICAgIHByaXZhdGUgRm9ybUNvbGxlY3Rpb24gR2V0Rm9ybUNvbGxlY3Rpb25Gcm9tRm9ybShGb3JtIGZvcm0pXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBmb3IgKGludCBpID0gMDsgaSA8IF9mb3JtQ29sbGVjdGlvbnMuQ291bnQ7IGkrKylcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaWYgKHRoaXMgPT0gX2Zvcm1Db2xsZWN0aW9uc1tpXS5Gb3JtT3duZXIpXHJcbiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIF9mb3JtQ29sbGVjdGlvbnNbaV07XHJcbiAgICAgICAgICAgICAgICB2YXIgdmlzaWJsZUZvcm1zID0gX2Zvcm1Db2xsZWN0aW9uc1tpXS5WaXNpYmxlRm9ybXM7XHJcbiAgICAgICAgICAgICAgICBmb3IgKGludCB4ID0gMDsgeCA8IHZpc2libGVGb3Jtcy5Db3VudDsgeCsrKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIGlmICh2aXNpYmxlRm9ybXNbeF0gPT0gdGhpcylcclxuICAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIF9mb3JtQ29sbGVjdGlvbnNbaV07XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIH1cclxuXHJcbiAgICAgICAgICAgIHJldHVybiBudWxsO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBib29sIF9pc0RpYWxvZztcclxuICAgICAgICBwcml2YXRlIGJvb2wgX2luQ2xvc2U7XHJcbiAgICAgICAgcHJpdmF0ZSBib29sIF9pbkRpYWxvZ1Jlc3VsdCA9IGZhbHNlO1xyXG5cclxuICAgICAgICBwcml2YXRlIFdpbmRvd1N0YXRlIF93aW5kb3dTdGF0ZTtcclxuXHJcbiAgICAgICAgcHVibGljIFdpbmRvd1N0YXRlIFdpbmRvd1N0YXRlXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXQgeyByZXR1cm4gX3dpbmRvd1N0YXRlOyB9XHJcbiAgICAgICAgICAgIHNldCB7IF93aW5kb3dTdGF0ZSA9IHZhbHVlOyB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgc3RhdGljIHZvaWQgQ2FsY3VsYXRlWk9yZGVyKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIEdldEFjdGl2ZUZvcm1Db2xsZWN0aW9uKCk7XHJcblxyXG4gICAgICAgICAgICBpZiAoX2Zvcm1Db2xsZWN0aW9ucyA9PSBudWxsKVxyXG4gICAgICAgICAgICAgICAgcmV0dXJuO1xyXG4gICAgICAgICAgICBfZm9ybUNvbGxlY3Rpb25zLlJlbW92ZShudWxsKTtcclxuICAgICAgICAgICAgdmFyIGNvdW50ID0gX2Zvcm1Db2xsZWN0aW9ucy5Db3VudDtcclxuICAgICAgICAgICAgaW50IHpJbmRleCA9IDE7XHJcblxyXG4gICAgICAgICAgICAvL3ZhciBmcmFnID0gRG9jdW1lbnQuQ3JlYXRlRG9jdW1lbnRGcmFnbWVudCgpO1xyXG5cclxuICAgICAgICAgICAgX2Zvcm1PdmVyTGF5LnN0eWxlLm9wYWNpdHkgPSBjb3VudCA9PSAwID8gXCJcIiA6IGNvdW50ID09IDEgPyBcIjBcIiA6IFwiMC40XCI7XHJcblxyXG4gICAgICAgICAgICBmb3IgKGludCB4ID0gMDsgeCA8IGNvdW50OyB4KyspXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIC8vaWYoSGVscGVyLk5vdERlc2t0b3ApXHJcbiAgICAgICAgICAgICAgICAvL3tcclxuICAgICAgICAgICAgICAgIC8vICAgIGlmKHggPT0gY291bnQgLSAxKVxyXG4gICAgICAgICAgICAgICAgLy8gICAge1xyXG4gICAgICAgICAgICAgICAgLy8gICAgICAgIGZyYWcuQXBwZW5kQ2hpbGQoRm9ybU92ZXJMYXkpO1xyXG4gICAgICAgICAgICAgICAgLy8gICAgICAgIHpJbmRleCA9IENhbGN1bGF0ZVpPcmRlcihGb3JtQ29sbGVjdGlvbnNbeF0sIHpJbmRleCwgZnJhZyk7XHJcbiAgICAgICAgICAgICAgICAvLyAgICB9XHJcbiAgICAgICAgICAgICAgICAvL31cclxuICAgICAgICAgICAgICAgIC8vZWxzZVxyXG4gICAgICAgICAgICAgICAgLy97XHJcbiAgICAgICAgICAgICAgICAvL31cclxuICAgICAgICAgICAgICAgIGlmICh4ID09IGNvdW50IC0gMSlcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAvL2ZyYWcuQXBwZW5kQ2hpbGQoRm9ybU92ZXJMYXkpO1xyXG4gICAgICAgICAgICAgICAgICAgIF9mb3JtT3ZlckxheS5zdHlsZS56SW5kZXggPSBDb252ZXJ0LlRvU3RyaW5nKHpJbmRleCk7XHJcbiAgICAgICAgICAgICAgICAgICAgekluZGV4Kys7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICB6SW5kZXggPSBDYWxjdWxhdGVaT3JkZXIoX2Zvcm1Db2xsZWN0aW9uc1t4XSwgekluZGV4KTsgLy8gZnJhZ1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIC8vekluZGV4ID0gQ2FsY3VsYXRlWk9yZGVyKHN0YW5kQWxvbmVGb3JtcywgekluZGV4KTsgLy8gZnJhZ1xyXG5cclxuICAgICAgICAgICAgLy9XaW5kb3dIb2xkZXIuRW1wdHkoKTtcclxuICAgICAgICAgICAgLy9XaW5kb3dIb2xkZXIuQXBwZW5kQ2hpbGQoZnJhZyk7XHJcblxyXG4gICAgICAgICAgICBpZiAoQWN0aXZlRm9ybSAhPSBudWxsKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBBY3RpdmVGb3JtLkVsZW1lbnQuZm9jdXMoKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuICAgICAgICBwcml2YXRlIHN0YXRpYyBMaXN0PEZvcm0+IFRvQ2xlYW4gPSBuZXcgTGlzdDxGb3JtPigpO1xyXG4gICAgICAgIHByaXZhdGUgc3RhdGljIGludCBDYWxjdWxhdGVaT3JkZXIoRm9ybUNvbGxlY3Rpb24gZm9ybUNvbGxlY3Rpb24sIGludCB6SW5kZXgpIC8vICwgRG9jdW1lbnRGcmFnbWVudCBmcmFnXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBMaXN0PEZvcm0+IFRvcE1vc3RGb3JtcyA9IG5ldyBMaXN0PEZvcm0+KCk7XHJcblxyXG4gICAgICAgICAgICB2YXIgVmlzaWJsZUZvcm1zID0gZm9ybUNvbGxlY3Rpb24uVmlzaWJsZUZvcm1zO1xyXG4gICAgICAgICAgICBpZiAoVmlzaWJsZUZvcm1zICE9IG51bGwpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGZvciAoaW50IGkgPSAwOyBpIDwgVmlzaWJsZUZvcm1zLkNvdW50OyBpKyspXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgaWYgKFZpc2libGVGb3Jtc1tpXS5FbGVtZW50ID09IG51bGwpXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBUb0NsZWFuLkFkZChWaXNpYmxlRm9ybXNbaV0pO1xyXG4gICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAvL2lmIChWaXNpYmxlRm9ybXNbaV0uVG9wTW9zdClcclxuICAgICAgICAgICAgICAgICAgICAgICAgLy8gICAgVG9wTW9zdEZvcm1zLkFkZChWaXNpYmxlRm9ybXNbaV0pO1xyXG4gICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIGZvciAoaW50IGkgPSAwOyBpIDwgVG9DbGVhbi5Db3VudDsgaSsrKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIGlmIChWaXNpYmxlRm9ybXMuQ29udGFpbnMoVG9DbGVhbltpXSkpXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBWaXNpYmxlRm9ybXMuUmVtb3ZlKFRvQ2xlYW5baV0pO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBUb0NsZWFuW2ldID0gbnVsbDtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICB9XHJcblxyXG4gICAgICAgICAgICAgICAgVG9DbGVhbi5SZW1vdmUobnVsbCk7XHJcblxyXG4gICAgICAgICAgICAgICAgaWYgKGZvcm1Db2xsZWN0aW9uLkZvcm1Pd25lciAhPSBudWxsKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIC8vZm9ybUNvbGxlY3Rpb24uRm9ybU93bmVyLk1hbmFnZVBsYWNlSG9sZGVycygpO1xyXG4gICAgICAgICAgICAgICAgICAgIGZvcm1Db2xsZWN0aW9uLkZvcm1Pd25lci5FbGVtZW50LnN0eWxlLnpJbmRleCA9IENvbnZlcnQuVG9TdHJpbmcoekluZGV4KTtcclxuICAgICAgICAgICAgICAgICAgICB6SW5kZXgrKztcclxuICAgICAgICAgICAgICAgICAgICAvL2ZyYWcuQXBwZW5kQ2hpbGQoZm9ybUNvbGxlY3Rpb24uRm9ybU93bmVyKTtcclxuXHJcbiAgICAgICAgICAgICAgICAgICAgLy9pZihIZWxwZXIuTm90RGVza3RvcClcclxuICAgICAgICAgICAgICAgICAgICAvL3tcclxuICAgICAgICAgICAgICAgICAgICAvLyAgICBpZihWaXNpYmxlRm9ybXMuQ291bnQgPT0gMClcclxuICAgICAgICAgICAgICAgICAgICAvLyAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgLy8gICAgICAgIGZvcm1Db2xsZWN0aW9uLkZvcm1Pd25lci5NYW5hZ2VQbGFjZUhvbGRlcnMoKTtcclxuICAgICAgICAgICAgICAgICAgICAvLyAgICAgICAgZnJhZy5BcHBlbmRDaGlsZChmb3JtQ29sbGVjdGlvbi5Gb3JtT3duZXIpO1xyXG4gICAgICAgICAgICAgICAgICAgIC8vICAgICAgICByZXR1cm4gekluZGV4O1xyXG4gICAgICAgICAgICAgICAgICAgIC8vICAgIH1cclxuICAgICAgICAgICAgICAgICAgICAvL31cclxuICAgICAgICAgICAgICAgICAgICAvL2Vsc2VcclxuICAgICAgICAgICAgICAgICAgICAvL3tcclxuICAgICAgICAgICAgICAgICAgICAvLyAgICBmb3JtQ29sbGVjdGlvbi5Gb3JtT3duZXIuTWFuYWdlUGxhY2VIb2xkZXJzKCk7XHJcbiAgICAgICAgICAgICAgICAgICAgLy8gICAgZnJhZy5BcHBlbmRDaGlsZChmb3JtQ29sbGVjdGlvbi5Gb3JtT3duZXIpO1xyXG4gICAgICAgICAgICAgICAgICAgIC8vfVxyXG4gICAgICAgICAgICAgICAgfVxyXG5cclxuICAgICAgICAgICAgICAgIGZvciAoaW50IGkgPSAwOyBpIDwgVG9wTW9zdEZvcm1zLkNvdW50OyBpKyspXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgdmFyIGZvcm0gPSBUb3BNb3N0Rm9ybXNbaV07XHJcbiAgICAgICAgICAgICAgICAgICAgVmlzaWJsZUZvcm1zLlJlbW92ZShmb3JtKTtcclxuICAgICAgICAgICAgICAgICAgICBWaXNpYmxlRm9ybXMuQWRkKGZvcm0pO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgaW50IGxlbmd0aCA9IFZpc2libGVGb3Jtcy5Db3VudDtcclxuICAgICAgICAgICAgICAgIGZvciAoaW50IGkgPSAwOyBpIDwgbGVuZ3RoOyBpKyspXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgaWYgKFZpc2libGVGb3Jtc1tpXSAhPSBudWxsICYmXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIFZpc2libGVGb3Jtc1tpXS5FbGVtZW50ICE9IG51bGwpXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAvL1Zpc2libGVGb3Jtc1tpXS5NYW5hZ2VQbGFjZUhvbGRlcnMoKTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgVmlzaWJsZUZvcm1zW2ldLkVsZW1lbnQuc3R5bGUuekluZGV4ID0gQ29udmVydC5Ub1N0cmluZyh6SW5kZXgpO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICB6SW5kZXgrKztcclxuICAgICAgICAgICAgICAgICAgICAgICAgLy9mcmFnLkFwcGVuZENoaWxkKFZpc2libGVGb3Jtc1tpXSk7XHJcblxyXG4gICAgICAgICAgICAgICAgICAgICAgICAvL2lmKEhlbHBlci5Ob3REZXNrdG9wKVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAvL3tcclxuICAgICAgICAgICAgICAgICAgICAgICAgLy8gICAgaWYobGVuZ3RoIC0gMSA9PSBpKVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAvLyAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIC8vICAgICAgICBWaXNpYmxlRm9ybXNbaV0uTWFuYWdlUGxhY2VIb2xkZXJzKCk7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIC8vICAgICAgICBmcmFnLkFwcGVuZENoaWxkKFZpc2libGVGb3Jtc1tpXSk7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIC8vICAgICAgICByZXR1cm4gekluZGV4O1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAvLyAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIC8vfWVsc2VcclxuICAgICAgICAgICAgICAgICAgICAgICAgLy97XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIC8vICAgIFZpc2libGVGb3Jtc1tpXS5NYW5hZ2VQbGFjZUhvbGRlcnMoKTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgLy8gICAgZnJhZy5BcHBlbmRDaGlsZChWaXNpYmxlRm9ybXNbaV0pO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAvL31cclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIH1cclxuXHJcbiAgICAgICAgICAgIHJldHVybiB6SW5kZXg7XHJcbiAgICAgICAgfVxyXG4gICAgICAgIHB1YmxpYyBEaWFsb2dSZXN1bHQgRGlhbG9nUmVzdWx0ID0gRGlhbG9nUmVzdWx0Lk5vbmU7XHJcbiAgICAgICAgcHVibGljIHZvaWQgQ2xvc2UoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgaWYgKF9pc0RpYWxvZyAmJiBfaW5EaWFsb2dSZXN1bHQpXHJcbiAgICAgICAgICAgICAgICByZXR1cm47XHJcblxyXG4gICAgICAgICAgICBfaW5DbG9zZSA9IHRydWU7XHJcblxyXG4gICAgICAgICAgICBPbkNsb3NpbmcoKTtcclxuXHJcbiAgICAgICAgICAgIFRvQ2xlYW4uQWRkKHRoaXMpO1xyXG5cclxuICAgICAgICAgICAgdmFyIG93bmVyRm9ybUNvbGxlY3Rpb24gPSBHZXRGb3JtQ29sbGVjdGlvbkZyb21Gb3JtKHRoaXMpO1xyXG5cclxuICAgICAgICAgICAgaWYgKG93bmVyRm9ybUNvbGxlY3Rpb24gIT0gbnVsbClcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaWYgKG93bmVyRm9ybUNvbGxlY3Rpb24uRm9ybU93bmVyID09IHRoaXMpXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgb3duZXJGb3JtQ29sbGVjdGlvbi5Gb3JtT3duZXIgPSBudWxsO1xyXG4gICAgICAgICAgICAgICAgICAgIGZvciAoaW50IGkgPSAwOyBpIDwgb3duZXJGb3JtQ29sbGVjdGlvbi5WaXNpYmxlRm9ybXMuQ291bnQ7IGkrKylcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGlmIChvd25lckZvcm1Db2xsZWN0aW9uLlZpc2libGVGb3Jtc1tpXSA9PSB0aGlzKVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgY29udGludWU7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIG93bmVyRm9ybUNvbGxlY3Rpb24uVmlzaWJsZUZvcm1zW2ldLkNsb3NlKCk7XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgICAgIGlmIChfZm9ybUNvbGxlY3Rpb25zLkNvdW50ID09IDEpXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBfZm9ybUNvbGxlY3Rpb25zID0gbmV3IExpc3Q8Rm9ybUNvbGxlY3Rpb24+KCk7XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIG93bmVyRm9ybUNvbGxlY3Rpb24uVmlzaWJsZUZvcm1zLlJlbW92ZSh0aGlzKTtcclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgfVxyXG5cclxuICAgICAgICAgICAgaWYgKEVsZW1lbnQgIT0gbnVsbClcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgLy9pZiAoIUZvclJldXNlKVxyXG4gICAgICAgICAgICAgICAgLy97XHJcbiAgICAgICAgICAgICAgICAvLyAgICBpZiAoU2V0dGluZ3MuRm9ybUZhZGVEdXJhdGlvbiA+IDApXHJcbiAgICAgICAgICAgICAgICAvLyAgICB7XHJcbiAgICAgICAgICAgICAgICAvLyAgICAgICAgU2VsZi5mYWRlT3V0KFNldHRpbmdzLkZvcm1GYWRlRHVyYXRpb24sIGNsb3NlQWN0aW9uKTtcclxuICAgICAgICAgICAgICAgIC8vICAgIH1cclxuICAgICAgICAgICAgICAgIC8vICAgIGVsc2VcclxuICAgICAgICAgICAgICAgIC8vICAgIHtcclxuICAgICAgICAgICAgICAgIC8vICAgICAgICBjbG9zZUFjdGlvbigpO1xyXG4gICAgICAgICAgICAgICAgLy8gICAgfVxyXG4gICAgICAgICAgICAgICAgLy99XHJcbiAgICAgICAgICAgICAgICAvL2Vsc2VcclxuICAgICAgICAgICAgICAgIC8ve1xyXG4gICAgICAgICAgICAgICAgLy8gICAgQ29udGVudC5zdHlsZS52aXNpYmlsaXR5ID0gXCJjb2xsYXBzZVwiO1xyXG4gICAgICAgICAgICAgICAgLy99XHJcbiAgICAgICAgICAgICAgICBFbGVtZW50LnN0eWxlLnZpc2liaWxpdHkgPSBcImNvbGxhcHNlXCI7XHJcbiAgICAgICAgICAgIH1cclxuXHJcbiAgICAgICAgICAgIENhbGN1bGF0ZVpPcmRlcigpO1xyXG5cclxuICAgICAgICAgICAgQWN0aXZlRm9ybSA9IF9QcmV2QWN0aXZlRm9ybTtcclxuICAgICAgICAgICAgaWYgKF9pc0RpYWxvZylcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgX2luRGlhbG9nUmVzdWx0ID0gdHJ1ZTtcclxuICAgICAgICAgICAgICAgIGlmIChEaWFsb2dSZXN1bHQgIT0gRGlhbG9nUmVzdWx0Lk5vbmUgJiZcclxuICAgICAgICAgICAgICAgIERpYWxvZ1Jlc3VsdHMgIT0gbnVsbCAmJiBEaWFsb2dSZXN1bHRzLkNvdW50ID4gMClcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBmb3IgKGludCBpID0gMDsgaSA8IERpYWxvZ1Jlc3VsdHMuQ291bnQ7IGkrKylcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIERpYWxvZ1Jlc3VsdHNbaV0uSW52b2tlSWZSZXN1bHQoRGlhbG9nUmVzdWx0KTtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIH1cclxuXHJcbiAgICAgICAgICAgIE9uRm9ybUNsb3NlZCgpO1xyXG5cclxuICAgICAgICAgICAgT25DbG9zZWQoKTtcclxuXHJcbiAgICAgICAgICAgIGlmIChXaW5kb3dTdGF0ZSA9PSBXaW5kb3dTdGF0ZS5NaW5pbWl6ZWQpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIF9taW5pbWl6ZWRGb3Jtcy5SZW1vdmUodGhpcyk7XHJcbiAgICAgICAgICAgICAgICBDYWxjdWxhdGVNaW5taXplZEZvcm1zTG9jYXRpb24oKTtcclxuICAgICAgICAgICAgfVxyXG5cclxuICAgICAgICAgICAgX2luQ2xvc2UgPSBmYWxzZTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgc3RhdGljIHZvaWQgQ2FsY3VsYXRlTWlubWl6ZWRGb3Jtc0xvY2F0aW9uKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGlmIChfbWluaW1pemVkRm9ybXMuQ291bnQgPiAwICYmIF9taW5pbWl6ZWRGb3Jtcy5Db250YWlucyhudWxsKSlcclxuICAgICAgICAgICAgICAgIF9taW5pbWl6ZWRGb3Jtcy5SZW1vdmUobnVsbCk7XHJcbiAgICAgICAgICAgIHZhciBSZW1vdmVMaXN0ID0gbmV3IExpc3Q8Rm9ybT4oKTtcclxuICAgICAgICAgICAgaW50IGNvdW50ID0gMDtcclxuICAgICAgICAgICAgZmxvYXQgd2lkdGhUb3RhbCA9IDA7XHJcbiAgICAgICAgICAgIGludCB5ID0gMzA7XHJcblxyXG4gICAgICAgICAgICB2YXIgdmlld1NpemUgPSBSZXR5cGVkLmRvbS5kb2N1bWVudC5ib2R5LmdldEJvdW5kaW5nQ2xpZW50UmVjdCgpO1xyXG5cclxuICAgICAgICAgICAgZm9yZWFjaCAodmFyIGl0ZW0gaW4gX21pbmltaXplZEZvcm1zKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBpZiAoaXRlbS5FbGVtZW50ID09IG51bGwgfHwgaXRlbS5XaW5kb3dTdGF0ZSAhPSBXaW5kb3dTdGF0ZS5NaW5pbWl6ZWQpXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgUmVtb3ZlTGlzdC5BZGQoaXRlbSk7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgdmFyIFRvSW5jcmVtZW50ID0gMyArIGl0ZW0uU2l6ZS5XaWR0aDtcclxuXHJcbiAgICAgICAgICAgICAgICAgICAgaWYgKHdpZHRoVG90YWwgKyBUb0luY3JlbWVudCA+IHZpZXdTaXplLndpZHRoKVxyXG4gICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgd2lkdGhUb3RhbCA9IDA7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGNvdW50ID0gMDtcclxuICAgICAgICAgICAgICAgICAgICAgICAgeSArPSAzMztcclxuICAgICAgICAgICAgICAgICAgICB9XHJcblxyXG4gICAgICAgICAgICAgICAgICAgIC8vaXRlbS5Mb2NhdGlvbiA9IG5ldyBWZWN0b3IyKHdpZHRoVG90YWwsIFwiKDEwMCUgLSBcIiArICh5ICsgMikgKyBcInB4KVwiKTtcclxuICAgICAgICAgICAgICAgICAgICBpdGVtLkVsZW1lbnQuc3R5bGUubGVmdCA9IHN0cmluZy5Gb3JtYXQoXCJ7MH1weFwiLHdpZHRoVG90YWwpO1xyXG4gICAgICAgICAgICAgICAgICAgIGl0ZW0uRWxlbWVudC5zdHlsZS50b3AgPSBcImNhbGMoMTAwJSAtIFwiICsgKHkgKyAyKSArIFwicHgpXCI7XHJcblxyXG4gICAgICAgICAgICAgICAgICAgIGNvdW50Kys7XHJcblxyXG4gICAgICAgICAgICAgICAgICAgIHdpZHRoVG90YWwgKz0gVG9JbmNyZW1lbnQ7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgZm9yZWFjaCAodmFyIGl0ZW0gaW4gUmVtb3ZlTGlzdClcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgX21pbmltaXplZEZvcm1zLlJlbW92ZShpdGVtKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBzdGF0aWMgTGlzdDxGb3JtPiBfbWluaW1pemVkRm9ybXMgPSBuZXcgTGlzdDxGb3JtPigpO1xyXG4gICAgICAgIHByb3RlY3RlZCB2aXJ0dWFsIHZvaWQgT25Gb3JtQ2xvc2VkKClcclxuICAgICAgICB7XHJcblxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJvdGVjdGVkIHZpcnR1YWwgdm9pZCBPbkNsb3NlZCgpXHJcbiAgICAgICAge1xyXG5cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgc3RhdGljIEZvcm1Db2xsZWN0aW9uIEdldEFjdGl2ZUZvcm1Db2xsZWN0aW9uKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGZvciAoaW50IGkgPSBfZm9ybUNvbGxlY3Rpb25zLkNvdW50IC0gMTsgaSA+PSAwOyBpLS0pXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHZhciBmcm1Db2wgPSBfZm9ybUNvbGxlY3Rpb25zW2ldO1xyXG4gICAgICAgICAgICAgICAgaWYgKGZybUNvbC5Gb3JtT3duZXIgPT0gbnVsbClcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBmb3IgKGludCB4ID0gMDsgeCA8IGZybUNvbC5WaXNpYmxlRm9ybXMuQ291bnQ7IHgrKylcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGlmIChmcm1Db2wuVmlzaWJsZUZvcm1zW3hdICE9IG51bGwpXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZybUNvbC5WaXNpYmxlRm9ybXNbeF0uQ2xvc2UoKTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgICAgICBfZm9ybUNvbGxlY3Rpb25zLlJlbW92ZUF0KGkpO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIHJldHVybiBmcm1Db2w7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIH1cclxuXHJcbiAgICAgICAgICAgIHJldHVybiBudWxsO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHZvaWQgQnJpbmdUb0Zyb250KClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHZhciBhY3RpdmVDb2xsZWN0ID0gR2V0QWN0aXZlRm9ybUNvbGxlY3Rpb24oKTtcclxuICAgICAgICAgICAgaWYgKGFjdGl2ZUNvbGxlY3QgIT0gbnVsbClcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaWYgKGFjdGl2ZUNvbGxlY3QuRm9ybU93bmVyID09IHRoaXMpXHJcbiAgICAgICAgICAgICAgICAgICAgcmV0dXJuO1xyXG4gICAgICAgICAgICAgICAgdmFyIHZpc2libGVGb3JtcyA9IGFjdGl2ZUNvbGxlY3QuVmlzaWJsZUZvcm1zO1xyXG4gICAgICAgICAgICAgICAgaWYgKHZpc2libGVGb3JtcyAhPSBudWxsICYmIHZpc2libGVGb3Jtcy5Db3VudCA+IDEpXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgdmlzaWJsZUZvcm1zLlJlbW92ZSh0aGlzKTtcclxuICAgICAgICAgICAgICAgICAgICB2aXNpYmxlRm9ybXMuQWRkKHRoaXMpO1xyXG4gICAgICAgICAgICAgICAgfVxyXG5cclxuICAgICAgICAgICAgICAgIENhbGN1bGF0ZVpPcmRlcigpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBTaG93KClcclxuICAgICAgICB7ICAgICAgICAgICAgXHJcbiAgICAgICAgICAgIGlmIChfaXNEaWFsb2cpXHJcbiAgICAgICAgICAgICAgICByZXR1cm47XHJcbiAgICAgICAgICAgIGlmICgoX2Zvcm1Db2xsZWN0aW9ucyA9PSBudWxsIHx8IF9mb3JtQ29sbGVjdGlvbnMuQ291bnQgPT0gMCkpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIF9zaG93U3RhcnROZXdMZXZlbCgpO1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuO1xyXG4gICAgICAgICAgICB9XHJcblxyXG4gICAgICAgICAgICB2YXIgYWN0aXZlQ29sbGVjdCA9IEdldEFjdGl2ZUZvcm1Db2xsZWN0aW9uKCk7XHJcbiAgICAgICAgICAgIHZhciB2aXNiaWxlRm9ybXMgPSBhY3RpdmVDb2xsZWN0LlZpc2libGVGb3JtcztcclxuXHJcbiAgICAgICAgICAgIGlmICghdmlzYmlsZUZvcm1zLkNvbnRhaW5zKHRoaXMpKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICB2aXNiaWxlRm9ybXMuQWRkKHRoaXMpO1xyXG4gICAgICAgICAgICAgICAgX3Nob3dGb3JtKCk7XHJcbiAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgIENhbGN1bGF0ZVpPcmRlcigpO1xyXG5cclxuICAgICAgICAgICAgICAgIE9uU2hvd2VkKCk7XHJcblxyXG4gICAgICAgICAgICAgICAgUmVzaXppbmcoKTtcclxuXHJcbiAgICAgICAgICAgICAgICBPbkxvYWQoRXZlbnRBcmdzLkVtcHR5KTtcclxuICAgICAgICAgICAgfVxyXG5cclxuICAgICAgICAgICAgQWN0aXZlRm9ybSA9IHRoaXM7ICAgICAgICAgICAgXHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBTaG93RGlhbG9nKHBhcmFtcyBEaWFsb2dPcHRpb25bXSBkaWFsb2dSZXN1bHRzKVxyXG4gICAgICAgIHsgICAgICAgICAgICBcclxuICAgICAgICAgICAgX2luRGlhbG9nUmVzdWx0ID0gZmFsc2U7XHJcblxyXG4gICAgICAgICAgICBfaXNEaWFsb2cgPSB0cnVlO1xyXG4gICAgICAgICAgICAvL2lmIChTdGFydFBvc2l0aW9uICE9IEZvcm1TdGFydFBvc2l0aW9uLk1hbnVhbClcclxuICAgICAgICAgICAgLy97XHJcbiAgICAgICAgICAgIC8vICAgIGlmICghSGVscGVyLk5vdERlc2t0b3ApXHJcbiAgICAgICAgICAgIC8vICAgICAgICBTdGFydFBvc2l0aW9uID0gRm9ybVN0YXJ0UG9zaXRpb24uQ2VudGVyO1xyXG4gICAgICAgICAgICAvL31cclxuICAgICAgICAgICAgX3Nob3dTdGFydE5ld0xldmVsKCk7XHJcblxyXG4gICAgICAgICAgICBpZiAoZGlhbG9nUmVzdWx0cyAhPSBudWxsICYmIGRpYWxvZ1Jlc3VsdHMuTGVuZ3RoID4gMClcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgRGlhbG9nUmVzdWx0cy5BZGRSYW5nZShkaWFsb2dSZXN1bHRzKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSB2b2lkIF9zaG93Rm9ybSgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBSZXR5cGVkLmRvbS5kb2N1bWVudC5ib2R5LmFwcGVuZENoaWxkPGdsb2JhbDo6UmV0eXBlZC5kb20uSFRNTEVsZW1lbnQ+KHRoaXMuRWxlbWVudCk7ICAgICAgICAgICAgXHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcml2YXRlIHZvaWQgX3Nob3dTdGFydE5ld0xldmVsKClcclxuICAgICAgICB7ICAgICAgICAgICAgXHJcbiAgICAgICAgICAgIF9mb3JtQ29sbGVjdGlvbnMuQWRkKG5ldyBGb3JtQ29sbGVjdGlvbih0aGlzKSk7XHJcbiAgICAgICAgICAgIF9zaG93Rm9ybSgpO1xyXG4gICAgICAgICAgICBDYWxjdWxhdGVaT3JkZXIoKTtcclxuXHJcbiAgICAgICAgICAgIC8vaWYgKFN0YXJ0UG9zaXRpb24gPT0gRm9ybVN0YXJ0UG9zaXRpb24uQ2VudGVyKVxyXG4gICAgICAgICAgICAvL3tcclxuICAgICAgICAgICAgLy8gICAgQ2VudHJlRm9ybSgpO1xyXG4gICAgICAgICAgICAvL31cclxuXHJcbiAgICAgICAgICAgIE9uU2hvd2VkKCk7XHJcbiAgICAgICAgICAgIFxyXG4gICAgICAgICAgICBSZXNpemluZygpO1xyXG5cclxuICAgICAgICAgICAgQWN0aXZlRm9ybSA9IHRoaXM7XHJcblxyXG4gICAgICAgICAgICBFbGVtZW50LmZvY3VzKCk7XHJcblxyXG4gICAgICAgICAgICBPbkxvYWQoRXZlbnRBcmdzLkVtcHR5KTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByb3RlY3RlZCB2aXJ0dWFsIHZvaWQgT25TaG93ZWQoKVxyXG4gICAgICAgIHtcclxuXHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcm90ZWN0ZWQgdm9pZCBSZXNpemluZygpXHJcbiAgICAgICAge1xyXG5cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgaW50IF9wcmV2WDtcclxuICAgICAgICBwcml2YXRlIGludCBfcHJldlk7XHJcblxyXG4gICAgICAgIHByaXZhdGUgaW50IF9wcmV2Rm9ybVg7XHJcbiAgICAgICAgcHJpdmF0ZSBpbnQgX3ByZXZGb3JtWTtcclxuXHJcbiAgICAgICAgcHVibGljIEZvcm0oKSA6IGJhc2UoKVxyXG4gICAgICAgIHsgICAgICAgICAgICBcclxuICAgICAgICAgICAgRWxlbWVudC5zZXRBdHRyaWJ1dGUoXCJzY29wZVwiLCBcImZvcm1cIik7XHJcbiAgICAgICAgICAgIFxyXG4gICAgICAgICAgICBUYWJTdG9wID0gZmFsc2U7XHJcblxyXG4gICAgICAgICAgICB0aGlzLkxvY2F0aW9uID0gbmV3IFBvaW50KDAsIDApO1xyXG5cclxuICAgICAgICAgICAgX3NldEJvcmRlcldpZHRoKCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcml2YXRlIGJvb2wgX2NvbnRyb2xCb3ggPSB0cnVlO1xyXG5cclxuICAgICAgICBwdWJsaWMgYm9vbCBDb250cm9sQm94XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXQgeyByZXR1cm4gX2NvbnRyb2xCb3g7IH1cclxuICAgICAgICAgICAgc2V0IHtcclxuICAgICAgICAgICAgICAgIGlmKF9jb250cm9sQm94ICE9IHZhbHVlKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIF9jb250cm9sQm94ID0gdmFsdWU7XHJcbiAgICAgICAgICAgICAgICAgICAgX3Byb2Nlc3NXaW5Gb3JtVmlldygpO1xyXG4gICAgICAgICAgICAgICAgfSAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBGb3JtQm9yZGVyU3R5bGUgX2Zvcm1Cb3JkZXJTdHlsZTtcclxuXHJcbiAgICAgICAgcHVibGljIEZvcm1Cb3JkZXJTdHlsZSBGb3JtQm9yZGVyU3R5bGVcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldCB7IHJldHVybiBfZm9ybUJvcmRlclN0eWxlOyB9XHJcbiAgICAgICAgICAgIHNldCB7XHJcbiAgICAgICAgICAgICAgICBpZihfZm9ybUJvcmRlclN0eWxlICE9IHZhbHVlKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIF9mb3JtQm9yZGVyU3R5bGUgPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgICAgICBfcHJvY2Vzc1dpbkZvcm1WaWV3KCk7XHJcbiAgICAgICAgICAgICAgICB9ICAgICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBcclxuXHJcbiAgICAgICAgcHJpdmF0ZSBlbnVtIEZvcm1Nb3ZlbWVudE1vZGVzXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBOb25lLFxyXG4gICAgICAgICAgICBNb3ZlXHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcm90ZWN0ZWQgb3ZlcnJpZGUgdm9pZCBPbk1vdXNlRG93bihNb3VzZUV2ZW50QXJncyBlKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgQWN0aXZlRm9ybSA9IHRoaXM7XHJcbiAgICAgICAgICAgIC8vIHdvcmsgb3V0IGFyZWEuLi4gb2YgY2xpY2suXHJcbiAgICAgICAgICAgIHZhciBzaXplID0gU2l6ZTtcclxuICAgICAgICAgICAgX2Zvcm1Nb3ZlbWVudE1vZGVzID0gRm9ybU1vdmVtZW50TW9kZXMuTm9uZTtcclxuXHJcbiAgICAgICAgICAgIC8vaWYoZS5YID4gMSAmJiBlLlggPCApXHJcbiAgICAgICAgICAgIGlmIChfYWxsb3dNb3ZlQ2hhbmdlKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBpZiAoZS5YID4gMSAmJiBlLlggPD0gc2l6ZS5XaWR0aCAtIF9mb3JtUmlnaHRCb3JkZXIgJiYgZS5ZID4gMSAmJiBlLlkgPD0gX2Zvcm1Ub3BCb3JkZXIpXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgX2Zvcm1Nb3ZlbWVudE1vZGVzID0gRm9ybU1vdmVtZW50TW9kZXMuTW92ZTtcclxuICAgICAgICAgICAgICAgICAgICBfcHJldlggPSBMb2NhdGlvbi5YIC0gKGUuWCArIExvY2F0aW9uLlgpO1xyXG4gICAgICAgICAgICAgICAgICAgIF9wcmV2WSA9IExvY2F0aW9uLlkgLSAoZS5ZICsgTG9jYXRpb24uWSk7XHJcblxyXG4gICAgICAgICAgICAgICAgICAgIF9wcmV2Rm9ybVggPSBMb2NhdGlvbi5YO1xyXG4gICAgICAgICAgICAgICAgICAgIF9wcmV2Rm9ybVkgPSBMb2NhdGlvbi5ZO1xyXG5cclxuICAgICAgICAgICAgICAgICAgICAvL2NsaWVudFJlYy50b3AgLSBtb3VzZVBvcy5ZZjtcclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgfVxyXG5cclxuICAgICAgICAgICAgX21vdXNlRG93bk9uQm9yZGVyID0gdHJ1ZTtcclxuXHJcbiAgICAgICAgICAgIGJhc2UuT25Nb3VzZURvd24oZSk7XHJcbiAgICAgICAgfVxyXG5cclxuXHJcbiAgICAgICAgcHJvdGVjdGVkIG92ZXJyaWRlIHZvaWQgT25Nb3VzZVVwKE1vdXNlRXZlbnRBcmdzIGUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBfbW91c2VEb3duT25Cb3JkZXIgPSBmYWxzZTtcclxuICAgICAgICAgICAgYmFzZS5Pbk1vdXNlVXAoZSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcm90ZWN0ZWQgb3ZlcnJpZGUgdm9pZCBPbk1vdXNlTW92ZShNb3VzZUV2ZW50QXJncyBlKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgLy8gaXMgbW91c2UgZG93bj8/P1xyXG4gICAgICAgICAgICBpZihfbW91c2VEb3duT25Cb3JkZXIpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGlmKF9mb3JtTW92ZW1lbnRNb2RlcyA9PSBGb3JtTW92ZW1lbnRNb2Rlcy5Nb3ZlKVxyXG4gICAgICAgICAgICAgICAgeyAgICAgICAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgICAgICAgTG9jYXRpb24gPSBuZXcgUG9pbnQoKExvY2F0aW9uLlggKyBlLlgpICsgX3ByZXZYLCAoTG9jYXRpb24uWSArIGUuWSkgKyBfcHJldlkpO1xyXG4gICAgICAgICAgICAgICAgICAgIC8vdmFyIG5ld1ggPSAoKG1YID0gbW91c2VQb3MuWGYpICsgTW92aW5nRm9ybS5wcmV2X3B4KTtcclxuICAgICAgICAgICAgICAgICAgICAvL3ZhciBuZXdZID0gKChtWSA9IG1vdXNlUG9zLllmKSArIE1vdmluZ0Zvcm0ucHJldl9weSk7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAvLyB3ZSBzaG91bGQgZG8gc29tZSBhY3Rpb24gcmVnYXJkaW5nIHRoaXMuLi4gZXRjIG1vdmUgZm9ybSwgcmVzaXplIGluIGRpcmVjdGlvbi5cclxuXHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgYmFzZS5Pbk1vdXNlTW92ZShlKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgdm9pZCBfcHJvY2Vzc1dpbkZvcm1WaWV3KClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHZhciBjbGllbnRTaXplID0gQ2xpZW50U2l6ZTtcclxuICAgICAgICAgICAgLy8gbmVlZCB0byBhbGxvdyBmb3IgY3VzdG9tIHNpemUgcGVyIHN0eWxlIC0gY3VycmVudGx5IHNldCBhcyB3aW5kb3dzIDEwLlxyXG4gICAgICAgICAgICBzd2l0Y2ggKF9mb3JtQm9yZGVyU3R5bGUpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGNhc2UgRm9ybUJvcmRlclN0eWxlLk5vbmU6XHJcbiAgICAgICAgICAgICAgICAgICAgX2Zvcm1Ub3BCb3JkZXIgPSAwO1xyXG4gICAgICAgICAgICAgICAgICAgIF9mb3JtQm90dG9uQm9yZGVyID0gMDtcclxuICAgICAgICAgICAgICAgICAgICBfZm9ybUxlZnRCb3JkZXIgPSAwO1xyXG4gICAgICAgICAgICAgICAgICAgIF9mb3JtUmlnaHRCb3JkZXIgPSAwO1xyXG4gICAgICAgICAgICAgICAgICAgIF9hbGxvd1NpemVDaGFuZ2UgPSBmYWxzZTtcclxuXHJcbiAgICAgICAgICAgICAgICAgICAgYnJlYWs7XHJcbiAgICAgICAgICAgICAgICBjYXNlIEZvcm1Cb3JkZXJTdHlsZS5GaXhlZFNpbmdsZTpcclxuICAgICAgICAgICAgICAgICAgICBfYWxsb3dTaXplQ2hhbmdlID0gZmFsc2U7XHJcbiAgICAgICAgICAgICAgICAgICAgaWYgKCFDb250cm9sQm94KVxyXG4gICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgX2Zvcm1Ub3BCb3JkZXIgPSAxO1xyXG4gICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBfZm9ybVRvcEJvcmRlciA9IDMxO1xyXG4gICAgICAgICAgICAgICAgICAgIH0gICAgICAgICAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgICAgICBfZm9ybUJvdHRvbkJvcmRlciA9IDE7XHJcbiAgICAgICAgICAgICAgICAgICAgX2Zvcm1MZWZ0Qm9yZGVyID0gMTtcclxuICAgICAgICAgICAgICAgICAgICBfZm9ybVJpZ2h0Qm9yZGVyID0gMTtcclxuICAgICAgICAgICAgICAgICAgICBicmVhaztcclxuICAgICAgICAgICAgICAgIGNhc2UgRm9ybUJvcmRlclN0eWxlLkZpeGVkM0Q6XHJcbiAgICAgICAgICAgICAgICAgICAgX2FsbG93U2l6ZUNoYW5nZSA9IGZhbHNlO1xyXG4gICAgICAgICAgICAgICAgICAgIGlmICghQ29udHJvbEJveClcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIF9mb3JtVG9wQm9yZGVyID0gMztcclxuICAgICAgICAgICAgICAgICAgICAgICAgX2Zvcm1Cb3R0b25Cb3JkZXIgPSAzO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBfZm9ybUxlZnRCb3JkZXIgPSAzO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBfZm9ybVJpZ2h0Qm9yZGVyID0gMztcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgX2Zvcm1Ub3BCb3JkZXIgPSAzMTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgX2Zvcm1Cb3R0b25Cb3JkZXIgPSAxO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBfZm9ybUxlZnRCb3JkZXIgPSAxO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBfZm9ybVJpZ2h0Qm9yZGVyID0gMTtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgYnJlYWs7XHJcbiAgICAgICAgICAgICAgICBjYXNlIEZvcm1Cb3JkZXJTdHlsZS5GaXhlZERpYWxvZzpcclxuXHJcbiAgICAgICAgICAgICAgICAgICAgX2FsbG93U2l6ZUNoYW5nZSA9IGZhbHNlO1xyXG4gICAgICAgICAgICAgICAgICAgIGlmICghQ29udHJvbEJveClcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIF9mb3JtVG9wQm9yZGVyID0gMjtcclxuICAgICAgICAgICAgICAgICAgICAgICAgX2Zvcm1Cb3R0b25Cb3JkZXIgPSAyO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBfZm9ybUxlZnRCb3JkZXIgPSAyO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBfZm9ybVJpZ2h0Qm9yZGVyID0gMjtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgX2Zvcm1Ub3BCb3JkZXIgPSAzMTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgX2Zvcm1Cb3R0b25Cb3JkZXIgPSAxO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBfZm9ybUxlZnRCb3JkZXIgPSAxO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBfZm9ybVJpZ2h0Qm9yZGVyID0gMTtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcblxyXG4gICAgICAgICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgICAgICAgIGJyZWFrO1xyXG4gICAgICAgICAgICAgICAgY2FzZSBGb3JtQm9yZGVyU3R5bGUuU2l6YWJsZTpcclxuICAgICAgICAgICAgICAgICAgICBpZighQ29udHJvbEJveClcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIF9mb3JtVG9wQm9yZGVyID0gODtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgX2Zvcm1Ub3BCb3JkZXIgPSAzMTtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgX2Zvcm1Cb3R0b25Cb3JkZXIgPSAxO1xyXG4gICAgICAgICAgICAgICAgICAgIF9mb3JtTGVmdEJvcmRlciA9IDE7XHJcbiAgICAgICAgICAgICAgICAgICAgX2Zvcm1SaWdodEJvcmRlciA9IDE7XHJcbiAgICAgICAgICAgICAgICAgICAgX2FsbG93U2l6ZUNoYW5nZSA9IHRydWU7XHJcbiAgICAgICAgICAgICAgICAgICAgYnJlYWs7XHJcbiAgICAgICAgICAgICAgICBjYXNlIEZvcm1Cb3JkZXJTdHlsZS5GaXhlZFRvb2xXaW5kb3c6XHJcbiAgICAgICAgICAgICAgICAgICAgaWYgKCFDb250cm9sQm94KVxyXG4gICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgX2Zvcm1Ub3BCb3JkZXIgPSAxO1xyXG4gICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBfZm9ybVRvcEJvcmRlciA9IDMxO1xyXG4gICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgICAgICBfZm9ybUJvdHRvbkJvcmRlciA9IDA7XHJcbiAgICAgICAgICAgICAgICAgICAgX2Zvcm1MZWZ0Qm9yZGVyID0gMDtcclxuICAgICAgICAgICAgICAgICAgICBfZm9ybVJpZ2h0Qm9yZGVyID0gMDtcclxuICAgICAgICAgICAgICAgICAgICBfYWxsb3dTaXplQ2hhbmdlID0gZmFsc2U7XHJcbiAgICAgICAgICAgICAgICAgICAgYnJlYWs7XHJcbiAgICAgICAgICAgICAgICBjYXNlIEZvcm1Cb3JkZXJTdHlsZS5TaXphYmxlVG9vbFdpbmRvdzpcclxuICAgICAgICAgICAgICAgICAgICBpZiAoIUNvbnRyb2xCb3gpXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBfZm9ybVRvcEJvcmRlciA9IDg7XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIF9mb3JtVG9wQm9yZGVyID0gMzE7XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgICAgIF9mb3JtQm90dG9uQm9yZGVyID0gMTtcclxuICAgICAgICAgICAgICAgICAgICBfZm9ybUxlZnRCb3JkZXIgPSAxO1xyXG4gICAgICAgICAgICAgICAgICAgIF9mb3JtUmlnaHRCb3JkZXIgPSAxO1xyXG4gICAgICAgICAgICAgICAgICAgIF9hbGxvd1NpemVDaGFuZ2UgPSB0cnVlO1xyXG4gICAgICAgICAgICAgICAgICAgIGJyZWFrO1xyXG4gICAgICAgICAgICAgICAgZGVmYXVsdDpcclxuICAgICAgICAgICAgICAgICAgICBicmVhaztcclxuICAgICAgICAgICAgfVxyXG5cclxuICAgICAgICAgICAgX3NldEJvcmRlcldpZHRoKCk7XHJcblxyXG4gICAgICAgICAgICBDbGllbnRTaXplID0gY2xpZW50U2l6ZTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgdm9pZCBfc2V0Qm9yZGVyV2lkdGgoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgRWxlbWVudC5zdHlsZS5ib3JkZXJUb3BXaWR0aCA9IF9mb3JtVG9wQm9yZGVyICsgXCJweFwiO1xyXG4gICAgICAgICAgICBFbGVtZW50LnN0eWxlLmJvcmRlckJvdHRvbVdpZHRoID0gX2Zvcm1Cb3R0b25Cb3JkZXIgKyBcInB4XCI7XHJcbiAgICAgICAgICAgIEVsZW1lbnQuc3R5bGUuYm9yZGVyTGVmdFdpZHRoID0gX2Zvcm1MZWZ0Qm9yZGVyICsgXCJweFwiO1xyXG4gICAgICAgICAgICBFbGVtZW50LnN0eWxlLmJvcmRlclJpZ2h0V2lkdGggPSBfZm9ybVJpZ2h0Qm9yZGVyICsgXCJweFwiO1xyXG4gICAgICAgIH1cclxuICAgICAgICBcclxuICAgICAgICBwdWJsaWMgb3ZlcnJpZGUgRm9udCBGb250IHsgZ2V0IHsgcmV0dXJuIGJhc2UuRm9udDsgfSBzZXQgeyAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgIGJhc2UuRm9udCA9IHZhbHVlOyAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgfSB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgU2l6ZSBHZXRDbGllbnRTaXplKFNpemUgc2l6ZSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHJldHVybiBuZXcgU2l6ZShzaXplLldpZHRoIC0gKF9mb3JtTGVmdEJvcmRlciArIF9mb3JtUmlnaHRCb3JkZXIpLCBzaXplLkhlaWdodCAtIChfZm9ybVRvcEJvcmRlciArIF9mb3JtQm90dG9uQm9yZGVyKSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcml2YXRlIFNpemUgU2V0U2l6ZShTaXplIGNsaWVudFNpemUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gbmV3IFNpemUoY2xpZW50U2l6ZS5XaWR0aCArIChfZm9ybUxlZnRCb3JkZXIgKyBfZm9ybVJpZ2h0Qm9yZGVyKSwgY2xpZW50U2l6ZS5IZWlnaHQgKyAoX2Zvcm1Ub3BCb3JkZXIgKyBfZm9ybUJvdHRvbkJvcmRlcikpO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJvdGVjdGVkIHZpcnR1YWwgdm9pZCBEaXNwb3NlKGJvb2wgZGlzcG9zaW5nKVxyXG4gICAgICAgIHtcclxuXHJcbiAgICAgICAgfVxyXG4gICAgICAgICAgICAgICBcclxuXHJcbiAgICAgICAgcHVibGljIFNpemUgQ2xpZW50U2l6ZSB7IGdldCB7IHJldHVybiBHZXRDbGllbnRTaXplKFNpemUpOyB9IHNldCB7IFNpemUgPSBTZXRTaXplKHZhbHVlKTsgfSB9XHJcbiAgICAgICAgcHVibGljIG92ZXJyaWRlIHN0cmluZyBUZXh0IHsgZ2V0OyBzZXQ7IH0gICAgICAgIFxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWM7XHJcbnVzaW5nIFN5c3RlbS5MaW5xO1xyXG51c2luZyBTeXN0ZW0uVGV4dDtcclxudXNpbmcgU3lzdGVtLlRocmVhZGluZy5UYXNrcztcclxuXHJcbm5hbWVzcGFjZSBTeXN0ZW0uV2luZG93cy5Gb3Jtc1xyXG57XHJcbiAgICBwdWJsaWMgZGVsZWdhdGUgdm9pZCBMaW5rTGFiZWxMaW5rQ2xpY2tlZEV2ZW50SGFuZGxlcihvYmplY3Qgc2VuZGVyLCBMaW5rTGFiZWxMaW5rQ2xpY2tlZEV2ZW50QXJncyBlKTtcclxuICAgIC8vXHJcbiAgICAvLyBTdW1tYXJ5OlxyXG4gICAgLy8gICAgIFByb3ZpZGVzIGRhdGEgZm9yIHRoZSBTeXN0ZW0uV2luZG93cy5Gb3Jtcy5MaW5rTGFiZWwuTGlua0NsaWNrZWQgZXZlbnQuICAgIFxyXG4gICAgcHVibGljIGNsYXNzIExpbmtMYWJlbExpbmtDbGlja2VkRXZlbnRBcmdzIDogRXZlbnRBcmdzXHJcbiAgICB7XHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBTdW1tYXJ5OlxyXG4gICAgICAgIC8vICAgICBJbml0aWFsaXplcyBhIG5ldyBpbnN0YW5jZSBvZiB0aGUgU3lzdGVtLldpbmRvd3MuRm9ybXMuTGlua0xhYmVsTGlua0NsaWNrZWRFdmVudEFyZ3NcclxuICAgICAgICAvLyAgICAgY2xhc3Mgd2l0aCB0aGUgc3BlY2lmaWVkIGxpbmsuXHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBQYXJhbWV0ZXJzOlxyXG4gICAgICAgIC8vICAgbGluazpcclxuICAgICAgICAvLyAgICAgVGhlIFN5c3RlbS5XaW5kb3dzLkZvcm1zLkxpbmtMYWJlbC5MaW5rIHRoYXQgd2FzIGNsaWNrZWQuXHJcbiAgICAgICAgcHVibGljIExpbmtMYWJlbExpbmtDbGlja2VkRXZlbnRBcmdzKExpbmtMYWJlbC5MaW5rIGxpbmspXHJcbiAgICAgICAge1xyXG5cclxuICAgICAgICB9XHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBTdW1tYXJ5OlxyXG4gICAgICAgIC8vICAgICBJbml0aWFsaXplcyBhIG5ldyBpbnN0YW5jZSBvZiB0aGUgU3lzdGVtLldpbmRvd3MuRm9ybXMuTGlua0xhYmVsTGlua0NsaWNrZWRFdmVudEFyZ3NcclxuICAgICAgICAvLyAgICAgY2xhc3Mgd2l0aCB0aGUgc3BlY2lmaWVkIGxpbmsgYW5kIHRoZSBzcGVjaWZpZWQgbW91c2UgYnV0dG9uLlxyXG4gICAgICAgIC8vXHJcbiAgICAgICAgLy8gUGFyYW1ldGVyczpcclxuICAgICAgICAvLyAgIGxpbms6XHJcbiAgICAgICAgLy8gICAgIFRoZSBTeXN0ZW0uV2luZG93cy5Gb3Jtcy5MaW5rTGFiZWwuTGluayB0aGF0IHdhcyBjbGlja2VkLlxyXG4gICAgICAgIC8vXHJcbiAgICAgICAgLy8gICBidXR0b246XHJcbiAgICAgICAgLy8gICAgIE9uZSBvZiB0aGUgU3lzdGVtLldpbmRvd3MuRm9ybXMuTW91c2VCdXR0b25zIHZhbHVlcy5cclxuICAgICAgICBwdWJsaWMgTGlua0xhYmVsTGlua0NsaWNrZWRFdmVudEFyZ3MoTGlua0xhYmVsLkxpbmsgbGluaywgTW91c2VCdXR0b25zIGJ1dHRvbilcclxuICAgICAgICB7XHJcblxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBTdW1tYXJ5OlxyXG4gICAgICAgIC8vICAgICBHZXRzIHRoZSBtb3VzZSBidXR0b24gdGhhdCBjYXVzZXMgdGhlIGxpbmsgdG8gYmUgY2xpY2tlZC5cclxuICAgICAgICAvL1xyXG4gICAgICAgIC8vIFJldHVybnM6XHJcbiAgICAgICAgLy8gICAgIE9uZSBvZiB0aGUgU3lzdGVtLldpbmRvd3MuRm9ybXMuTW91c2VCdXR0b25zIHZhbHVlcy5cclxuICAgICAgICBwdWJsaWMgTW91c2VCdXR0b25zIEJ1dHRvbiB7IGdldDsgcHJpdmF0ZSBzZXQ7IH1cclxuICAgICAgICAvL1xyXG4gICAgICAgIC8vIFN1bW1hcnk6XHJcbiAgICAgICAgLy8gICAgIEdldHMgdGhlIFN5c3RlbS5XaW5kb3dzLkZvcm1zLkxpbmtMYWJlbC5MaW5rIHRoYXQgd2FzIGNsaWNrZWQuXHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBSZXR1cm5zOlxyXG4gICAgICAgIC8vICAgICBBIGxpbmsgb24gdGhlIFN5c3RlbS5XaW5kb3dzLkZvcm1zLkxpbmtMYWJlbC5cclxuICAgICAgICBwdWJsaWMgTGlua0xhYmVsLkxpbmsgTGluayB7IGdldDsgcHJpdmF0ZSBzZXQ7IH1cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBCcmlkZ2U7XHJcbnVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWM7XHJcbnVzaW5nIFN5c3RlbS5EcmF3aW5nO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLldpbmRvd3MuRm9ybXNcclxue1xyXG4gICAgLy9cclxuICAgIC8vIFN1bW1hcnk6XHJcbiAgICAvLyAgICAgUHJvdmlkZXMgZGF0YSBmb3IgdGhlIFN5c3RlbS5XaW5kb3dzLkZvcm1zLkNvbnRyb2wuTW91c2VVcCwgU3lzdGVtLldpbmRvd3MuRm9ybXMuQ29udHJvbC5Nb3VzZURvd24sXHJcbiAgICAvLyAgICAgYW5kIFN5c3RlbS5XaW5kb3dzLkZvcm1zLkNvbnRyb2wuTW91c2VNb3ZlIGV2ZW50cy5cclxuICAgIHB1YmxpYyBjbGFzcyBNb3VzZUV2ZW50QXJncyA6IEV2ZW50QXJnc1xyXG4gICAge1xyXG4gICAgICAgIHB1YmxpYyBSZXR5cGVkLmRvbS5Nb3VzZUV2ZW50IE9yaWdpbmFsO1xyXG5cclxuICAgICAgICBwcml2YXRlIHN0YXRpYyBQb2ludCBHZXRPZmZzZXRQb2ludChSZXR5cGVkLmRvbS5FbGVtZW50IGVsZW1lbnQpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBkb3VibGUgdG9wID0gMDtcclxuICAgICAgICAgICAgZG91YmxlIGxlZnQgPSAwOyAgICAgICAgICAgIFxyXG4gICAgICAgICAgICBkb1xyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBkeW5hbWljIGR5bSA9IGVsZW1lbnQ7XHJcbiAgICAgICAgICAgICAgICB0b3AgKz0gZHltLm9mZnNldFRvcDtcclxuICAgICAgICAgICAgICAgIGxlZnQgKz0gZHltLm9mZnNldExlZnQ7XHJcbiAgICAgICAgICAgICAgICBlbGVtZW50ID0gZHltLm9mZnNldFBhcmVudDtcclxuICAgICAgICAgICAgfSB3aGlsZSAoZWxlbWVudCAhPSBudWxsKTtcclxuXHJcbiAgICAgICAgICAgIHJldHVybiBuZXcgUG9pbnQoKGludClsZWZ0LCAoaW50KXRvcCk7XHJcbiAgICAgICAgfVxyXG4gICAgICAgIHN0YXRpYyBib29sIElzRWRnZTtcclxuICAgICAgICBzdGF0aWMgTW91c2VFdmVudEFyZ3MoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgSXNFZGdlID0gUmV0eXBlZC5kb20ud2luZG93Lm5hdmlnYXRvci51c2VyQWdlbnQuSW5kZXhPZihcIkVkZ2VcIikgPiAtMTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBzdGF0aWMgTW91c2VFdmVudEFyZ3MgQ3JlYXRlRnJvbU1vdXNlRXZlbnQoUmV0eXBlZC5kb20uTW91c2VFdmVudCBvcmlnaW5hbCwgQ29udHJvbCB0YXJnZXQpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICAvLyB3aGF0IHdlIG5lZWQgdG8gZG8gaXMgZ2V0IHRoZSBsb2NhbCB4LCB5IG9mZiBmcm9tIHRoZSB0YXJnZXQuXHJcblxyXG4gICAgICAgICAgICBQb2ludCBtb3VzZVBvaW50O1xyXG5cclxuICAgICAgICAgICAgaWYob3JpZ2luYWwuY3VycmVudFRhcmdldCA9PSB0YXJnZXQuRWxlbWVudClcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaWYoQnJvd3Nlci5Jc0lFIHx8IElzRWRnZSlcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICB2YXIgb2Zmc2V0ID0gR2V0T2Zmc2V0UG9pbnQodGFyZ2V0LkVsZW1lbnQpO1xyXG4gICAgICAgICAgICAgICAgICAgIG1vdXNlUG9pbnQgPSBuZXcgUG9pbnQoKGludCkob3JpZ2luYWwuY2xpZW50WCAtIG9mZnNldC5YKSwgKGludCkob3JpZ2luYWwuY2xpZW50WSAtIG9mZnNldC5ZKSk7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgbW91c2VQb2ludCA9IG5ldyBQb2ludCgoaW50KW9yaWdpbmFsLmxheWVyWCwgKGludClvcmlnaW5hbC5sYXllclkpO1xyXG4gICAgICAgICAgICAgICAgfSAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHZhciBvZmZzZXQgPSBHZXRPZmZzZXRQb2ludCh0YXJnZXQuRWxlbWVudCk7XHJcbiAgICAgICAgICAgICAgICBtb3VzZVBvaW50ID0gbmV3IFBvaW50KChpbnQpKG9yaWdpbmFsLnggLSBvZmZzZXQuWCksIChpbnQpKG9yaWdpbmFsLnkgLSBvZmZzZXQuWSkpO1xyXG4gICAgICAgICAgICB9XHJcblxyXG4gICAgICAgICAgICAvL0NvbnNvbGUuQ2xlYXIoKTtcclxuICAgICAgICAgICAgLy9Db25zb2xlLldyaXRlTGluZShtb3VzZVBvaW50LlRvU3RyaW5nKCkpO1xyXG4gICAgICAgICAgICBcclxuICAgICAgICAgICAgdmFyIGJ1dHRvbiA9IChpbnQpb3JpZ2luYWwuYnV0dG9uO1xyXG4gICAgICAgICAgICByZXR1cm4gbmV3IE1vdXNlRXZlbnRBcmdzKFxyXG4gICAgICAgICAgICAgICAgYnV0dG9uID09IDEgPyBNb3VzZUJ1dHRvbnMuTGVmdCA6XHJcbiAgICAgICAgICAgICAgICBidXR0b24gPT0gMiA/IE1vdXNlQnV0dG9ucy5SaWdodCA6XHJcbiAgICAgICAgICAgICAgICBidXR0b24gPT0gNCA/IE1vdXNlQnV0dG9ucy5NaWRkbGUgOlxyXG4gICAgICAgICAgICAgICAgYnV0dG9uID09IDggPyBNb3VzZUJ1dHRvbnMuWEJ1dHRvbjIgOlxyXG4gICAgICAgICAgICAgICAgTW91c2VCdXR0b25zLlhCdXR0b24yLFxyXG4gICAgICAgICAgICAgICAgMSwgbW91c2VQb2ludC5YLCBtb3VzZVBvaW50LlksIDApXHJcbiAgICAgICAgICAgIHsgT3JpZ2luYWwgPSBvcmlnaW5hbCB9OyAgICAgICAgICAgIFxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBTdW1tYXJ5OlxyXG4gICAgICAgIC8vICAgICBJbml0aWFsaXplcyBhIG5ldyBpbnN0YW5jZSBvZiB0aGUgU3lzdGVtLldpbmRvd3MuRm9ybXMuTW91c2VFdmVudEFyZ3MgY2xhc3MuXHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBQYXJhbWV0ZXJzOlxyXG4gICAgICAgIC8vICAgYnV0dG9uOlxyXG4gICAgICAgIC8vICAgICBPbmUgb2YgdGhlIFN5c3RlbS5XaW5kb3dzLkZvcm1zLk1vdXNlQnV0dG9ucyB2YWx1ZXMgdGhhdCBpbmRpY2F0ZSB3aGljaCBtb3VzZVxyXG4gICAgICAgIC8vICAgICBidXR0b24gd2FzIHByZXNzZWQuXHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyAgIGNsaWNrczpcclxuICAgICAgICAvLyAgICAgVGhlIG51bWJlciBvZiB0aW1lcyBhIG1vdXNlIGJ1dHRvbiB3YXMgcHJlc3NlZC5cclxuICAgICAgICAvL1xyXG4gICAgICAgIC8vICAgeDpcclxuICAgICAgICAvLyAgICAgVGhlIHgtY29vcmRpbmF0ZSBvZiBhIG1vdXNlIGNsaWNrLCBpbiBwaXhlbHMuXHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyAgIHk6XHJcbiAgICAgICAgLy8gICAgIFRoZSB5LWNvb3JkaW5hdGUgb2YgYSBtb3VzZSBjbGljaywgaW4gcGl4ZWxzLlxyXG4gICAgICAgIC8vXHJcbiAgICAgICAgLy8gICBkZWx0YTpcclxuICAgICAgICAvLyAgICAgQSBzaWduZWQgY291bnQgb2YgdGhlIG51bWJlciBvZiBkZXRlbnRzIHRoZSB3aGVlbCBoYXMgcm90YXRlZC5cclxuICAgICAgICBwdWJsaWMgTW91c2VFdmVudEFyZ3MoTW91c2VCdXR0b25zIGJ1dHRvbiwgaW50IGNsaWNrcywgaW50IHgsIGludCB5LCBpbnQgZGVsdGEpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICB0aGlzLkJ1dHRvbiA9IGJ1dHRvbjtcclxuICAgICAgICAgICAgdGhpcy5DbGlja3MgPSBjbGlja3M7XHJcbiAgICAgICAgICAgIHRoaXMuWCA9IHg7XHJcbiAgICAgICAgICAgIHRoaXMuWSA9IHk7XHJcbiAgICAgICAgICAgIHRoaXMuRGVsdGEgPSBkZWx0YTtcclxuICAgICAgICAgICAgdGhpcy5Mb2NhdGlvbiA9IG5ldyBQb2ludChYLCBZKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIC8vXHJcbiAgICAgICAgLy8gU3VtbWFyeTpcclxuICAgICAgICAvLyAgICAgR2V0cyB3aGljaCBtb3VzZSBidXR0b24gd2FzIHByZXNzZWQuXHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBSZXR1cm5zOlxyXG4gICAgICAgIC8vICAgICBPbmUgb2YgdGhlIFN5c3RlbS5XaW5kb3dzLkZvcm1zLk1vdXNlQnV0dG9ucyB2YWx1ZXMuXHJcbiAgICAgICAgcHVibGljIE1vdXNlQnV0dG9ucyBCdXR0b24geyBnZXQ7IHByaXZhdGUgc2V0OyB9XHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBTdW1tYXJ5OlxyXG4gICAgICAgIC8vICAgICBHZXRzIHRoZSBudW1iZXIgb2YgdGltZXMgdGhlIG1vdXNlIGJ1dHRvbiB3YXMgcHJlc3NlZCBhbmQgcmVsZWFzZWQuXHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBSZXR1cm5zOlxyXG4gICAgICAgIC8vICAgICBBbiBTeXN0ZW0uSW50MzIgdGhhdCBjb250YWlucyB0aGUgbnVtYmVyIG9mIHRpbWVzIHRoZSBtb3VzZSBidXR0b24gd2FzIHByZXNzZWRcclxuICAgICAgICAvLyAgICAgYW5kIHJlbGVhc2VkLlxyXG4gICAgICAgIHB1YmxpYyBpbnQgQ2xpY2tzIHsgZ2V0OyBwcml2YXRlIHNldDsgfVxyXG4gICAgICAgIC8vXHJcbiAgICAgICAgLy8gU3VtbWFyeTpcclxuICAgICAgICAvLyAgICAgR2V0cyB0aGUgeC1jb29yZGluYXRlIG9mIHRoZSBtb3VzZSBkdXJpbmcgdGhlIGdlbmVyYXRpbmcgbW91c2UgZXZlbnQuXHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBSZXR1cm5zOlxyXG4gICAgICAgIC8vICAgICBUaGUgeC1jb29yZGluYXRlIG9mIHRoZSBtb3VzZSwgaW4gcGl4ZWxzLlxyXG4gICAgICAgIHB1YmxpYyBpbnQgWCB7IGdldDsgcHJpdmF0ZSBzZXQ7IH1cclxuICAgICAgICAvL1xyXG4gICAgICAgIC8vIFN1bW1hcnk6XHJcbiAgICAgICAgLy8gICAgIEdldHMgdGhlIHktY29vcmRpbmF0ZSBvZiB0aGUgbW91c2UgZHVyaW5nIHRoZSBnZW5lcmF0aW5nIG1vdXNlIGV2ZW50LlxyXG4gICAgICAgIC8vXHJcbiAgICAgICAgLy8gUmV0dXJuczpcclxuICAgICAgICAvLyAgICAgVGhlIHktY29vcmRpbmF0ZSBvZiB0aGUgbW91c2UsIGluIHBpeGVscy5cclxuICAgICAgICBwdWJsaWMgaW50IFkgeyBnZXQ7IHByaXZhdGUgc2V0OyB9XHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBTdW1tYXJ5OlxyXG4gICAgICAgIC8vICAgICBHZXRzIGEgc2lnbmVkIGNvdW50IG9mIHRoZSBudW1iZXIgb2YgZGV0ZW50cyB0aGUgbW91c2Ugd2hlZWwgaGFzIHJvdGF0ZWQsIG11bHRpcGxpZWRcclxuICAgICAgICAvLyAgICAgYnkgdGhlIFdIRUVMX0RFTFRBIGNvbnN0YW50LiBBIGRldGVudCBpcyBvbmUgbm90Y2ggb2YgdGhlIG1vdXNlIHdoZWVsLlxyXG4gICAgICAgIC8vXHJcbiAgICAgICAgLy8gUmV0dXJuczpcclxuICAgICAgICAvLyAgICAgQSBzaWduZWQgY291bnQgb2YgdGhlIG51bWJlciBvZiBkZXRlbnRzIHRoZSBtb3VzZSB3aGVlbCBoYXMgcm90YXRlZCwgbXVsdGlwbGllZFxyXG4gICAgICAgIC8vICAgICBieSB0aGUgV0hFRUxfREVMVEEgY29uc3RhbnQuXHJcbiAgICAgICAgcHVibGljIGludCBEZWx0YSB7IGdldDsgcHJpdmF0ZSBzZXQ7IH1cclxuICAgICAgICAvL1xyXG4gICAgICAgIC8vIFN1bW1hcnk6XHJcbiAgICAgICAgLy8gICAgIEdldHMgdGhlIGxvY2F0aW9uIG9mIHRoZSBtb3VzZSBkdXJpbmcgdGhlIGdlbmVyYXRpbmcgbW91c2UgZXZlbnQuXHJcbiAgICAgICAgLy9cclxuICAgICAgICAvLyBSZXR1cm5zOlxyXG4gICAgICAgIC8vICAgICBBIFN5c3RlbS5EcmF3aW5nLlBvaW50IHRoYXQgY29udGFpbnMgdGhlIHgtIGFuZCB5LSBtb3VzZSBjb29yZGluYXRlcywgaW4gcGl4ZWxzLFxyXG4gICAgICAgIC8vICAgICByZWxhdGl2ZSB0byB0aGUgdXBwZXItbGVmdCBjb3JuZXIgb2YgdGhlIGZvcm0uXHJcbiAgICAgICAgcHVibGljIFBvaW50IExvY2F0aW9uIHsgZ2V0OyBwcml2YXRlIHNldDsgfVxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYztcclxudXNpbmcgU3lzdGVtLkxpbnE7XHJcbnVzaW5nIFN5c3RlbS5UZXh0O1xyXG51c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzO1xyXG5cclxubmFtZXNwYWNlIFN5c3RlbS5XaW5kb3dzLkZvcm1zXHJcbntcclxuICAgIC8vXHJcbiAgICAvLyBTdW1tYXJ5OlxyXG4gICAgLy8gICAgIFJlcHJlc2VudHMgdGhlIGNvbGxlY3Rpb24gb2YgaXRlbXMgaW4gYSBTeXN0ZW0uV2luZG93cy5Gb3Jtcy5Db21ib0JveC5cclxuICAgIHB1YmxpYyBjbGFzcyBPYmplY3RDb2xsZWN0aW9uIDogSUxpc3Q8b2JqZWN0PiwgSUNvbGxlY3Rpb24sIElFbnVtZXJhYmxlXHJcbiAgICB7XHJcbiAgICAgICAgcHJpdmF0ZSBDb250cm9sIF9vd25lcjtcclxuXHJcbiAgICAgICAgcHVibGljIE9iamVjdENvbGxlY3Rpb24oQ29udHJvbCBvd25lcilcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIF9vd25lciA9IG93bmVyO1xyXG4gICAgICAgICAgICBfY29udHJvbHMgPSBuZXcgTGlzdDxvYmplY3Q+KCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgQ29udHJvbCBPd25lciB7IGdldCB7IHJldHVybiBfb3duZXI7IH0gfVxyXG4gICAgICAgIHB1YmxpYyBib29sIElzU3luY2hyb25pemVkIHsgZ2V0IHsgcmV0dXJuIGZhbHNlOyB9IH1cclxuXHJcbiAgICAgICAgcHVibGljIG9iamVjdCBTeW5jUm9vdFxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHRocm93IG5ldyBOb3RJbXBsZW1lbnRlZEV4Y2VwdGlvbigpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG4gICAgICAgIHByaXZhdGUgTGlzdDxvYmplY3Q+IF9jb250cm9scztcclxuXHJcbiAgICAgICAgcHVibGljIG9iamVjdCB0aGlzW2ludCBpbmRleF1cclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldCB7IHJldHVybiBfY29udHJvbHNbaW5kZXhdOyB9XHJcbiAgICAgICAgICAgIHNldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBfY29udHJvbHNbaW5kZXhdID0gdmFsdWU7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBpbnQgQ291bnQgeyBnZXQgeyByZXR1cm4gX2NvbnRyb2xzLkNvdW50OyB9IH1cclxuXHJcbiAgICAgICAgcHVibGljIGJvb2wgSXNSZWFkT25seSB7IGdldCB7IHJldHVybiBmYWxzZTsgfSB9XHJcblxyXG4gICAgICAgIHB1YmxpYyB2b2lkIEFkZChvYmplY3QgaXRlbSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIF9vd25lci5FbGVtZW50LmFwcGVuZENoaWxkPGdsb2JhbDo6UmV0eXBlZC5kb20uSFRNTE9wdGlvbkVsZW1lbnQ+KG5ldyBSZXR5cGVkLmRvbS5IVE1MT3B0aW9uRWxlbWVudCgpIHsgdmFsdWUgPSBfY29udHJvbHMuQ291bnQuVG9TdHJpbmcoKSwgdGV4dENvbnRlbnQgPSAoaXRlbSArIFwiXCIpIH0gKTtcclxuICAgICAgICAgICAgX2NvbnRyb2xzLkFkZChpdGVtKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyB2b2lkIEFkZFJhbmdlKG9iamVjdFtdIGl0ZW0pXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBpZiAoaXRlbSA9PSBudWxsIHx8IGl0ZW0uTGVuZ3RoID09IDApXHJcbiAgICAgICAgICAgICAgICByZXR1cm47XHJcbiAgICAgICAgICAgIHZhciBmcmFnID0gUmV0eXBlZC5kb20uZG9jdW1lbnQuY3JlYXRlRG9jdW1lbnRGcmFnbWVudCgpO1xyXG4gICAgICAgICAgICBmb3IgKGludCBpID0gMDsgaSA8IGl0ZW0uTGVuZ3RoOyBpKyspXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGZyYWcuYXBwZW5kQ2hpbGQ8Z2xvYmFsOjpSZXR5cGVkLmRvbS5IVE1MT3B0aW9uRWxlbWVudD4obmV3IFJldHlwZWQuZG9tLkhUTUxPcHRpb25FbGVtZW50KCkgeyB2YWx1ZSA9IF9jb250cm9scy5Db3VudC5Ub1N0cmluZygpLCB0ZXh0Q29udGVudCA9IChpdGVtW2ldICsgXCJcIikgfSk7XHJcbiAgICAgICAgICAgICAgICBfY29udHJvbHMuQWRkKGl0ZW1baV0pO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIF9vd25lci5FbGVtZW50LmFwcGVuZENoaWxkPGdsb2JhbDo6UmV0eXBlZC5kb20uRG9jdW1lbnRGcmFnbWVudD4oZnJhZyk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBDbGVhcigpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICAvKkBcclxuXHRcdFx0dmFyIGxlbiA9IF9vd25lci5FbGVtZW50LmNoaWxkTm9kZXMubGVuZ3RoO1xyXG5cdFx0XHR3aGlsZShsZW4tLSlcclxuXHRcdFx0e1xyXG5cdFx0XHRcdF9vd25lci5FbGVtZW50LnJlbW92ZUNoaWxkKF9vd25lci5FbGVtZW50Lmxhc3RDaGlsZCk7XHJcblx0XHRcdH07XHJcblx0XHRcdCovXHJcbiAgICAgICAgICAgIF9jb250cm9scy5DbGVhcigpO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIGJvb2wgQ29udGFpbnMob2JqZWN0IGl0ZW0pXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gX2NvbnRyb2xzLkNvbnRhaW5zKGl0ZW0pO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHZvaWQgQ29weVRvKG9iamVjdFtdIGFycmF5LCBpbnQgYXJyYXlJbmRleClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5Db3B5VG8oYXJyYXksIGFycmF5SW5kZXgpO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHZvaWQgQ29weVRvKEFycmF5IGFycmF5LCBpbnQgYXJyYXlJbmRleClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5Db3B5VG8oKG9iamVjdFtdKWFycmF5LCBhcnJheUluZGV4KTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBJRW51bWVyYXRvcjxvYmplY3Q+IEdldEVudW1lcmF0b3IoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgcmV0dXJuIF9jb250cm9scy5HZXRFbnVtZXJhdG9yKCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgaW50IEluZGV4T2Yob2JqZWN0IGl0ZW0pXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gX2NvbnRyb2xzLkluZGV4T2YoaXRlbSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBJbnNlcnQoaW50IGluZGV4LCBvYmplY3QgaXRlbSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIF9vd25lci5FbGVtZW50Lmluc2VydEJlZm9yZTxnbG9iYWw6OlJldHlwZWQuZG9tLkhUTUxPcHRpb25FbGVtZW50PihuZXcgUmV0eXBlZC5kb20uSFRNTE9wdGlvbkVsZW1lbnQoKSB7IHZhbHVlID0gX2NvbnRyb2xzLkNvdW50LlRvU3RyaW5nKCksIHRleHRDb250ZW50ID0gKGl0ZW0gKyBcIlwiKSB9LCBfb3duZXIuRWxlbWVudC5jaGlsZE5vZGVzW2luZGV4XSk7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5JbnNlcnQoaW5kZXgsIGl0ZW0pO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIGJvb2wgUmVtb3ZlKG9iamVjdCBpdGVtKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgX293bmVyLkVsZW1lbnQucmVtb3ZlQ2hpbGQ8Z2xvYmFsOjpSZXR5cGVkLmRvbS5Ob2RlPihfb3duZXIuRWxlbWVudC5jaGlsZE5vZGVzW19jb250cm9scy5JbmRleE9mKGl0ZW0pXSk7ICAgICAgICAgICAgXHJcbiAgICAgICAgICAgIHJldHVybiBfY29udHJvbHMuUmVtb3ZlKGl0ZW0pO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHZvaWQgUmVtb3ZlQXQoaW50IGluZGV4KVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgX293bmVyLkVsZW1lbnQucmVtb3ZlQ2hpbGQ8Z2xvYmFsOjpSZXR5cGVkLmRvbS5Ob2RlPihfb3duZXIuRWxlbWVudC5jaGlsZE5vZGVzW2luZGV4XSk7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5SZW1vdmVBdChpbmRleCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBJRW51bWVyYXRvciBJRW51bWVyYWJsZS5HZXRFbnVtZXJhdG9yKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHJldHVybiBfY29udHJvbHMuR2V0RW51bWVyYXRvcigpO1xyXG4gICAgICAgIH1cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLldpbmRvd3MuRm9ybXNcclxue1xyXG4gICAgcHVibGljIHN0cnVjdCBQYWRkaW5nXHJcbiAgICB7XHJcbiAgICAgICAgcHVibGljIGludCBMZWZ0LCBUb3AsIFJpZ2h0LCBCb3R0b207XHJcbiAgICAgICAgcHVibGljIFBhZGRpbmcoaW50IGxlZnQsIGludCB0b3AsIGludCByaWdodCwgaW50IGJvdHRvbSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIExlZnQgPSBsZWZ0OyBUb3AgPSB0b3A7IFJpZ2h0ID0gcmlnaHQ7IEJvdHRvbSA9IGJvdHRvbTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBQYWRkaW5nKGludCBhbGwpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBMZWZ0ID0gYWxsOyBUb3AgPSBhbGw7IFJpZ2h0ID0gYWxsOyBCb3R0b20gPSBhbGw7XHJcbiAgICAgICAgfVxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWM7XHJcbnVzaW5nIFN5c3RlbS5MaW5xO1xyXG51c2luZyBTeXN0ZW0uVGV4dDtcclxudXNpbmcgU3lzdGVtLlRocmVhZGluZy5UYXNrcztcclxuXHJcbm5hbWVzcGFjZSBTeXN0ZW0uV2luZG93cy5Gb3Jtc1xyXG57XHJcbiAgICBwdWJsaWMgY2xhc3MgQnV0dG9uQmFzZSA6IENvbnRyb2xcclxuICAgIHtcclxuICAgICAgICBwcm90ZWN0ZWQgQnV0dG9uQmFzZShSZXR5cGVkLmRvbS5IVE1MRWxlbWVudCBlbGVtZW50KSA6IGJhc2UoZWxlbWVudClcclxuICAgICAgICB7XHJcblxyXG4gICAgICAgIH1cclxuICAgICAgICBwdWJsaWMgb3ZlcnJpZGUgYm9vbCBBdXRvU2l6ZSB7IGdldDsgc2V0OyB9XHJcbiAgICAgICAgcHVibGljIG92ZXJyaWRlIHN0cmluZyBUZXh0IHsgZ2V0IHsgcmV0dXJuIGJhc2UuVGV4dDsgfSBzZXQge1xyXG4gICAgICAgICAgICAgICAgYmFzZS5UZXh0ID0gdmFsdWU7XHJcbiAgICAgICAgICAgICAgICBFbGVtZW50LnRleHRDb250ZW50ID0gdmFsdWU7XHJcbiAgICAgICAgICAgIH0gfVxyXG4gICAgICAgIHB1YmxpYyBib29sIFVzZVZpc3VhbFN0eWxlQmFja0NvbG9yIHsgZ2V0OyBzZXQ7IH0gICAgICAgIFxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWM7XHJcbnVzaW5nIFN5c3RlbS5EcmF3aW5nO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLldpbmRvd3MuRm9ybXNcclxue1xyXG4gICAgcHVibGljIGNsYXNzIENvbWJvQm94IDogQ29udHJvbFxyXG4gICAge1xyXG4gICAgICAgIHB1YmxpYyBDb21ib0JveCgpIDogYmFzZShuZXcgUmV0eXBlZC5kb20uSFRNTFNlbGVjdEVsZW1lbnQoKSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIEl0ZW1zID0gbmV3IE9iamVjdENvbGxlY3Rpb24odGhpcyk7XHJcbiAgICAgICAgfVxyXG4gICAgICAgIHB1YmxpYyBPYmplY3RDb2xsZWN0aW9uIEl0ZW1zIHsgZ2V0OyBwcml2YXRlIHNldDsgfVxyXG4gICAgICAgIHB1YmxpYyB2aXJ0dWFsIGJvb2wgRm9ybWF0dGluZ0VuYWJsZWQgeyBnZXQ7IHNldDsgfVxyXG4gICAgICAgIHB1YmxpYyB2aXJ0dWFsIGludCBJdGVtSGVpZ2h0IHsgZ2V0OyBzZXQ7IH1cclxuICAgICAgICBwdWJsaWMgRHJhd01vZGUgRHJhd01vZGUgeyBnZXQ7IHNldDsgfVxyXG4gICAgICAgIHB1YmxpYyB2aXJ0dWFsIFNpemUgTWluaW11bVNpemUgeyBnZXQ7IHNldDsgfVxyXG4gICAgfVxyXG5cclxuICAgIHB1YmxpYyBjbGFzcyBMaXN0Qm94IDogQ29udHJvbFxyXG4gICAge1xyXG4gICAgICAgIHB1YmxpYyBMaXN0Qm94KCkgOiBiYXNlKG5ldyBSZXR5cGVkLmRvbS5IVE1MU2VsZWN0RWxlbWVudCgpKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgRWxlbWVudC5BczxSZXR5cGVkLmRvbS5IVE1MU2VsZWN0RWxlbWVudD4oKS5tdWx0aXBsZSA9IHRydWU7XHJcbiAgICAgICAgICAgIEl0ZW1zID0gbmV3IE9iamVjdENvbGxlY3Rpb24odGhpcyk7XHJcbiAgICAgICAgfVxyXG4gICAgICAgIHB1YmxpYyBPYmplY3RDb2xsZWN0aW9uIEl0ZW1zIHsgZ2V0OyBwcml2YXRlIHNldDsgfVxyXG4gICAgICAgIHB1YmxpYyB2aXJ0dWFsIGJvb2wgRm9ybWF0dGluZ0VuYWJsZWQgeyBnZXQ7IHNldDsgfVxyXG4gICAgICAgIHB1YmxpYyB2aXJ0dWFsIGludCBJdGVtSGVpZ2h0IHsgZ2V0OyBzZXQ7IH1cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uRHJhd2luZztcclxudXNpbmcgU3lzdGVtLkxpbnE7XHJcbnVzaW5nIFN5c3RlbS5UZXh0O1xyXG51c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzO1xyXG5cclxubmFtZXNwYWNlIFN5c3RlbS5XaW5kb3dzLkZvcm1zXHJcbntcclxuICAgIHB1YmxpYyBjbGFzcyBDb250YWluZXJDb250cm9sIDogQ29udHJvbFxyXG4gICAge1xyXG4gICAgICAgIHB1YmxpYyBTaXplRiBBdXRvU2NhbGVEaW1lbnNpb25zIHsgZ2V0OyBzZXQ7IH1cclxuICAgICAgICBwdWJsaWMgQXV0b1NjYWxlTW9kZSBBdXRvU2NhbGVNb2RlIHsgZ2V0OyBzZXQ7IH1cclxuXHJcbiAgICAgICAgcHVibGljIENvbnRhaW5lckNvbnRyb2woKSA6IGJhc2UobmV3IFJldHlwZWQuZG9tLkhUTUxEaXZFbGVtZW50KCkpXHJcbiAgICAgICAge1xyXG5cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBDb250YWluZXJDb250cm9sKFJldHlwZWQuZG9tLkhUTUxFbGVtZW50IGVsZW1lbnQpIDogYmFzZShlbGVtZW50KVxyXG4gICAgICAgIHtcclxuXHJcbiAgICAgICAgfVxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYztcclxudXNpbmcgU3lzdGVtLkxpbnE7XHJcbnVzaW5nIFN5c3RlbS5UZXh0O1xyXG51c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzO1xyXG5cclxubmFtZXNwYWNlIFN5c3RlbS5XaW5kb3dzLkZvcm1zXHJcbntcclxuICAgIC8vLyA8c3VtbWFyeT5cclxuICAgIC8vLyBUT0RPIC0gYWRkIGNvbnRyb2xzIHZpYSBodG1sLi4uLlxyXG4gICAgLy8vIDwvc3VtbWFyeT5cclxuICAgIHB1YmxpYyBjbGFzcyBDb250cm9sQ29sbGVjdGlvbiA6IElMaXN0PENvbnRyb2w+LCBJQ29sbGVjdGlvbiwgSUVudW1lcmFibGVcclxuICAgIHtcclxuICAgICAgICBpbnRlcm5hbCBDb250cm9sIF9vd25lcjtcclxuXHJcbiAgICAgICAgcHVibGljIENvbnRyb2xDb2xsZWN0aW9uKENvbnRyb2wgb3duZXIpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBfb3duZXIgPSBvd25lcjtcclxuICAgICAgICAgICAgX2NvbnRyb2xzID0gbmV3IExpc3Q8Q29udHJvbD4oKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBDb250cm9sIE93bmVyIHsgZ2V0IHsgcmV0dXJuIF9vd25lcjsgfSB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgTGlzdDxDb250cm9sPiBfY29udHJvbHM7XHJcblxyXG4gICAgICAgIHB1YmxpYyBDb250cm9sIHRoaXNbaW50IGluZGV4XSB7IGdldCB7IHJldHVybiBfY29udHJvbHNbaW5kZXhdOyAgfSBzZXQge1xyXG4gICAgICAgICAgICAgICAgX2NvbnRyb2xzW2luZGV4XSA9IHZhbHVlO1xyXG4gICAgICAgICAgICB9IH1cclxuXHJcbiAgICAgICAgcHVibGljIGludCBDb3VudCB7IGdldCB7IHJldHVybiBfY29udHJvbHMuQ291bnQ7ICB9IH1cclxuXHJcbiAgICAgICAgcHVibGljIGJvb2wgSXNSZWFkT25seSB7IGdldCB7IHJldHVybiBmYWxzZTsgfSB9XHJcbiAgICAgICAgcHVibGljIGJvb2wgSXNTeW5jaHJvbml6ZWQgeyBnZXQgeyByZXR1cm4gZmFsc2U7IH0gfVxyXG5cclxuICAgICAgICBwdWJsaWMgb2JqZWN0IFN5bmNSb290XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgdGhyb3cgbmV3IE5vdEltcGxlbWVudGVkRXhjZXB0aW9uKCk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyB2b2lkIEFkZChDb250cm9sIGl0ZW0pXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBfb3duZXIuRWxlbWVudC5hcHBlbmRDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLkhUTUxFbGVtZW50PihpdGVtLkVsZW1lbnQpO1xyXG4gICAgICAgICAgICBpdGVtLl9wYXJlbnQgPSBPd25lcjtcclxuICAgICAgICAgICAgaXRlbS5JbnZva2VMb2FkKCk7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5BZGQoaXRlbSk7XHJcbiAgICAgICAgICAgIF9vd25lci5PbkNvbnRyb2xBZGRlZChpdGVtKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyB2b2lkIEFkZFJhbmdlKENvbnRyb2xbXSBpdGVtKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgaWYgKGl0ZW0gPT0gbnVsbCB8fCBpdGVtLkxlbmd0aCA9PSAwKVxyXG4gICAgICAgICAgICAgICAgcmV0dXJuO1xyXG4gICAgICAgICAgICB2YXIgZnJhZyA9IFJldHlwZWQuZG9tLmRvY3VtZW50LmNyZWF0ZURvY3VtZW50RnJhZ21lbnQoKTtcclxuICAgICAgICAgICAgZm9yIChpbnQgaSA9IDA7IGkgPCBpdGVtLkxlbmd0aDsgaSsrKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBmcmFnLmFwcGVuZENoaWxkPGdsb2JhbDo6UmV0eXBlZC5kb20uSFRNTEVsZW1lbnQ+KGl0ZW1baV0uRWxlbWVudCk7XHJcbiAgICAgICAgICAgICAgICBpdGVtW2ldLl9wYXJlbnQgPSBPd25lcjtcclxuICAgICAgICAgICAgICAgIGl0ZW1baV0uSW52b2tlTG9hZCgpO1xyXG4gICAgICAgICAgICAgICAgX2NvbnRyb2xzLkFkZChpdGVtW2ldKTtcclxuICAgICAgICAgICAgICAgIF9vd25lci5PbkNvbnRyb2xBZGRlZChpdGVtW2ldKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICBfb3duZXIuRWxlbWVudC5hcHBlbmRDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLkRvY3VtZW50RnJhZ21lbnQ+KGZyYWcpO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHZvaWQgQ2xlYXIoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgLypAXHJcblx0XHRcdHZhciBsZW4gPSBfb3duZXIuRWxlbWVudC5jaGlsZE5vZGVzLmxlbmd0aDtcclxuXHRcdFx0d2hpbGUobGVuLS0pXHJcblx0XHRcdHtcclxuXHRcdFx0XHRfb3duZXIuRWxlbWVudC5yZW1vdmVDaGlsZChfb3duZXIuRWxlbWVudC5sYXN0Q2hpbGQpO1xyXG5cdFx0XHR9O1xyXG5cdFx0XHQqL1xyXG4gICAgICAgICAgICBfY29udHJvbHMuQ2xlYXIoKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBib29sIENvbnRhaW5zKENvbnRyb2wgaXRlbSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHJldHVybiBfY29udHJvbHMuQ29udGFpbnMoaXRlbSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBDb3B5VG8oQ29udHJvbFtdIGFycmF5LCBpbnQgYXJyYXlJbmRleClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5Db3B5VG8oYXJyYXksIGFycmF5SW5kZXgpO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHZvaWQgQ29weVRvKEFycmF5IGFycmF5LCBpbnQgYXJyYXlJbmRleClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5Db3B5VG8oKENvbnRyb2xbXSlhcnJheSwgYXJyYXlJbmRleCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgSUVudW1lcmF0b3I8Q29udHJvbD4gR2V0RW51bWVyYXRvcigpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gX2NvbnRyb2xzLkdldEVudW1lcmF0b3IoKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBpbnQgSW5kZXhPZihDb250cm9sIGl0ZW0pXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gX2NvbnRyb2xzLkluZGV4T2YoaXRlbSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBJbnNlcnQoaW50IGluZGV4LCBDb250cm9sIGl0ZW0pXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBfb3duZXIuRWxlbWVudC5pbnNlcnRCZWZvcmU8Z2xvYmFsOjpSZXR5cGVkLmRvbS5IVE1MRWxlbWVudD4oaXRlbS5FbGVtZW50LCBfb3duZXIuRWxlbWVudC5jaGlsZE5vZGVzW2luZGV4XSk7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5JbnNlcnQoaW5kZXgsIGl0ZW0pO1xyXG4gICAgICAgICAgICBfb3duZXIuT25Db250cm9sQWRkZWQoaXRlbSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgYm9vbCBSZW1vdmUoQ29udHJvbCBpdGVtKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgX293bmVyLkVsZW1lbnQucmVtb3ZlQ2hpbGQ8Z2xvYmFsOjpSZXR5cGVkLmRvbS5IVE1MRWxlbWVudD4oaXRlbS5FbGVtZW50KTtcclxuXHJcbiAgICAgICAgICAgIF9vd25lci5PbkNvbnRyb2xSZW1vdmVkKGl0ZW0pO1xyXG5cclxuICAgICAgICAgICAgcmV0dXJuIF9jb250cm9scy5SZW1vdmUoaXRlbSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBSZW1vdmVBdChpbnQgaW5kZXgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBfb3duZXIuRWxlbWVudC5yZW1vdmVDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLk5vZGU+KF9vd25lci5FbGVtZW50LmNoaWxkTm9kZXNbaW5kZXhdKTtcclxuXHJcbiAgICAgICAgICAgIF9vd25lci5PbkNvbnRyb2xSZW1vdmVkKF9jb250cm9sc1tpbmRleF0pO1xyXG5cclxuICAgICAgICAgICAgX2NvbnRyb2xzLlJlbW92ZUF0KGluZGV4KTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIElFbnVtZXJhdG9yIElFbnVtZXJhYmxlLkdldEVudW1lcmF0b3IoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgcmV0dXJuIF9jb250cm9scy5HZXRFbnVtZXJhdG9yKCk7XHJcbiAgICAgICAgfVxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWM7XHJcbnVzaW5nIFN5c3RlbS5Db21wb25lbnRNb2RlbDtcclxudXNpbmcgU3lzdGVtLkRhdGE7XHJcbnVzaW5nIFN5c3RlbS5MaW5xO1xyXG51c2luZyBTeXN0ZW0uVGV4dDtcclxudXNpbmcgU3lzdGVtLlRocmVhZGluZy5UYXNrcztcclxuXHJcbm5hbWVzcGFjZSBTeXN0ZW0uV2luZG93cy5Gb3Jtc1xyXG57XHJcbiAgICBwdWJsaWMgY2xhc3MgRGF0YUdyaWRWaWV3IDogQ29udHJvbCwgSVN1cHBvcnRJbml0aWFsaXplXHJcbiAgICB7XHJcbiAgICAgICAgcHVibGljIERhdGFHcmlkVmlld0NvbHVtbkhlYWRlcnNIZWlnaHRTaXplTW9kZSBDb2x1bW5IZWFkZXJzSGVpZ2h0U2l6ZU1vZGUgeyBnZXQ7IHNldDsgfVxyXG4gICAgICAgIHB1YmxpYyBEYXRhR3JpZFZpZXdDb2x1bW5Db2xsZWN0aW9uIENvbHVtbnMgeyBnZXQ7IHByaXZhdGUgc2V0OyB9XHJcbiAgICAgICAgcHVibGljIERhdGFHcmlkVmlld1Jvd0NvbGxlY3Rpb24gUm93cyB7IGdldDsgcHJpdmF0ZSBzZXQ7IH1cclxuXHJcbiAgICAgICAgaW50ZXJuYWwgUmV0eXBlZC5kb20uSFRNTFRhYmxlRWxlbWVudCB0YWJsZTtcclxuICAgICAgICBwdWJsaWMgRGF0YUdyaWRWaWV3KCkgOiBiYXNlKG5ldyBSZXR5cGVkLmRvbS5IVE1MRGl2RWxlbWVudCgpKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgdGFibGUgPSBuZXcgUmV0eXBlZC5kb20uSFRNTFRhYmxlRWxlbWVudCgpO1xyXG4gICAgICAgICAgICBFbGVtZW50LmFwcGVuZENoaWxkPGdsb2JhbDo6UmV0eXBlZC5kb20uSFRNTFRhYmxlRWxlbWVudD4odGFibGUpO1xyXG5cclxuICAgICAgICAgICAgRWxlbWVudC5zdHlsZS5vdmVyZmxvdyA9IFwiYXV0b1wiO1xyXG5cclxuICAgICAgICAgICAgQ29sdW1ucyA9IG5ldyBEYXRhR3JpZFZpZXdDb2x1bW5Db2xsZWN0aW9uKHRoaXMsIHRhYmxlKTtcclxuICAgICAgICAgICAgUm93cyA9IG5ldyBEYXRhR3JpZFZpZXdSb3dDb2xsZWN0aW9uKHRoaXMsIHRhYmxlKTtcclxuXHJcbiAgICAgICAgICAgIFRhYlN0b3AgPSBmYWxzZTtcclxuXHJcbiAgICAgICAgICAgIEVsZW1lbnQuc2V0QXR0cmlidXRlKFwic2NvcGVcIiwgXCJ0YWJsZVwiKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyB2b2lkIEJlZ2luSW5pdCgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyB2b2lkIEVuZEluaXQoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgXHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgb3ZlcnJpZGUgb2JqZWN0IFRhZ1xyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0IHsgcmV0dXJuIF90YWc7IH1cclxuICAgICAgICAgICAgc2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIF90YWcgPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgIGlmIChfdGFnIGlzIHN0cmluZylcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICB2YXIgc3RyID0gKF90YWcgKyBcIlwiKTtcclxuICAgICAgICAgICAgICAgICAgICBpZiAoc3RyLkNvbnRhaW5zKFwiLFwiKSlcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHZhciBhcnJ5ID0gc3RyLlNwbGl0KCcsJyk7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIEVsZW1lbnQuY2xhc3NOYW1lID0gYXJyeVswXTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgaWYgKGFycnkuTGVuZ3RoID49IDIpXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhYmxlLmNsYXNzTmFtZSA9IGFycnlbMV07XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZiAoYXJyeS5MZW5ndGggPj0gMylcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBDb2x1bW5zLmhlYWRlci5jbGFzc05hbWUgPSBhcnJ5WzJdO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIENvbHVtbnMuaGVhZGVyLmNsYXNzTmFtZSA9IFwiXCI7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWJsZS5jbGFzc05hbWUgPSBcIlwiO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgQ29sdW1ucy5oZWFkZXIuY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBFbGVtZW50LmNsYXNzTmFtZSA9IHN0cjtcclxuICAgICAgICAgICAgICAgICAgICAgICAgdGFibGUuY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgICAgICAgICAgQ29sdW1ucy5oZWFkZXIuY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgdGFibGUuY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgICAgICBFbGVtZW50LmNsYXNzTmFtZSA9IFwiXCI7XHJcbiAgICAgICAgICAgICAgICAgICAgQ29sdW1ucy5oZWFkZXIuY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSB2b2lkIE9uTmV3Um93RXZlbnQob2JqZWN0IHNlbmRlciwgTmV3Um93RXZlbnRBcmdzIGFyZ3MpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBSb3dzLkFkZChhcmdzLlJvdyk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcml2YXRlIG9iamVjdCBkYXRhU291cmNlO1xyXG4gICAgICAgIHB1YmxpYyBvYmplY3QgRGF0YVNvdXJjZSB7IGdldCB7IHJldHVybiBkYXRhU291cmNlOyB9IHNldCB7XHJcbiAgICAgICAgICAgICAgICBpZih2YWx1ZSAhPSBkYXRhU291cmNlKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIGlmKGRhdGFTb3VyY2UgIT0gbnVsbClcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGlmKGRhdGFTb3VyY2UgaXMgRGF0YVRhYmxlKVxyXG4gICAgICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YXIgZHQgPSBkYXRhU291cmNlLkFzPERhdGFUYWJsZT4oKTtcclxuXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBkdC5OZXdSb3dFdmVudCAtPSBPbk5ld1Jvd0V2ZW50O1xyXG4gICAgICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG5cclxuICAgICAgICAgICAgICAgICAgICBkYXRhU291cmNlID0gdmFsdWU7XHJcblxyXG4gICAgICAgICAgICAgICAgICAgIGlmIChkYXRhU291cmNlICE9IG51bGwgJiYgZGF0YVNvdXJjZSBpcyBEYXRhVGFibGUpXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICB2YXIgZHQgPSBkYXRhU291cmNlLkFzPERhdGFUYWJsZT4oKTtcclxuXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGR0Lk5ld1Jvd0V2ZW50ICs9IE9uTmV3Um93RXZlbnQ7XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgfSAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgfSB9XHJcbiAgICB9XHJcbn1cclxuIiwidXNpbmcgU3lzdGVtO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnM7XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLldpbmRvd3MuRm9ybXNcclxue1xyXG4gICAgLy8vIDxzdW1tYXJ5PlxyXG4gICAgLy8vIFRPRE8gLSBhZGQgY29udHJvbHMgdmlhIGh0bWwuLi4uXHJcbiAgICAvLy8gPC9zdW1tYXJ5PlxyXG4gICAgcHVibGljIGNsYXNzIERhdGFHcmlkVmlld0NvbHVtbkNvbGxlY3Rpb24gOiBJTGlzdDxEYXRhR3JpZFZpZXdDb2x1bW4+LCBJQ29sbGVjdGlvbiwgSUVudW1lcmFibGVcclxuICAgIHtcclxuICAgICAgICBpbnRlcm5hbCBEYXRhR3JpZFZpZXcgX293bmVyO1xyXG4gICAgICAgIGludGVybmFsIFJldHlwZWQuZG9tLkhUTUxUYWJsZVNlY3Rpb25FbGVtZW50IGhlYWRlcjtcclxuXHJcbiAgICAgICAgcHVibGljIERhdGFHcmlkVmlld0NvbHVtbkNvbGxlY3Rpb24oRGF0YUdyaWRWaWV3IG93bmVyLCBSZXR5cGVkLmRvbS5IVE1MVGFibGVFbGVtZW50IHRhYmxlKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgX293bmVyID0gb3duZXI7XHJcbiAgICAgICAgICAgIF9jb250cm9scyA9IG5ldyBMaXN0PERhdGFHcmlkVmlld0NvbHVtbj4oKTsgICAgICAgICAgICBcclxuXHJcbiAgICAgICAgICAgIGhlYWRlciA9IHRhYmxlLmNyZWF0ZVRIZWFkKCk7XHJcbiAgICAgICAgICAgIHRhYmxlLmFwcGVuZENoaWxkPGdsb2JhbDo6UmV0eXBlZC5kb20uSFRNTFRhYmxlU2VjdGlvbkVsZW1lbnQ+KGhlYWRlcik7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgRGF0YUdyaWRWaWV3IE93bmVyIHsgZ2V0IHsgcmV0dXJuIF9vd25lcjsgfSB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgTGlzdDxEYXRhR3JpZFZpZXdDb2x1bW4+IF9jb250cm9scztcclxuICAgICAgICBwdWJsaWMgYm9vbCBJc1N5bmNocm9uaXplZCB7IGdldCB7IHJldHVybiBmYWxzZTsgfSB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBvYmplY3QgU3luY1Jvb3RcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICB0aHJvdyBuZXcgTm90SW1wbGVtZW50ZWRFeGNlcHRpb24oKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuICAgICAgICBwdWJsaWMgRGF0YUdyaWRWaWV3Q29sdW1uIHRoaXNbaW50IGluZGV4XSB7IGdldCB7IHJldHVybiBfY29udHJvbHNbaW5kZXhdOyAgfSBzZXQge1xyXG4gICAgICAgICAgICAgICAgX2NvbnRyb2xzW2luZGV4XSA9IHZhbHVlO1xyXG4gICAgICAgICAgICB9IH1cclxuXHJcbiAgICAgICAgcHVibGljIGludCBDb3VudCB7IGdldCB7IHJldHVybiBfY29udHJvbHMuQ291bnQ7ICB9IH1cclxuXHJcbiAgICAgICAgcHVibGljIGJvb2wgSXNSZWFkT25seSB7IGdldCB7IHJldHVybiBmYWxzZTsgfSB9XHJcblxyXG4gICAgICAgIHB1YmxpYyB2b2lkIEFkZChEYXRhR3JpZFZpZXdDb2x1bW4gaXRlbSlcclxuICAgICAgICB7XHJcblxyXG4gICAgICAgICAgICBoZWFkZXIuYXBwZW5kQ2hpbGQ8Z2xvYmFsOjpSZXR5cGVkLmRvbS5IVE1MVGFibGVIZWFkZXJDZWxsRWxlbWVudD4oaXRlbS5FbGVtZW50KTtcclxuICAgICAgICAgICAgX2NvbnRyb2xzLkFkZChpdGVtKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyB2b2lkIEFkZFJhbmdlKERhdGFHcmlkVmlld0NvbHVtbltdIGl0ZW0pXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBpZiAoaXRlbSA9PSBudWxsIHx8IGl0ZW0uTGVuZ3RoID09IDApXHJcbiAgICAgICAgICAgICAgICByZXR1cm47XHJcbiAgICAgICAgICAgIHZhciBmcmFnID0gUmV0eXBlZC5kb20uZG9jdW1lbnQuY3JlYXRlRG9jdW1lbnRGcmFnbWVudCgpO1xyXG4gICAgICAgICAgICBmb3IgKGludCBpID0gMDsgaSA8IGl0ZW0uTGVuZ3RoOyBpKyspXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGZyYWcuYXBwZW5kQ2hpbGQ8Z2xvYmFsOjpSZXR5cGVkLmRvbS5IVE1MVGFibGVIZWFkZXJDZWxsRWxlbWVudD4oaXRlbVtpXS5FbGVtZW50KTtcclxuICAgICAgICAgICAgICAgIF9jb250cm9scy5BZGQoaXRlbVtpXSk7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgaGVhZGVyLmFwcGVuZENoaWxkPGdsb2JhbDo6UmV0eXBlZC5kb20uRG9jdW1lbnRGcmFnbWVudD4oZnJhZyk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBDbGVhcigpXHJcbiAgICAgICAgeyAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAvKkBcclxuXHRcdFx0dmFyIGxlbiA9IGhlYWRlci5jaGlsZE5vZGVzLmxlbmd0aDtcclxuXHRcdFx0d2hpbGUobGVuLS0pXHJcblx0XHRcdHtcclxuXHRcdFx0XHRoZWFkZXIucmVtb3ZlQ2hpbGQoaGVhZGVyLmxhc3RDaGlsZCk7XHJcblx0XHRcdH07XHJcblx0XHRcdCovXHJcbiAgICAgICAgICAgIF9jb250cm9scy5DbGVhcigpO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIGJvb2wgQ29udGFpbnMoRGF0YUdyaWRWaWV3Q29sdW1uIGl0ZW0pXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gX2NvbnRyb2xzLkNvbnRhaW5zKGl0ZW0pO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHZvaWQgQ29weVRvKERhdGFHcmlkVmlld0NvbHVtbltdIGFycmF5LCBpbnQgYXJyYXlJbmRleClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5Db3B5VG8oYXJyYXksIGFycmF5SW5kZXgpO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHZvaWQgQ29weVRvKEFycmF5IGFycmF5LCBpbnQgYXJyYXlJbmRleClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5Db3B5VG8oKERhdGFHcmlkVmlld0NvbHVtbltdKWFycmF5LCBhcnJheUluZGV4KTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBJRW51bWVyYXRvcjxEYXRhR3JpZFZpZXdDb2x1bW4+IEdldEVudW1lcmF0b3IoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgcmV0dXJuIF9jb250cm9scy5HZXRFbnVtZXJhdG9yKCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgaW50IEluZGV4T2YoRGF0YUdyaWRWaWV3Q29sdW1uIGl0ZW0pXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gX2NvbnRyb2xzLkluZGV4T2YoaXRlbSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBJbnNlcnQoaW50IGluZGV4LCBEYXRhR3JpZFZpZXdDb2x1bW4gaXRlbSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGhlYWRlci5pbnNlcnRCZWZvcmU8Z2xvYmFsOjpSZXR5cGVkLmRvbS5IVE1MVGFibGVIZWFkZXJDZWxsRWxlbWVudD4oaXRlbS5FbGVtZW50LCBoZWFkZXIuY2hpbGROb2Rlc1tpbmRleF0pO1xyXG4gICAgICAgICAgICBfY29udHJvbHMuSW5zZXJ0KGluZGV4LCBpdGVtKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBib29sIFJlbW92ZShEYXRhR3JpZFZpZXdDb2x1bW4gaXRlbSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGhlYWRlci5yZW1vdmVDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLkhUTUxUYWJsZUhlYWRlckNlbGxFbGVtZW50PihpdGVtLkVsZW1lbnQpO1xyXG4gICAgICAgICAgICByZXR1cm4gX2NvbnRyb2xzLlJlbW92ZShpdGVtKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyB2b2lkIFJlbW92ZUF0KGludCBpbmRleClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGhlYWRlci5yZW1vdmVDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLk5vZGU+KGhlYWRlci5jaGlsZE5vZGVzW2luZGV4XSk7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5SZW1vdmVBdChpbmRleCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBJRW51bWVyYXRvciBJRW51bWVyYWJsZS5HZXRFbnVtZXJhdG9yKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHJldHVybiBfY29udHJvbHMuR2V0RW51bWVyYXRvcigpO1xyXG4gICAgICAgIH1cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucztcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWM7XHJcbnVzaW5nIFN5c3RlbS5EYXRhO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLldpbmRvd3MuRm9ybXNcclxue1xyXG4gICAgLy8vIDxzdW1tYXJ5PlxyXG4gICAgLy8vIFRPRE8gLSBhZGQgY29udHJvbHMgdmlhIGh0bWwuLi4uXHJcbiAgICAvLy8gPC9zdW1tYXJ5PlxyXG4gICAgcHVibGljIGNsYXNzIERhdGFHcmlkVmlld1Jvd0NvbGxlY3Rpb24gOiBJTGlzdDxEYXRhUm93PiwgSUNvbGxlY3Rpb24sIElFbnVtZXJhYmxlXHJcbiAgICB7XHJcbiAgICAgICAgaW50ZXJuYWwgRGF0YUdyaWRWaWV3IF9vd25lcjtcclxuICAgICAgICBpbnRlcm5hbCBSZXR5cGVkLmRvbS5IVE1MVGFibGVTZWN0aW9uRWxlbWVudCBib2R5O1xyXG5cclxuICAgICAgICBwdWJsaWMgRGF0YUdyaWRWaWV3Um93Q29sbGVjdGlvbihEYXRhR3JpZFZpZXcgb3duZXIsIFJldHlwZWQuZG9tLkhUTUxUYWJsZUVsZW1lbnQgdGFibGUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBfb3duZXIgPSBvd25lcjtcclxuICAgICAgICAgICAgX2NvbnRyb2xzID0gbmV3IExpc3Q8RGF0YVJvdz4oKTtcclxuXHJcbiAgICAgICAgICAgIGJvZHkgPSB0YWJsZS5jcmVhdGVUQm9keSgpO1xyXG4gICAgICAgICAgICB0YWJsZS5hcHBlbmRDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLkhUTUxUYWJsZVNlY3Rpb25FbGVtZW50Pihib2R5KTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBEYXRhR3JpZFZpZXcgT3duZXIgeyBnZXQgeyByZXR1cm4gX293bmVyOyB9IH1cclxuXHJcbiAgICAgICAgcHJpdmF0ZSBMaXN0PERhdGFSb3c+IF9jb250cm9scztcclxuXHJcbiAgICAgICAgcHVibGljIERhdGFSb3cgdGhpc1tpbnQgaW5kZXhdIHsgZ2V0IHsgcmV0dXJuIF9jb250cm9sc1tpbmRleF07ICB9IHNldCB7XHJcbiAgICAgICAgICAgICAgICBfY29udHJvbHNbaW5kZXhdID0gdmFsdWU7XHJcbiAgICAgICAgICAgIH0gfVxyXG5cclxuICAgICAgICBwdWJsaWMgaW50IENvdW50IHsgZ2V0IHsgcmV0dXJuIF9jb250cm9scy5Db3VudDsgIH0gfVxyXG5cclxuICAgICAgICBwdWJsaWMgYm9vbCBJc1JlYWRPbmx5IHsgZ2V0IHsgcmV0dXJuIGZhbHNlOyB9IH1cclxuICAgICAgICBwdWJsaWMgYm9vbCBJc1N5bmNocm9uaXplZCB7IGdldCB7IHJldHVybiBmYWxzZTsgfSB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBvYmplY3QgU3luY1Jvb3RcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICB0aHJvdyBuZXcgTm90SW1wbGVtZW50ZWRFeGNlcHRpb24oKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuICAgICAgICBwdWJsaWMgdm9pZCBBZGQoRGF0YVJvdyBpdGVtKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgYm9keS5hcHBlbmRDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLkhUTUxUYWJsZVJvd0VsZW1lbnQ+KGl0ZW0uRWxlbWVudCk7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5BZGQoaXRlbSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBBZGRSYW5nZShEYXRhUm93W10gaXRlbSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGlmIChpdGVtID09IG51bGwgfHwgaXRlbS5MZW5ndGggPT0gMClcclxuICAgICAgICAgICAgICAgIHJldHVybjtcclxuICAgICAgICAgICAgdmFyIGZyYWcgPSBSZXR5cGVkLmRvbS5kb2N1bWVudC5jcmVhdGVEb2N1bWVudEZyYWdtZW50KCk7XHJcbiAgICAgICAgICAgIGZvciAoaW50IGkgPSAwOyBpIDwgaXRlbS5MZW5ndGg7IGkrKylcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgZnJhZy5hcHBlbmRDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLkhUTUxUYWJsZVJvd0VsZW1lbnQ+KGl0ZW1baV0uRWxlbWVudCk7XHJcbiAgICAgICAgICAgICAgICBfY29udHJvbHMuQWRkKGl0ZW1baV0pO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIGJvZHkuYXBwZW5kQ2hpbGQ8Z2xvYmFsOjpSZXR5cGVkLmRvbS5Eb2N1bWVudEZyYWdtZW50PihmcmFnKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyB2b2lkIENsZWFyKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIC8qQFxyXG5cdFx0XHR2YXIgbGVuID0gYm9keS5jaGlsZE5vZGVzLmxlbmd0aDtcclxuXHRcdFx0d2hpbGUobGVuLS0pXHJcblx0XHRcdHtcclxuXHRcdFx0XHRib2R5LnJlbW92ZUNoaWxkKGJvZHkubGFzdENoaWxkKTtcclxuXHRcdFx0fTtcclxuXHRcdFx0Ki9cclxuICAgICAgICAgICAgX2NvbnRyb2xzLkNsZWFyKCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgYm9vbCBDb250YWlucyhEYXRhUm93IGl0ZW0pXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICByZXR1cm4gX2NvbnRyb2xzLkNvbnRhaW5zKGl0ZW0pO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHZvaWQgQ29weVRvKERhdGFSb3dbXSBhcnJheSwgaW50IGFycmF5SW5kZXgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBfY29udHJvbHMuQ29weVRvKGFycmF5LCBhcnJheUluZGV4KTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyB2b2lkIENvcHlUbyhBcnJheSBhcnJheSwgaW50IGFycmF5SW5kZXgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBfY29udHJvbHMuQ29weVRvKChEYXRhUm93W10pYXJyYXksIGFycmF5SW5kZXgpO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIElFbnVtZXJhdG9yPERhdGFSb3c+IEdldEVudW1lcmF0b3IoKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgcmV0dXJuIF9jb250cm9scy5HZXRFbnVtZXJhdG9yKCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgaW50IEluZGV4T2YoRGF0YVJvdyBpdGVtKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgcmV0dXJuIF9jb250cm9scy5JbmRleE9mKGl0ZW0pO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIHZvaWQgSW5zZXJ0KGludCBpbmRleCwgRGF0YVJvdyBpdGVtKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgYm9keS5pbnNlcnRCZWZvcmU8Z2xvYmFsOjpSZXR5cGVkLmRvbS5IVE1MVGFibGVSb3dFbGVtZW50PihpdGVtLkVsZW1lbnQsIGJvZHkuY2hpbGROb2Rlc1tpbmRleF0pO1xyXG4gICAgICAgICAgICBfY29udHJvbHMuSW5zZXJ0KGluZGV4LCBpdGVtKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBib29sIFJlbW92ZShEYXRhUm93IGl0ZW0pXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBib2R5LnJlbW92ZUNoaWxkPGdsb2JhbDo6UmV0eXBlZC5kb20uSFRNTFRhYmxlUm93RWxlbWVudD4oaXRlbS5FbGVtZW50KTtcclxuICAgICAgICAgICAgcmV0dXJuIF9jb250cm9scy5SZW1vdmUoaXRlbSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgdm9pZCBSZW1vdmVBdChpbnQgaW5kZXgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBib2R5LnJlbW92ZUNoaWxkPGdsb2JhbDo6UmV0eXBlZC5kb20uTm9kZT4oYm9keS5jaGlsZE5vZGVzW2luZGV4XSk7XHJcbiAgICAgICAgICAgIF9jb250cm9scy5SZW1vdmVBdChpbmRleCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBJRW51bWVyYXRvciBJRW51bWVyYWJsZS5HZXRFbnVtZXJhdG9yKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIHJldHVybiBfY29udHJvbHMuR2V0RW51bWVyYXRvcigpO1xyXG4gICAgICAgIH1cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLldpbmRvd3MuRm9ybXNcclxue1xyXG4gICAgcHVibGljIGNsYXNzIEdyb3VwQm94IDogQ29udHJvbFxyXG4gICAge1xyXG4gICAgICAgIHByaXZhdGUgUmV0eXBlZC5kb20uSFRNTExlZ2VuZEVsZW1lbnQgbGVnZW5kO1xyXG4gICAgICAgIHByaXZhdGUgUGFuZWwgcGFuZWw7XHJcbiAgICAgICAgcHVibGljIEdyb3VwQm94KCkgOiBiYXNlKG5ldyBSZXR5cGVkLmRvbS5IVE1MRmllbGRTZXRFbGVtZW50KCkpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBwYW5lbCA9IG5ldyBQYW5lbCgpO1xyXG5cclxuICAgICAgICAgICAgRWxlbWVudC5zZXRBdHRyaWJ1dGUoXCJzY29wZVwiLCBcImdyb3VwYm94XCIpO1xyXG5cclxuICAgICAgICAgICAgRWxlbWVudC5hcHBlbmRDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLkhUTUxMZWdlbmRFbGVtZW50PihsZWdlbmQgPSBuZXcgUmV0eXBlZC5kb20uSFRNTExlZ2VuZEVsZW1lbnQoKSk7XHJcblxyXG4gICAgICAgICAgICBsZWdlbmQuc2V0QXR0cmlidXRlKFwic2NvcGVcIiwgXCJncm91cGJveGxlZ2VuZFwiKTtcclxuXHJcbiAgICAgICAgICAgIEVsZW1lbnQuYXBwZW5kQ2hpbGQ8Z2xvYmFsOjpSZXR5cGVkLmRvbS5IVE1MRWxlbWVudD4ocGFuZWwuRWxlbWVudCk7XHJcbiAgICAgICAgICAgIHBhbmVsLkVsZW1lbnQuc3R5bGUucG9zaXRpb24gPSBcInJlbGF0aXZlXCI7XHJcbiAgICAgICAgICAgIENvbnRyb2xzLl9vd25lciA9IHBhbmVsO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIG92ZXJyaWRlIHN0cmluZyBUZXh0XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXQgeyByZXR1cm4gbGVnZW5kLnRleHRDb250ZW50OyB9XHJcbiAgICAgICAgICAgIHNldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBiYXNlLlRleHQgPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgIGxlZ2VuZC50ZXh0Q29udGVudCA9IHZhbHVlO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgb3ZlcnJpZGUgb2JqZWN0IFRhZ1xyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0IHsgcmV0dXJuIF90YWc7IH1cclxuICAgICAgICAgICAgc2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIF90YWcgPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgIGlmIChfdGFnIGlzIHN0cmluZylcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICB2YXIgc3RyID0gKF90YWcgKyBcIlwiKTtcclxuICAgICAgICAgICAgICAgICAgICBpZiAoc3RyLkNvbnRhaW5zKFwiLFwiKSlcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHZhciBhcnJ5ID0gc3RyLlNwbGl0KCcsJyk7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIEVsZW1lbnQuY2xhc3NOYW1lID0gYXJyeVswXTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgaWYgKGFycnkuTGVuZ3RoID09IDMpXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxlZ2VuZC5jbGFzc05hbWUgPSBhcnJ5WzFdO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgcGFuZWwuRWxlbWVudC5jbGFzc05hbWUgPSBhcnJ5WzJdO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgbGVnZW5kLmNsYXNzTmFtZSA9IFwiXCI7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBwYW5lbC5FbGVtZW50LmNsYXNzTmFtZSA9IFwiXCI7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgRWxlbWVudC5jbGFzc05hbWUgPSBzdHI7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGxlZ2VuZC5jbGFzc05hbWUgPSBcIlwiO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBwYW5lbC5FbGVtZW50LmNsYXNzTmFtZSA9IFwiXCI7XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIEVsZW1lbnQuY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgICAgICBsZWdlbmQuY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgICAgICBwYW5lbC5FbGVtZW50LmNsYXNzTmFtZSA9IFwiXCI7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcbiAgICB9XHJcbn1cclxuIiwidXNpbmcgU3lzdGVtO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYztcclxudXNpbmcgU3lzdGVtLkxpbnE7XHJcbnVzaW5nIFN5c3RlbS5UZXh0O1xyXG51c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzO1xyXG5cclxubmFtZXNwYWNlIFN5c3RlbS5XaW5kb3dzLkZvcm1zXHJcbntcclxuICAgIHB1YmxpYyBjbGFzcyBMYWJlbCA6IENvbnRyb2xcclxuICAgIHtcclxuICAgICAgICBwdWJsaWMgTGFiZWwoKSA6IGJhc2UobmV3IFJldHlwZWQuZG9tLkhUTUxTcGFuRWxlbWVudCgpKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgVGFiU3RvcCA9IGZhbHNlO1xyXG4gICAgICAgICAgICBFbGVtZW50LnNldEF0dHJpYnV0ZShcInNjb3BlXCIsIFwibGFiZWxcIik7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgb3ZlcnJpZGUgc3RyaW5nIFRleHRcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldCB7IHJldHVybiBFbGVtZW50LnRleHRDb250ZW50OyB9XHJcbiAgICAgICAgICAgIHNldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBiYXNlLlRleHQgPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgIEVsZW1lbnQudGV4dENvbnRlbnQgPSB2YWx1ZTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLldpbmRvd3MuRm9ybXNcclxue1xyXG4gICAgcHVibGljIGNsYXNzIExpbmtMYWJlbCA6IENvbnRyb2xcclxuICAgIHtcclxuICAgICAgICBwdWJsaWMgTGlua0xhYmVsKCkgOiBiYXNlKG5ldyBSZXR5cGVkLmRvbS5IVE1MQW5jaG9yRWxlbWVudCgpKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgVGFiU3RvcCA9IGZhbHNlO1xyXG4gICAgICAgICAgICAvL0VsZW1lbnQuQXM8SFRNTEFuY2hvckVsZW1lbnQ+KCkuSHJlZiA9IFwiI1wiO1xyXG4gICAgICAgICAgICBFbGVtZW50LnN0eWxlLmN1cnNvciA9IFwicG9pbnRlclwiO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIG92ZXJyaWRlIHN0cmluZyBUZXh0XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXQgeyByZXR1cm4gRWxlbWVudC50ZXh0Q29udGVudDsgfVxyXG4gICAgICAgICAgICBzZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgYmFzZS5UZXh0ID0gdmFsdWU7XHJcbiAgICAgICAgICAgICAgICBFbGVtZW50LnRleHRDb250ZW50ID0gdmFsdWU7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByb3RlY3RlZCBvdmVycmlkZSB2b2lkIE9uQ2xpY2soRXZlbnRBcmdzIGUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBiYXNlLk9uQ2xpY2soZSk7XHJcblxyXG4gICAgICAgICAgICBpZiAoTGlua0NsaWNrZWQgIT0gbnVsbClcclxuICAgICAgICAgICAgICAgIExpbmtDbGlja2VkKHRoaXMsIG5ldyBMaW5rTGFiZWxMaW5rQ2xpY2tlZEV2ZW50QXJncyhudWxsKSk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgZXZlbnQgTGlua0xhYmVsTGlua0NsaWNrZWRFdmVudEhhbmRsZXIgTGlua0NsaWNrZWQ7XHJcblxyXG4gICAgICAgIHB1YmxpYyBjbGFzcyBMaW5rXHJcbiAgICAgICAge1xyXG5cclxuICAgICAgICB9XHJcbiAgICB9XHJcbn1cclxuIiwidXNpbmcgU3lzdGVtO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYztcclxudXNpbmcgU3lzdGVtLkRyYXdpbmc7XHJcbnVzaW5nIFN5c3RlbS5MaW5xO1xyXG51c2luZyBTeXN0ZW0uVGV4dDtcclxudXNpbmcgU3lzdGVtLlRocmVhZGluZy5UYXNrcztcclxuXHJcbm5hbWVzcGFjZSBTeXN0ZW0uV2luZG93cy5Gb3Jtc1xyXG57XHJcbiAgICBwdWJsaWMgY2xhc3MgUHJvZ3Jlc3NCYXIgOiBDb250cm9sXHJcbiAgICB7XHJcbiAgICAgICAgaW50ZXJuYWwgUmV0eXBlZC5kb20uSFRNTERpdkVsZW1lbnQgcHJvZ3Jlc3NCYXI7XHJcbiAgICAgICAgcHVibGljIFByb2dyZXNzQmFyKCkgOiBiYXNlKG5ldyBSZXR5cGVkLmRvbS5IVE1MRGl2RWxlbWVudCgpKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgRWxlbWVudC5hcHBlbmRDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLkhUTUxEaXZFbGVtZW50Pihwcm9ncmVzc0JhciA9IG5ldyBSZXR5cGVkLmRvbS5IVE1MRGl2RWxlbWVudCgpKTtcclxuICAgICAgICAgICAgVGFiU3RvcCA9IGZhbHNlO1xyXG4gICAgICAgICAgICBFbGVtZW50LnNldEF0dHJpYnV0ZShcInNjb3BlXCIsIFwicHJvZ3Jlc3NcIik7ICAgICAgICAgICAgXHJcbiAgICAgICAgfVxyXG4gICAgICAgIFxyXG4gICAgICAgIHB1YmxpYyBvdmVycmlkZSBDb2xvciBGb3JlQ29sb3IgeyBnZXQgeyByZXR1cm4gYmFzZS5Gb3JlQ29sb3I7IH0gc2V0IHtcclxuICAgICAgICAgICAgICAgIGJhc2UuRm9yZUNvbG9yID0gdmFsdWU7XHJcbiAgICAgICAgICAgICAgICBpZihfaW5pdClcclxuICAgICAgICAgICAgICAgICAgICBwcm9ncmVzc0Jhci5zdHlsZS5iYWNrZ3JvdW5kQ29sb3IgPSB2YWx1ZS5Ub0h0bWwoKTtcclxuICAgICAgICAgICAgfSB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgaW50IF92YWx1ZTtcclxuICAgICAgICBwdWJsaWMgaW50IFZhbHVlIHsgZ2V0IHsgcmV0dXJuIF92YWx1ZTsgfSAgc2V0IHtcclxuICAgICAgICAgICAgICAgIGlmICh2YWx1ZSA8IDApXHJcbiAgICAgICAgICAgICAgICAgICAgdmFsdWUgPSAwO1xyXG4gICAgICAgICAgICAgICAgaWYgKHZhbHVlID4gMTAwKVxyXG4gICAgICAgICAgICAgICAgICAgIHZhbHVlID0gMTAwO1xyXG4gICAgICAgICAgICAgICAgX3ZhbHVlID0gdmFsdWU7XHJcbiAgICAgICAgICAgICAgICBpZihfaW5pdClcclxuICAgICAgICAgICAgICAgICAgICBwcm9ncmVzc0Jhci5zdHlsZS53aWR0aCA9IF92YWx1ZSArIFwiJVwiO1xyXG4gICAgICAgICAgICB9IH1cclxuXHJcbiAgICAgICAgcHVibGljIG92ZXJyaWRlIG9iamVjdCBUYWdcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldCB7IHJldHVybiBfdGFnOyB9XHJcbiAgICAgICAgICAgIHNldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBfdGFnID0gdmFsdWU7XHJcbiAgICAgICAgICAgICAgICBpZiAoX3RhZyBpcyBzdHJpbmcpXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgdmFyIHN0ciA9IChfdGFnICsgXCJcIik7XHJcbiAgICAgICAgICAgICAgICAgICAgaWYgKHN0ci5Db250YWlucyhcIixcIikpXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICB2YXIgYXJyeSA9IHN0ci5TcGxpdCgnLCcpO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBFbGVtZW50LmNsYXNzTmFtZSA9IGFycnlbMF07XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGlmIChhcnJ5Lkxlbmd0aCA9PSAyKVxyXG4gICAgICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBwcm9ncmVzc0Jhci5jbGFzc05hbWUgPSBhcnJ5WzFdOyAgICAgICAgICAgICAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHByb2dyZXNzQmFyLmNsYXNzTmFtZSA9IFwiXCI7ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIEVsZW1lbnQuY2xhc3NOYW1lID0gc3RyO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBwcm9ncmVzc0Jhci5jbGFzc05hbWUgPSBcIlwiO1xyXG4gICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBFbGVtZW50LmNsYXNzTmFtZSA9IFwiXCI7XHJcbiAgICAgICAgICAgICAgICAgICAgcHJvZ3Jlc3NCYXIuY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLldpbmRvd3MuRm9ybXNcclxue1xyXG4gICAgcHVibGljIGNsYXNzIFRhYkNvbnRyb2wgOiBDb250cm9sXHJcbiAgICB7XHJcbiAgICAgICAgcHVibGljIFRhYkNvbnRyb2woKSA6IGJhc2UobmV3IFJldHlwZWQuZG9tLkhUTUxVTGlzdEVsZW1lbnQoKSlcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIEVsZW1lbnQuc2V0QXR0cmlidXRlKFwic2NvcGVcIiwgXCJ0YWJjb250cm9sXCIpO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgaW50ZXJuYWwgb3ZlcnJpZGUgdm9pZCBPbkNvbnRyb2xBZGRlZChDb250cm9sIGNvbnRyb2wpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBiYXNlLk9uQ29udHJvbEFkZGVkKGNvbnRyb2wpO1xyXG5cclxuICAgICAgICAgICAgaWYoY29udHJvbCBpcyBUYWJQYWdlKVxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBDb250cm9scy5BZGQoY29udHJvbC5BczxUYWJQYWdlPigpLkhlYWRlcik7XHJcblxyXG4gICAgICAgICAgICAgICAgUGVyZm9ybUxheW91dCgpO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBpbnRlcm5hbCBvdmVycmlkZSB2b2lkIE9uQ29udHJvbFJlbW92ZWQoQ29udHJvbCBjb250cm9sKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgYmFzZS5PbkNvbnRyb2xSZW1vdmVkKGNvbnRyb2wpO1xyXG5cclxuICAgICAgICAgICAgaWYgKGNvbnRyb2wgaXMgVGFiUGFnZSlcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgQ29udHJvbHMuUmVtb3ZlKGNvbnRyb2wuQXM8VGFiUGFnZT4oKS5IZWFkZXIpO1xyXG5cclxuICAgICAgICAgICAgICAgIFBlcmZvcm1MYXlvdXQoKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIFRhYlBhZ2VbXSBUYWJQYWdlcyB7IGdldCB7XHJcbiAgICAgICAgICAgICAgICBMaXN0PFRhYlBhZ2U+IHBhZ2VzID0gbmV3IExpc3Q8VGFiUGFnZT4oKTtcclxuICAgICAgICAgICAgICAgIGZvcmVhY2ggKHZhciBjb250cm9sIGluIENvbnRyb2xzKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIGlmIChjb250cm9sIGlzIFRhYlBhZ2UpXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBwYWdlcy5BZGQoY29udHJvbC5BczxUYWJQYWdlPigpKTtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gcGFnZXMuVG9BcnJheSgpOyAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgfSB9XHJcblxyXG4gICAgICAgIGludGVybmFsIHZvaWQgUmVzaXplVGFiSGVhZGVyU2l6ZSgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBpbnQgaSA9IDA7XHJcbiAgICAgICAgICAgIGRvdWJsZSB4ID0gMDtcclxuICAgICAgICAgICAgZm9yZWFjaCAodmFyIHBhZ2UgaW4gVGFiUGFnZXMpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHZhciBkaXYgPSBuZXcgVGFiUGFnZUhlYWRlcigpO1xyXG4gICAgICAgICAgICAgICAgZGl2LlRleHQgPSBwYWdlLlRleHQ7XHJcbiAgICAgICAgICAgICAgICBkaXYuRWxlbWVudC5jbGFzc05hbWUgPSBwYWdlLkhlYWRlci5FbGVtZW50LmNsYXNzTmFtZTtcclxuICAgICAgICAgICAgICAgIGRpdi5FbGVtZW50LnN0eWxlLnZpc2liaWxpdHkgPSBcImhpZGRlblwiO1xyXG4gICAgICAgICAgICAgICAgUmV0eXBlZC5kb20uZG9jdW1lbnQuYm9keS5hcHBlbmRDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLkhUTUxFbGVtZW50PihkaXYuRWxlbWVudCk7XHJcbiAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgIHZhciByZWMgPSBkaXYuRWxlbWVudC5nZXRCb3VuZGluZ0NsaWVudFJlY3QoKTtcclxuXHJcbiAgICAgICAgICAgICAgICAvL3BhZ2UuSGVhZGVyLkxvY2F0aW9uID0gbmV3IERyYXdpbmcuUG9pbnQoKGludCl4LCBpID09IF9zZWxlY3RlZEluZGV4ID8gMCA6IDQpO1xyXG4gICAgICAgICAgICAgICAgcGFnZS5IZWFkZXIuRWxlbWVudC5zdHlsZS5sZWZ0ID0geCArIFwicHhcIjtcclxuXHJcbiAgICAgICAgICAgICAgICBSZXR5cGVkLmRvbS5kb2N1bWVudC5ib2R5LnJlbW92ZUNoaWxkPGdsb2JhbDo6UmV0eXBlZC5kb20uSFRNTEVsZW1lbnQ+KGRpdi5FbGVtZW50KTtcclxuXHJcbiAgICAgICAgICAgICAgICB4ICs9IHJlYy53aWR0aDtcclxuXHJcbiAgICAgICAgICAgICAgICBwYWdlLkVsZW1lbnQuc3R5bGUuaGVpZ2h0ID0gXCJjYWxjKDEwMCUgLSBcIiArICgoaW50KXJlYy5oZWlnaHQgLSAxKSArIFwicHgpXCI7XHJcbiAgICAgICAgICAgICAgICBwYWdlLkVsZW1lbnQuc3R5bGUudG9wID0gKChpbnQpcmVjLmhlaWdodCAtIDEpICsgXCJweFwiO1xyXG4gICAgICAgICAgICAgICAgcGFnZS5FbGVtZW50LnN0eWxlLmxlZnQgPSBcIjBcIjtcclxuICAgICAgICAgICAgICAgIHBhZ2UuRWxlbWVudC5zdHlsZS53aWR0aCA9IFwiMTAwJVwiO1xyXG4gICAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgICBpKys7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9IFxyXG5cclxuICAgICAgICBwdWJsaWMgb3ZlcnJpZGUgdm9pZCBQZXJmb3JtTGF5b3V0KClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGlmKGxheW91dFN1c3BlbmRlZClcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIGJhc2UuUGVyZm9ybUxheW91dCgpO1xyXG5cclxuICAgICAgICAgICAgaW50IGkgPSAwO1xyXG4gICAgICAgICAgICBUYWJQYWdlIGFjdGl2ZVBhZ2UgPSBudWxsO1xyXG4gICAgICAgICAgICBcclxuICAgICAgICAgICAgZm9yZWFjaCAodmFyIHBhZ2UgaW4gVGFiUGFnZXMpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGlmKGkgPT0gMClcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBpZiAoIXBhZ2UuSGVhZGVyLkVsZW1lbnQuY2xhc3NMaXN0LmNvbnRhaW5zKFwiZmlyc3RcIikpXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHBhZ2UuSGVhZGVyLkVsZW1lbnQuY2xhc3NMaXN0LmFkZChcImZpcnN0XCIpO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIHBhZ2UuSGVhZGVyLkVsZW1lbnQuY2xhc3NMaXN0LnJlbW92ZShcImZpcnN0XCIpO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgICBpZighc3RyaW5nLklzTnVsbE9yV2hpdGVTcGFjZShMaW5rVGFnKSlcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBpZihMaW5rVGFnLkNvbnRhaW5zKFwiIFwiKSlcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHN0cmluZ1tdIHRhZ3MgPSBMaW5rVGFnLlNwbGl0KCcgJyk7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGZvcmVhY2ggKHZhciBpdGVtIGluIHRhZ3MpXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmKCFzdHJpbmcuSXNOdWxsT3JXaGl0ZVNwYWNlKGl0ZW0pKVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmICghcGFnZS5IZWFkZXIuRWxlbWVudC5jbGFzc0xpc3QuY29udGFpbnMoaXRlbSkpXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHBhZ2UuSGVhZGVyLkVsZW1lbnQuY2xhc3NMaXN0LmFkZChpdGVtKTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgICAgICAgICAgfVxyXG5cclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgaWYgKCFwYWdlLkhlYWRlci5FbGVtZW50LmNsYXNzTGlzdC5jb250YWlucyhMaW5rVGFnKSlcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHBhZ2UuSGVhZGVyLkVsZW1lbnQuY2xhc3NMaXN0LmFkZChMaW5rVGFnKTtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgICB9XHJcblxyXG4gICAgICAgICAgICAgICAgaWYgKF9zZWxlY3RlZEluZGV4ID09IGkpXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgYWN0aXZlUGFnZSA9IHBhZ2U7XHJcbiAgICAgICAgICAgICAgICAgICAgaWYoIXBhZ2UuSGVhZGVyLkVsZW1lbnQuY2xhc3NMaXN0LmNvbnRhaW5zKFwiYWN0aXZlXCIpKVxyXG4gICAgICAgICAgICAgICAgICAgICAgICBwYWdlLkhlYWRlci5FbGVtZW50LmNsYXNzTGlzdC5hZGQoXCJhY3RpdmVcIik7XHJcblxyXG4gICAgICAgICAgICAgICAgICAgIGlmICghcGFnZS5FbGVtZW50LmNsYXNzTGlzdC5jb250YWlucyhcImFjdGl2ZVwiKSlcclxuICAgICAgICAgICAgICAgICAgICAgICAgcGFnZS5FbGVtZW50LmNsYXNzTGlzdC5hZGQoXCJhY3RpdmVcIik7XHJcblxyXG4gICAgICAgICAgICAgICAgICAgIHBhZ2UuVmlzaWJsZSA9IHRydWU7XHJcbiAgICAgICAgICAgICAgICAgICAgcGFnZS5TaXplID0gbmV3IERyYXdpbmcuU2l6ZSh0aGlzLlNpemUuV2lkdGggLSA4LCB0aGlzLlNpemUuSGVpZ2h0IC0gKDIyICsgNCkpO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAge1xyXG5cclxuICAgICAgICAgICAgICAgICAgICBDb250cm9scy5SZW1vdmUocGFnZS5IZWFkZXIpO1xyXG4gICAgICAgICAgICAgICAgICAgIENvbnRyb2xzLkFkZChwYWdlLkhlYWRlcik7XHJcblxyXG4gICAgICAgICAgICAgICAgICAgIHBhZ2UuRWxlbWVudC5jbGFzc0xpc3QucmVtb3ZlKFwiYWN0aXZlXCIpO1xyXG5cclxuICAgICAgICAgICAgICAgICAgICBwYWdlLkhlYWRlci5FbGVtZW50LmNsYXNzTGlzdC5yZW1vdmUoXCJhY3RpdmVcIik7XHJcbiAgICAgICAgICAgICAgICAgICAgcGFnZS5WaXNpYmxlID0gZmFsc2U7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICBpKys7XHJcbiAgICAgICAgICAgIH1cclxuXHJcbiAgICAgICAgICAgIGlmIChhY3RpdmVQYWdlICE9IG51bGwpXHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIENvbnRyb2xzLlJlbW92ZShhY3RpdmVQYWdlLkhlYWRlcik7XHJcbiAgICAgICAgICAgICAgICBDb250cm9scy5BZGQoYWN0aXZlUGFnZS5IZWFkZXIpO1xyXG4gICAgICAgICAgICB9XHJcblxyXG4gICAgICAgICAgICBSZXNpemVUYWJIZWFkZXJTaXplKCk7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcml2YXRlIGludCBfc2VsZWN0ZWRJbmRleCA9IC0xO1xyXG5cclxuICAgICAgICBwdWJsaWMgaW50IFNlbGVjdGVkSW5kZXhcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldCB7IHJldHVybiBfc2VsZWN0ZWRJbmRleDsgfVxyXG4gICAgICAgICAgICBzZXQge1xyXG4gICAgICAgICAgICAgICAgaWYoX3NlbGVjdGVkSW5kZXggIT0gdmFsdWUpXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgX3NlbGVjdGVkSW5kZXggPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgICAgICBQZXJmb3JtTGF5b3V0KCk7XHJcbiAgICAgICAgICAgICAgICB9ICAgICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwcml2YXRlIHN0cmluZyBMaW5rVGFnO1xyXG5cclxuICAgICAgICBwdWJsaWMgb3ZlcnJpZGUgb2JqZWN0IFRhZ1xyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0IHsgcmV0dXJuIF90YWc7IH1cclxuICAgICAgICAgICAgc2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIF90YWcgPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgIGlmIChfdGFnIGlzIHN0cmluZylcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICB2YXIgc3RyID0gKF90YWcgKyBcIlwiKTtcclxuICAgICAgICAgICAgICAgICAgICBpZiAoc3RyLkNvbnRhaW5zKFwiLFwiKSlcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHZhciBhcnJ5ID0gc3RyLlNwbGl0KCcsJyk7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIEVsZW1lbnQuY2xhc3NOYW1lID0gYXJyeVswXTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgaWYgKGFycnkuTGVuZ3RoID09IDIpXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIExpbmtUYWcgPSBhcnJ5WzFdOyAgICAgICAgICAgICAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIExpbmtUYWcgPSBcIlwiO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIEVsZW1lbnQuY2xhc3NOYW1lID0gc3RyO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBMaW5rVGFnID0gXCJcIjtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgRWxlbWVudC5jbGFzc05hbWUgPSBcIlwiO1xyXG4gICAgICAgICAgICAgICAgICAgIExpbmtUYWcgPSBcIlwiO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLldpbmRvd3MuRm9ybXNcclxue1xyXG4gICAgcHVibGljIGNsYXNzIFRhYlBhZ2VIZWFkZXIgOiBDb250cm9sXHJcbiAgICB7XHJcbiAgICAgICAgLy9saVxyXG4gICAgICAgIHB1YmxpYyBUYWJQYWdlSGVhZGVyKCkgOiBiYXNlKG5ldyBSZXR5cGVkLmRvbS5IVE1MQW5jaG9yRWxlbWVudCgpKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgRWxlbWVudC5zZXRBdHRyaWJ1dGUoXCJzY29wZVwiLCBcInRhYnBhZ2VoZWFkZXJcIik7XHJcbiAgICAgICAgICAgIEVsZW1lbnQuc3R5bGUucGFkZGluZyA9IG51bGw7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgb3ZlcnJpZGUgc3RyaW5nIFRleHRcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICByZXR1cm4gRWxlbWVudC5pbm5lclRleHQ7XHJcbiAgICAgICAgICAgIH1cclxuXHJcbiAgICAgICAgICAgIHNldFxyXG4gICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICBpZihFbGVtZW50LmlubmVyVGV4dCAhPSB2YWx1ZSlcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBFbGVtZW50LmlubmVyVGV4dCA9IHZhbHVlO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWM7XHJcbnVzaW5nIFN5c3RlbS5MaW5xO1xyXG51c2luZyBTeXN0ZW0uVGV4dDtcclxudXNpbmcgU3lzdGVtLlRocmVhZGluZy5UYXNrcztcclxubmFtZXNwYWNlIFN5c3RlbS5XaW5kb3dzLkZvcm1zXHJcbntcclxuICAgIHB1YmxpYyBjbGFzcyBUZXh0Qm94IDogQ29udHJvbFxyXG4gICAgeyAgICAgICAgICAgICAgICBcclxuICAgICAgICBcclxuXHJcbiAgICAgICAgcHVibGljIFRleHRCb3goKSA6IGJhc2UobmV3IFJldHlwZWQuZG9tLkhUTUxJbnB1dEVsZW1lbnQoKSB7IHR5cGUgPSBcInRleHRcIiB9KVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgLy9UZXh0Q2hhbmdlZFxyXG4gICAgICAgICAgICBGdW5jPFJldHlwZWQuZG9tLkV2ZW50LCBvYmplY3Q+IHdvcmtPdXRFdmVudCA9IChldikgPT5cclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgaWYoVGV4dCAhPSBwcmV2U3RyaW5nKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIHByZXZTdHJpbmcgPSBUZXh0O1xyXG4gICAgICAgICAgICAgICAgICAgIE9uVGV4dENoYW5nZWQoRXZlbnRBcmdzLkVtcHR5KTtcclxuICAgICAgICAgICAgICAgIH0gICAgICAgICAgICAgICAgXHJcblxyXG4gICAgICAgICAgICAgICAgcmV0dXJuIG51bGw7XHJcbiAgICAgICAgICAgIH07XHJcblxyXG4gICAgICAgICAgICBFbGVtZW50Lm9uY2hhbmdlID0gbmV3IFJldHlwZWQuZG9tLkhUTUxFbGVtZW50Lm9uY2hhbmdlRm4od29ya091dEV2ZW50KTtcclxuICAgICAgICAgICAgRWxlbWVudC5vbnBhc3RlID0gbmV3IFJldHlwZWQuZG9tLkhUTUxFbGVtZW50Lm9ucGFzdGVGbih3b3JrT3V0RXZlbnQpO1xyXG4gICAgICAgICAgICBFbGVtZW50Lm9ua2V5ZG93biA9IG5ldyBSZXR5cGVkLmRvbS5IVE1MRWxlbWVudC5vbmtleWRvd25Gbih3b3JrT3V0RXZlbnQpO1xyXG4gICAgICAgICAgICBFbGVtZW50Lm9ua2V5dXAgPSBuZXcgUmV0eXBlZC5kb20uSFRNTEVsZW1lbnQub25rZXl1cEZuKHdvcmtPdXRFdmVudCk7XHJcbiAgICAgICAgICAgIEVsZW1lbnQub25ibHVyID0gbmV3IFJldHlwZWQuZG9tLkhUTUxFbGVtZW50Lm9uYmx1ckZuKHdvcmtPdXRFdmVudCk7XHJcbiAgICAgICAgfVxyXG4gICAgICAgIHByaXZhdGUgc3RyaW5nIHByZXZTdHJpbmc7XHJcbiAgICAgICAgcHVibGljIG92ZXJyaWRlIHN0cmluZyBUZXh0IHsgZ2V0IHsgcmV0dXJuIEVsZW1lbnQuQXM8UmV0eXBlZC5kb20uSFRNTElucHV0RWxlbWVudD4oKS52YWx1ZTsgfSBzZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgYmFzZS5UZXh0ID0gdmFsdWU7ICAgICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgICAgRWxlbWVudC5BczxSZXR5cGVkLmRvbS5IVE1MSW5wdXRFbGVtZW50PigpLnZhbHVlID0gdmFsdWU7XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHByaXZhdGUgYm9vbCBfdXNlU3lzdGVtUGFzc3dvcmRDaGFyO1xyXG5cclxuICAgICAgICBwdWJsaWMgYm9vbCBVc2VTeXN0ZW1QYXNzd29yZENoYXJcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldCB7IHJldHVybiBfdXNlU3lzdGVtUGFzc3dvcmRDaGFyOyB9XHJcbiAgICAgICAgICAgIHNldCB7XHJcbiAgICAgICAgICAgICAgICBfdXNlU3lzdGVtUGFzc3dvcmRDaGFyID0gdmFsdWU7XHJcbiAgICAgICAgICAgICAgICBpZihfdXNlU3lzdGVtUGFzc3dvcmRDaGFyKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIHRoaXMuRWxlbWVudC5BczxSZXR5cGVkLmRvbS5IVE1MSW5wdXRFbGVtZW50PigpLnR5cGUgPSBcInBhc3N3b3JkXCI7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICBlbHNlXHJcbiAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgdGhpcy5FbGVtZW50LkFzPFJldHlwZWQuZG9tLkhUTUxJbnB1dEVsZW1lbnQ+KCkudHlwZSA9IFwidGV4dFwiO1xyXG4gICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuXHJcbiAgICAgICAgcHJvdGVjdGVkIHZpcnR1YWwgdm9pZCBPblRleHRDaGFuZ2VkKEV2ZW50QXJncyBlKVxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgaWYgKFRleHRDaGFuZ2VkICE9IG51bGwpXHJcbiAgICAgICAgICAgICAgICBUZXh0Q2hhbmdlZCh0aGlzLCBlKTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBldmVudCBFdmVudEhhbmRsZXIgVGV4dENoYW5nZWQ7XHJcbiAgICB9XHJcbn1cclxuIiwidXNpbmcgU3lzdGVtO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYztcclxudXNpbmcgU3lzdGVtLkxpbnE7XHJcbnVzaW5nIFN5c3RlbS5UZXh0O1xyXG51c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzO1xyXG5cclxubmFtZXNwYWNlIFN5c3RlbS5XaW5kb3dzLkZvcm1zXHJcbntcclxuICAgIHB1YmxpYyBjbGFzcyBCdXR0b24gOiBCdXR0b25CYXNlXHJcbiAgICB7XHJcbiAgICAgICAgcHVibGljIEJ1dHRvbigpIDogYmFzZShuZXcgUmV0eXBlZC5kb20uSFRNTEJ1dHRvbkVsZW1lbnQoKSlcclxuICAgICAgICB7XHJcblxyXG4gICAgICAgIH0gICAgICAgIFxyXG4gICAgfVxyXG59XHJcbiIsInVzaW5nIFN5c3RlbTtcclxudXNpbmcgU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWM7XHJcbnVzaW5nIFN5c3RlbS5MaW5xO1xyXG51c2luZyBTeXN0ZW0uVGV4dDtcclxudXNpbmcgU3lzdGVtLlRocmVhZGluZy5UYXNrcztcclxuXHJcbm5hbWVzcGFjZSBTeXN0ZW0uV2luZG93cy5Gb3Jtc1xyXG57XHJcbiAgICBwdWJsaWMgY2xhc3MgQ2hlY2tCb3ggOiBCdXR0b25CYXNlXHJcbiAgICB7XHJcbiAgICAgICAgcHJpdmF0ZSBSZXR5cGVkLmRvbS5IVE1MSW5wdXRFbGVtZW50IGNoZWNrQm94O1xyXG4gICAgICAgIHByaXZhdGUgUmV0eXBlZC5kb20uSFRNTExhYmVsRWxlbWVudCB0ZXh0O1xyXG4gICAgICAgIHByaXZhdGUgc3RhdGljIGludCBjaGVja2JveFRvTGFiZWxJZDtcclxuICAgICAgICBwdWJsaWMgQ2hlY2tCb3goKSA6IGJhc2UobmV3IFJldHlwZWQuZG9tLkhUTUxEaXZFbGVtZW50KCkpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICB2YXIgaWQgPSBjaGVja2JveFRvTGFiZWxJZCsrO1xyXG4gICAgICAgICAgICB2YXIgaWRzID0gXCJfX2NoZWNrXCIgKyBpZC5Ub1N0cmluZygpO1xyXG5cclxuICAgICAgICAgICAgXHJcblxyXG4gICAgICAgICAgICBFbGVtZW50LmFwcGVuZENoaWxkPGdsb2JhbDo6UmV0eXBlZC5kb20uSFRNTElucHV0RWxlbWVudD4oKGNoZWNrQm94ID0gbmV3IFJldHlwZWQuZG9tLkhUTUxJbnB1dEVsZW1lbnQoKSB7IHR5cGUgPSBcImNoZWNrYm94XCIsIGlkID0gaWRzIH0pKTtcclxuICAgICAgICAgICAgRWxlbWVudC5hcHBlbmRDaGlsZDxnbG9iYWw6OlJldHlwZWQuZG9tLkhUTUxMYWJlbEVsZW1lbnQ+KHRleHQgPSBuZXcgUmV0eXBlZC5kb20uSFRNTExhYmVsRWxlbWVudCgpIHsgaHRtbEZvciA9IGlkcyB9KTtcclxuXHJcbiAgICAgICAgICAgIGNoZWNrQm94LnN0eWxlLmN1cnNvciA9IFwicG9pbnRlclwiO1xyXG4gICAgICAgICAgICB0ZXh0LnN0eWxlLmN1cnNvciA9IFwicG9pbnRlclwiO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgcHVibGljIGJvb2wgQ2hlY2tlZCB7IGdldCB7IHJldHVybiBjaGVja0JveC5AY2hlY2tlZDsgfSBzZXQgeyBjaGVja0JveC5AY2hlY2tlZCA9IHZhbHVlOyB9IH1cclxuXHJcbiAgICAgICAgcHVibGljIG92ZXJyaWRlIHN0cmluZyBUZXh0XHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBnZXQgeyByZXR1cm4gdGV4dC50ZXh0Q29udGVudDsgfVxyXG4gICAgICAgICAgICBzZXRcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgdGV4dC50ZXh0Q29udGVudCA9IHZhbHVlO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBwdWJsaWMgb3ZlcnJpZGUgb2JqZWN0IFRhZ1xyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0IHsgcmV0dXJuIF90YWc7IH1cclxuICAgICAgICAgICAgc2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIF90YWcgPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgIGlmIChfdGFnIGlzIHN0cmluZylcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICB2YXIgc3RyID0gKF90YWcgKyBcIlwiKTtcclxuICAgICAgICAgICAgICAgICAgICBpZihzdHIuQ29udGFpbnMoXCIsXCIpKVxyXG4gICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgdmFyIGFycnkgPSBzdHIuU3BsaXQoJywnKTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgRWxlbWVudC5jbGFzc05hbWUgPSBhcnJ5WzBdO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBpZihhcnJ5Lkxlbmd0aCA9PSAzKVxyXG4gICAgICAgICAgICAgICAgICAgICAgICB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBjaGVja0JveC5jbGFzc05hbWUgPSBhcnJ5WzFdO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgdGV4dC5jbGFzc05hbWUgPSBhcnJ5WzJdO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgY2hlY2tCb3guY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRleHQuY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgICAgICAgICAgfSAgICAgICAgICAgICAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgRWxlbWVudC5jbGFzc05hbWUgPSBzdHI7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGNoZWNrQm94LmNsYXNzTmFtZSA9IFwiXCI7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHRleHQuY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgICAgICB9ICAgICAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIGVsc2VcclxuICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICBFbGVtZW50LmNsYXNzTmFtZSA9IFwiXCI7XHJcbiAgICAgICAgICAgICAgICAgICAgY2hlY2tCb3guY2xhc3NOYW1lID0gXCJcIjtcclxuICAgICAgICAgICAgICAgICAgICB0ZXh0LmNsYXNzTmFtZSA9IFwiXCI7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIFxyXG4gICAgICAgIHB1YmxpYyBvdmVycmlkZSBpbnQgVGFiSW5kZXhcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIGdldCB7IHJldHVybiBfdGFiSW5kZXg7IH1cclxuICAgICAgICAgICAgc2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGlmKF9pbml0KVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIF90YWJJbmRleCA9IHZhbHVlO1xyXG4gICAgICAgICAgICAgICAgICAgIGlmIChUYWJTdG9wKVxyXG4gICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgY2hlY2tCb3gudGFiSW5kZXggPSB2YWx1ZTtcclxuICAgICAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAgICAgZWxzZVxyXG4gICAgICAgICAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgY2hlY2tCb3gucmVtb3ZlQXR0cmlidXRlKFwiVGFiSW5kZXhcIik7XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgfSAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuICAgIH1cclxufVxyXG4iLCJ1c2luZyBTeXN0ZW07XHJcbnVzaW5nIFN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljO1xyXG51c2luZyBTeXN0ZW0uTGlucTtcclxudXNpbmcgU3lzdGVtLlRleHQ7XHJcbnVzaW5nIFN5c3RlbS5UaHJlYWRpbmcuVGFza3M7XHJcblxyXG5uYW1lc3BhY2UgU3lzdGVtLldpbmRvd3MuRm9ybXNcclxue1xyXG4gICAgcHVibGljIGNsYXNzIFBhbmVsIDogQ29udGFpbmVyQ29udHJvbFxyXG4gICAge1xyXG4gICAgICAgIHB1YmxpYyBQYW5lbCgpIDogYmFzZSgpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBUYWJTdG9wID0gZmFsc2U7XHJcbiAgICAgICAgfSAgICAgICAgXHJcbiAgICB9XHJcbn1cclxuIiwidXNpbmcgU3lzdGVtO1xyXG51c2luZyBTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYztcclxudXNpbmcgU3lzdGVtLkxpbnE7XHJcbnVzaW5nIFN5c3RlbS5UZXh0O1xyXG51c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzO1xyXG5cclxubmFtZXNwYWNlIFN5c3RlbS5XaW5kb3dzLkZvcm1zXHJcbntcclxuICAgIHB1YmxpYyBjbGFzcyBUYWJQYWdlIDogUGFuZWxcclxuICAgIHtcclxuICAgICAgICBpbnRlcm5hbCBUYWJQYWdlSGVhZGVyIEhlYWRlcjtcclxuICAgICAgICBwdWJsaWMgYm9vbCBVc2VWaXN1YWxTdHlsZUJhY2tDb2xvciB7IGdldDsgc2V0OyB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBUYWJQYWdlKClcclxuICAgICAgICB7XHJcbiAgICAgICAgICAgIEhlYWRlciA9IG5ldyBUYWJQYWdlSGVhZGVyKCk7XHJcbiAgICAgICAgICAgIEhlYWRlci5DbGljayArPSBIZWFkZXJfQ2xpY2s7XHJcbiAgICAgICAgICAgIEVsZW1lbnQuc2V0QXR0cmlidXRlKFwic2NvcGVcIiwgXCJ0YWJwYWdlXCIpOyAgICAgICAgICAgXHJcbiAgICAgICAgfSAgICAgICAgXHJcblxyXG4gICAgICAgIHByaXZhdGUgdm9pZCBIZWFkZXJfQ2xpY2sob2JqZWN0IHNlbmRlciwgRXZlbnRBcmdzIGUpXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgICBpZihQYXJlbnQgaXMgVGFiQ29udHJvbClcclxuICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgdmFyIHBhZ2VzID0gUGFyZW50LkFzPFRhYkNvbnRyb2w+KCkuVGFiUGFnZXM7XHJcbiAgICAgICAgICAgICAgICBmb3IgKGludCBpID0gMDsgaSA8IHBhZ2VzLkxlbmd0aDsgaSsrKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIGlmKHBhZ2VzW2ldID09IHRoaXMpXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBQYXJlbnQuQXM8VGFiQ29udHJvbD4oKS5TZWxlY3RlZEluZGV4ID0gaTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJuO1xyXG4gICAgICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIFBhcmVudC5BczxUYWJDb250cm9sPigpLlNlbGVjdGVkSW5kZXggPSAtMTsgICAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHB1YmxpYyBvdmVycmlkZSBzdHJpbmcgVGV4dFxyXG4gICAgICAgIHtcclxuICAgICAgICAgICAgZ2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIHJldHVybiBIZWFkZXIuVGV4dDtcclxuICAgICAgICAgICAgfVxyXG5cclxuICAgICAgICAgICAgc2V0XHJcbiAgICAgICAgICAgIHtcclxuICAgICAgICAgICAgICAgIGlmKEhlYWRlci5UZXh0ICE9IHZhbHVlKVxyXG4gICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgIEhlYWRlci5UZXh0ID0gdmFsdWU7XHJcbiAgICAgICAgICAgICAgICAgICAgaWYoUGFyZW50IGlzIFRhYkNvbnRyb2wpXHJcbiAgICAgICAgICAgICAgICAgICAge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBQYXJlbnQuQXM8VGFiQ29udHJvbD4oKS5SZXNpemVUYWJIZWFkZXJTaXplKCk7XHJcbiAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgfSAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH1cclxuICAgIH1cclxufVxyXG4iXQp9Cg==
