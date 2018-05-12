@@ -28,12 +28,25 @@ I also support Mouse events close to how windows emulates them, etc if you click
 Create a **C# Class Library** (Bridge/ClassicForms) use nuget to add classicforms to that project, Bridge and Retyped.dom will be added also.
 
 Create a **C# Class Library** (.Net 4/Win) but this will be used to store your form's
-Create a **Form** add a button
+Create a **Form** name it frm1, add a button for the toolbar.
 double click on that button, Add ```Console.WriteLine("Hello World!");```    
 
 Now right click on Bridge/ClassicForms Project, Click Add -> Add Existing in the Popup Menu.
 Locate the Form you added with the botton, Before you add, make sure you click the arrow next to Add, You will see **Add as link** this allows for changes in the ui to link directly to both applications. This is a one time thing when you create a Form.
 I am researching on how to just use one project for now.
+
+Create a ```program.cs``` in your (Bridge/ClassicForms) project, Add the following code.
+
+```csharp
+public static void Main()
+{
+   // Create a new Instance of frm1.  
+   var x = new frm1();
+   
+   // Invoke the method Show, to bring the first window to the screen.
+   x.Show();
+}
+```
    
 **Build the Solutiuon**
 Locate the Index.html under (Bridge/ClassicForms) Project, make a copy. in the copied version, Add the link to the windows 10 css file, if you would like to use Bootstrap or any other css file, make sure the buttons and form's have had a ClassName Assigned to there Tag. (some controls have multiple ClassNames) - use a `,` to seperate these classnames.
