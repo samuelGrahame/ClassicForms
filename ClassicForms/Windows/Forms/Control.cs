@@ -494,6 +494,29 @@ namespace System.Windows.Forms
                 return null;
             };
 
+            Element.onmouseleave = (ev) =>
+            {
+                ev.stopPropagation();
+
+                if (ClickedOnControl == null)
+                {                    
+                    document.body.style.cursor = null;
+                }
+
+                OnMouseLeave(EventArgs.Empty);
+
+                return null;
+            };
+
+            Element.onmouseenter = (ev) =>
+            {
+                ev.stopPropagation();
+
+                OnMouseEnter(EventArgs.Empty);
+
+                return null;
+            };
+
             Element.onmousemove = (ev) =>
             {
                 if (ClickedOnControl == null)
@@ -540,7 +563,7 @@ namespace System.Windows.Forms
                 Load(this, e);
         }
 
-        public event EventHandler Load;
+        public event EventHandler Load;        
 
         protected virtual void OnMouseUp(MouseEventArgs e)
         {
@@ -577,6 +600,21 @@ namespace System.Windows.Forms
         public event MouseEventHandler MouseMove;
         public event MouseEventHandler MouseUp;
         public event EventHandler Disposed;
+        public event EventHandler MouseLeave;
+        public event EventHandler MouseEnter;
+
+        protected virtual void OnMouseLeave(EventArgs e)
+        {
+            if (MouseLeave != null)
+                MouseLeave(this, e);
+        }
+
+        protected virtual void OnMouseEnter(EventArgs e)
+        {
+            if (MouseEnter != null)
+                MouseEnter(this, e);
+        }
+
         protected byte layoutSuspendCount;
 
         public void SuspendLayout()

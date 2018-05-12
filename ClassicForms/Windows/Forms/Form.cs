@@ -602,40 +602,84 @@ namespace System.Windows.Forms
         {
             None,
             Move,
-            TopLeft
+            TopLeft,
+            Left,
+            BottomLeft,
+            Top,
+            TopRight,
+            Right,
+            BottomRight,
+            Bottom
+        }
+
+        private FormMovementModes GetMovementMode(MouseEventArgs e)
+        {
+            if (_allowMoveChange || _allowSizeChange)
+            {
+                if (_allowSizeChange)
+                {
+                    if (e.X >= 0 && e.X <= 3 && e.Y >= 0 && e.Y <= 3)
+                    {
+                        document.body.style.cursor = "nw-resize";
+                        return FormMovementModes.TopLeft;
+                    } else if (e.X >= 0 && e.X <= 2 && e.Y > 3 && e.Y < Size.Height - 3)
+                    {
+                        document.body.style.cursor = "w-resize";
+                        return FormMovementModes.Left;
+                    }
+                    else if (e.X >= 0 && e.X <= 3 && e.Y >= Size.Height - 3 && e.Y <= Size.Height)
+                    {
+                        document.body.style.cursor = "sw-resize";
+                        return FormMovementModes.BottomLeft;
+                    }
+                    else if (e.X > 3 && e.X < Size.Width - 3 && e.Y >= 0 && e.Y < 3)
+                    {
+                        document.body.style.cursor = "n-resize";
+                        return FormMovementModes.Top;
+                    }
+                    else if (e.X >= Size.Width - 3 && e.X <= Size.Width && e.Y >= 0 && e.Y < 3)
+                    {
+                        document.body.style.cursor = "ne-resize";
+                        return FormMovementModes.TopRight;
+                    }
+                    else if (e.X > Size.Width - 3 && e.X <= Size.Width && e.Y > 3 && e.Y < Size.Height - 3)
+                    {
+                        document.body.style.cursor = "e-resize";
+                        return FormMovementModes.Right;
+                    }
+                    else if (e.X >= Size.Width - 3 && e.X <= Size.Width && e.Y >= Size.Height - 3 && e.Y <= Size.Height)
+                    {
+                        document.body.style.cursor = "se-resize";
+                        return FormMovementModes.BottomRight;
+                    }
+                    else if (e.X > 3 && e.X < Size.Width - 3 && e.Y > Size.Height - 3 && e.Y <= Size.Height)
+                    {
+                        document.body.style.cursor = "s-resize";
+                        return FormMovementModes.Bottom;
+                    }
+                }
+
+                if (!_mouseDownOnBorder && _allowMoveChange && e.X > 1 && e.X <= Size.Width - _formRightBorder && e.Y > 1 && e.Y <= _formTopBorder)
+                {
+                    document.body.style.cursor = "move";
+                    return FormMovementModes.Move;                    
+                }
+            }
+
+            document.body.style.cursor = null;
+
+            return FormMovementModes.None;
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
             ActiveForm = this;
             // work out area... of click.
-            var size = Size;
-            _formMovementModes = FormMovementModes.None;
             document.body.style.userSelect = null;
-            _mouseDownOnBorder = false;
 
-            //if(e.X > 1 && e.X < )
-            if (_allowMoveChange || _allowSizeChange)
-            {
-                
+            _formMovementModes = GetMovementMode(e);
 
-                if (_allowSizeChange)
-                {
-                    if (e.X >= 0 && e.X <= 3 && e.Y >= 0 && e.Y <= 3)
-                    {
-                        _mouseDownOnBorder = true;
-                        _formMovementModes = FormMovementModes.TopLeft;
-                    }
-                }
-
-                if (!_mouseDownOnBorder && _allowMoveChange && e.X > 1 && e.X <= size.Width - _formRightBorder && e.Y > 1 && e.Y <= _formTopBorder)
-                {
-                    _formMovementModes = FormMovementModes.Move;
-                    _mouseDownOnBorder = true;
-                }
-            }
-
-            if(_mouseDownOnBorder)
+            if ((_mouseDownOnBorder = (_formMovementModes != FormMovementModes.None)))
             {
                 document.body.style.userSelect = "none";
                 _prevX = Location.X - (e.X + Location.X);
@@ -645,7 +689,6 @@ namespace System.Windows.Forms
                 _prevFormY = Location.Y;
             }
             
-
             base.OnMouseDown(e);
         }
 
@@ -654,6 +697,9 @@ namespace System.Windows.Forms
         {
             document.body.style.userSelect = null;
             _mouseDownOnBorder = false;
+
+            document.body.style.cursor = null;
+
             base.OnMouseUp(e);
         }
 
@@ -662,22 +708,58 @@ namespace System.Windows.Forms
             // is mouse down???
             if(_mouseDownOnBorder)
             {
-                if(_formMovementModes == FormMovementModes.Move)
+                var prev = Location;
+                var newY = (Location.Y + e.Y) + _prevY;
+                var newX = (Location.X + e.X) + _prevX;
+
+                if (_formMovementModes == FormMovementModes.Move)
                 {                    
-                    Location = new Point((Location.X + e.X) + _prevX, (Location.Y + e.Y) + _prevY);
-                    //var newX = ((mX = mousePos.Xf) + MovingForm.prev_px);
-                    //var newY = ((mY = mousePos.Yf) + MovingForm.prev_py);
+                    Location = new Point(newX, newY);
                 }else if(_formMovementModes == FormMovementModes.TopLeft)
-                {
-                    var prev = Location;
+                {                    
                     SuspendLayout();
-                    Location = new Point((Location.X + e.X) + _prevX, (Location.Y + e.Y) + _prevY);
+                    Location = new Point(newX, newY);
                     Size = new Size(Size.Width + (prev.X - Location.X), Size.Height + (prev.Y - Location.Y));
-
                     ResumeLayout(true);
+                }else if(_formMovementModes == FormMovementModes.Top)
+                {
+                    SuspendLayout();
+                    Location = new Point(Location.X, newY);
+                    Size = new Size(Size.Width, Size.Height - (newY - prev.Y));
+                    ResumeLayout(true);                    
+                }else if(_formMovementModes == FormMovementModes.TopRight)
+                {
+                    SuspendLayout();
+                    Location = new Point(Location.X, newY);
+                    Size = new Size(e.X, Size.Height - (newY - prev.Y));
+                    ResumeLayout(true);
+                }else if(_formMovementModes == FormMovementModes.Left)
+                {
+                    SuspendLayout();
+                    Location = new Point(newX, Location.Y);
+                    Size = new Size(Size.Width - (newX - prev.X), Size.Height);
+                    ResumeLayout(true);
+                }else if(_formMovementModes == FormMovementModes.BottomLeft)
+                {
+                    SuspendLayout();
+                    Location = new Point(newX, Location.Y);
+                    Size = new Size(Size.Width - (newX - prev.X), e.Y);
+                    ResumeLayout(true);
+                }else if(_formMovementModes == FormMovementModes.Bottom)
+                {                    
+                    Size = new Size(Size.Width, e.Y);                    
+                }else if(_formMovementModes == FormMovementModes.Right)
+                {
+                    Size = new Size(e.X, Size.Height);                    
+                }else if(_formMovementModes== FormMovementModes.BottomRight)
+                {
+                    Size = new Size(e.X, e.Y);                    
                 }
-                // we should do some action regarding this... etc move form, resize in direction.
 
+            }
+            else
+            {
+                GetMovementMode(e);
             }
             base.OnMouseMove(e);
         }

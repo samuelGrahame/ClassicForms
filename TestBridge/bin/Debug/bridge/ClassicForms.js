@@ -4849,7 +4849,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             fields: {
                 None: 0,
                 Move: 1,
-                TopLeft: 2
+                TopLeft: 2,
+                Left: 3,
+                BottomLeft: 4,
+                Top: 5,
+                TopRight: 6,
+                Right: 7,
+                BottomRight: 8,
+                Bottom: 9
             }
         }
     });
@@ -10419,7 +10426,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             MouseDown: null,
             MouseMove: null,
             MouseUp: null,
-            Disposed: null
+            Disposed: null,
+            MouseLeave: null,
+            MouseEnter: null
         },
         props: {
             Name: {
@@ -10782,6 +10791,26 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return null;
                 });
 
+                this.Element.onmouseleave = Bridge.fn.bind(this, function (ev) {
+                    ev.stopPropagation();
+
+                    if (System.Windows.Forms.Control.ClickedOnControl == null) {
+                        document.body.style.cursor = null;
+                    }
+
+                    this.OnMouseLeave({ });
+
+                    return null;
+                });
+
+                this.Element.onmouseenter = Bridge.fn.bind(this, function (ev) {
+                    ev.stopPropagation();
+
+                    this.OnMouseEnter({ });
+
+                    return null;
+                });
+
                 this.Element.onmousemove = Bridge.fn.bind(this, function (ev) {
                     if (System.Windows.Forms.Control.ClickedOnControl == null) {
                         ev.stopPropagation();
@@ -10914,6 +10943,16 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             OnMouseUp: function (e) {
                 if (!Bridge.staticEquals(this.MouseUp, null)) {
                     this.MouseUp(this, e);
+                }
+            },
+            OnMouseLeave: function (e) {
+                if (!Bridge.staticEquals(this.MouseLeave, null)) {
+                    this.MouseLeave(this, e);
+                }
+            },
+            OnMouseEnter: function (e) {
+                if (!Bridge.staticEquals(this.MouseEnter, null)) {
+                    this.MouseEnter(this, e);
                 }
             },
             SuspendLayout: function () {
@@ -12724,32 +12763,54 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             Resizing: function () {
 
             },
-            OnMouseDown: function (e) {
-                System.Windows.Forms.Form.ActiveForm = this;
-                // work out area... of click.
-                var size = this.Size.$clone();
-                this._formMovementModes = System.Windows.Forms.Form.FormMovementModes.None;
-                document.body.style.userSelect = null;
-                this._mouseDownOnBorder = false;
-
-                //if(e.X > 1 && e.X < )
+            GetMovementMode: function (e) {
                 if (this._allowMoveChange || this._allowSizeChange) {
-
-
                     if (this._allowSizeChange) {
                         if (e.X >= 0 && e.X <= 3 && e.Y >= 0 && e.Y <= 3) {
-                            this._mouseDownOnBorder = true;
-                            this._formMovementModes = System.Windows.Forms.Form.FormMovementModes.TopLeft;
+                            document.body.style.cursor = "nw-resize";
+                            return System.Windows.Forms.Form.FormMovementModes.TopLeft;
+                        } else if (e.X >= 0 && e.X <= 2 && e.Y > 3 && e.Y < ((this.Size.Height - 3) | 0)) {
+                            document.body.style.cursor = "w-resize";
+                            return System.Windows.Forms.Form.FormMovementModes.Left;
+                        } else if (e.X >= 0 && e.X <= 3 && e.Y >= ((this.Size.Height - 3) | 0) && e.Y <= this.Size.Height) {
+                            document.body.style.cursor = "sw-resize";
+                            return System.Windows.Forms.Form.FormMovementModes.BottomLeft;
+                        } else if (e.X > 3 && e.X < ((this.Size.Width - 3) | 0) && e.Y >= 0 && e.Y < 3) {
+                            document.body.style.cursor = "n-resize";
+                            return System.Windows.Forms.Form.FormMovementModes.Top;
+                        } else if (e.X >= ((this.Size.Width - 3) | 0) && e.X <= this.Size.Width && e.Y >= 0 && e.Y < 3) {
+                            document.body.style.cursor = "ne-resize";
+                            return System.Windows.Forms.Form.FormMovementModes.TopRight;
+                        } else if (e.X > ((this.Size.Width - 3) | 0) && e.X <= this.Size.Width && e.Y > 3 && e.Y < ((this.Size.Height - 3) | 0)) {
+                            document.body.style.cursor = "e-resize";
+                            return System.Windows.Forms.Form.FormMovementModes.Right;
+                        } else if (e.X >= ((this.Size.Width - 3) | 0) && e.X <= this.Size.Width && e.Y >= ((this.Size.Height - 3) | 0) && e.Y <= this.Size.Height) {
+                            document.body.style.cursor = "se-resize";
+                            return System.Windows.Forms.Form.FormMovementModes.BottomRight;
+                        } else if (e.X > 3 && e.X < ((this.Size.Width - 3) | 0) && e.Y > ((this.Size.Height - 3) | 0) && e.Y <= this.Size.Height) {
+                            document.body.style.cursor = "s-resize";
+                            return System.Windows.Forms.Form.FormMovementModes.Bottom;
                         }
                     }
 
-                    if (!this._mouseDownOnBorder && this._allowMoveChange && e.X > 1 && e.X <= ((size.Width - this._formRightBorder) | 0) && e.Y > 1 && e.Y <= this._formTopBorder) {
-                        this._formMovementModes = System.Windows.Forms.Form.FormMovementModes.Move;
-                        this._mouseDownOnBorder = true;
+                    if (!this._mouseDownOnBorder && this._allowMoveChange && e.X > 1 && e.X <= ((this.Size.Width - this._formRightBorder) | 0) && e.Y > 1 && e.Y <= this._formTopBorder) {
+                        document.body.style.cursor = "move";
+                        return System.Windows.Forms.Form.FormMovementModes.Move;
                     }
                 }
 
-                if (this._mouseDownOnBorder) {
+                document.body.style.cursor = null;
+
+                return System.Windows.Forms.Form.FormMovementModes.None;
+            },
+            OnMouseDown: function (e) {
+                System.Windows.Forms.Form.ActiveForm = this;
+                // work out area... of click.
+                document.body.style.userSelect = null;
+
+                this._formMovementModes = this.GetMovementMode(e);
+
+                if (((this._mouseDownOnBorder = (this._formMovementModes !== System.Windows.Forms.Form.FormMovementModes.None)))) {
                     document.body.style.userSelect = "none";
                     this._prevX = (this.Location.X - (((e.X + this.Location.X) | 0))) | 0;
                     this._prevY = (this.Location.Y - (((e.Y + this.Location.Y) | 0))) | 0;
@@ -12758,31 +12819,60 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this._prevFormY = this.Location.Y;
                 }
 
-
                 System.Windows.Forms.ContainerControl.prototype.OnMouseDown.call(this, e);
             },
             OnMouseUp: function (e) {
                 document.body.style.userSelect = null;
                 this._mouseDownOnBorder = false;
+
+                document.body.style.cursor = null;
+
                 System.Windows.Forms.ContainerControl.prototype.OnMouseUp.call(this, e);
             },
             OnMouseMove: function (e) {
                 // is mouse down???
                 if (this._mouseDownOnBorder) {
+                    var prev = this.Location.$clone();
+                    var newY = ((((this.Location.Y + e.Y) | 0)) + this._prevY) | 0;
+                    var newX = ((((this.Location.X + e.X) | 0)) + this._prevX) | 0;
+
                     if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.Move) {
-                        this.Location = new System.Drawing.Point.$ctor1((((((this.Location.X + e.X) | 0)) + this._prevX) | 0), (((((this.Location.Y + e.Y) | 0)) + this._prevY) | 0));
-                        //var newX = ((mX = mousePos.Xf) + MovingForm.prev_px);
-                        //var newY = ((mY = mousePos.Yf) + MovingForm.prev_py);
+                        this.Location = new System.Drawing.Point.$ctor1(newX, newY);
                     } else if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.TopLeft) {
-                        var prev = this.Location.$clone();
                         this.SuspendLayout();
-                        this.Location = new System.Drawing.Point.$ctor1((((((this.Location.X + e.X) | 0)) + this._prevX) | 0), (((((this.Location.Y + e.Y) | 0)) + this._prevY) | 0));
+                        this.Location = new System.Drawing.Point.$ctor1(newX, newY);
                         this.Size = new System.Drawing.Size.$ctor2(((this.Size.Width + (((prev.X - this.Location.X) | 0))) | 0), ((this.Size.Height + (((prev.Y - this.Location.Y) | 0))) | 0));
-
                         this.ResumeLayout$1(true);
+                    } else if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.Top) {
+                        this.SuspendLayout();
+                        this.Location = new System.Drawing.Point.$ctor1(this.Location.X, newY);
+                        this.Size = new System.Drawing.Size.$ctor2(this.Size.Width, ((this.Size.Height - (((newY - prev.Y) | 0))) | 0));
+                        this.ResumeLayout$1(true);
+                    } else if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.TopRight) {
+                        this.SuspendLayout();
+                        this.Location = new System.Drawing.Point.$ctor1(this.Location.X, newY);
+                        this.Size = new System.Drawing.Size.$ctor2(e.X, ((this.Size.Height - (((newY - prev.Y) | 0))) | 0));
+                        this.ResumeLayout$1(true);
+                    } else if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.Left) {
+                        this.SuspendLayout();
+                        this.Location = new System.Drawing.Point.$ctor1(newX, this.Location.Y);
+                        this.Size = new System.Drawing.Size.$ctor2(((this.Size.Width - (((newX - prev.X) | 0))) | 0), this.Size.Height);
+                        this.ResumeLayout$1(true);
+                    } else if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.BottomLeft) {
+                        this.SuspendLayout();
+                        this.Location = new System.Drawing.Point.$ctor1(newX, this.Location.Y);
+                        this.Size = new System.Drawing.Size.$ctor2(((this.Size.Width - (((newX - prev.X) | 0))) | 0), e.Y);
+                        this.ResumeLayout$1(true);
+                    } else if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.Bottom) {
+                        this.Size = new System.Drawing.Size.$ctor2(this.Size.Width, e.Y);
+                    } else if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.Right) {
+                        this.Size = new System.Drawing.Size.$ctor2(e.X, this.Size.Height);
+                    } else if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.BottomRight) {
+                        this.Size = new System.Drawing.Size.$ctor2(e.X, e.Y);
                     }
-                    // we should do some action regarding this... etc move form, resize in direction.
 
+                } else {
+                    this.GetMovementMode(e);
                 }
                 System.Windows.Forms.ContainerControl.prototype.OnMouseMove.call(this, e);
             },
