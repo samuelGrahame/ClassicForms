@@ -4,6 +4,8 @@ ClassicForms is a library that allows you to use winforms designer.
 
 [![NuGet](https://img.shields.io/nuget/v/classicforms.svg)](https://www.nuget.org/packages/classicforms) [![Built with Bridge.NET](https://img.shields.io/badge/built%20with-Bridge.NET-blue.svg)](http://bridge.net/)
 
+https://www.nuget.org/packages/ClassicForms
+
 using the same designer:
   one is using the windows10.css
   the other is using bootstrap v4 css
