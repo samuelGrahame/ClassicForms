@@ -4876,6 +4876,19 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.Windows.Forms.FormStartPosition", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                Manual: 0,
+                CenterScreen: 1,
+                WindowsDefaultLocation: 2,
+                WindowsDefaultBounds: 3,
+                CenterParent: 4
+            }
+        }
+    });
+
     Bridge.define("System.Windows.Forms.Layout.ArrangedElementCollection", {
         inherits: [System.Collections.IList,System.Collections.ICollection,System.Collections.IEnumerable],
         statics: {
@@ -11020,10 +11033,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this.SetState2(64, true);
                 }
                 if (!performLayout) {
+                    this.OnInitLayout();
                     System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(this);
                     var controls = this.Controls;
                     if (controls != null) {
                         for (var i = 0; i < controls.Count; i = (i + 1) | 0) {
+                            controls.getItem(i).OnInitLayout();
                             this.LayoutEngine.InitLayout(controls.getItem(i), System.Windows.Forms.BoundsSpecified.All);
                             System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(controls.getItem(i));
                         }
@@ -11108,6 +11123,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             PerformLayout: function (affectedElement, propertyName) {
                 this.PerformLayout$2(new System.Windows.Forms.LayoutEventArgs.ctor(affectedElement, propertyName));
+            },
+            OnInitLayout: function () {
+
             },
             GetState: function (flag) {
                 return ((this.state & flag) > 0);
@@ -11837,7 +11855,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         inherits: [System.Windows.Forms.Control],
         fields: {
             _selectedIndex: 0,
-            LinkTag: null
+            _linkTag: null
         },
         props: {
             TabPages: {
@@ -11870,6 +11888,17 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                 }
             },
+            LinkTag: {
+                get: function () {
+                    return this._linkTag;
+                },
+                set: function (value) {
+                    if (!Bridge.referenceEquals(this._linkTag, value)) {
+                        this._linkTag = value;
+                        this.PerformLayout$1();
+                    }
+                }
+            },
             Tag: {
                 get: function () {
                     return this._tag;
@@ -11895,6 +11924,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         this.LinkTag = "";
                     }
                 }
+            },
+            LinkTag1: {
+                get: function () {
+                    return this._linkTag;
+                },
+                set: function (value) {
+                    this._linkTag = value;
+                }
             }
         },
         ctors: {
@@ -11905,6 +11942,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.$initialize();
                 System.Windows.Forms.Control.ctor.call(this, document.createElement("ul"));
                 this.Element.setAttribute("scope", "tabcontrol");
+                this.Element.style.outline = "0";
             }
         },
         methods: {
@@ -11938,6 +11976,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         div.Text = page.Text;
                         div.Element.className = page.Header.Element.className;
                         div.Element.style.visibility = "hidden";
+                        div.Element.style.outline = "none";
+                        div.Element.style.margin = "none";
+
                         document.body.appendChild(div.Element);
 
                         var rec = div.Element.getBoundingClientRect();
@@ -11961,13 +12002,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         $t.System$IDisposable$Dispose();
                     }
                 }},
-            PerformLayout$1: function () {
+            RenderTabContent: function () {
                 var $t, $t1;
-                if (this.layoutSuspendCount > 0) {
-                    return;
-                }
-                System.Windows.Forms.Control.prototype.PerformLayout$1.call(this);
-
                 var i = 0;
                 var activePage = null;
 
@@ -12006,7 +12042,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                                     page.Header.Element.classList.add(this.LinkTag);
                                 }
                             }
-
                         }
 
                         if (this._selectedIndex === i) {
@@ -12021,6 +12056,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                             page.Visible = true;
                             page.Size = new System.Drawing.Size.$ctor2(((this.Size.Width - 8) | 0), ((this.Size.Height - (26)) | 0));
+                            page.Header.Element.style.borderBottom = null;
+                            page.Header.Element.style.cursor = null;
                         } else {
 
                             this.Controls.remove(page.Header);
@@ -12028,7 +12065,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                             page.Element.classList.remove("active");
 
+                            page.Header.Element.style.cursor = "pointer";
                             page.Header.Element.classList.remove("active");
+                            page.Header.Element.style.outline = "0";
+                            page.Header.Element.style.margin = "0";
+                            page.Header.Element.style.borderBottom = "none";
+
                             page.Visible = false;
                         }
                         i = (i + 1) | 0;
@@ -12044,6 +12086,16 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 }
 
                 this.ResizeTabHeaderSize();
+            },
+            OnLayout: function (levent) {
+                System.Windows.Forms.Control.prototype.OnLayout.call(this, levent);
+
+                this.RenderTabContent();
+            },
+            PerformLayout$1: function () {
+                System.Windows.Forms.Control.prototype.PerformLayout$1.call(this);
+
+                this.RenderTabContent();
             }
         }
     });
@@ -12138,11 +12190,26 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
     Bridge.define("System.Windows.Forms.Button", {
         inherits: [System.Windows.Forms.ButtonBase],
+        fields: {
+            DialogResult: 0
+        },
         ctors: {
             ctor: function () {
                 this.$initialize();
                 System.Windows.Forms.ButtonBase.ctor.call(this, document.createElement("button"));
 
+            }
+        },
+        methods: {
+            OnClick: function (e) {
+                if (this.DialogResult !== System.Windows.Forms.DialogResult.None) {
+                    var frm = this.GetForm();
+                    if (frm != null) {
+                        frm.DialogResult = this.DialogResult;
+                        frm.Close();
+                    }
+                }
+                System.Windows.Forms.ButtonBase.prototype.OnClick.call(this, e);
             }
         }
     });
@@ -12294,6 +12361,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this._minimizedForms = new (System.Collections.Generic.List$1(System.Windows.Forms.Form)).ctor();
                 },
                 ctor: function () {
+                    document.body.style.userSelect = "none";
+
                     System.Windows.Forms.Form._formOverLay = document.createElement("div");
 
                     System.Windows.Forms.Form._formOverLay.style.height = "100%";
@@ -12518,6 +12587,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _mouseDownOnBorder: false,
             _formMovementModes: 0,
             btnClose: null,
+            StartPosition: 0,
             DialogResults: null,
             _isDialog: false,
             _inClose: false,
@@ -12632,7 +12702,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 return null;
             },
             Close: function () {
-                if (this._isDialog && this._inDialogResult) {
+                if ((this._isDialog && this._inDialogResult) || this._inClose) {
                     return;
                 }
 
@@ -12700,6 +12770,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     System.Windows.Forms.Form._minimizedForms.remove(this);
                     System.Windows.Forms.Form.CalculateMinmizedFormsLocation();
                 }
+
+                this.Dispose();
 
                 this._inClose = false;
             },
@@ -12769,6 +12841,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             _showForm: function () {
                 document.body.appendChild(this.Element);
+                if (this.StartPosition === System.Windows.Forms.FormStartPosition.CenterScreen) {
+                    var rec = document.body.getBoundingClientRect();
+
+                    this.Location = new System.Drawing.Point.$ctor1(Bridge.Int.clip32((rec.width * 0.5) - (this.Size.Width * 0.5)), Bridge.Int.clip32((rec.height * 0.5) + (this.Size.Height * 0.5)));
+                }
             },
             _showStartNewLevel: function () {
                 System.Windows.Forms.Form._formCollections.add(new System.Windows.Forms.Form.FormCollection(this));
@@ -12839,12 +12916,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             OnMouseDown: function (e) {
                 System.Windows.Forms.Form.ActiveForm = this;
                 // work out area... of click.
-                document.body.style.userSelect = null;
+                //document.body.style.userSelect = null;
 
                 this._formMovementModes = this.GetMovementMode(e);
 
                 if (((this._mouseDownOnBorder = (this._formMovementModes !== System.Windows.Forms.Form.FormMovementModes.None)))) {
-                    document.body.style.userSelect = "none";
+                    //document.body.style.userSelect = "none";
                     this._prevX = (this.Location.X - (((e.X + this.Location.X) | 0))) | 0;
                     this._prevY = (this.Location.Y - (((e.Y + this.Location.Y) | 0))) | 0;
 
@@ -12855,7 +12932,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 System.Windows.Forms.ContainerControl.prototype.OnMouseDown.call(this, e);
             },
             OnMouseUp: function (e) {
-                document.body.style.userSelect = null;
+                //document.body.style.userSelect = null;
                 this._mouseDownOnBorder = false;
 
                 document.body.style.cursor = null;
@@ -13059,6 +13136,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 System.Windows.Forms.Panel.ctor.call(this);
                 this.Header = new System.Windows.Forms.TabPageHeader();
                 this.Header.addClick(Bridge.fn.cacheBind(this, this.Header_Click));
+
                 this.Element.setAttribute("scope", "tabpage");
             }
         },

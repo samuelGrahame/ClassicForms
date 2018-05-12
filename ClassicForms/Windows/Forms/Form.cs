@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,14 @@ namespace System.Windows.Forms
         private FormMovementModes _formMovementModes = FormMovementModes.None;
         public static HTMLDivElement _formOverLay = null;
         private Button btnClose;
-        
+
+        [DefaultValue(1)]
+        public FormStartPosition StartPosition { get; set; }
+
         static Form()
         {
+            document.body.style.userSelect = "none";
+
             _formOverLay = new HTMLDivElement();
 
             _formOverLay.style.height = "100%";
@@ -279,8 +285,8 @@ namespace System.Windows.Forms
         }
         public DialogResult DialogResult = DialogResult.None;
         public void Close()
-        {
-            if (_isDialog && _inDialogResult)
+        {            
+            if ((_isDialog && _inDialogResult) || _inClose)
                 return;
 
             _inClose = true;
@@ -358,6 +364,8 @@ namespace System.Windows.Forms
                 _minimizedForms.Remove(this);
                 CalculateMinmizedFormsLocation();
             }
+
+            this.Dispose();
 
             _inClose = false;
         }
@@ -509,7 +517,13 @@ namespace System.Windows.Forms
 
         private void _showForm()
         {
-            document.body.appendChild(this.Element);            
+            document.body.appendChild(this.Element);   
+            if(StartPosition == FormStartPosition.CenterScreen)
+            {
+                var rec = document.body.getBoundingClientRect().As<ClientRect>();
+
+                this.Location = new Point((int)((rec.width * 0.5d) - (this.Size.Width * 0.5d)), (int)((rec.height * 0.5d) + (this.Size.Height * 0.5d)));
+            }
         }
 
         private void _showStartNewLevel()
@@ -675,13 +689,13 @@ namespace System.Windows.Forms
         {
             ActiveForm = this;
             // work out area... of click.
-            document.body.style.userSelect = null;
+            //document.body.style.userSelect = null;
 
             _formMovementModes = GetMovementMode(e);
 
             if ((_mouseDownOnBorder = (_formMovementModes != FormMovementModes.None)))
             {
-                document.body.style.userSelect = "none";
+                //document.body.style.userSelect = "none";
                 _prevX = Location.X - (e.X + Location.X);
                 _prevY = Location.Y - (e.Y + Location.Y);
 
@@ -695,7 +709,7 @@ namespace System.Windows.Forms
 
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            document.body.style.userSelect = null;
+            //document.body.style.userSelect = null;
             _mouseDownOnBorder = false;
 
             document.body.style.cursor = null;

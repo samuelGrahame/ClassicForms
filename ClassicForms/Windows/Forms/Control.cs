@@ -682,12 +682,14 @@ namespace System.Windows.Forms
             }
             if (!performLayout)
             {
+                this.OnInitLayout();
                 CommonProperties.xClearPreferredSizeCache(this);
                 ControlCollection controls = Controls;
                 if (controls != null)
                 {
                     for (int i = 0; i < controls.Count; i++)
                     {
+                        controls[i].OnInitLayout();
                         this.LayoutEngine.InitLayout(controls[i], BoundsSpecified.All);
                         CommonProperties.xClearPreferredSizeCache(controls[i]);
                     }
@@ -783,6 +785,11 @@ namespace System.Windows.Forms
         }
 
         internal LayoutEventArgs cachedLayoutEventArgs;
+
+        public virtual void OnInitLayout()
+        {
+
+        }
 
         public virtual void PerformLayout()
         {

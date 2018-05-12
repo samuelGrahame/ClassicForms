@@ -83,6 +83,7 @@
     <Compile Include="Windows\Forms\ButtonBase.cs" />
     <Compile Include="Windows\Forms\CheckBox.cs" />
     <Compile Include="Windows\Forms\ClientUtils.cs" />
+    <Compile Include="Windows\Forms\FormStartPosition.cs" />
     <Compile Include="Windows\Forms\Layout\LayoutTransaction.cs" />
     <Compile Include="Windows\Forms\Layout\PropertyNames.cs" />
     <Compile Include="Windows\Forms\TextFormatFlags.cs" />
