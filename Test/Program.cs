@@ -13,7 +13,7 @@ namespace Test
         {
             Application.EnableVisualStyles();
 
-            var x = new frmCustomer();
+            var x = new frmAnchorTest();
             
             Application.Run(x);
         }

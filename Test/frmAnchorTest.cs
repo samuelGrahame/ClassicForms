@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Test
 {
-    public class frmCustomer : Form
+    public class frmAnchorTest : Form
     {
         private Button button2;
         private Button button3;
@@ -15,9 +15,10 @@ namespace Test
         private Button button5;
         private Button button6;
         private Button button7;
+        private Button button8;
         private Button button1;
 
-        public frmCustomer() : base()
+        public frmAnchorTest() : base()
         {            
             InitializeComponent();
         }
@@ -31,6 +32,7 @@ namespace Test
             this.button5 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
+            this.button8 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -117,9 +119,21 @@ namespace Test
             this.button7.Text = "Anchor Top, Left, Right";
             this.button7.UseVisualStyleBackColor = true;
             // 
-            // frmCustomer
+            // button8
+            // 
+            this.button8.Location = new System.Drawing.Point(102, 83);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(75, 44);
+            this.button8.TabIndex = 7;
+            this.button8.Tag = "btn btn-warning";
+            this.button8.Text = "Close";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
+            // 
+            // frmAnchorTest
             // 
             this.ClientSize = new System.Drawing.Size(697, 413);
+            this.Controls.Add(this.button8);
             this.Controls.Add(this.button7);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
@@ -128,8 +142,9 @@ namespace Test
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Location = new System.Drawing.Point(50, 50);
-            this.Name = "frmCustomer";
+            this.Name = "frmAnchorTest";
             this.Tag = "modal-content";
+            this.Load += new System.EventHandler(this.frmAnchorTest_Load);
             this.Resize += new System.EventHandler(this.frmCustomer_Resize);
             this.ResumeLayout(false);
 
@@ -152,13 +167,13 @@ namespace Test
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var x = new frmCustomer();
+            var x = new frmAnchorTest();
             x.Show();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            var x = new frmCustomer();
+            var x = new frmAnchorTest();
             x.ShowDialog();
         }
 
@@ -170,6 +185,16 @@ namespace Test
         private void button4_Click(object sender, EventArgs e)
         {
             this.Width += 1;
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void frmAnchorTest_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

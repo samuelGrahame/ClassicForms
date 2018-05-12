@@ -34,10 +34,10 @@
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Test\frmCustomer.cs">
-      <Link>UI\frmCustomer.cs</Link>
+    <Compile Include="..\Test\frmAnchorTest.cs">
+      <Link>UI\frmAnchorTest.cs</Link>
     </Compile>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Target Name="CopyLinkedFiles" BeforeTargets="Build" Inputs="@(LinkedItem)" Outputs="@(LinkedItem->'%(Filename)%(Extension)')">
@@ -101,9 +101,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Test\frmCustomer.resx">
-      <Link>UI\frmCustomer.resx</Link>
-      <DependentUpon>frmCustomer.cs</DependentUpon>
+    <EmbeddedResource Include="..\Test\frmAnchorTest.resx">
+      <Link>UI\frmAnchorTest.resx</Link>
+      <DependentUpon>frmAnchorTest.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

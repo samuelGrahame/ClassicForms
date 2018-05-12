@@ -7,11 +7,11 @@ using Test;
 
 namespace TestBridge
 {
-    public class Class1
+    public class Program
     {
         public static void Main()
         {
-            var x = new frmCustomer();
+            var x = new frmAnchorTest();
             x.Show();
         }
     }

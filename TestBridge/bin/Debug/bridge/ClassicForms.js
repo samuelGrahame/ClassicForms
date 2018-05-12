@@ -10904,6 +10904,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.OnLoad({ });
             },
             OnLoad: function (e) {
+                var $t;
+                ($t = document.activeElement) != null ? $t.blur() : null;
+
                 if (!Bridge.staticEquals(this.Load, null)) {
                     this.Load(this, e);
                 }

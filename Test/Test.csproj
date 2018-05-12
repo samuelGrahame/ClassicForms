@@ -46,15 +46,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="frmCustomer.cs">
+    <Compile Include="frmAnchorTest.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmCustomer.resx">
-      <DependentUpon>frmCustomer.cs</DependentUpon>
+    <EmbeddedResource Include="frmAnchorTest.resx">
+      <DependentUpon>frmAnchorTest.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

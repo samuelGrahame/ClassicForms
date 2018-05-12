@@ -527,24 +527,6 @@ namespace System.Windows.Forms
                 MouseMove(this, e);
         }
 
-
-
-        //protected virtual void OnResize(EventArgs e)
-        //{
-        //    if (Resize != null)
-        //        Resize(this, e);
-
-        //    if (layoutSuspended)
-        //    {
-        //        return;
-        //    }
-
-        //    foreach (var control in Controls)
-        //    {
-        //        control.PerformLayout();
-        //    }
-        //}
-
         internal void InvokeLoad()
         {
             OnLoad(EventArgs.Empty);
@@ -552,6 +534,8 @@ namespace System.Windows.Forms
 
         protected virtual void OnLoad(EventArgs e)
         {
+            document.activeElement?.As<HTMLElement>().blur();
+
             if (Load != null)
                 Load(this, e);
         }
