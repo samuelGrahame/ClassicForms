@@ -6198,46 +6198,87 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
     Bridge.define("System.Windows.Forms.MouseEventArgs", {
         statics: {
             fields: {
-                IsEdge: false
+                IsEdge: false,
+                IsFF: false
             },
             ctors: {
                 ctor: function () {
-                    System.Windows.Forms.MouseEventArgs.IsEdge = System.String.indexOf(window.navigator.userAgent, "Edge") > -1;
+                    var userAgent = window.navigator.userAgent.toLowerCase();
+                    System.Windows.Forms.MouseEventArgs.IsEdge = System.String.indexOf(userAgent, "edge") > -1;
+                    System.Windows.Forms.MouseEventArgs.IsFF = System.String.indexOf(userAgent, "firefox") > -1;
                 }
             },
             methods: {
                 GetOffsetPoint: function (element) {
                     var top = 0;
                     var left = 0;
+
                     do {
                         var dym = element;
-                        top += dym.offsetTop;
-                        left += dym.offsetLeft;
-                        element = dym.offsetParent;
+                        if (System.Windows.Forms.MouseEventArgs.IsFF) {
+                            var rec = element.getBoundingClientRect();
+                            top += rec.top;
+                            left += rec.left;
+                            //element = dym.offsetParent;
+                            element = element.parentElement;
+                        } else {
+                            top += dym.offsetTop;
+                            left += dym.offsetLeft;
+                            element = dym.offsetParent;
+                        }
+
+
                     } while (element != null);
 
                     return new System.Drawing.Point.$ctor1(Bridge.Int.clip32(left), Bridge.Int.clip32(top));
                 },
+                GetClientMouseLocation: function (e) {
+                    var x = 0;
+                    var y = 0;
+                    			  if (!e) var e = window.event;
+
+                    			  if (e.pageX || e.pageY) {
+                    				x = e.pageX;
+                    				y = e.pageY;
+                    			  } else if (e.clientX || e.clientY) {
+                    				x = e.clientX + document.body.scrollLeft +
+                    								   document.documentElement.scrollLeft;
+                    				y = e.clientY + document.body.scrollTop +
+                    								   document.documentElement.scrollTop;
+                    			  }
+                    			
+                    return new System.Drawing.PointF.$ctor1(x, y);
+                },
                 CreateFromMouseEvent: function (original, target) {
                     var $t;
-                    // what we need to do is get the local x, y off from the target.
-
+                    // what we need to do is get the local x, y off from the target.            
                     var mousePoint = new System.Drawing.Point();
 
                     if (Bridge.referenceEquals(original.currentTarget, target.Element)) {
                         if (Bridge.Browser.isIE || System.Windows.Forms.MouseEventArgs.IsEdge) {
                             var offset = System.Windows.Forms.MouseEventArgs.GetOffsetPoint(target.Element);
                             mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(original.clientX - offset.X), Bridge.Int.clip32(original.clientY - offset.Y));
+                        }
+                        if (System.Windows.Forms.MouseEventArgs.IsFF) {
+                            var vect = System.Windows.Forms.MouseEventArgs.GetClientMouseLocation(original);
+                            //var offset = GetOffsetPoint(target.Element);
+                            var rec = target.Element.getBoundingClientRect();
+                            mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(vect.X - rec.left), Bridge.Int.clip32(vect.Y - rec.top));
                         } else {
+
                             mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(original.layerX), Bridge.Int.clip32(original.layerY));
                         }
                     } else {
-                        var offset1 = System.Windows.Forms.MouseEventArgs.GetOffsetPoint(target.Element);
-                        mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(original.x - offset1.X), Bridge.Int.clip32(original.y - offset1.Y));
+                        if (System.Windows.Forms.MouseEventArgs.IsFF) {
+                            var vect1 = System.Windows.Forms.MouseEventArgs.GetClientMouseLocation(original);
+                            //var offset = GetOffsetPoint(target.Element);
+                            var rec1 = target.Element.getBoundingClientRect();
+                            mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(vect1.X - rec1.left), Bridge.Int.clip32(vect1.Y - rec1.top));
+                        } else {
+                            var offset1 = System.Windows.Forms.MouseEventArgs.GetOffsetPoint(target.Element);
+                            mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(original.x - offset1.X), Bridge.Int.clip32(original.y - offset1.Y));
+                        }
                     }
-
-                    //Console.Clear();
-                    //Console.WriteLine(mousePoint.ToString());
 
                     var button = Bridge.Int.clip32(original.button);
                     return ($t = new System.Windows.Forms.MouseEventArgs(button === 1 ? System.Windows.Forms.MouseButtons.Left : button === 2 ? System.Windows.Forms.MouseButtons.Right : button === 4 ? System.Windows.Forms.MouseButtons.Middle : button === 8 ? System.Windows.Forms.MouseButtons.XButton2 : System.Windows.Forms.MouseButtons.XButton2, 1, mousePoint.X, mousePoint.Y, 0), $t.Original = original, $t);

@@ -20,50 +20,102 @@ namespace System.Windows.Forms
         private static Point GetOffsetPoint(Element element)
         {
             double top = 0;
-            double left = 0;            
+            double left = 0;
+
             do
             {
                 dynamic dym = element;
-                top += dym.offsetTop;
-                left += dym.offsetLeft;
-                element = dym.offsetParent;
+                if(IsFF)
+                {
+                    var rec = element.getBoundingClientRect().As<ClientRect>();
+                    top += rec.top;
+                    left += rec.left;
+                    //element = dym.offsetParent;
+                    element = element.parentElement;
+                }
+                else
+                {
+                    top += dym.offsetTop;
+                    left += dym.offsetLeft;
+                    element = dym.offsetParent;
+                }
+                
+
             } while (element != null);
 
             return new Point((int)left, (int)top);
         }
         static bool IsEdge;
+        static bool IsFF;
+
         static MouseEventArgs()
         {
-            IsEdge = window.navigator.userAgent.IndexOf("Edge") > -1;
+            var userAgent = window.navigator.userAgent.ToLower();
+            IsEdge = userAgent.IndexOf("edge") > -1;
+            IsFF = userAgent.IndexOf("firefox") > -1;
+        }
+
+        public static PointF GetClientMouseLocation(object e)
+        {
+            var x = 0;
+            var y = 0;
+            /*@
+			  if (!e) var e = window.event;
+
+			  if (e.pageX || e.pageY) {
+				x = e.pageX;
+				y = e.pageY;
+			  } else if (e.clientX || e.clientY) {
+				x = e.clientX + document.body.scrollLeft +
+								   document.documentElement.scrollLeft;
+				y = e.clientY + document.body.scrollTop +
+								   document.documentElement.scrollTop;
+			  }
+			*/
+            return new PointF(x, y);
         }
 
         public static MouseEventArgs CreateFromMouseEvent(MouseEvent original, Control target)
         {
-            // what we need to do is get the local x, y off from the target.
-
+            // what we need to do is get the local x, y off from the target.            
             Point mousePoint;
 
             if(original.currentTarget == target.Element)
             {
-                if(Browser.IsIE || IsEdge)
+                if(Browser.IsIE || IsEdge)                    
                 {
                     var offset = GetOffsetPoint(target.Element);
                     mousePoint = new Point((int)(original.clientX - offset.X), (int)(original.clientY - offset.Y));
                 }
+                if (IsFF)
+                {
+                    var vect = GetClientMouseLocation(original);
+                    //var offset = GetOffsetPoint(target.Element);
+                    var rec = target.Element.getBoundingClientRect().As<ClientRect>();
+                    mousePoint = new Point((int)(vect.X - rec.left), (int)(vect.Y - rec.top));
+                }
                 else
                 {
+
                     mousePoint = new Point((int)original.layerX, (int)original.layerY);
                 }                
             }
             else
             {
-                var offset = GetOffsetPoint(target.Element);
-                mousePoint = new Point((int)(original.x - offset.X), (int)(original.y - offset.Y));
+                if(IsFF)
+                {
+                    var vect = GetClientMouseLocation(original);
+                    //var offset = GetOffsetPoint(target.Element);
+                    var rec = target.Element.getBoundingClientRect().As<ClientRect>();
+                    mousePoint = new Point((int)(vect.X - rec.left), (int)(vect.Y - rec.top));
+                }
+                else
+                {
+                    var offset = GetOffsetPoint(target.Element);
+                    mousePoint = new Point((int)(original.x - offset.X), (int)(original.y - offset.Y));
+                }                
             }
 
-            //Console.Clear();
-            //Console.WriteLine(mousePoint.ToString());
-            
             var button = (int)original.button;
             return new MouseEventArgs(
                 button == 1 ? MouseButtons.Left :
