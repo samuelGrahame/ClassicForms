@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Retyped.dom;
-using static Retyped.jquery;
 namespace System.Windows.Forms
 {
     public class TextBox : Control
@@ -20,8 +19,8 @@ namespace System.Windows.Forms
                 {
                     prevString = Text;
                     OnTextChanged(EventArgs.Empty);
-                }                
-
+                }
+                
                 return null;
             };
 
