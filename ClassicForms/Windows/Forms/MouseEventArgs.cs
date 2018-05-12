@@ -80,23 +80,15 @@ namespace System.Windows.Forms
             // what we need to do is get the local x, y off from the target.            
             Point mousePoint;
 
-            if(original.currentTarget == target.Element)
+            if(!IsFF && original.currentTarget == target.Element)
             {
                 if(Browser.IsIE || IsEdge)                    
                 {
                     var offset = GetOffsetPoint(target.Element);
                     mousePoint = new Point((int)(original.clientX - offset.X), (int)(original.clientY - offset.Y));
-                }
-                if (IsFF)
-                {
-                    var vect = GetClientMouseLocation(original);
-                    //var offset = GetOffsetPoint(target.Element);
-                    var rec = target.Element.getBoundingClientRect().As<ClientRect>();
-                    mousePoint = new Point((int)(vect.X - rec.left), (int)(vect.Y - rec.top));
-                }
+                }                
                 else
                 {
-
                     mousePoint = new Point((int)original.layerX, (int)original.layerY);
                 }                
             }
@@ -105,7 +97,6 @@ namespace System.Windows.Forms
                 if(IsFF)
                 {
                     var vect = GetClientMouseLocation(original);
-                    //var offset = GetOffsetPoint(target.Element);
                     var rec = target.Element.getBoundingClientRect().As<ClientRect>();
                     mousePoint = new Point((int)(vect.X - rec.left), (int)(vect.Y - rec.top));
                 }

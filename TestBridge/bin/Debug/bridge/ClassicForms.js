@@ -6254,26 +6254,18 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     // what we need to do is get the local x, y off from the target.            
                     var mousePoint = new System.Drawing.Point();
 
-                    if (Bridge.referenceEquals(original.currentTarget, target.Element)) {
+                    if (!System.Windows.Forms.MouseEventArgs.IsFF && Bridge.referenceEquals(original.currentTarget, target.Element)) {
                         if (Bridge.Browser.isIE || System.Windows.Forms.MouseEventArgs.IsEdge) {
                             var offset = System.Windows.Forms.MouseEventArgs.GetOffsetPoint(target.Element);
                             mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(original.clientX - offset.X), Bridge.Int.clip32(original.clientY - offset.Y));
-                        }
-                        if (System.Windows.Forms.MouseEventArgs.IsFF) {
-                            var vect = System.Windows.Forms.MouseEventArgs.GetClientMouseLocation(original);
-                            //var offset = GetOffsetPoint(target.Element);
-                            var rec = target.Element.getBoundingClientRect();
-                            mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(vect.X - rec.left), Bridge.Int.clip32(vect.Y - rec.top));
                         } else {
-
                             mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(original.layerX), Bridge.Int.clip32(original.layerY));
                         }
                     } else {
                         if (System.Windows.Forms.MouseEventArgs.IsFF) {
-                            var vect1 = System.Windows.Forms.MouseEventArgs.GetClientMouseLocation(original);
-                            //var offset = GetOffsetPoint(target.Element);
-                            var rec1 = target.Element.getBoundingClientRect();
-                            mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(vect1.X - rec1.left), Bridge.Int.clip32(vect1.Y - rec1.top));
+                            var vect = System.Windows.Forms.MouseEventArgs.GetClientMouseLocation(original);
+                            var rec = target.Element.getBoundingClientRect();
+                            mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(vect.X - rec.left), Bridge.Int.clip32(vect.Y - rec.top));
                         } else {
                             var offset1 = System.Windows.Forms.MouseEventArgs.GetOffsetPoint(target.Element);
                             mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(original.x - offset1.X), Bridge.Int.clip32(original.y - offset1.Y));
