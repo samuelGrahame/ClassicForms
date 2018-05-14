@@ -49,12 +49,12 @@ namespace System.Windows.Forms
 
         public Point Location
         {
-            get { return _location; }
+            get { return new Point(_location.X - Margin.Left, _location.Y - Margin.Top); }
             set
             {
                 var prev = _location;
-                _location = value;
-
+                _location = new Point(value.X + Margin.Left, value.Y + Margin.Top);
+                
                 Element.style.left = _location.X + "px";
                 Element.style.top = _location.Y + "px";
 
@@ -250,9 +250,10 @@ namespace System.Windows.Forms
         }
 
         private Size _size;
-        public Size Size { get { return _size; } set {
-                var prev = _size;
-                _size = value;
+        public Size Size { get { return new Size(_size.Width + Margin.Right, _size.Height + Margin.Bottom); } set {
+                var prev = _size;                
+                _size = new Size(value.Width - Margin.Right, value.Height - Margin.Bottom);
+
                 if (_autoSize)
                 {
                     Element.style.width = "auto";
@@ -469,8 +470,7 @@ namespace System.Windows.Forms
             Element.style.boxSizing = "borderbox";
 
             Element.style.padding = "0";
-
-
+            
             Element.style.fontSize = "inherit";
             Element.style.fontFamily = "inherit";
 
@@ -528,8 +528,29 @@ namespace System.Windows.Forms
 
                 return null;
             };
+            SetMargins(new Padding(3));
             AutoSizeMode = AutoSizeMode.GrowOnly;
             _init = true;
+        }
+
+        internal void SetMargins(Padding margin)
+        {
+            margin = LayoutUtils.ClampNegativePaddingToZero(margin);
+            if(margin == Padding.Empty)
+            {
+                Element.style.marginLeft = null;
+                Element.style.marginTop = null;
+                Element.style.marginRight = null;
+                Element.style.marginBottom = null;
+            }
+            else
+            {
+                Element.style.marginLeft = margin.Left + "px";
+                Element.style.marginTop = margin.Top + "px";
+                Element.style.marginRight = margin.Right + "px";
+                Element.style.marginBottom = margin.Bottom + "px";
+            }
+            CommonProperties.SetMargin(this, margin);
         }
 
         protected virtual void OnClick(EventArgs e)
@@ -570,8 +591,35 @@ namespace System.Windows.Forms
             if (MouseUp != null)
                 MouseUp(this, e);
         }
+        
+        public Padding Margin
+        {
+            get =>
+                CommonProperties.GetMargin(this);
+            set
+            {                
+                var prevlocation = Location;
+                var prevSize = Size;
 
-        public Padding Margin { get; set; }
+                SetMargins(value);
+
+                this.OnMarginChanged(EventArgs.Empty);
+
+                Location = prevlocation;
+                Size = prevSize;
+            }
+        }
+
+        protected virtual void OnMarginChanged(EventArgs e)
+        {
+            if (MarginChanged != null)
+            {
+                MarginChanged(this, e);
+            }
+        }
+
+        public event EventHandler MarginChanged;
+
         public Padding Padding { get; set; }
 
         public Rectangle Bounds => new Rectangle(Location, Size);

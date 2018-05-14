@@ -1532,7 +1532,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
     Bridge.define("System.Data.DataColumn", {
         fields: {
             Name: null,
-            Table: null
+            Table: null,
+            DataType: null
         },
         ctors: {
             ctor: function (table, name) {
@@ -1572,6 +1573,13 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 }
 
                 return -1;
+            },
+            Add$1: function (columnName, type) {
+                var data = new System.Data.DataColumn(this.Table, columnName);
+
+                this.Columns.add(data);
+
+                return data;
             },
             Add: function (columnName) {
                 var data = new System.Data.DataColumn(this.Table, columnName);
@@ -4680,6 +4688,17 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             fields: {
                 GrowAndShrink: 0,
                 GrowOnly: 1
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.BorderStyle", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                None: 0,
+                FixedSingle: 1,
+                Fixed3D: 2
             }
         }
     });
@@ -10449,7 +10468,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _autoSize: false,
             _init: false,
             Element: null,
-            Margin: null,
             Padding: null,
             _participatesInLayout: false,
             _properties: null,
@@ -10464,6 +10482,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         },
         events: {
             Load: null,
+            MarginChanged: null,
             Click: null,
             Resize: null,
             LocationChanged: null,
@@ -10506,11 +10525,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             Location: {
                 get: function () {
-                    return this._location.$clone();
+                    return new System.Drawing.Point.$ctor1(((this._location.X - this.Margin.Left) | 0), ((this._location.Y - this.Margin.Top) | 0));
                 },
                 set: function (value) {
                     var prev = this._location.$clone();
-                    this._location = value.$clone();
+                    this._location = new System.Drawing.Point.$ctor1(((value.X + this.Margin.Left) | 0), ((value.Y + this.Margin.Top) | 0));
 
                     this.Element.style.left = this._location.X + "px";
                     this.Element.style.top = this._location.Y + "px";
@@ -10597,11 +10616,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             Size: {
                 get: function () {
-                    return this._size.$clone();
+                    return new System.Drawing.Size.$ctor2(((this._size.Width + this.Margin.Right) | 0), ((this._size.Height + this.Margin.Bottom) | 0));
                 },
                 set: function (value) {
                     var prev = this._size.$clone();
-                    this._size = value.$clone();
+                    this._size = new System.Drawing.Size.$ctor2(((value.Width - this.Margin.Right) | 0), ((value.Height - this.Margin.Bottom) | 0));
+
                     if (this._autoSize) {
                         this.Element.style.width = "auto";
                         this.Element.style.height = "auto";
@@ -10717,6 +10737,22 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                 }
             },
+            Margin: {
+                get: function () {
+                    return System.Windows.Forms.Layout.CommonProperties.GetMargin(this);
+                },
+                set: function (value) {
+                    var prevlocation = this.Location.$clone();
+                    var prevSize = this.Size.$clone();
+
+                    this.SetMargins(value.$clone());
+
+                    this.OnMarginChanged({ });
+
+                    this.Location = prevlocation.$clone();
+                    this.Size = prevSize.$clone();
+                }
+            },
             Bounds: {
                 get: function () {
                     return new System.Drawing.Rectangle.$ctor1(this.Location.$clone(), this.Size.$clone());
@@ -10793,7 +10829,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this._size = new System.Drawing.Size();
                 this._backColor = new System.Drawing.Color();
                 this.ForeColor = new System.Drawing.Color();
-                this.Margin = new System.Windows.Forms.Padding();
                 this.Padding = new System.Windows.Forms.Padding();
                 this._enabled = true;
                 this._readonly = false;
@@ -10814,7 +10849,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.Element.style.boxSizing = "borderbox";
 
                 this.Element.style.padding = "0";
-
 
                 this.Element.style.fontSize = "inherit";
                 this.Element.style.fontFamily = "inherit";
@@ -10866,6 +10900,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                     return null;
                 });
+                this.SetMargins(new System.Windows.Forms.Padding.$ctor1(3));
                 this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowOnly;
                 this._init = true;
             }
@@ -10960,6 +10995,21 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                 }
             },
+            SetMargins: function (margin) {
+                margin = System.Windows.Forms.Layout.LayoutUtils.ClampNegativePaddingToZero(margin.$clone());
+                if (System.Windows.Forms.Padding.op_Equality(margin.$clone(), System.Windows.Forms.Padding.Empty.$clone())) {
+                    this.Element.style.marginLeft = null;
+                    this.Element.style.marginTop = null;
+                    this.Element.style.marginRight = null;
+                    this.Element.style.marginBottom = null;
+                } else {
+                    this.Element.style.marginLeft = margin.Left + "px";
+                    this.Element.style.marginTop = margin.Top + "px";
+                    this.Element.style.marginRight = margin.Right + "px";
+                    this.Element.style.marginBottom = margin.Bottom + "px";
+                }
+                System.Windows.Forms.Layout.CommonProperties.SetMargin(this, margin.$clone());
+            },
             OnClick: function (e) {
                 if (!Bridge.staticEquals(this.Click, null)) {
                     this.Click(this, e);
@@ -10989,6 +11039,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             OnMouseUp: function (e) {
                 if (!Bridge.staticEquals(this.MouseUp, null)) {
                     this.MouseUp(this, e);
+                }
+            },
+            OnMarginChanged: function (e) {
+                if (!Bridge.staticEquals(this.MarginChanged, null)) {
+                    this.MarginChanged(this, e);
                 }
             },
             OnMouseLeave: function (e) {
@@ -13100,6 +13155,33 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
     Bridge.define("System.Windows.Forms.Panel", {
         inherits: [System.Windows.Forms.ContainerControl],
+        fields: {
+            _borderStyle: 0
+        },
+        props: {
+            BorderStyle: {
+                get: function () {
+                    return this._borderStyle;
+                },
+                set: function (value) {
+                    if (this._borderStyle !== value) {
+                        switch (this._borderStyle) {
+                            case System.Windows.Forms.BorderStyle.None: 
+                                this.Element.style.border = null;
+                                break;
+                            case System.Windows.Forms.BorderStyle.FixedSingle: 
+                            case System.Windows.Forms.BorderStyle.Fixed3D: 
+                                this.Element.style.border = "solid 1px rgb(100, 100, 100)";
+                                break;
+                            default: 
+                                break;
+                        }
+
+                        this._borderStyle = value;
+                    }
+                }
+            }
+        },
         ctors: {
             ctor: function () {
                 this.$initialize();

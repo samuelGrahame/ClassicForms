@@ -74,6 +74,7 @@
     <Compile Include="IWellKnownStringEqualityComparer.cs" />
     <Compile Include="OrdinalComparer.cs" />
     <Compile Include="StringUtils.cs" />
+    <Compile Include="Windows\Forms\BorderStyle.cs" />
     <Compile Include="Windows\Forms\DpiHelper.cs" />
     <Compile Include="Windows\Forms\AnchorStyles.cs" />
     <Compile Include="Windows\Forms\AutoScaleMode.cs" />
