@@ -15,6 +15,7 @@ namespace System.Windows.Forms
         {
             Header = new TabPageHeader();
             Header.Click += Header_Click;
+         
             Element.setAttribute("scope", "tabpage");           
         }        
 

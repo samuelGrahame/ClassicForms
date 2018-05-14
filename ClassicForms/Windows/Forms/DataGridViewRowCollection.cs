@@ -104,7 +104,7 @@ namespace System.Windows.Forms
 
         public void Insert(int index, DataRow item)
         {
-            body.insertBefore(item.Element, body.childNodes[index]);
+            body.insertBefore(item.Element, (Node)body.childNodes[index]);
             _controls.Insert(index, item);
         }
 

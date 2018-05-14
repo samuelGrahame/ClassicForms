@@ -104,7 +104,7 @@ namespace System.Windows.Forms
 
         public void Insert(int index, object item)
         {
-            _owner.Element.insertBefore(new HTMLOptionElement() { value = _controls.Count.ToString(), textContent = (item + "") }, _owner.Element.childNodes[index]);
+            _owner.Element.insertBefore(new HTMLOptionElement() { value = _controls.Count.ToString(), textContent = (item + "") }, (Node)_owner.Element.childNodes[index]);
             _controls.Insert(index, item);
         }
 

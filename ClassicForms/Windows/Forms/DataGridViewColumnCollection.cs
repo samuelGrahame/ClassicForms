@@ -104,7 +104,7 @@ namespace System.Windows.Forms
 
         public void Insert(int index, DataGridViewColumn item)
         {
-            header.insertBefore(item.Element, header.childNodes[index]);
+            header.insertBefore(item.Element, (Node)header.childNodes[index]);
             _controls.Insert(index, item);
         }
 

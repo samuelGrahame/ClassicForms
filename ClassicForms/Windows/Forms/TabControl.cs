@@ -12,6 +12,7 @@ namespace System.Windows.Forms
         public TabControl() : base(new HTMLUListElement())
         {
             Element.setAttribute("scope", "tabcontrol");
+            Element.style.outline = "0";
         }
 
         internal override void OnControlAdded(Control control)
@@ -60,9 +61,12 @@ namespace System.Windows.Forms
                 div.Text = page.Text;
                 div.Element.className = page.Header.Element.className;
                 div.Element.style.visibility = "hidden";
+                div.Element.style.outline = "none";
+                div.Element.style.margin = "none";
+
                 document.body.appendChild(div.Element);
                 
-                var rec = div.Element.getBoundingClientRect();
+                var rec = div.Element.getBoundingClientRect().As<ClientRect>();
 
                 //page.Header.Location = new Drawing.Point((int)x, i == _selectedIndex ? 0 : 4);
                 page.Header.Element.style.left = x + "px";
@@ -78,22 +82,16 @@ namespace System.Windows.Forms
                 
                 i++;
             }
-        } 
+        }
 
-        public override void PerformLayout()
+        protected void RenderTabContent()
         {
-            if(layoutSuspended)
-            {
-                return;
-            }
-            base.PerformLayout();
-
             int i = 0;
             TabPage activePage = null;
-            
+
             foreach (var page in TabPages)
             {
-                if(i == 0)
+                if (i == 0)
                 {
                     if (!page.Header.Element.classList.contains("first"))
                         page.Header.Element.classList.add("first");
@@ -102,15 +100,15 @@ namespace System.Windows.Forms
                 {
                     page.Header.Element.classList.remove("first");
                 }
-                
-                if(!string.IsNullOrWhiteSpace(LinkTag))
+
+                if (!string.IsNullOrWhiteSpace(LinkTag))
                 {
-                    if(LinkTag.Contains(" "))
+                    if (LinkTag.Contains(" "))
                     {
                         string[] tags = LinkTag.Split(' ');
                         foreach (var item in tags)
                         {
-                            if(!string.IsNullOrWhiteSpace(item))
+                            if (!string.IsNullOrWhiteSpace(item))
                             {
                                 if (!page.Header.Element.classList.contains(item))
                                     page.Header.Element.classList.add(item);
@@ -123,13 +121,12 @@ namespace System.Windows.Forms
                         if (!page.Header.Element.classList.contains(LinkTag))
                             page.Header.Element.classList.add(LinkTag);
                     }
-                    
                 }
 
                 if (_selectedIndex == i)
                 {
                     activePage = page;
-                    if(!page.Header.Element.classList.contains("active"))
+                    if (!page.Header.Element.classList.contains("active"))
                         page.Header.Element.classList.add("active");
 
                     if (!page.Element.classList.contains("active"))
@@ -137,6 +134,8 @@ namespace System.Windows.Forms
 
                     page.Visible = true;
                     page.Size = new Drawing.Size(this.Size.Width - 8, this.Size.Height - (22 + 4));
+                    page.Header.Element.style.borderBottom = null;
+                    page.Header.Element.style.cursor = null;
                 }
                 else
                 {
@@ -146,7 +145,12 @@ namespace System.Windows.Forms
 
                     page.Element.classList.remove("active");
 
+                    page.Header.Element.style.cursor = "pointer";
                     page.Header.Element.classList.remove("active");
+                    page.Header.Element.style.outline = "0";
+                    page.Header.Element.style.margin = "0";
+                    page.Header.Element.style.borderBottom = "none";
+
                     page.Visible = false;
                 }
                 i++;
@@ -159,6 +163,20 @@ namespace System.Windows.Forms
             }
 
             ResizeTabHeaderSize();
+        }
+
+        protected override void OnLayout(LayoutEventArgs levent)
+        {
+            base.OnLayout(levent);
+
+            RenderTabContent();
+        }
+
+        public override void PerformLayout()
+        {
+            base.PerformLayout();
+
+            RenderTabContent();
         }
 
         private int _selectedIndex = -1;
@@ -175,7 +193,23 @@ namespace System.Windows.Forms
             }
         }
 
-        private string LinkTag;
+        private string _linkTag;
+        private string LinkTag
+        {
+            get
+            {
+                return _linkTag;
+            }
+            set
+            {
+                if(_linkTag != value)
+                {
+                    _linkTag = value;
+                    PerformLayout();
+                }
+            }
+        }
+
 
         public override object Tag
         {
@@ -213,5 +247,6 @@ namespace System.Windows.Forms
             }
         }
 
+        public string LinkTag1 { get => _linkTag; set => _linkTag = value; }
     }
 }
