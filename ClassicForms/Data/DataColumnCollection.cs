@@ -31,6 +31,15 @@ namespace System.Data
 
         }
 
+        public DataColumn Add(string columnName, Type type)
+        {
+            var data = new DataColumn(Table, columnName);
+            
+            Columns.Add(data);
+
+            return data;
+        }
+
         public DataColumn Add(string columnName)
         {
             var data = new DataColumn(Table, columnName);
