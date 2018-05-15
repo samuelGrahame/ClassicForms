@@ -351,8 +351,16 @@ namespace System.Windows.Forms
             }
         }
 
-
-        public virtual Color ForeColor { get; set; }
+        private Color _foreColor;
+        public virtual Color ForeColor
+        {
+            get { return _foreColor; }
+            set
+            {
+                ForeColor = value;
+                Element.style.color = _foreColor.ToHtml();
+            }
+        }
 
         protected void ApplyReadonly(HTMLElement element = null)
         {
