@@ -597,12 +597,12 @@ namespace System.Windows.Forms
 
             this.Location = new Point(0, 0);
 
-            btnClose = new Button()
-            {
-                Tag = "Close"
-            };
-            btnClose.Element.setAttribute("scope", "closeform");            
-            Controls.Add(btnClose);
+            //btnClose = new Button()
+            //{
+            //    Tag = "Close"
+            //};
+            //btnClose.Element.setAttribute("scope", "closeform");            
+            //Controls.Add(btnClose);
 
             _setBorderWidth();
         }

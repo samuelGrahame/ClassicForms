@@ -198,6 +198,32 @@ namespace System.Windows.Forms
             }
         }
 
+        protected override bool GetDefaultTabStop()
+        {
+            return false;
+        }
+
+        public TabPage SelectedPage
+        {
+            get { return _selectedIndex < 0 ? null : TabPages[_selectedIndex]; }
+            set
+            {
+                if (value == null)
+                {
+                    SelectedIndex = -1;
+                    return;
+                }                
+                for (int i = 0; i < TabPages.Length; i++)
+                {
+                    if (TabPages[i] == value)
+                    {
+                        SelectedIndex = i;
+                        return;
+                    }                        
+                }
+                SelectedIndex = -1;
+            }
+        }
         private string _linkTag;
         private string LinkTag
         {

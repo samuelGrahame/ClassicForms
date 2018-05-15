@@ -16,6 +16,11 @@ namespace System.Windows.Forms
             Element.style.padding = null;
         }
 
+        protected override bool GetDefaultTabStop()
+        {
+            return false;
+        }
+
         public override string Text
         {
             get

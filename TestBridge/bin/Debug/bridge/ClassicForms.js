@@ -10488,6 +10488,70 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         return null;
                     };
 
+                    window.onkeydown = function (ev) {
+                        if (ev.keyCode === 9) {
+                            if (System.Windows.Forms.Form.ActiveForm != null) {
+                                var NotshiftKey = !ev.shiftKey;
+
+                                var frm = System.Windows.Forms.Form.ActiveForm;
+                                if (frm.ActiveControl != null) {
+                                    ev.stopPropagation();
+                                    ev.preventDefault();
+                                    var prevActive = frm.ActiveControl;
+                                    var nextControl = frm.ActiveControl.GetNextControl(frm.ActiveControl, NotshiftKey);
+                                    if (nextControl != null) {
+                                        if (prevActive == null || !Bridge.referenceEquals(prevActive.Parent, nextControl.Parent)) {
+                                            nextControl.OnChildGotTabbed();
+                                        }
+                                        frm.ActiveControl = nextControl;
+
+                                    } else {
+                                        //Control control = frm;
+                                        //control = control.TabIndexControl(NotshiftKey, true);
+                                        //if (control != null)
+                                        //{
+                                        //    if (!control.TabStop)
+                                        //    {
+                                        //        control = frm.ActiveControl.GetNextControl(control, NotshiftKey);
+                                        //    }
+
+                                        //    if (control != null)
+                                        //    {
+                                        //        ev.stopPropagation();
+                                        //        ev.preventDefault();
+
+                                        //        control.OnChildGotTabbed();
+                                        //        frm.ActiveControl = control;
+                                        //    }
+                                        //}
+                                    }
+                                } else {
+                                    //TODO - finish tab looping
+                                    //Control control = frm;
+                                    //control = control.TabIndexControl(NotshiftKey, true);
+                                    //if (control != null)
+                                    //{
+                                    //    if (!control.TabStop)
+                                    //    {
+                                    //        control = frm.ActiveControl.GetNextControl(control, NotshiftKey);
+                                    //    }
+
+                                    //    if (control != null)
+                                    //    {
+                                    //        ev.stopPropagation();
+                                    //        ev.preventDefault();
+
+                                    //        control.OnChildGotTabbed();
+                                    //        frm.ActiveControl = control;                                    
+                                    //    }
+                                    //}                            
+                                }
+                            }
+                        }
+
+                        return null;
+                    };
+
                     window.onmouseup = function (ev) {
                         if (System.Windows.Forms.Control.ClickedOnControl != null) {
                             ev.stopPropagation();
@@ -10712,7 +10776,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (this.TabStop) {
                         this.Element.tabIndex = value;
                     } else {
-                        this.Element.removeAttribute("TabIndex");
+                        this.Element.removeAttribute("tabIndex");
                     }
                 }
             },
@@ -10915,7 +10979,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 this.Visible = true;
 
-                this.TabStop = true;
+                this.TabStop = this.GetDefaultTabStop();
 
                 this.Element.onclick = Bridge.fn.bind(this, function (ev) {
                     this.OnClick({ });
@@ -10981,6 +11045,89 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             }
         },
         methods: {
+            OnChildGotTabbed: function () {
+                if (this.Parent != null) {
+                    this.Parent.OnChildGotTabbed();
+                }
+            },
+            GetNextControl: function (ctl, forward, isParent) {
+                var $t;
+                if (isParent === void 0) { isParent = false; }
+                if (ctl == null) {
+                    return null;
+                }
+                if (ctl.Parent == null) {
+                    return null;
+                }
+                var diffControl = null;
+                var diff = 2147483647;
+                $t = Bridge.getEnumerator(ctl.Parent.Children);
+                try {
+                    while ($t.moveNext()) {
+                        var child = Bridge.cast($t.Current, System.Windows.Forms.Control);
+                        if (Bridge.referenceEquals(child, ctl)) {
+                            continue;
+                        }
+                        // change to once closest
+                        if ((child.TabStop || isParent) && (forward ? child.TabIndex > ctl.TabIndex : child.TabIndex <= ctl.TabIndex)) {
+                            var preDiff;
+                            if (forward) {
+                                preDiff = (child.TabIndex - ctl.TabIndex) | 0;
+                            } else {
+                                preDiff = (ctl.TabIndex - child.TabIndex) | 0;
+                            }
+                            if (preDiff < diff) {
+                                diffControl = child;
+                                diff = preDiff;
+                            }
+                        }
+                    }
+                } finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$Dispose();
+                    }
+                }if (diffControl == null) {
+                    if (ctl.Parent.Parent == null) {
+                        return null;
+                    }
+                    var control = this.GetNextControl(ctl.Parent, forward, true);
+
+                    if (control == null) {
+                        return null;
+                    }
+                    var controlFound = null;
+                    while (((controlFound = control.TabIndexControl(forward))) == null) {
+                        control = this.GetNextControl(control, forward, true);
+                        if (control == null) {
+                            return null;
+                        }
+                    }
+                    return controlFound;
+                } else {
+                    return diffControl;
+                }
+            },
+            TabIndexControl: function (forward, checkAll) {
+                var $t;
+                if (checkAll === void 0) { checkAll = false; }
+                var selected = null;
+                var index = forward ? 2147483647 : -2147483648;
+                $t = Bridge.getEnumerator(this.Controls);
+                try {
+                    while ($t.moveNext()) {
+                        var item = $t.Current;
+                        if ((checkAll || item.TabStop) && (forward ? item.TabIndex < index : item.TabIndex > index)) {
+                            index = item.TabIndex;
+                            selected = item;
+                        }
+                    }
+                } finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$Dispose();
+                    }
+                }
+                return selected;
+            },
             GetAutoSizeMode: function () {
                 return System.Windows.Forms.Layout.CommonProperties.GetAutoSizeMode(this);
             },
@@ -11036,6 +11183,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return this.Parent.GetForm();
                 }
             },
+            GetDefaultTabStop: function () {
+                return true;
+            },
             ApplyDisabled: function (element) {
                 if (element === void 0) { element = null; }
                 if (element == null) {
@@ -11086,7 +11236,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (Bridge.is(this.Parent, System.Windows.Forms.Form)) {
                     return this.Parent;
                 } else {
-                    return this.FindForm();
+                    return this.Parent.FindForm();
                 }
             },
             GetDefaultMargins: function () {
@@ -11884,8 +12034,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             ctor: function () {
                 this.$initialize();
                 System.Windows.Forms.Control.ctor.call(this, document.createElement("span"));
-                this.TabStop = false;
                 this.Element.setAttribute("scope", "label");
+            }
+        },
+        methods: {
+            GetDefaultTabStop: function () {
+                return false;
             }
         }
     });
@@ -12060,6 +12214,26 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         this._selectedIndex = value;
                         this.PerformLayout$1();
                     }
+                }
+            },
+            SelectedPage: {
+                get: function () {
+                    var $t;
+                    return this._selectedIndex < 0 ? null : ($t = this.TabPages)[System.Array.index(this._selectedIndex, $t)];
+                },
+                set: function (value) {
+                    var $t;
+                    if (value == null) {
+                        this.SelectedIndex = -1;
+                        return;
+                    }
+                    for (var i = 0; i < this.TabPages.length; i = (i + 1) | 0) {
+                        if (Bridge.referenceEquals(($t = this.TabPages)[System.Array.index(i, $t)], value)) {
+                            this.SelectedIndex = i;
+                            return;
+                        }
+                    }
+                    this.SelectedIndex = -1;
                 }
             },
             LinkTag: {
@@ -12272,6 +12446,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 System.Windows.Forms.Control.prototype.PerformLayout$1.call(this);
 
                 this.RenderTabContent();
+            },
+            GetDefaultTabStop: function () {
+                return false;
             }
         }
     });
@@ -12296,6 +12473,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 System.Windows.Forms.Control.ctor.call(this, document.createElement("a"));
                 this.Element.setAttribute("scope", "tabpageheader");
                 this.Element.style.padding = null;
+            }
+        },
+        methods: {
+            GetDefaultTabStop: function () {
+                return false;
             }
         }
     });
@@ -12854,7 +13036,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this._controlBox = true;
             },
             ctor: function () {
-                var $t;
                 this.$initialize();
                 System.Windows.Forms.ContainerControl.ctor.call(this);
                 this.Element.setAttribute("scope", "form");
@@ -12863,9 +13044,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 this.Location = new System.Drawing.Point.$ctor1(0, 0);
 
-                this.btnClose = ($t = new System.Windows.Forms.Button(), $t.Tag = "Close", $t);
-                this.btnClose.Element.setAttribute("scope", "closeform");
-                this.Controls.add(this.btnClose);
+                //btnClose = new Button()
+                //{
+                //    Tag = "Close"
+                //};
+                //btnClose.Element.setAttribute("scope", "closeform");            
+                //Controls.Add(btnClose);
 
                 this._setBorderWidth();
             }
@@ -13365,16 +13549,15 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         },
         methods: {
             Header_Click: function (sender, e) {
-                if (Bridge.is(this.Parent, System.Windows.Forms.TabControl)) {
-                    var pages = this.Parent.TabPages;
-                    for (var i = 0; i < pages.length; i = (i + 1) | 0) {
-                        if (Bridge.referenceEquals(pages[System.Array.index(i, pages)], this)) {
-                            this.Parent.SelectedIndex = i;
-                            return;
-                        }
-                    }
-                    this.Parent.SelectedIndex = -1;
+                if (this.Parent != null && Bridge.is(this.Parent, System.Windows.Forms.TabControl)) {
+                    this.Parent.SelectedPage = this;
                 }
+            },
+            OnChildGotTabbed: function () {
+                if (this.Parent != null && Bridge.is(this.Parent, System.Windows.Forms.TabControl)) {
+                    this.Parent.SelectedPage = this;
+                }
+                System.Windows.Forms.Panel.prototype.OnChildGotTabbed.call(this);
             }
         }
     });

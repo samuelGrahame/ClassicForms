@@ -15,6 +15,82 @@ namespace System.Windows.Forms
         public string Name { get { return Element.getAttribute("Name"); } set { Element.setAttribute("Name", value); } }
         private Point _location;
 
+        protected virtual void OnChildGotTabbed()
+        {
+            if (this.Parent != null)
+                this.Parent.OnChildGotTabbed();
+        }
+
+        public Control GetNextControl(Control ctl, bool forward, bool isParent = false)
+        {
+            if (ctl == null)
+                return null;
+            if (ctl.Parent == null)
+                return null;
+            Control diffControl = null;
+            int diff = int.MaxValue;
+            foreach (Control child in ctl.Parent.Children)
+            {
+                if (child == ctl)
+                    continue;                
+                // change to once closest
+                if ((child.TabStop || isParent) && (forward ? child.TabIndex > ctl.TabIndex : child.TabIndex <= ctl.TabIndex))
+                {
+                    int preDiff;
+                    if(forward)
+                    {
+                        preDiff = child.TabIndex - ctl.TabIndex;
+                    }
+                    else
+                    {
+                        preDiff = ctl.TabIndex - child.TabIndex;
+                    }
+                    if(preDiff < diff)
+                    {
+                        diffControl = child;
+                        diff = preDiff;
+                    }
+                }
+            }
+            if(diffControl == null)
+            {
+                if (ctl.Parent.Parent == null)
+                    return null;
+                var control = GetNextControl(ctl.Parent, forward, true);
+
+                if (control == null)
+                    return null;
+                Control controlFound = null;
+                while((controlFound = control.TabIndexControl(forward)) == null)
+                {
+                    control = GetNextControl(control, forward, true);
+                    if (control == null)
+                        return null;
+                }
+                return controlFound;
+            }
+            else
+            {
+                return diffControl;
+            }
+        }
+
+        internal Control TabIndexControl(bool forward, bool checkAll = false)
+        {
+            Control selected = null;
+            int index = forward ? int.MaxValue : int.MinValue;
+            foreach (Control item in Controls)
+            {
+                if((checkAll || item.TabStop) && (forward ? item.TabIndex < index : item.TabIndex > index))
+                {
+                    index = item.TabIndex;
+                    selected = item;
+                }
+            }
+
+            return selected;
+        }
+
         protected AutoSizeMode GetAutoSizeMode() =>
     CommonProperties.GetAutoSizeMode(this);
 
@@ -274,8 +350,13 @@ namespace System.Windows.Forms
                 }
             } }
 
-        private bool _tabStop;
-        public bool TabStop { get { return _tabStop; } set {
+        protected virtual bool GetDefaultTabStop()
+        {
+            return true;
+        }
+
+        protected bool _tabStop;
+        public virtual bool TabStop { get { return _tabStop; } set {
                 _tabStop = value;
                 TabIndex = _tabIndex;
             } }
@@ -289,7 +370,7 @@ namespace System.Windows.Forms
                 }
                 else
                 {
-                    Element.removeAttribute("TabIndex");
+                    Element.removeAttribute("tabIndex");
                 }
             } }
         public virtual string Text { get; set; }
@@ -452,11 +533,85 @@ namespace System.Windows.Forms
                 return null;
             };
 
+            window.onkeydown = (ev) =>
+            {
+                if(ev.keyCode == 9)
+                {
+                    if (Form.ActiveForm != null)
+                    {
+                        bool NotshiftKey = !ev.shiftKey;
+
+                        var frm = Form.ActiveForm;
+                        if (frm.ActiveControl != null)
+                        {
+                            ev.stopPropagation();
+                            ev.preventDefault();
+                            var prevActive = frm.ActiveControl;
+                            var nextControl = frm.ActiveControl.GetNextControl(frm.ActiveControl, NotshiftKey);
+                            if(nextControl != null)
+                            {
+                                if (prevActive == null || prevActive.Parent != nextControl.Parent)
+                                {
+                                    nextControl.OnChildGotTabbed();
+                                }
+                                frm.ActiveControl = nextControl;
+
+                            }
+                            else
+                            {
+                                //Control control = frm;
+                                //control = control.TabIndexControl(NotshiftKey, true);
+                                //if (control != null)
+                                //{
+                                //    if (!control.TabStop)
+                                //    {
+                                //        control = frm.ActiveControl.GetNextControl(control, NotshiftKey);
+                                //    }
+
+                                //    if (control != null)
+                                //    {
+                                //        ev.stopPropagation();
+                                //        ev.preventDefault();
+
+                                //        control.OnChildGotTabbed();
+                                //        frm.ActiveControl = control;
+                                //    }
+                                //}
+                            }
+                        }
+                        else
+                        {                
+                            //TODO - finish tab looping
+                            //Control control = frm;
+                            //control = control.TabIndexControl(NotshiftKey, true);
+                            //if (control != null)
+                            //{
+                            //    if (!control.TabStop)
+                            //    {
+                            //        control = frm.ActiveControl.GetNextControl(control, NotshiftKey);
+                            //    }
+
+                            //    if (control != null)
+                            //    {
+                            //        ev.stopPropagation();
+                            //        ev.preventDefault();
+
+                            //        control.OnChildGotTabbed();
+                            //        frm.ActiveControl = control;                                    
+                            //    }
+                            //}                            
+                        }
+                    }
+                }
+                
+                return null;
+            };
+
             window.onmouseup = (ev) =>
             {
                 if (ClickedOnControl != null)
                 {
-                    ev.stopPropagation();
+                   ev.stopPropagation();
 
                     ClickedOnControl.OnMouseUp(MouseEventArgs.CreateFromMouseEvent(ev, ClickedOnControl));
 
@@ -474,7 +629,7 @@ namespace System.Windows.Forms
             if (Parent is Form)
                 return Parent.As<Form>();
             else
-                return FindForm();
+                return Parent.FindForm();
         }
 
         internal Control(HTMLElement element)
@@ -496,7 +651,7 @@ namespace System.Windows.Forms
 
             Visible = true;
 
-            TabStop = true;
+            TabStop = GetDefaultTabStop();
 
             Element.onclick = (ev) =>
             {

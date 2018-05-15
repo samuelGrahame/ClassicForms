@@ -11,8 +11,12 @@ namespace System.Windows.Forms
     {
         public Label() : base(new HTMLSpanElement())
         {
-            TabStop = false;
             Element.setAttribute("scope", "label");
+        }
+
+        protected override bool GetDefaultTabStop()
+        {
+            return false;
         }
 
         public override string Text
