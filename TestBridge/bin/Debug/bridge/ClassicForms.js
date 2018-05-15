@@ -10516,7 +10516,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _backColor: null,
             _enabled: false,
             _readonly: false,
-            ForeColor: null,
+            _foreColor: null,
             _tag: null,
             Controls: null,
             _font: null,
@@ -10548,7 +10548,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             MouseUp: null,
             Disposed: null,
             MouseLeave: null,
-            MouseEnter: null
+            MouseEnter: null,
+            GotFocus: null,
+            LostFocus: null
         },
         props: {
             Name: {
@@ -10741,6 +10743,15 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this.ApplyReadonly();
                 }
             },
+            ForeColor: {
+                get: function () {
+                    return this._foreColor.$clone();
+                },
+                set: function (value) {
+                    this.ForeColor = value.$clone();
+                    this.Element.style.color = this._foreColor.ToHtml();
+                }
+            },
             /**
              * Use Tag as Class Name
              *
@@ -10876,7 +10887,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.MinimumSize = new System.Drawing.Size();
                 this._size = new System.Drawing.Size();
                 this._backColor = new System.Drawing.Color();
-                this.ForeColor = new System.Drawing.Color();
+                this._foreColor = new System.Drawing.Color();
                 this.Padding = new System.Windows.Forms.Padding();
                 this._enabled = true;
                 this._readonly = false;
@@ -10916,6 +10927,21 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     ev.stopPropagation();
 
                     this.OnMouseDown(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this));
+
+                    return null;
+                });
+
+                this.Element.onfocus = Bridge.fn.bind(this, function (ev) {
+                    var frm = this.FindForm();
+                    frm.ActiveControl = this;
+
+                    this.OnGotFocus({ });
+
+                    return null;
+                });
+
+                this.Element.onblur = Bridge.fn.bind(this, function (ev) {
+                    this.OnLostFocus({ });
 
                     return null;
                 });
@@ -11053,6 +11079,16 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 }
                 return this.Parent.GetCurrentInheritFont();
             },
+            FindForm: function () {
+                if (this.Parent == null) {
+                    return null;
+                }
+                if (Bridge.is(this.Parent, System.Windows.Forms.Form)) {
+                    return this.Parent;
+                } else {
+                    return this.FindForm();
+                }
+            },
             GetDefaultMargins: function () {
                 return new System.Windows.Forms.Padding.$ctor1(3);
             },
@@ -11108,6 +11144,16 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             OnMarginChanged: function (e) {
                 if (!Bridge.staticEquals(this.MarginChanged, null)) {
                     this.MarginChanged(this, e);
+                }
+            },
+            OnGotFocus: function (e) {
+                if (!Bridge.staticEquals(this.GotFocus, null)) {
+                    this.GotFocus(this, e);
+                }
+            },
+            OnLostFocus: function (e) {
+                if (!Bridge.staticEquals(this.LostFocus, null)) {
+                    this.LostFocus(this, e);
                 }
             },
             OnMouseLeave: function (e) {
@@ -11421,8 +11467,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (this._disposing) {
                     return;
                 }
-
                 this._disposing = true;
+
                 if (!Bridge.staticEquals(this.Disposed, null)) {
                     this.Disposed(this, { });
                 }
@@ -12717,6 +12763,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _mouseDownOnBorder: false,
             _formMovementModes: 0,
             btnClose: null,
+            _activeControl: null,
             StartPosition: 0,
             DialogResults: null,
             _isDialog: false,
@@ -12733,6 +12780,17 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             Text: null
         },
         props: {
+            ActiveControl: {
+                get: function () {
+                    return this._activeControl;
+                },
+                set: function (value) {
+                    if (!Bridge.referenceEquals(this._activeControl, value)) {
+                        this.SetActiveControl(value);
+                        this._activeControl.Element.focus();
+                    }
+                }
+            },
             WindowState: {
                 get: function () {
                     return this._windowState;
@@ -12813,6 +12871,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             }
         },
         methods: {
+            SetActiveControl: function (control) {
+                if (this._activeControl != null) {
+                    this._activeControl.Element.blur();
+                }
+                this._activeControl = control;
+            },
             GetDefaultMargins: function () {
                 return System.Windows.Forms.Padding.Empty.$clone();
             },

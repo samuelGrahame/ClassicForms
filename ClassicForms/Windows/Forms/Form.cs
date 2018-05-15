@@ -22,6 +22,26 @@ namespace System.Windows.Forms
         public static HTMLDivElement _formOverLay = null;
         private Button btnClose;
 
+        internal Control _activeControl = null;
+        public Control ActiveControl { get => _activeControl; set {
+                if(_activeControl != value)
+                {
+                    SetActiveControl(value);                    
+                    _activeControl.Element.focus();
+                }
+            }
+        }
+
+        internal void SetActiveControl(Control control)
+        {
+            if (_activeControl != null)
+            {
+                _activeControl.Element.blur();
+            }
+            _activeControl = control;
+        }
+
+
         [DefaultValue(1)]
         public FormStartPosition StartPosition { get; set; }
 

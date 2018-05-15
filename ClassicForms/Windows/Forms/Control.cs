@@ -467,6 +467,16 @@ namespace System.Windows.Forms
 
         }
 
+        public Form FindForm()
+        {
+            if (Parent == null)
+                return null;
+            if (Parent is Form)
+                return Parent.As<Form>();
+            else
+                return FindForm();
+        }
+
         internal Control(HTMLElement element)
         {
             Element = element;
@@ -500,6 +510,23 @@ namespace System.Windows.Forms
                 ev.stopPropagation();
 
                 OnMouseDown(MouseEventArgs.CreateFromMouseEvent(ev, this));
+
+                return null;
+            };
+
+            Element.onfocus = (ev) =>
+            {
+                var frm = this.FindForm();
+                frm.ActiveControl = this;
+
+                OnGotFocus(EventArgs.Empty);
+
+                return null;
+            };
+
+            Element.onblur = (ev) =>
+            {                
+                OnLostFocus(EventArgs.Empty);
 
                 return null;
             };
@@ -665,6 +692,20 @@ namespace System.Windows.Forms
         public event EventHandler Disposed;
         public event EventHandler MouseLeave;
         public event EventHandler MouseEnter;
+        public event EventHandler GotFocus;
+        public event EventHandler LostFocus;
+
+        protected virtual void OnGotFocus(EventArgs e)
+        {
+            if (GotFocus != null)
+                GotFocus(this, e);
+        }
+
+        protected virtual void OnLostFocus(EventArgs e)
+        {
+            if (LostFocus != null)
+                LostFocus(this, e);
+        }
 
         protected virtual void OnMouseLeave(EventArgs e)
         {
@@ -1096,8 +1137,8 @@ namespace System.Windows.Forms
         {
             if (_disposing)
                 return;
-
             _disposing = true;
+
             if (Disposed != null)
                 Disposed(this, EventArgs.Empty);
 
