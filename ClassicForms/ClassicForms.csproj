@@ -42,6 +42,7 @@
     <Compile Include="ComponentModel\InvalidEnumArgumentException.cs" />
     <Compile Include="IServiceProviderV2.cs" />
     <Compile Include="OrdinalRandomizedComparer.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="StringComparer.cs" />
     <Compile Include="Collections\ArrayList.cs" />
     <Compile Include="Collections\Generic\Specialized\BitVector32.cs" />

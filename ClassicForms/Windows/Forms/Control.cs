@@ -433,6 +433,7 @@ namespace System.Windows.Forms
 
         static Control()
         {
+            document.body.style.overflow = "hidden";
             window.onmousemove = (ev) =>
             {
                 if (ClickedOnControl != null)

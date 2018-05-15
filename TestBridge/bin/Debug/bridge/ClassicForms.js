@@ -10424,6 +10424,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this.PropControlsCollection = System.Windows.Forms.PropertyStore.CreateKey();
                 },
                 ctor: function () {
+                    document.body.style.overflow = "hidden";
                     window.onmousemove = function (ev) {
                         if (System.Windows.Forms.Control.ClickedOnControl != null) {
                             ev.stopPropagation();

@@ -10,15 +10,18 @@ namespace System.Drawing
     {
         public string FamilyName { get; }
         public float EmSize { get; }
+        public FontStyle Style { get; } = FontStyle.Regular;
+        public GraphicsUnit Unit { get; } = GraphicsUnit.Point;
 
         public Font(string familyName, float emSize, FontStyle style, GraphicsUnit unit, byte gdiCharSet) : this(familyName, emSize)
         {
-            
+            Style = style;
         }
 
         public Font(string familyName, float emSize)
         {
-            FamilyName = familyName;
+            if(!Settings.WinFormIgnoreFontName)
+                FamilyName = familyName;
             EmSize = emSize;
         }
 
