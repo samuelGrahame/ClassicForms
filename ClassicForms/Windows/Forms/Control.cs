@@ -405,17 +405,7 @@ namespace System.Windows.Forms
         private Font _font;
         public virtual Font Font { get { return _font; } set {
                 _font = value;
-                if (_font == null)
-                {
-                    Element.style.fontSize = "inherit";
-                    Element.style.fontFamily = "inherit";
-                }
-                else
-                {
-                    Element.style.fontSize = _font.EmSize.ToString() + "pt";
-                    Element.style.fontFamily = _font.FamilyName;
-                }
-
+                Font.SetFont(_font, Element);                
             } }
         private bool _autoSize;
         protected bool _init;

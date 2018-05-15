@@ -2773,18 +2773,44 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
     });
 
     Bridge.define("System.Drawing.Font", {
+        statics: {
+            methods: {
+                SetFont: function (font, element) {
+                    if (font == null) {
+                        element.style.fontSize = "inherit";
+                        element.style.fontFamily = "inherit";
+                    } else {
+                        element.style.fontSize = (System.Single.format(font.EmSize) || "") + "pt";
+                        if (!System.String.isNullOrWhiteSpace(font.FamilyName)) {
+                            element.style.fontFamily = font.FamilyName;
+                        } else {
+                            element.style.fontFamily = "inherit";
+                        }
+                    }
+
+                }
+            }
+        },
         fields: {
             FamilyName: null,
-            EmSize: 0
+            EmSize: 0,
+            Style: 0,
+            Unit: 0
         },
         ctors: {
+            init: function () {
+                this.Style = System.Drawing.FontStyle.Regular;
+                this.Unit = System.Drawing.GraphicsUnit.Point;
+            },
             $ctor1: function (familyName, emSize, style, unit, gdiCharSet) {
                 System.Drawing.Font.ctor.call(this, familyName, emSize);
-
+                this.Style = style;
             },
             ctor: function (familyName, emSize) {
                 this.$initialize();
-                this.FamilyName = familyName;
+                if (!System.Settings.WinFormIgnoreFontName) {
+                    this.FamilyName = familyName;
+                }
                 this.EmSize = emSize;
             }
         }
@@ -4553,6 +4579,19 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return this.getHashCode2(str);
                 }
                 return Bridge.getHashCode(obj);
+            }
+        }
+    });
+
+    Bridge.define("System.Settings", {
+        statics: {
+            fields: {
+                WinFormIgnoreFontName: false
+            },
+            ctors: {
+                init: function () {
+                    this.WinFormIgnoreFontName = false;
+                }
             }
         }
     });
@@ -10716,14 +10755,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 },
                 set: function (value) {
                     this._font = value;
-                    if (this._font == null) {
-                        this.Element.style.fontSize = "inherit";
-                        this.Element.style.fontFamily = "inherit";
-                    } else {
-                        this.Element.style.fontSize = (System.Single.format(this._font.EmSize) || "") + "pt";
-                        this.Element.style.fontFamily = this._font.FamilyName;
-                    }
-
+                    System.Drawing.Font.SetFont(this._font, this.Element);
                 }
             },
             AutoSize: {
