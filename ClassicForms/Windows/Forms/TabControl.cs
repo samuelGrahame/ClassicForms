@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,6 +52,8 @@ namespace System.Windows.Forms
                 return pages.ToArray();                
             } }
 
+        public override Font Font { get => base.Font; set { base.Font = value; ResizeTabHeaderSize(); } }
+
         internal void ResizeTabHeaderSize()
         {
             int i = 0;
@@ -63,6 +66,8 @@ namespace System.Windows.Forms
                 div.Element.style.visibility = "hidden";
                 div.Element.style.outline = "none";
                 div.Element.style.margin = "none";
+
+                Font.SetFont(page.GetCurrentInheritFont(), div.Element);
 
                 document.body.appendChild(div.Element);
                 

@@ -418,6 +418,15 @@ namespace System.Windows.Forms
                 }
             } }
 
+        public Font GetCurrentInheritFont()
+        {
+            if (Font != null)
+                return Font;
+            if (Parent == null)
+                return null;
+            return Parent.GetCurrentInheritFont();
+        }
+
         internal HTMLElement Element;
         internal static Control ClickedOnControl;
 

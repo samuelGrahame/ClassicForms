@@ -4592,6 +4592,21 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 init: function () {
                     this.WinFormIgnoreFontName = false;
                 }
+            },
+            methods: {
+                IsUsingWindowsCSS: function () {
+                    for (var i = 0; i < document.head.childElementCount; i = (i + 1) | 0) {
+                        var child = document.head.children[i];
+                        if (Bridge.is(child, HTMLLinkElement)) {
+                            var link = child;
+                            if (link.rel != null && Bridge.referenceEquals(link.rel.toLowerCase(), "stylesheet") && link.href != null && System.String.contains(link.href.toLowerCase(),"windows10.css")) {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
+                }
             }
         }
     });
@@ -11029,6 +11044,15 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                 }
             },
+            GetCurrentInheritFont: function () {
+                if (this.Font != null) {
+                    return this.Font;
+                }
+                if (this.Parent == null) {
+                    return null;
+                }
+                return this.Parent.GetCurrentInheritFont();
+            },
             GetDefaultMargins: function () {
                 return new System.Windows.Forms.Padding.$ctor1(3);
             },
@@ -11972,6 +11996,15 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }return pages.ToArray();
                 }
             },
+            Font: {
+                get: function () {
+                    return Bridge.ensureBaseProperty(this, "Font").$System$Windows$Forms$Control$Font;
+                },
+                set: function (value) {
+                    Bridge.ensureBaseProperty(this, "Font").$System$Windows$Forms$Control$Font = value;
+                    this.ResizeTabHeaderSize();
+                }
+            },
             SelectedIndex: {
                 get: function () {
                     return this._selectedIndex;
@@ -12073,6 +12106,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         div.Element.style.visibility = "hidden";
                         div.Element.style.outline = "none";
                         div.Element.style.margin = "none";
+
+                        System.Drawing.Font.SetFont(page.GetCurrentInheritFont(), div.Element);
 
                         document.body.appendChild(div.Element);
 
