@@ -10525,11 +10525,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             Location: {
                 get: function () {
-                    return new System.Drawing.Point.$ctor1(((this._location.X - this.Margin.Left) | 0), ((this._location.Y - this.Margin.Top) | 0));
+                    return this._location.$clone();
                 },
                 set: function (value) {
                     var prev = this._location.$clone();
-                    this._location = new System.Drawing.Point.$ctor1(((value.X + this.Margin.Left) | 0), ((value.Y + this.Margin.Top) | 0));
+                    this._location = value.$clone(); // new Point(value.X + Margin.Left, value.Y + Margin.Top);
 
                     this.Element.style.left = this._location.X + "px";
                     this.Element.style.top = this._location.Y + "px";
@@ -10616,11 +10616,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             Size: {
                 get: function () {
-                    return new System.Drawing.Size.$ctor2(((this._size.Width + this.Margin.Right) | 0), ((this._size.Height + this.Margin.Bottom) | 0));
+                    return this._size.$clone();
                 },
                 set: function (value) {
                     var prev = this._size.$clone();
-                    this._size = new System.Drawing.Size.$ctor2(((value.Width - this.Margin.Right) | 0), ((value.Height - this.Margin.Bottom) | 0));
+                    this._size = value.$clone(); // new Size(value.Width - Margin.Right, value.Height - Margin.Bottom);
 
                     if (this._autoSize) {
                         this.Element.style.width = "auto";
@@ -10742,15 +10742,15 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return System.Windows.Forms.Layout.CommonProperties.GetMargin(this);
                 },
                 set: function (value) {
-                    var prevlocation = this.Location.$clone();
-                    var prevSize = this.Size.$clone();
+                    //var prevlocation = Location;
+                    //var prevSize = Size;
 
                     this.SetMargins(value.$clone());
 
                     this.OnMarginChanged({ });
 
-                    this.Location = prevlocation.$clone();
-                    this.Size = prevSize.$clone();
+                    //Location = prevlocation;
+                    //Size = prevSize;
                 }
             },
             Bounds: {
@@ -10849,6 +10849,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.Element.style.boxSizing = "borderbox";
 
                 this.Element.style.padding = "0";
+                // Element.style.margin = "1px";
 
                 this.Element.style.fontSize = "inherit";
                 this.Element.style.fontFamily = "inherit";
@@ -10900,7 +10901,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                     return null;
                 });
-                this.SetMargins(new System.Windows.Forms.Padding.$ctor1(3));
+                this.SetMargins(this.GetDefaultMargins());
                 this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowOnly;
                 this._init = true;
             }
@@ -10995,19 +10996,25 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                 }
             },
+            GetDefaultMargins: function () {
+                return new System.Windows.Forms.Padding.$ctor1(3);
+            },
             SetMargins: function (margin) {
                 margin = System.Windows.Forms.Layout.LayoutUtils.ClampNegativePaddingToZero(margin.$clone());
-                if (System.Windows.Forms.Padding.op_Equality(margin.$clone(), System.Windows.Forms.Padding.Empty.$clone())) {
-                    this.Element.style.marginLeft = null;
-                    this.Element.style.marginTop = null;
-                    this.Element.style.marginRight = null;
-                    this.Element.style.marginBottom = null;
-                } else {
-                    this.Element.style.marginLeft = margin.Left + "px";
-                    this.Element.style.marginTop = margin.Top + "px";
-                    this.Element.style.marginRight = margin.Right + "px";
-                    this.Element.style.marginBottom = margin.Bottom + "px";
-                }
+                //if(margin == Padding.Empty)
+                //{
+                //    Element.style.marginLeft = null;
+                //    Element.style.marginTop = null;
+                //    Element.style.marginRight = null;
+                //    Element.style.marginBottom = null;
+                //}
+                //else
+                //{
+                //    Element.style.marginLeft = margin.Left + "px";
+                //    Element.style.marginTop = margin.Top + "px";
+                //    Element.style.marginRight = margin.Right + "px";
+                //    Element.style.marginBottom = margin.Bottom + "px";
+                //}
                 System.Windows.Forms.Layout.CommonProperties.SetMargin(this, margin.$clone());
             },
             OnClick: function (e) {
@@ -12738,6 +12745,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             }
         },
         methods: {
+            GetDefaultMargins: function () {
+                return System.Windows.Forms.Padding.Empty.$clone();
+            },
             OnClosing: function () {
 
             },
@@ -13165,19 +13175,18 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 },
                 set: function (value) {
                     if (this._borderStyle !== value) {
+                        this._borderStyle = value;
                         switch (this._borderStyle) {
                             case System.Windows.Forms.BorderStyle.None: 
                                 this.Element.style.border = null;
                                 break;
                             case System.Windows.Forms.BorderStyle.FixedSingle: 
                             case System.Windows.Forms.BorderStyle.Fixed3D: 
-                                this.Element.style.border = "solid 1px rgb(100, 100, 100)";
+                                this.Element.style.border = "1px solid rgb(100, 100, 100)";
                                 break;
                             default: 
                                 break;
                         }
-
-                        this._borderStyle = value;
                     }
                 }
             }

@@ -56,6 +56,11 @@ namespace System.Windows.Forms
             document.body.appendChild(_formOverLay);
         }
 
+        protected override Padding GetDefaultMargins()
+        {
+            return Padding.Empty;
+        }
+
         // what we need to do is support modals      
         private static List<FormCollection> _formCollections = new List<FormCollection>();
 

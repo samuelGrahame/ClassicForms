@@ -12,6 +12,7 @@ namespace System.Windows.Forms
         public BorderStyle BorderStyle { get { return _borderStyle; } set {
                 if(_borderStyle != value)
                 {
+                    _borderStyle = value;
                     switch (_borderStyle)
                     {
                         case BorderStyle.None:
@@ -19,13 +20,11 @@ namespace System.Windows.Forms
                             break;
                         case BorderStyle.FixedSingle:                            
                         case BorderStyle.Fixed3D:
-                            Element.style.border = "solid 1px rgb(100, 100, 100)";
+                            Element.style.border = "1px solid rgb(100, 100, 100)";
                             break;
                         default:
                             break;
-                    }
-                    
-                    _borderStyle = value;
+                    }                    
                 }                
             }
         }
