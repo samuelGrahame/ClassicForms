@@ -75,6 +75,15 @@ namespace System.Windows.Forms
             }
         }
 
+        public void Focus()
+        {
+            var frm = FindForm();
+            if(frm != null)
+            {
+                frm.ActiveControl = this;
+            }
+        }
+
         internal Control TabIndexControl(bool forward, bool checkAll = false)
         {
             Control selected = null;

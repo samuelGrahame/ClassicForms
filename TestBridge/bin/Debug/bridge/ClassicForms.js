@@ -11107,6 +11107,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return diffControl;
                 }
             },
+            Focus: function () {
+                var frm = this.FindForm();
+                if (frm != null) {
+                    frm.ActiveControl = this;
+                }
+            },
             TabIndexControl: function (forward, checkAll) {
                 var $t;
                 if (checkAll === void 0) { checkAll = false; }
