@@ -88,6 +88,7 @@
     <Compile Include="Windows\Forms\FormStartPosition.cs" />
     <Compile Include="Windows\Forms\Layout\LayoutTransaction.cs" />
     <Compile Include="Windows\Forms\Layout\PropertyNames.cs" />
+    <Compile Include="Windows\Forms\TableLayoutPanel.cs" />
     <Compile Include="Windows\Forms\TextFormatFlags.cs" />
     <Compile Include="Windows\Forms\ComboBox.cs" />
     <Compile Include="Windows\Forms\ContainerControl.cs" />

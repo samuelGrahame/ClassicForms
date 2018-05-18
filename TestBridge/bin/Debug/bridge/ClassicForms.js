@@ -12499,6 +12499,17 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.Windows.Forms.TableLayoutPanel", {
+        inherits: [System.Windows.Forms.Control],
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+                System.Windows.Forms.Control.ctor.call(this, document.createElement("div"));
+
+            }
+        }
+    });
+
     Bridge.define("System.Windows.Forms.TabPageHeader", {
         inherits: [System.Windows.Forms.Control],
         props: {
