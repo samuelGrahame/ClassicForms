@@ -192,8 +192,9 @@ namespace System.Windows.Forms
             set {
                 if(_selectedIndex != value)
                 {
-                    _selectedIndex = value;
+                    _selectedIndex = value;                    
                     PerformLayout();
+                    OnSelectedIndexChanged(EventArgs.Empty);
                 }                
             }
         }
@@ -201,6 +202,14 @@ namespace System.Windows.Forms
         protected override bool GetDefaultTabStop()
         {
             return false;
+        }
+
+        public event EventHandler SelectedIndexChanged;
+
+        protected void OnSelectedIndexChanged(EventArgs args)
+        {
+            if (SelectedIndexChanged != null)
+                SelectedIndexChanged(this, args);
         }
 
         public TabPage SelectedPage

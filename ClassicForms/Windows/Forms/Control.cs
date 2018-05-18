@@ -84,6 +84,8 @@ namespace System.Windows.Forms
             }
         }
 
+        public string AccessibleName { get => Element.getAttribute("placeholder"); set => Element.setAttribute("placeholder", value); }
+
         internal Control TabIndexControl(bool forward, bool checkAll = false)
         {
             Control selected = null;
@@ -447,7 +449,7 @@ namespace System.Windows.Forms
             get { return _foreColor; }
             set
             {
-                ForeColor = value;
+                _foreColor = value;
                 Element.style.color = _foreColor.ToHtml();
             }
         }
@@ -681,7 +683,14 @@ namespace System.Windows.Forms
             Element.onfocus = (ev) =>
             {
                 var frm = this.FindForm();
-                frm.ActiveControl = this;
+                try
+                {
+                    frm.ActiveControl = this;
+                }
+                catch (Exception)
+                {
+
+                }
 
                 OnGotFocus(EventArgs.Empty);
 

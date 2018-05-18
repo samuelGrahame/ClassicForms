@@ -2780,7 +2780,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         element.style.fontSize = "inherit";
                         element.style.fontFamily = "inherit";
                     } else {
-                        element.style.fontSize = (System.Single.format(font.EmSize) || "") + "pt";
+                        if (font.EmSize > 0) {
+                            element.style.fontSize = (System.Single.format(font.EmSize) || "") + "pt";
+                        } else {
+                            element.style.fontSize = "inherit";
+                        }
+
                         if (!System.String.isNullOrWhiteSpace(font.FamilyName)) {
                             element.style.fontFamily = font.FamilyName;
                         } else {
@@ -2810,8 +2815,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.$initialize();
                 if (!System.Settings.WinFormIgnoreFontName) {
                     this.FamilyName = familyName;
+                } else {
+                    this.FamilyName = System.Settings.WinFormIgnoreFontDefaultFontName;
                 }
-                this.EmSize = emSize;
+                if (!System.Settings.WinFormIgnoreFontSize) {
+                    this.EmSize = emSize;
+                } else {
+                    this.EmSize = System.Settings.WinFormIgnoreFontDefaultSize;
+                }
             }
         }
     });
@@ -4586,11 +4597,17 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
     Bridge.define("System.Settings", {
         statics: {
             fields: {
-                WinFormIgnoreFontName: false
+                WinFormIgnoreFontName: false,
+                WinFormIgnoreFontSize: false,
+                WinFormIgnoreFontDefaultFontName: null,
+                WinFormIgnoreFontDefaultSize: 0
             },
             ctors: {
                 init: function () {
                     this.WinFormIgnoreFontName = false;
+                    this.WinFormIgnoreFontSize = false;
+                    this.WinFormIgnoreFontDefaultFontName = "";
+                    this.WinFormIgnoreFontDefaultSize = 0;
                 }
             },
             methods: {
@@ -10625,6 +10642,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this.Element.setAttribute("Name", value);
                 }
             },
+            AccessibleName: {
+                get: function () {
+                    return this.Element.getAttribute("placeholder");
+                },
+                set: function (value) {
+                    this.Element.setAttribute("placeholder", value);
+                }
+            },
             AutoSizeMode: {
                 get: function () {
                     return this.GetAutoSizeMode();
@@ -10812,7 +10837,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return this._foreColor.$clone();
                 },
                 set: function (value) {
-                    this.ForeColor = value.$clone();
+                    this._foreColor = value.$clone();
                     this.Element.style.color = this._foreColor.ToHtml();
                 }
             },
@@ -10997,7 +11022,13 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 this.Element.onfocus = Bridge.fn.bind(this, function (ev) {
                     var frm = this.FindForm();
-                    frm.ActiveControl = this;
+                    try {
+                        frm.ActiveControl = this;
+                    }
+                    catch ($e1) {
+                        $e1 = System.Exception.create($e1);
+
+                    }
 
                     this.OnGotFocus({ });
 
@@ -12182,6 +12213,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _selectedIndex: 0,
             _linkTag: null
         },
+        events: {
+            SelectedIndexChanged: null
+        },
         props: {
             TabPages: {
                 get: function () {
@@ -12219,6 +12253,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (this._selectedIndex !== value) {
                         this._selectedIndex = value;
                         this.PerformLayout$1();
+                        this.OnSelectedIndexChanged({ });
                     }
                 }
             },
@@ -12455,6 +12490,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             GetDefaultTabStop: function () {
                 return false;
+            },
+            OnSelectedIndexChanged: function (args) {
+                if (!Bridge.staticEquals(this.SelectedIndexChanged, null)) {
+                    this.SelectedIndexChanged(this, args);
+                }
             }
         }
     });
@@ -12491,6 +12531,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
     Bridge.define("System.Windows.Forms.TextBox", {
         inherits: [System.Windows.Forms.Control],
         fields: {
+            Multiline: false,
             prevString: null,
             _useSystemPasswordChar: false
         },
@@ -12975,7 +13016,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 set: function (value) {
                     if (!Bridge.referenceEquals(this._activeControl, value)) {
                         this.SetActiveControl(value);
-                        this._activeControl.Element.focus();
+                        if (this._activeControl != null && this._activeControl.Element != null) {
+                            this._activeControl.Element.focus();
+                        }
                     }
                 }
             },
@@ -13229,9 +13272,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _showForm: function () {
                 document.body.appendChild(this.Element);
                 if (this.StartPosition === System.Windows.Forms.FormStartPosition.CenterScreen) {
-                    var rec = document.body.getBoundingClientRect();
-
-                    this.Location = new System.Drawing.Point.$ctor1(Bridge.Int.clip32((rec.width * 0.5) - (this.Size.Width * 0.5)), Bridge.Int.clip32((rec.height * 0.5) + (this.Size.Height * 0.5)));
+                    this.Location = new System.Drawing.Point.$ctor1(Bridge.Int.clip32((window.innerWidth * 0.5) - (this.Size.Width * 0.5)), Bridge.Int.clip32((window.innerHeight * 0.5) - (this.Size.Height * 0.5)));
                 }
             },
             _showStartNewLevel: function () {

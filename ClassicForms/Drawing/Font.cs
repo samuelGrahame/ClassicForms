@@ -23,8 +23,12 @@ namespace System.Drawing
             }
             else
             {
-                element.style.fontSize = font.EmSize.ToString() + "pt";
-                if(!string.IsNullOrWhiteSpace(font.FamilyName))
+                if(font.EmSize > 0)
+                    element.style.fontSize = font.EmSize.ToString() + "pt";
+                else
+                    element.style.fontSize = "inherit";
+
+                if (!string.IsNullOrWhiteSpace(font.FamilyName))
                     element.style.fontFamily = font.FamilyName;
                 else
                     element.style.fontFamily = "inherit";
@@ -39,9 +43,14 @@ namespace System.Drawing
 
         public Font(string familyName, float emSize)
         {
-            if(!Settings.WinFormIgnoreFontName)
+            if (!Settings.WinFormIgnoreFontName)
                 FamilyName = familyName;
-            EmSize = emSize;
+            else
+                FamilyName = Settings.WinFormIgnoreFontDefaultFontName;
+            if (!Settings.WinFormIgnoreFontSize)
+                EmSize = emSize;
+            else
+                EmSize = Settings.WinFormIgnoreFontDefaultSize;
         }
 
     }

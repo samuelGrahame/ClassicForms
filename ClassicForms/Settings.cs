@@ -10,6 +10,10 @@ namespace System
     public static class Settings
     {
         public static bool WinFormIgnoreFontName = false;
+        public static bool WinFormIgnoreFontSize = false;
+        public static string WinFormIgnoreFontDefaultFontName = "";
+        public static float WinFormIgnoreFontDefaultSize = 0;
+
         public static bool IsUsingWindowsCSS()
         {
             for (int i = 0; i < document.head.childElementCount; i++)

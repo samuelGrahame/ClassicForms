@@ -26,8 +26,9 @@ namespace System.Windows.Forms
         public Control ActiveControl { get => _activeControl; set {
                 if(_activeControl != value)
                 {
-                    SetActiveControl(value);                    
-                    _activeControl.Element.focus();
+                    SetActiveControl(value);       
+                    if(_activeControl != null && _activeControl.Element != null)
+                        _activeControl.Element.focus();
                 }
             }
         }
@@ -544,10 +545,8 @@ namespace System.Windows.Forms
         {
             document.body.appendChild(this.Element);   
             if(StartPosition == FormStartPosition.CenterScreen)
-            {
-                var rec = document.body.getBoundingClientRect().As<ClientRect>();
-
-                this.Location = new Point((int)((rec.width * 0.5d) - (this.Size.Width * 0.5d)), (int)((rec.height * 0.5d) + (this.Size.Height * 0.5d)));
+            {                
+                this.Location = new Point((int)((window.innerWidth * 0.5d) - (this.Size.Width * 0.5d)), (int)((window.innerHeight * 0.5d) - (this.Size.Height * 0.5d)));
             }
         }
 
