@@ -15,8 +15,9 @@ namespace System.Windows.Forms
         private int _formBottonBorder = 1;
         private int _formLeftBorder = 1;
         private int _formRightBorder = 1;
-        private bool _allowSizeChange = true; // not yet implemented.
-        private bool _allowMoveChange = true; // not yet implemented.
+        private bool _allowSizeChange = true;
+        private bool _allowMoveChange = true;
+
         private bool _mouseDownOnBorder = false;
         private FormMovementModes _formMovementModes = FormMovementModes.None;
         public static HTMLDivElement _formOverLay = null;
@@ -83,9 +84,9 @@ namespace System.Windows.Forms
         }
 
         // what we need to do is support modals      
-        private static List<FormCollection> _formCollections = new List<FormCollection>();
+        internal static List<FormCollection> _formCollections = new List<FormCollection>();
 
-        private class FormCollection
+        internal class FormCollection
         {
             public Form FormOwner;
             public List<Form> VisibleForms = new List<Form>();
@@ -166,12 +167,106 @@ namespace System.Windows.Forms
         private bool _inClose;
         private bool _inDialogResult = false;
 
-        private WindowState _windowState;
+        private FormWindowState _windowState;
+        private FormWindowState _prevwindowState;
 
-        public WindowState WindowState
+        public int Left { get => Location.X; set => Location = new Point(value, Location.Y); }
+        public int Top { get => Location.Y; set => Location = new Point(Location.X, value); }
+
+        public FormWindowState WindowState
         {
             get { return _windowState; }
-            set { _windowState = value; }
+            set {
+                SetWindowState(value); }
+        }
+        private int prev_left, prev_top, prev_width, prev_height;
+        public void SetWindowState(FormWindowState state)
+        {           
+            if (state == _windowState)
+                return;
+
+            _prevwindowState = _windowState;
+
+            if (_prevwindowState == FormWindowState.Minimized)
+            {
+                //Body.style.opacity = PreviousOpacity;
+                                
+                _minimizedForms.Remove(this);                
+
+                CalculateMinmizedFormsLocation();
+            }
+
+            if (!_allowSizeChange)
+                return;
+
+            if ((_windowState = state) == FormWindowState.Normal)
+            {
+                SuspendLayout();
+                this.Location = new Point(prev_left, prev_top);
+                this.Size = new Size(prev_width, prev_height);                
+                ResumeLayout();                
+            }
+            else if (_windowState == FormWindowState.Maximized)
+            {
+                if (_prevwindowState == FormWindowState.Normal)
+                {
+                    prev_left = Left;
+                    prev_top = Top;
+                    prev_width = Width;
+                    prev_height = Height;
+                }
+
+                //Style.borderWidth = "0";
+
+                SnapToWindow();
+            }
+            else if (_windowState == FormWindowState.Minimized)
+            {                
+                if (_prevwindowState == FormWindowState.Normal)
+                {
+                    prev_left = Left;
+                    prev_top = Top;
+                    prev_width = Width;
+                    prev_height = Height;
+                }
+                else
+                {
+                   //Style.borderWidth = "1px";
+                }
+
+                //HeadingTitle.style.marginRight = "0";
+                //HeadingTitle.style.left = "3px";
+                //HeadingTitle.style.transform = "translate(0, -50%)";
+
+                //var offset = (ShowClose ? 45.5f : 0);
+
+                Width = 150; //  (float)Math.Max(GetTextWidth(Text, "10pt Tahoma") + 32, 100) + offset;
+                Height = 30;
+
+                //Heading.classList.add("form-heading-min");
+
+                //if (ButtonMinimize != null)
+                //{
+                //    ButtonMinimize.innerHTML = "+";
+                //}
+
+                //previousDisplay = Body.style.display;
+                //Body.style.display = "none";
+
+                _minimizedForms.Add(this);
+
+                CalculateMinmizedFormsLocation();
+            }
+
+            Resizing();
+        }
+
+        internal void SnapToWindow()
+        {
+            SuspendLayout();
+            this.Location = new Point(0, 0);
+            this.Size = new Size(GetWindowWidth(), GetWindowHeight());
+            ResumeLayout();
         }
 
         public static void CalculateZOrder()
@@ -385,7 +480,7 @@ namespace System.Windows.Forms
 
             OnClosed();
 
-            if (WindowState == WindowState.Minimized)
+            if (WindowState == FormWindowState.Minimized)
             {
                 _minimizedForms.Remove(this);
                 CalculateMinmizedFormsLocation();
@@ -396,7 +491,7 @@ namespace System.Windows.Forms
             _inClose = false;
         }
 
-        private static void CalculateMinmizedFormsLocation()
+        internal static void CalculateMinmizedFormsLocation()
         {
             if (_minimizedForms.Count > 0 && _minimizedForms.Contains(null))
                 _minimizedForms.Remove(null);
@@ -409,7 +504,7 @@ namespace System.Windows.Forms
 
             foreach (var item in _minimizedForms)
             {
-                if (item.Element == null || item.WindowState != WindowState.Minimized)
+                if (item.Element == null || item.WindowState != FormWindowState.Minimized)
                 {
                     RemoveList.Add(item);
                 }
@@ -548,6 +643,16 @@ namespace System.Windows.Forms
             {                
                 this.Location = new Point((int)((window.innerWidth * 0.5d) - (this.Size.Width * 0.5d)), (int)((window.innerHeight * 0.5d) - (this.Size.Height * 0.5d)));
             }
+        }
+
+        public static int GetWindowHeight()
+        {
+            return (int)window.innerHeight;
+        }
+
+        public static int GetWindowWidth()
+        {
+            return (int)window.innerWidth;
         }
 
         private void _showStartNewLevel()

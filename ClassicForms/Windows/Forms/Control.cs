@@ -630,7 +630,36 @@ namespace System.Windows.Forms
                 }
                 return null;
             };
+            window.onresize = (ev) =>
+            {
+                bool containsMin = false;
+                foreach (var item in AllOpenedForms())
+                {
+                    if (item.WindowState == FormWindowState.Maximized)
+                        item.SnapToWindow();
+                    else if (item.WindowState == FormWindowState.Minimized)
+                        containsMin = true;
 
+                }
+                if (containsMin)
+                    Form.CalculateMinmizedFormsLocation();
+
+                return null;
+            };
+        }
+
+        public static List<Form> AllOpenedForms()
+        {
+            var list = new List<Form>();
+
+            foreach (var item in Form._formCollections)
+            {
+                list.Add(item.FormOwner);
+                if (item.VisibleForms != null && item.VisibleForms.Count > 0)
+                    list.AddRange(item.VisibleForms);
+            }
+
+            return list;
         }
 
         public Form FindForm()

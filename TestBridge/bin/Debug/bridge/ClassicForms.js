@@ -4979,6 +4979,17 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.Windows.Forms.FormWindowState", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                Normal: 0,
+                Minimized: 1,
+                Maximized: 2
+            }
+        }
+    });
+
     Bridge.define("System.Windows.Forms.Layout.ArrangedElementCollection", {
         inherits: [System.Collections.IList,System.Collections.ICollection,System.Collections.IEnumerable],
         statics: {
@@ -7485,17 +7496,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     nBits = nBits % 32;
                     return ((value << nBits) | (value >> (((32 - nBits) | 0))));
                 }
-            }
-        }
-    });
-
-    Bridge.define("System.Windows.Forms.WindowState", {
-        $kind: "enum",
-        statics: {
-            fields: {
-                Normal: 0,
-                Minimized: 1,
-                Maximized: 2
             }
         }
     });
@@ -10579,7 +10579,54 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         }
                         return null;
                     };
+                    window.onresize = function (ev) {
+                        var $t;
+                        var containsMin = false;
+                        $t = Bridge.getEnumerator(System.Windows.Forms.Control.AllOpenedForms());
+                        try {
+                            while ($t.moveNext()) {
+                                var item = $t.Current;
+                                if (item.WindowState === System.Windows.Forms.FormWindowState.Maximized) {
+                                    item.SnapToWindow();
+                                } else {
+                                    if (item.WindowState === System.Windows.Forms.FormWindowState.Minimized) {
+                                        containsMin = true;
+                                    }
+                                }
 
+                            }
+                        } finally {
+                            if (Bridge.is($t, System.IDisposable)) {
+                                $t.System$IDisposable$Dispose();
+                            }
+                        }if (containsMin) {
+                            System.Windows.Forms.Form.CalculateMinmizedFormsLocation();
+                        }
+
+                        return null;
+                    };
+                }
+            },
+            methods: {
+                AllOpenedForms: function () {
+                    var $t;
+                    var list = new (System.Collections.Generic.List$1(System.Windows.Forms.Form)).ctor();
+
+                    $t = Bridge.getEnumerator(System.Windows.Forms.Form._formCollections);
+                    try {
+                        while ($t.moveNext()) {
+                            var item = $t.Current;
+                            list.add(item.FormOwner);
+                            if (item.VisibleForms != null && item.VisibleForms.Count > 0) {
+                                list.AddRange(item.VisibleForms);
+                            }
+                        }
+                    } finally {
+                        if (Bridge.is($t, System.IDisposable)) {
+                            $t.System$IDisposable$Dispose();
+                        }
+                    }
+                    return list;
                 }
             }
         },
@@ -12939,7 +12986,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     try {
                         while ($t.moveNext()) {
                             var item = $t.Current;
-                            if (item.Element == null || item.WindowState !== System.Windows.Forms.WindowState.Minimized) {
+                            if (item.Element == null || item.WindowState !== System.Windows.Forms.FormWindowState.Minimized) {
                                 RemoveList.add(item);
                             } else {
                                 var ToIncrement = (3 + item.Size.Width) | 0;
@@ -12990,6 +13037,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
 
                     return null;
+                },
+                GetWindowHeight: function () {
+                    return Bridge.Int.clip32(window.innerHeight);
+                },
+                GetWindowWidth: function () {
+                    return Bridge.Int.clip32(window.innerWidth);
                 }
             }
         },
@@ -13010,6 +13063,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _inClose: false,
             _inDialogResult: false,
             _windowState: 0,
+            _prevwindowState: 0,
+            prev_left: 0,
+            prev_top: 0,
+            prev_width: 0,
+            prev_height: 0,
             DialogResult: 0,
             _prevX: 0,
             _prevY: 0,
@@ -13033,12 +13091,28 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                 }
             },
+            Left: {
+                get: function () {
+                    return this.Location.X;
+                },
+                set: function (value) {
+                    this.Location = new System.Drawing.Point.$ctor1(value, this.Location.Y);
+                }
+            },
+            Top: {
+                get: function () {
+                    return this.Location.Y;
+                },
+                set: function (value) {
+                    this.Location = new System.Drawing.Point.$ctor1(this.Location.X, value);
+                }
+            },
             WindowState: {
                 get: function () {
                     return this._windowState;
                 },
                 set: function (value) {
-                    this._windowState = value;
+                    this.SetWindowState(value);
                 }
             },
             ControlBox: {
@@ -13142,6 +13216,83 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 return null;
             },
+            SetWindowState: function (state) {
+                if (state === this._windowState) {
+                    return;
+                }
+
+                this._prevwindowState = this._windowState;
+
+                if (this._prevwindowState === System.Windows.Forms.FormWindowState.Minimized) {
+                    //Body.style.opacity = PreviousOpacity;
+
+                    System.Windows.Forms.Form._minimizedForms.remove(this);
+
+                    System.Windows.Forms.Form.CalculateMinmizedFormsLocation();
+                }
+
+                if (!this._allowSizeChange) {
+                    return;
+                }
+
+                if (((this._windowState = state)) === System.Windows.Forms.FormWindowState.Normal) {
+                    this.SuspendLayout();
+                    this.Location = new System.Drawing.Point.$ctor1(this.prev_left, this.prev_top);
+                    this.Size = new System.Drawing.Size.$ctor2(this.prev_width, this.prev_height);
+                    this.ResumeLayout();
+                } else if (this._windowState === System.Windows.Forms.FormWindowState.Maximized) {
+                    if (this._prevwindowState === System.Windows.Forms.FormWindowState.Normal) {
+                        this.prev_left = this.Left;
+                        this.prev_top = this.Top;
+                        this.prev_width = this.Width;
+                        this.prev_height = this.Height;
+                    }
+
+                    //Style.borderWidth = "0";
+
+                    this.SnapToWindow();
+                } else if (this._windowState === System.Windows.Forms.FormWindowState.Minimized) {
+                    if (this._prevwindowState === System.Windows.Forms.FormWindowState.Normal) {
+                        this.prev_left = this.Left;
+                        this.prev_top = this.Top;
+                        this.prev_width = this.Width;
+                        this.prev_height = this.Height;
+                    } else {
+                        //Style.borderWidth = "1px";
+                    }
+
+                    //HeadingTitle.style.marginRight = "0";
+                    //HeadingTitle.style.left = "3px";
+                    //HeadingTitle.style.transform = "translate(0, -50%)";
+
+                    //var offset = (ShowClose ? 45.5f : 0);
+
+                    this.Width = 150; //  (float)Math.Max(GetTextWidth(Text, "10pt Tahoma") + 32, 100) + offset;
+                    this.Height = 30;
+
+                    //Heading.classList.add("form-heading-min");
+
+                    //if (ButtonMinimize != null)
+                    //{
+                    //    ButtonMinimize.innerHTML = "+";
+                    //}
+
+                    //previousDisplay = Body.style.display;
+                    //Body.style.display = "none";
+
+                    System.Windows.Forms.Form._minimizedForms.add(this);
+
+                    System.Windows.Forms.Form.CalculateMinmizedFormsLocation();
+                }
+
+                this.Resizing();
+            },
+            SnapToWindow: function () {
+                this.SuspendLayout();
+                this.Location = new System.Drawing.Point.$ctor1(0, 0);
+                this.Size = new System.Drawing.Size.$ctor2(System.Windows.Forms.Form.GetWindowWidth(), System.Windows.Forms.Form.GetWindowHeight());
+                this.ResumeLayout();
+            },
             Close: function () {
                 if ((this._isDialog && this._inDialogResult) || this._inClose) {
                     return;
@@ -13207,7 +13358,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 this.OnClosed();
 
-                if (this.WindowState === System.Windows.Forms.WindowState.Minimized) {
+                if (this.WindowState === System.Windows.Forms.FormWindowState.Minimized) {
                     System.Windows.Forms.Form._minimizedForms.remove(this);
                     System.Windows.Forms.Form.CalculateMinmizedFormsLocation();
                 }
