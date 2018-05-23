@@ -67,7 +67,7 @@ namespace Test
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(84, 318);
             this.button3.TabIndex = 2;
-            this.button3.Tag = "btn btn-light";
+            this.button3.Tag = "btn btn-info";
             this.button3.Text = "Anchor Top, Bottom, Right";
             this.button3.UseVisualStyleBackColor = true;
             // 
@@ -79,7 +79,7 @@ namespace Test
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(493, 65);
             this.button5.TabIndex = 4;
-            this.button5.Tag = "btn btn-light";
+            this.button5.Tag = "btn btn-info";
             this.button5.Text = "Anchor Bottom, Left, Right";
             this.button5.UseVisualStyleBackColor = true;
             // 
@@ -91,7 +91,7 @@ namespace Test
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(84, 389);
             this.button6.TabIndex = 5;
-            this.button6.Tag = "btn btn-light";
+            this.button6.Tag = "btn btn-info";
             this.button6.Text = "Anchor Top, Bottom, Left";
             this.button6.UseVisualStyleBackColor = true;
             // 
@@ -103,7 +103,7 @@ namespace Test
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(493, 65);
             this.button7.TabIndex = 6;
-            this.button7.Tag = "btn btn-light";
+            this.button7.Tag = "btn btn-info";
             this.button7.Text = "Anchor Top, Left, Right";
             this.button7.UseVisualStyleBackColor = true;
             // 

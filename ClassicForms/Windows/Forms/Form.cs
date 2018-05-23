@@ -21,8 +21,7 @@ namespace System.Windows.Forms
         private bool _mouseDownOnBorder = false;
         private FormMovementModes _formMovementModes = FormMovementModes.None;
         public static HTMLDivElement _formOverLay = null;
-        private Button btnClose;
-
+        
         internal Control _activeControl = null;
         public Control ActiveControl { get => _activeControl; set {
                 if(_activeControl != value)
@@ -208,6 +207,7 @@ namespace System.Windows.Forms
 
             if ((_windowState = state) == FormWindowState.Normal)
             {
+                _htmlwindowMaxAndRestoreStateButton.setAttribute("scope", "form-max");
                 SuspendLayout();
                 this.Location = new Point(prev_left, prev_top);
                 this.Size = new Size(prev_width, prev_height);                
@@ -215,6 +215,7 @@ namespace System.Windows.Forms
             }
             else if (_windowState == FormWindowState.Maximized)
             {
+                _htmlwindowMaxAndRestoreStateButton.setAttribute("scope", "form-restore");
                 if (_prevwindowState == FormWindowState.Normal)
                 {
                     prev_left = Left;
@@ -228,7 +229,8 @@ namespace System.Windows.Forms
                 SnapToWindow();
             }
             else if (_windowState == FormWindowState.Minimized)
-            {                
+            {
+                _htmlwindowMaxAndRestoreStateButton.setAttribute("scope", "form-max");
                 if (_prevwindowState == FormWindowState.Normal)
                 {
                     prev_left = Left;
@@ -613,6 +615,8 @@ namespace System.Windows.Forms
             {
                 SetWindowState(_preWindowState);
             }
+
+            CalculateFormWindowButtons();
         }
 
         public void Show()
@@ -702,13 +706,228 @@ namespace System.Windows.Forms
         private int _prevFormX;
         private int _prevFormY;
 
+        private HTMLDivElement _htmlcloseButton;
+        private HTMLDivElement _htmlwindowMaxAndRestoreStateButton;
+        private HTMLDivElement _htmlMinimizeButton;
+
+        private HTMLDivElement CreateFormWindowButton(FormWindowButton formWindowButton)
+        {
+            var div = new HTMLDivElement();
+            div.style.position = "absolute";
+
+            Action onClick = null;
+
+            switch (formWindowButton)
+            {
+                case FormWindowButton.Close:
+                    div.setAttribute("scope", "form-close");
+                    onClick = () =>
+                    {
+                        this.Close();
+                    };
+                    break;
+                case FormWindowButton.MaxAndRestore:
+                    div.setAttribute("scope", "form-max");
+                    onClick = () =>
+                    {
+                        if(WindowState == FormWindowState.Maximized)
+                        {
+                            WindowState = FormWindowState.Normal;
+                        }else if (WindowState == FormWindowState.Minimized)
+                        {
+                            WindowState = _prevwindowState;
+                        }
+                        else
+                        {
+                            WindowState = FormWindowState.Maximized;
+                        }
+                    };
+                    break;
+                case FormWindowButton.Minimize:
+                    div.setAttribute("scope", "form-min");
+                    onClick = () =>
+                    {
+                        WindowState = FormWindowState.Minimized;
+                    };
+                    break;
+                default:
+                    break;
+            }
+            div.onmousedown = (ev) =>
+            {
+                ev.stopPropagation();
+                return null;
+            };
+            div.onmousemove = (ev) =>
+            {
+                ev.stopPropagation();
+                return null;
+            };
+            div.onmouseup = (ev) =>
+            {
+                ev.stopPropagation();
+                return null;
+            };
+            div.onmouseenter = (ev) =>
+            {
+                ev.stopPropagation();
+
+                document.body.style.cursor = null;
+
+                return null;
+
+            };
+            
+            div.onclick = (ev) =>
+            {
+                ev.stopPropagation();
+                if(onClick != null)
+                    onClick();
+                return null;
+            };
+
+            Element.appendChild(div);
+
+            return div;
+        }
+
+        private enum FormWindowButton
+        {
+            Close,
+            MaxAndRestore,
+            Minimize            
+        }
+
+        private void CalculateFormWindowButtons()
+        {
+            if(!_hasShown)
+            {
+                return;
+            }
+
+            if(!ControlBox || FormBorderStyle == FormBorderStyle.None)
+            {
+                _htmlwindowMaxAndRestoreStateButton.style.visibility = "hidden";
+                _htmlMinimizeButton.style.visibility = "hidden";
+                _htmlcloseButton.style.visibility = "hidden";
+            }
+            else
+            {
+                bool restoreVisiable = false;
+                bool minimizeVisable = false;
+                if (!_allowSizeChange || !_maximizeBox)
+                {
+                    _htmlwindowMaxAndRestoreStateButton.style.visibility = "hidden";                    
+                }
+                else
+                {
+                    _htmlwindowMaxAndRestoreStateButton.style.visibility = "inherit";
+                    restoreVisiable = true;
+                }
+                if (!_minimizeBox)
+                {
+                    _htmlMinimizeButton.style.visibility = "hidden";
+                }
+                else
+                {
+                    _htmlMinimizeButton.style.visibility = "inherit";
+                    minimizeVisable = true;
+                }
+                _htmlcloseButton.style.visibility = "inherit";
+                string top = -(_formTopBorder - 1) + "px";
+                int widthHeight = _formTopBorder;
+                string height = widthHeight - 2 + "px";
+                int increment = widthHeight + (int)(_formTopBorder * 0.25f) - 1;
+                int width = widthHeight + (int)(_formTopBorder * 0.25f) - 2;
+
+                _htmlcloseButton.style.top = top;
+                _htmlcloseButton.style.height = height;
+                _htmlcloseButton.style.width = width + "px";
+
+                if (restoreVisiable)
+                {
+                    _htmlwindowMaxAndRestoreStateButton.style.top = top;
+                    _htmlwindowMaxAndRestoreStateButton.style.height =  height;
+                    _htmlwindowMaxAndRestoreStateButton.style.width = width + "px";
+                }
+                if(minimizeVisable)
+                {
+                    _htmlMinimizeButton.style.top = top;
+                    _htmlMinimizeButton.style.height = height;
+                    _htmlMinimizeButton.style.width = width + "px";
+                }
+                int leftPlus = increment;
+                if (Settings.WinFormButtonSide == Settings.WinFormButtonSides.Left)
+                {
+                    _htmlcloseButton.style.left = "1px";                    
+                    if(restoreVisiable)
+                    {
+                        leftPlus += increment;
+                        _htmlwindowMaxAndRestoreStateButton.style.left = leftPlus + "px";
+                    }
+                    if (minimizeVisable)
+                    {
+                        leftPlus += increment;
+                        _htmlMinimizeButton.style.left = leftPlus + "px";
+                    }
+                }
+                else
+                {
+                    _htmlcloseButton.style.left = "calc(100% - " + leftPlus + "px)";
+                    
+                    if (restoreVisiable)
+                    {
+                        leftPlus += increment;
+                        _htmlwindowMaxAndRestoreStateButton.style.left = "calc(100% - " + leftPlus + "px)";
+                    }
+                    if (minimizeVisable)
+                    {
+                        leftPlus += increment;
+                        _htmlMinimizeButton.style.left = "calc(100% - " + leftPlus + "px)";
+                    }
+                }
+            }
+
+            
+        }
+
+        private bool _maximizeBox = true;
+        public virtual bool MaximizeBox { get => _maximizeBox; set {
+                if(_maximizeBox != value)
+                {
+                    _maximizeBox = value;
+                    CalculateFormWindowButtons();
+                }
+            } }
+
+        private bool _minimizeBox = true;
+        public virtual bool MinimizeBox
+        {
+            get => _minimizeBox; set
+            {
+                if (_minimizeBox != value)
+                {
+                    _minimizeBox = value;
+                    CalculateFormWindowButtons();
+                }
+            }
+        }
+
         public Form() : base()
         {            
             Element.setAttribute("scope", "form");
+            Element.style.overflow = "visible";
             
             TabStop = false;
 
             this.Location = new Point(0, 0);
+
+            _htmlcloseButton = CreateFormWindowButton(FormWindowButton.Close);
+            _htmlwindowMaxAndRestoreStateButton = CreateFormWindowButton(FormWindowButton.MaxAndRestore);
+            _htmlMinimizeButton = CreateFormWindowButton(FormWindowButton.Minimize);
+
+            //WinFormButtonSide
+
 
             //btnClose = new Button()
             //{
@@ -734,8 +953,9 @@ namespace System.Windows.Forms
             }
         }
 
-        private FormBorderStyle _formBorderStyle;
+        private FormBorderStyle _formBorderStyle = FormBorderStyle.Sizable;
 
+        [DefaultValue(4)]
         public FormBorderStyle FormBorderStyle
         {
             get { return _formBorderStyle; }
@@ -1056,6 +1276,8 @@ namespace System.Windows.Forms
             _setBorderWidth();
 
             ClientSize = clientSize;
+
+            CalculateFormWindowButtons();
         }
 
         private void _setBorderWidth()
@@ -1064,6 +1286,8 @@ namespace System.Windows.Forms
             Element.style.borderBottomWidth = _formBottonBorder + "px";
             Element.style.borderLeftWidth = _formLeftBorder + "px";
             Element.style.borderRightWidth = _formRightBorder + "px";
+
+
         }
         
         public override Font Font { get { return base.Font; } set {                

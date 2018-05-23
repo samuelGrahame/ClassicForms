@@ -36,6 +36,16 @@ namespace System
         /// Only for *FireFox
         /// </summary>
         public static float WinFormDoubleClickDelayMS = 500;
+
+        public static WinFormButtonSides WinFormButtonSide = WinFormButtonSides.Right;
+
+        public enum WinFormButtonSides
+        {
+            Left,
+            Right
+        }
+
+
         /// <summary>
         /// check in the window10.css is in the current html file. window10.css is a classicforms default css file.
         /// </summary>

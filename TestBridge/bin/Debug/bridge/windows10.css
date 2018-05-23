@@ -419,3 +419,36 @@ a[scope=tabpageheader]:focus {
 a[scope=tabpageheader] {
     cursor: default;
 }
+
+div[scope=form-close] {
+    transition: background-color 0.2s ease;
+}
+
+div[scope=form-close]:hover {
+    background-color: rgb(232, 17, 35);
+}
+
+div[scope=form-min] {
+    transition: background-color 0.2s ease;
+}
+
+
+div[scope=form-min]:hover {
+    background-color: rgb(26, 134, 219);
+}
+
+div[scope=form-restore] {
+    transition: background-color 0.2s ease;
+}
+
+    div[scope=form-restore]:hover {
+        background-color: rgb(26, 134, 219);
+    }
+
+div[scope=form-max] {
+    transition: background-color 0.2s ease;
+}
+
+    div[scope=form-max]:hover {
+        background-color: rgb(26, 134, 219);
+    }
