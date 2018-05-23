@@ -13062,6 +13062,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _isDialog: false,
             _inClose: false,
             _inDialogResult: false,
+            _hasShown: false,
+            _preWindowState: 0,
             _windowState: 0,
             _prevwindowState: 0,
             prev_left: 0,
@@ -13166,6 +13168,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this._formMovementModes = System.Windows.Forms.Form.FormMovementModes.None;
                 this.DialogResults = new (System.Collections.Generic.List$1(System.Windows.Forms.DialogOption)).ctor();
                 this._inDialogResult = false;
+                this._hasShown = false;
                 this.DialogResult = System.Windows.Forms.DialogResult.None;
                 this._controlBox = true;
             },
@@ -13217,6 +13220,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 return null;
             },
             SetWindowState: function (state) {
+                if (!this._hasShown) {
+                    this._preWindowState = state;
+                    return;
+                }
                 if (state === this._windowState) {
                     return;
                 }
@@ -13388,6 +13395,23 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     System.Windows.Forms.Form.CalculateZOrder();
                 }
             },
+            PreShown: function () {
+                this._showForm();
+
+                System.Windows.Forms.Form.CalculateZOrder();
+
+                this._hasShown = true;
+
+                this.OnShowed();
+
+                this.Resizing();
+
+                this.OnLoad({ });
+
+                if (this._prevwindowState !== this._windowState) {
+                    this.SetWindowState(this._prevwindowState);
+                }
+            },
             Show: function () {
                 if (this._isDialog) {
                     return;
@@ -13404,13 +13428,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     visbileForms.add(this);
                     this._showForm();
 
-                    System.Windows.Forms.Form.CalculateZOrder();
-
-                    this.OnShowed();
-
-                    this.Resizing();
-
-                    this.OnLoad({ });
+                    this.PreShown();
                 }
 
                 System.Windows.Forms.Form.ActiveForm = this;
@@ -13439,23 +13457,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             _showStartNewLevel: function () {
                 System.Windows.Forms.Form._formCollections.add(new System.Windows.Forms.Form.FormCollection(this));
-                this._showForm();
-                System.Windows.Forms.Form.CalculateZOrder();
 
-                //if (StartPosition == FormStartPosition.Center)
-                //{
-                //    CentreForm();
-                //}
-
-                this.OnShowed();
-
-                this.Resizing();
+                this.PreShown();
 
                 System.Windows.Forms.Form.ActiveForm = this;
-
                 this.Element.focus();
-
-                this.OnLoad({ });
             },
             OnShowed: function () {
 

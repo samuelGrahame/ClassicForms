@@ -609,9 +609,9 @@ namespace System.Windows.Forms
 
             OnLoad(EventArgs.Empty);
 
-            if (_prevwindowState != _windowState)
+            if (_preWindowState != _windowState)
             {
-                SetWindowState(_prevwindowState);
+                SetWindowState(_preWindowState);
             }
         }
 
