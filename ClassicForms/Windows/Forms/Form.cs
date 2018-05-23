@@ -768,7 +768,7 @@ namespace System.Windows.Forms
         {
             if (_allowMoveChange || _allowSizeChange)
             {
-                if (_allowSizeChange)
+                if (_allowSizeChange && WindowState == FormWindowState.Normal)
                 {
                     if (e.X >= 0 && e.X <= 3 && e.Y >= 0 && e.Y <= 3)
                     {
@@ -865,7 +865,14 @@ namespace System.Windows.Forms
                 var newX = (Location.X + e.X) + _prevX;
 
                 if (_formMovementModes == FormMovementModes.Move)
-                {                    
+                {
+                    if (WindowState == FormWindowState.Maximized)
+                    {
+                        WindowState = FormWindowState.Normal;                        
+                        newX = e.X - (prev_width / 2);
+                        _prevX = newX - e.X;
+                    }
+
                     Location = new Point(newX, newY);
                 }else if(_formMovementModes == FormMovementModes.TopLeft)
                 {                    

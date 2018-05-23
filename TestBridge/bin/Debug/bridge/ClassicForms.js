@@ -13408,8 +13408,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 this.OnLoad({ });
 
-                if (this._prevwindowState !== this._windowState) {
-                    this.SetWindowState(this._prevwindowState);
+                if (this._preWindowState !== this._windowState) {
+                    this.SetWindowState(this._preWindowState);
                 }
             },
             Show: function () {
@@ -13471,7 +13471,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             GetMovementMode: function (e) {
                 if (this._allowMoveChange || this._allowSizeChange) {
-                    if (this._allowSizeChange) {
+                    if (this._allowSizeChange && this.WindowState === System.Windows.Forms.FormWindowState.Normal) {
                         if (e.X >= 0 && e.X <= 3 && e.Y >= 0 && e.Y <= 3) {
                             document.body.style.cursor = "nw-resize";
                             return System.Windows.Forms.Form.FormMovementModes.TopLeft;
@@ -13543,6 +13543,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     var newX = ((((this.Location.X + e.X) | 0)) + this._prevX) | 0;
 
                     if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.Move) {
+                        if (this.WindowState === System.Windows.Forms.FormWindowState.Maximized) {
+                            this.WindowState = System.Windows.Forms.FormWindowState.Normal;
+                            //MovingForm.changeWindowState();
+
+                            newX = (e.X - (((Bridge.Int.div(this.prev_width, 2)) | 0))) | 0;
+                            this._prevX = (newX - e.X) | 0;
+                        }
+
                         this.Location = new System.Drawing.Point.$ctor1(newX, newY);
                     } else if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.TopLeft) {
                         this.SuspendLayout();
