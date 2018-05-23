@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -704,7 +705,25 @@ namespace System.Windows.Forms
                 ClickedOnControl = this;
                 ev.stopPropagation();
 
-                OnMouseDown(MouseEventArgs.CreateFromMouseEvent(ev, this));
+                var evar = MouseEventArgs.CreateFromMouseEvent(ev, this);
+
+                if (lastMouseDownEvent == null)
+                {
+                    lastMouseDownEvent = Stopwatch.StartNew();
+                    OnMouseDown(evar);                    
+                }                    
+                else
+                {
+                    if(lastMouseDownEvent.ElapsedMilliseconds <= Settings.WinFormDoubleClickDelayMS)
+                    {
+                        lastMouseDownEvent = null;
+                        if(!Settings.WinFormOnDoubleClickDontDispatchMouseDown)
+                            OnMouseDown(evar);
+                        OnMouseDoubleClick(evar);
+                    }
+                    else
+                        OnMouseDown(evar);
+                }
 
                 return null;
             };
@@ -891,11 +910,14 @@ namespace System.Windows.Forms
         public event MouseEventHandler MouseDown;
         public event MouseEventHandler MouseMove;
         public event MouseEventHandler MouseUp;
+        public event MouseEventHandler MouseDoubleClick;
         public event EventHandler Disposed;
         public event EventHandler MouseLeave;
         public event EventHandler MouseEnter;
         public event EventHandler GotFocus;
         public event EventHandler LostFocus;
+
+        private Stopwatch lastMouseDownEvent;
 
         protected virtual void OnGotFocus(EventArgs e)
         {
@@ -919,6 +941,12 @@ namespace System.Windows.Forms
         {
             if (MouseEnter != null)
                 MouseEnter(this, e);
+        }
+
+        protected virtual void OnMouseDoubleClick(MouseEventArgs e)
+        {
+            if (MouseDoubleClick != null)
+                MouseDoubleClick(this, e);
         }
 
         protected byte layoutSuspendCount;

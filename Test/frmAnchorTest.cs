@@ -148,6 +148,7 @@ namespace Test
             this.Tag = "modal-content";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.frmAnchorTest_Load);
+            this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.frmAnchorTest_MouseDoubleClick);
             this.MouseEnter += new System.EventHandler(this.frmAnchorTest_MouseEnter);
             this.MouseLeave += new System.EventHandler(this.frmAnchorTest_MouseLeave);
             this.Resize += new System.EventHandler(this.frmCustomer_Resize);
@@ -211,6 +212,11 @@ namespace Test
         {
             var x = new frmDockingTest();
             x.Show();
+        }
+
+        private void frmAnchorTest_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+
         }
     }
 }
