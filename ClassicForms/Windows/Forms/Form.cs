@@ -207,6 +207,7 @@ namespace System.Windows.Forms
 
             if ((_windowState = state) == FormWindowState.Normal)
             {
+                Element.style.overflow = "visible";
                 _htmlwindowMaxAndRestoreStateButton.setAttribute("scope", "form-max");
                 SuspendLayout();
                 this.Location = new Point(prev_left, prev_top);
@@ -215,6 +216,7 @@ namespace System.Windows.Forms
             }
             else if (_windowState == FormWindowState.Maximized)
             {
+                Element.style.overflow = "visible";
                 _htmlwindowMaxAndRestoreStateButton.setAttribute("scope", "form-restore");
                 if (_prevwindowState == FormWindowState.Normal)
                 {
@@ -247,8 +249,8 @@ namespace System.Windows.Forms
                 //HeadingTitle.style.left = "3px";
                 //HeadingTitle.style.transform = "translate(0, -50%)";
 
-                //var offset = (ShowClose ? 45.5f : 0);
-
+                //var offset = (ShowClose ? 45.5f : 0);                
+                Element.style.overflow = "hidden";
                 Width = 150; //  (float)Math.Max(GetTextWidth(Text, "10pt Tahoma") + 32, 100) + offset;
                 Height = 30;
 
@@ -834,27 +836,29 @@ namespace System.Windows.Forms
                     minimizeVisable = true;
                 }
                 _htmlcloseButton.style.visibility = "inherit";
-                string top = -(_formTopBorder - 1) + "px";
-                int widthHeight = _formTopBorder;
-                string height = widthHeight - 2 + "px";
-                int increment = widthHeight + (int)(_formTopBorder * 0.25f) - 1;
-                int width = widthHeight + (int)(_formTopBorder * 0.25f) - 2;
+
+                int bonusSize = (int)(_formTopBorder * 0.5f);
+
+                string top = -(_formTopBorder - 1) + "px";                
+                string height = _formTopBorder - 2 + "px";
+                int increment = _formTopBorder + bonusSize - 1;
+                string width = increment - 1 + "px";
 
                 _htmlcloseButton.style.top = top;
                 _htmlcloseButton.style.height = height;
-                _htmlcloseButton.style.width = width + "px";
+                _htmlcloseButton.style.width = width;
 
                 if (restoreVisiable)
                 {
                     _htmlwindowMaxAndRestoreStateButton.style.top = top;
                     _htmlwindowMaxAndRestoreStateButton.style.height =  height;
-                    _htmlwindowMaxAndRestoreStateButton.style.width = width + "px";
+                    _htmlwindowMaxAndRestoreStateButton.style.width = width;
                 }
                 if(minimizeVisable)
                 {
                     _htmlMinimizeButton.style.top = top;
                     _htmlMinimizeButton.style.height = height;
-                    _htmlMinimizeButton.style.width = width + "px";
+                    _htmlMinimizeButton.style.width = width;
                 }
                 int leftPlus = increment;
                 if (Settings.WinFormButtonSide == Settings.WinFormButtonSides.Left)
@@ -986,6 +990,12 @@ namespace System.Windows.Forms
 
         private FormMovementModes GetMovementMode(MouseEventArgs e)
         {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                document.body.style.cursor = null;
+                return FormMovementModes.Move;
+            }                
+
             if (_allowMoveChange || _allowSizeChange)
             {
                 if (_allowSizeChange && WindowState == FormWindowState.Normal)
@@ -1050,6 +1060,11 @@ namespace System.Windows.Forms
             //document.body.style.userSelect = null;
 
             _formMovementModes = GetMovementMode(e);
+            if (WindowState == FormWindowState.Minimized)
+            {
+                _formMovementModes = FormMovementModes.None;
+                WindowState = _prevwindowState;
+            }                            
 
             if ((_mouseDownOnBorder = (_formMovementModes != FormMovementModes.None)))
             {

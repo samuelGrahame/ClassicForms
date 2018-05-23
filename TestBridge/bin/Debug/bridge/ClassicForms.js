@@ -13315,7 +13315,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.$initialize();
                 System.Windows.Forms.ContainerControl.ctor.call(this);
                 this.Element.setAttribute("scope", "form");
-                this.Element.style.overflow = "auto";
+                this.Element.style.overflow = "visible";
 
                 this.TabStop = false;
 
@@ -13390,12 +13390,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 }
 
                 if (((this._windowState = state)) === System.Windows.Forms.FormWindowState.Normal) {
+                    this.Element.style.overflow = "visible";
                     this._htmlwindowMaxAndRestoreStateButton.setAttribute("scope", "form-max");
                     this.SuspendLayout();
                     this.Location = new System.Drawing.Point.$ctor1(this.prev_left, this.prev_top);
                     this.Size = new System.Drawing.Size.$ctor2(this.prev_width, this.prev_height);
                     this.ResumeLayout();
                 } else if (this._windowState === System.Windows.Forms.FormWindowState.Maximized) {
+                    this.Element.style.overflow = "visible";
                     this._htmlwindowMaxAndRestoreStateButton.setAttribute("scope", "form-restore");
                     if (this._prevwindowState === System.Windows.Forms.FormWindowState.Normal) {
                         this.prev_left = this.Left;
@@ -13422,8 +13424,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     //HeadingTitle.style.left = "3px";
                     //HeadingTitle.style.transform = "translate(0, -50%)";
 
-                    //var offset = (ShowClose ? 45.5f : 0);
-
+                    //var offset = (ShowClose ? 45.5f : 0);                
+                    this.Element.style.overflow = "hidden";
                     this.Width = 150; //  (float)Math.Max(GetTextWidth(Text, "10pt Tahoma") + 32, 100) + offset;
                     this.Height = 30;
 
@@ -13713,25 +13715,27 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         minimizeVisable = true;
                     }
                     this._htmlcloseButton.style.visibility = "inherit";
+
+                    var bonusSize = Bridge.Int.clip32(this._formTopBorder * 0.5);
+
                     var top = ((-(((this._formTopBorder - 1) | 0))) | 0) + "px";
-                    var widthHeight = this._formTopBorder;
-                    var height = ((widthHeight - 2) | 0) + "px";
-                    var increment = (((widthHeight + Bridge.Int.clip32((this._formTopBorder * 0.25))) | 0) - 1) | 0;
-                    var width = (((widthHeight + Bridge.Int.clip32((this._formTopBorder * 0.25))) | 0) - 2) | 0;
+                    var height = ((this._formTopBorder - 2) | 0) + "px";
+                    var increment = (((this._formTopBorder + bonusSize) | 0) - 1) | 0;
+                    var width = ((increment - 1) | 0) + "px";
 
                     this._htmlcloseButton.style.top = top;
                     this._htmlcloseButton.style.height = height;
-                    this._htmlcloseButton.style.width = width + "px";
+                    this._htmlcloseButton.style.width = width;
 
                     if (restoreVisiable) {
                         this._htmlwindowMaxAndRestoreStateButton.style.top = top;
                         this._htmlwindowMaxAndRestoreStateButton.style.height = height;
-                        this._htmlwindowMaxAndRestoreStateButton.style.width = width + "px";
+                        this._htmlwindowMaxAndRestoreStateButton.style.width = width;
                     }
                     if (minimizeVisable) {
                         this._htmlMinimizeButton.style.top = top;
                         this._htmlMinimizeButton.style.height = height;
-                        this._htmlMinimizeButton.style.width = width + "px";
+                        this._htmlMinimizeButton.style.width = width;
                     }
                     var leftPlus = increment;
                     if (System.Settings.WinFormButtonSide === System.Settings.WinFormButtonSides.Left) {
@@ -13761,6 +13765,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
             },
             GetMovementMode: function (e) {
+                if (this.WindowState === System.Windows.Forms.FormWindowState.Minimized) {
+                    document.body.style.cursor = null;
+                    return System.Windows.Forms.Form.FormMovementModes.Move;
+                }
+
                 if (this._allowMoveChange || this._allowSizeChange) {
                     if (this._allowSizeChange && this.WindowState === System.Windows.Forms.FormWindowState.Normal) {
                         if (e.X >= 0 && e.X <= 3 && e.Y >= 0 && e.Y <= 3) {
@@ -13806,6 +13815,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 //document.body.style.userSelect = null;
 
                 this._formMovementModes = this.GetMovementMode(e);
+                if (this.WindowState === System.Windows.Forms.FormWindowState.Minimized) {
+                    this._formMovementModes = System.Windows.Forms.Form.FormMovementModes.None;
+                    this.WindowState = this._prevwindowState;
+                }
 
                 if (((this._mouseDownOnBorder = (this._formMovementModes !== System.Windows.Forms.Form.FormMovementModes.None)))) {
                     //document.body.style.userSelect = "none";
