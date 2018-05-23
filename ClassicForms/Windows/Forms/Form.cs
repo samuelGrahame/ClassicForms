@@ -716,6 +716,7 @@ namespace System.Windows.Forms
         {
             var div = new HTMLDivElement();
             div.style.position = "absolute";
+            div.classList.add("form-button");
 
             Action onClick = null;
 
@@ -846,18 +847,21 @@ namespace System.Windows.Forms
 
                 _htmlcloseButton.style.top = top;
                 _htmlcloseButton.style.height = height;
+                _htmlcloseButton.style.lineHeight = height;
                 _htmlcloseButton.style.width = width;
 
                 if (restoreVisiable)
                 {
                     _htmlwindowMaxAndRestoreStateButton.style.top = top;
                     _htmlwindowMaxAndRestoreStateButton.style.height =  height;
+                    _htmlwindowMaxAndRestoreStateButton.style.lineHeight = height;
                     _htmlwindowMaxAndRestoreStateButton.style.width = width;
                 }
                 if(minimizeVisable)
                 {
                     _htmlMinimizeButton.style.top = top;
                     _htmlMinimizeButton.style.height = height;
+                    _htmlMinimizeButton.style.lineHeight = height;
                     _htmlMinimizeButton.style.width = width;
                 }
                 int leftPlus = increment;

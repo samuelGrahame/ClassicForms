@@ -13626,6 +13626,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             CreateFormWindowButton: function (formWindowButton) {
                 var div = document.createElement("div");
                 div.style.position = "absolute";
+                div.classList.add("form-button");
 
                 var onClick = null;
 

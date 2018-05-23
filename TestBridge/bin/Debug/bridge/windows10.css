@@ -420,16 +420,16 @@ a[scope=tabpageheader] {
     cursor: default;
 }
 
-div[scope=form-close] {
-    transition: background-color 0.2s ease;
+div[scope=form-close]:before {
+    content: '\2A09';    
 }
 
 div[scope=form-close]:hover {
     background-color: rgb(232, 17, 35);
 }
 
-div[scope=form-min] {
-    transition: background-color 0.2s ease;
+div[scope=form-min]:before {
+    content: '\1F5D5';    
 }
 
 
@@ -437,18 +437,27 @@ div[scope=form-min]:hover {
     background-color: rgb(26, 134, 219);
 }
 
-div[scope=form-restore] {
+div.form-button {
     transition: background-color 0.2s ease;
+    text-align: center;
+    vertical-align: middle;    
+    font-size: 20px;
+    color: white;
+    font-weight:100;
 }
 
-    div[scope=form-restore]:hover {
-        background-color: rgb(26, 134, 219);
-    }
-
-div[scope=form-max] {
-    transition: background-color 0.2s ease;
+div[scope=form-restore]:before {
+    content: '\25F1';
 }
 
-    div[scope=form-max]:hover {
-        background-color: rgb(26, 134, 219);
-    }
+div[scope=form-restore]:hover {
+    background-color: rgb(26, 134, 219);
+}
+
+div[scope=form-max]:before {
+    content: '\1F5D6';
+}
+
+div[scope=form-max]:hover {
+    background-color: rgb(26, 134, 219);
+}
