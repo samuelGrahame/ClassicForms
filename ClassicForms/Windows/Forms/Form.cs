@@ -166,6 +166,8 @@ namespace System.Windows.Forms
         private bool _isDialog;
         private bool _inClose;
         private bool _inDialogResult = false;
+        private bool _hasShown = false;
+        private FormWindowState _preWindowState;
 
         private FormWindowState _windowState;
         private FormWindowState _prevwindowState;
@@ -182,6 +184,11 @@ namespace System.Windows.Forms
         private int prev_left, prev_top, prev_width, prev_height;
         public void SetWindowState(FormWindowState state)
         {           
+            if(!_hasShown)
+            {
+                _preWindowState = state;
+                return;
+            }
             if (state == _windowState)
                 return;
 
@@ -588,6 +595,26 @@ namespace System.Windows.Forms
             }
         }
 
+        private void PreShown()
+        {
+            _showForm();
+
+            CalculateZOrder();
+
+            _hasShown = true;
+
+            OnShowed();
+
+            Resizing();
+
+            OnLoad(EventArgs.Empty);
+
+            if (_prevwindowState != _windowState)
+            {
+                SetWindowState(_prevwindowState);
+            }
+        }
+
         public void Show()
         {            
             if (_isDialog)
@@ -606,13 +633,7 @@ namespace System.Windows.Forms
                 visbileForms.Add(this);
                 _showForm();
                 
-                CalculateZOrder();
-
-                OnShowed();
-
-                Resizing();
-
-                OnLoad(EventArgs.Empty);
+                PreShown();                
             }
 
             ActiveForm = this;            
@@ -658,23 +679,11 @@ namespace System.Windows.Forms
         private void _showStartNewLevel()
         {            
             _formCollections.Add(new FormCollection(this));
-            _showForm();
-            CalculateZOrder();
-
-            //if (StartPosition == FormStartPosition.Center)
-            //{
-            //    CentreForm();
-            //}
-
-            OnShowed();
             
-            Resizing();
-
+            PreShown();
+            
             ActiveForm = this;
-
             Element.focus();
-
-            OnLoad(EventArgs.Empty);
         }
 
         protected virtual void OnShowed()
