@@ -4597,10 +4597,59 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
     Bridge.define("System.Settings", {
         statics: {
             fields: {
+                IsEdge: false,
+                IsFF: false,
+                /**
+                 * enabled override the default font name.
+                 *
+                 * @static
+                 * @public
+                 * @memberof System.Settings
+                 * @default false
+                 * @type boolean
+                 */
                 WinFormIgnoreFontName: false,
+                /**
+                 * enabled override the default font size.
+                 *
+                 * @static
+                 * @public
+                 * @memberof System.Settings
+                 * @default false
+                 * @type boolean
+                 */
                 WinFormIgnoreFontSize: false,
+                /**
+                 * default font, empty is not used - inherit.
+                 *
+                 * @static
+                 * @public
+                 * @memberof System.Settings
+                 * @default ""
+                 * @type string
+                 */
                 WinFormIgnoreFontDefaultFontName: null,
-                WinFormIgnoreFontDefaultSize: 0
+                /**
+                 * this controls the default font size. if zero it is ignored.
+                 *
+                 * @static
+                 * @public
+                 * @memberof System.Settings
+                 * @default 0
+                 * @type number
+                 */
+                WinFormIgnoreFontDefaultSize: 0,
+                /**
+                 * This is the delay for the double click. because firefox does not allow the double click for elements that have the mouse down event. it will not raise dbl click event. so we will emulate it.
+                 Only for *FireFox
+                 *
+                 * @static
+                 * @public
+                 * @memberof System.Settings
+                 * @default 500
+                 * @type number
+                 */
+                WinFormDoubleClickDelayMS: 0
             },
             ctors: {
                 init: function () {
@@ -4608,9 +4657,19 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this.WinFormIgnoreFontSize = false;
                     this.WinFormIgnoreFontDefaultFontName = "";
                     this.WinFormIgnoreFontDefaultSize = 0;
+                    this.WinFormDoubleClickDelayMS = 500;
                 }
             },
             methods: {
+                /**
+                 * check in the window10.css is in the current html file. window10.css is a classicforms default css file.
+                 *
+                 * @static
+                 * @public
+                 * @this System.Settings
+                 * @memberof System.Settings
+                 * @return  {boolean}
+                 */
                 IsUsingWindowsCSS: function () {
                     for (var i = 0; i < document.head.childElementCount; i = (i + 1) | 0) {
                         var child = document.head.children[i];
@@ -6311,15 +6370,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
     Bridge.define("System.Windows.Forms.MouseEventArgs", {
         statics: {
-            fields: {
-                IsEdge: false,
-                IsFF: false
-            },
             ctors: {
                 ctor: function () {
                     var userAgent = window.navigator.userAgent.toLowerCase();
-                    System.Windows.Forms.MouseEventArgs.IsEdge = System.String.indexOf(userAgent, "edge") > -1;
-                    System.Windows.Forms.MouseEventArgs.IsFF = System.String.indexOf(userAgent, "firefox") > -1;
+                    System.Settings.IsEdge = System.String.indexOf(userAgent, "edge") > -1;
+                    System.Settings.IsFF = System.String.indexOf(userAgent, "firefox") > -1;
                 }
             },
             methods: {
@@ -6329,7 +6384,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                     do {
                         var dym = element;
-                        if (System.Windows.Forms.MouseEventArgs.IsFF) {
+                        if (System.Settings.IsFF) {
                             var rec = element.getBoundingClientRect();
                             top += rec.top;
                             left += rec.left;
@@ -6368,15 +6423,15 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     // what we need to do is get the local x, y off from the target.            
                     var mousePoint = new System.Drawing.Point();
 
-                    if (!System.Windows.Forms.MouseEventArgs.IsFF && Bridge.referenceEquals(original.currentTarget, target.Element)) {
-                        if (Bridge.Browser.isIE || System.Windows.Forms.MouseEventArgs.IsEdge) {
+                    if (!System.Settings.IsFF && Bridge.referenceEquals(original.currentTarget, target.Element)) {
+                        if (Bridge.Browser.isIE || System.Settings.IsEdge) {
                             var offset = System.Windows.Forms.MouseEventArgs.GetOffsetPoint(target.Element);
                             mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(original.clientX - offset.X), Bridge.Int.clip32(original.clientY - offset.Y));
                         } else {
                             mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(original.layerX), Bridge.Int.clip32(original.layerY));
                         }
                     } else {
-                        if (System.Windows.Forms.MouseEventArgs.IsFF) {
+                        if (System.Settings.IsFF) {
                             var vect = System.Windows.Forms.MouseEventArgs.GetClientMouseLocation(original);
                             var rec = target.Element.getBoundingClientRect();
                             mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(vect.X - rec.left), Bridge.Int.clip32(vect.Y - rec.top));
@@ -10654,6 +10709,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             Padding: null,
             _participatesInLayout: false,
             _properties: null,
+            lastMouseDownEvent: null,
             layoutSuspendCount: 0,
             LayoutEngine: null,
             LayoutChanged: null,
@@ -10674,6 +10730,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             MouseDown: null,
             MouseMove: null,
             MouseUp: null,
+            MouseDoubleClick: null,
             Disposed: null,
             MouseLeave: null,
             MouseEnter: null,
@@ -11062,10 +11119,35 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     System.Windows.Forms.Control.ClickedOnControl = this;
                     ev.stopPropagation();
 
-                    this.OnMouseDown(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this));
+                    var evar = System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this);
+                    if (System.Settings.IsFF) {
+                        if (this.lastMouseDownEvent == null) {
+                            this.lastMouseDownEvent = System.Diagnostics.Stopwatch.startNew();
+                            this.OnMouseDown(evar);
+                        } else {
+                            if (System.Int64.toNumber(this.lastMouseDownEvent.milliseconds()) <= System.Settings.WinFormDoubleClickDelayMS) {
+                                this.lastMouseDownEvent = null;
+                                this.OnMouseDoubleClick(evar);
+                            } else {
+                                this.OnMouseDown(evar);
+                            }
+                        }
+                    } else {
+                        this.OnMouseDown(evar);
+                    }
+
 
                     return null;
                 });
+
+                if (!System.Settings.IsFF) {
+                    this.Element.ondblclick = Bridge.fn.bind(this, function (ev) {
+                        var evar = System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this);
+                        this.OnMouseDoubleClick(evar);
+
+                        return null;
+                    });
+                }
 
                 this.Element.onfocus = Bridge.fn.bind(this, function (ev) {
                     var frm = this.FindForm();
@@ -11398,6 +11480,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             OnMouseEnter: function (e) {
                 if (!Bridge.staticEquals(this.MouseEnter, null)) {
                     this.MouseEnter(this, e);
+                }
+            },
+            OnMouseDoubleClick: function (e) {
+                if (!Bridge.staticEquals(this.MouseDoubleClick, null)) {
+                    this.MouseDoubleClick(this, e);
                 }
             },
             SuspendLayout: function () {
@@ -13535,6 +13622,16 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 System.Windows.Forms.ContainerControl.prototype.OnMouseUp.call(this, e);
             },
+            OnMouseDoubleClick: function (e) {
+                if (this.WindowState === System.Windows.Forms.FormWindowState.Normal) {
+                    var movement = this.GetMovementMode(e);
+                    if (movement === System.Windows.Forms.Form.FormMovementModes.Move) {
+                        this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+                    }
+                }
+
+                System.Windows.Forms.ContainerControl.prototype.OnMouseDoubleClick.call(this, e);
+            },
             OnMouseMove: function (e) {
                 // is mouse down???
                 if (this._mouseDownOnBorder) {
@@ -13545,8 +13642,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.Move) {
                         if (this.WindowState === System.Windows.Forms.FormWindowState.Maximized) {
                             this.WindowState = System.Windows.Forms.FormWindowState.Normal;
-                            //MovingForm.changeWindowState();
-
                             newX = (e.X - (((Bridge.Int.div(this.prev_width, 2)) | 0))) | 0;
                             this._prevX = (newX - e.X) | 0;
                         }

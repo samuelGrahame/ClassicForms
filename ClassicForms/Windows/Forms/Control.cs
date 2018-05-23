@@ -706,29 +706,45 @@ namespace System.Windows.Forms
                 ev.stopPropagation();
 
                 var evar = MouseEventArgs.CreateFromMouseEvent(ev, this);
-
-                if (lastMouseDownEvent == null)
+                if(Settings.IsFF)
                 {
-                    lastMouseDownEvent = Stopwatch.StartNew();
-                    OnMouseDown(evar);                    
-                }                    
-                else
-                {
-                    if(lastMouseDownEvent.ElapsedMilliseconds <= Settings.WinFormDoubleClickDelayMS)
+                    if (lastMouseDownEvent == null)
                     {
-                        lastMouseDownEvent = null;
-                        if(!Settings.WinFormOnDoubleClickDontDispatchMouseDown)
-                            OnMouseDown(evar);
-                        OnMouseDoubleClick(evar);
+                        lastMouseDownEvent = Stopwatch.StartNew();
+                        OnMouseDown(evar);
                     }
                     else
-                        OnMouseDown(evar);
+                    {
+                        if (lastMouseDownEvent.ElapsedMilliseconds <= Settings.WinFormDoubleClickDelayMS)
+                        {
+                            lastMouseDownEvent = null;                            
+                            OnMouseDoubleClick(evar);
+                        }
+                        else
+                            OnMouseDown(evar);
+                    }
                 }
+                else
+                {
+                    OnMouseDown(evar);
+                }
+                
 
                 return null;
             };
 
-            Element.onfocus = (ev) =>
+            if (!Settings.IsFF)
+            {
+                Element.ondblclick = (ev) =>
+                {
+                    var evar = MouseEventArgs.CreateFromMouseEvent(ev, this);                    
+                    OnMouseDoubleClick(evar);
+
+                    return null;
+                };
+            }
+
+                Element.onfocus = (ev) =>
             {
                 var frm = this.FindForm();
                 try
