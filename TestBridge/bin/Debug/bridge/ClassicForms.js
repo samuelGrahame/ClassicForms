@@ -13663,7 +13663,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return null;
                 };
                 div.onmousemove = function (ev) {
-                    ev.stopPropagation();
+                    if (System.Windows.Forms.Control.ClickedOnControl == null) {
+                        ev.stopPropagation();
+                    }
                     return null;
                 };
                 div.onmouseup = function (ev) {
@@ -13726,16 +13728,19 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                     this._htmlcloseButton.style.top = top;
                     this._htmlcloseButton.style.height = height;
+                    this._htmlcloseButton.style.lineHeight = height;
                     this._htmlcloseButton.style.width = width;
 
                     if (restoreVisiable) {
                         this._htmlwindowMaxAndRestoreStateButton.style.top = top;
                         this._htmlwindowMaxAndRestoreStateButton.style.height = height;
+                        this._htmlwindowMaxAndRestoreStateButton.style.lineHeight = height;
                         this._htmlwindowMaxAndRestoreStateButton.style.width = width;
                     }
                     if (minimizeVisable) {
                         this._htmlMinimizeButton.style.top = top;
                         this._htmlMinimizeButton.style.height = height;
+                        this._htmlMinimizeButton.style.lineHeight = height;
                         this._htmlMinimizeButton.style.width = width;
                     }
                     var leftPlus = increment;

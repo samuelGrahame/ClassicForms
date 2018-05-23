@@ -440,10 +440,10 @@ div[scope=form-min]:hover {
 div.form-button {
     transition: background-color 0.2s ease;
     text-align: center;
-    vertical-align: middle;    
-    font-size: 20px;
+    vertical-align: middle;
+    font-size: 15px;
     color: white;
-    font-weight:100;
+    font-weight: lighter;
 }
 
 div[scope=form-restore]:before {

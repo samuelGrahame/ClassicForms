@@ -758,12 +758,14 @@ namespace System.Windows.Forms
             }
             div.onmousedown = (ev) =>
             {
-                ev.stopPropagation();
+                if (ClickedOnControl == null)
+                    ev.stopPropagation();
                 return null;
             };
             div.onmousemove = (ev) =>
             {
-                ev.stopPropagation();
+                if (ClickedOnControl == null)
+                    ev.stopPropagation();
                 return null;
             };
             div.onmouseup = (ev) =>
@@ -773,10 +775,12 @@ namespace System.Windows.Forms
             };
             div.onmouseenter = (ev) =>
             {
-                ev.stopPropagation();
-
-                document.body.style.cursor = null;
-
+                if (ClickedOnControl == null)
+                {
+                    ev.stopPropagation();
+                    document.body.style.cursor = null;
+                }
+                    
                 return null;
 
             };
