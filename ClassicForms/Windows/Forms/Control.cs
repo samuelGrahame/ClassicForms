@@ -814,7 +814,7 @@ namespace System.Windows.Forms
             //    Element.style.marginBottom = margin.Bottom + "px";
             //}
             CommonProperties.SetMargin(this, margin);
-        }
+        }        
 
         protected virtual void OnClick(EventArgs e)
         {

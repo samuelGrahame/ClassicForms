@@ -182,7 +182,7 @@ namespace System.Windows.Forms
                 SetWindowState(value); }
         }
         private int prev_left, prev_top, prev_width, prev_height;
-        public void SetWindowState(FormWindowState state)
+        private void SetWindowState(FormWindowState state)
         {           
             if(!_hasShown)
             {
@@ -853,6 +853,20 @@ namespace System.Windows.Forms
             document.body.style.cursor = null;
 
             base.OnMouseUp(e);
+        }
+
+        protected override void OnMouseDoubleClick(MouseEventArgs e)
+        {
+            if(WindowState == FormWindowState.Normal)
+            {
+                var movement = GetMovementMode(e);
+                if (movement == FormMovementModes.Move)
+                {
+                    WindowState = FormWindowState.Maximized;
+                }
+            }
+            
+            base.OnMouseDoubleClick(e);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
