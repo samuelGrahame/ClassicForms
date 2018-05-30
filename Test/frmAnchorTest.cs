@@ -145,7 +145,7 @@ namespace Test
             this.Location = new System.Drawing.Point(50, 50);
             this.Name = "frmAnchorTest";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Tag = "modal-content";
+            this.Tag = "";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.frmAnchorTest_Load);
             this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.frmAnchorTest_MouseDoubleClick);

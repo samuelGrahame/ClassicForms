@@ -4650,7 +4650,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                  * @type number
                  */
                 WinFormDoubleClickDelayMS: 0,
-                WinFormButtonSide: 0
+                WinFormButtonSide: 0,
+                _isUsingWindowsCSS: false,
+                _isUsingBootStrap: false,
+                _isUsingMaterial: false,
+                _hasLoaded: false
             },
             ctors: {
                 init: function () {
@@ -4660,6 +4664,19 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this.WinFormIgnoreFontDefaultSize = 0;
                     this.WinFormDoubleClickDelayMS = 500;
                     this.WinFormButtonSide = System.Settings.WinFormButtonSides.Right;
+                },
+                ctor: function () {
+                    try {
+                        System.Settings._isUsingMaterial = System.Settings.IsUsingMaterial();
+                        System.Settings._isUsingBootStrap = System.Settings.IsUsingBootStrap();
+                        System.Settings._isUsingWindowsCSS = System.Settings.IsUsingWindowsCSS();
+                    }
+                    catch ($e1) {
+                        $e1 = System.Exception.create($e1);
+
+                    }
+
+                    System.Settings._hasLoaded = true;
                 }
             },
             methods: {
@@ -4673,17 +4690,40 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                  * @return  {boolean}
                  */
                 IsUsingWindowsCSS: function () {
+                    if (System.Settings._hasLoaded) {
+                        return System.Settings._isUsingWindowsCSS;
+                    }
+                    return System.Settings.ContainsCssLink("windows10.css");
+                },
+                ContainsCssLink: function (content) {
+                    if (System.String.isNullOrWhiteSpace(content)) {
+                        return false;
+                    }
+
+                    content = content.trim().toLowerCase();
                     for (var i = 0; i < document.head.childElementCount; i = (i + 1) | 0) {
                         var child = document.head.children[i];
                         if (Bridge.is(child, HTMLLinkElement)) {
                             var link = child;
-                            if (link.rel != null && Bridge.referenceEquals(link.rel.toLowerCase(), "stylesheet") && link.href != null && System.String.contains(link.href.toLowerCase(),"windows10.css")) {
+                            if (link.rel != null && Bridge.referenceEquals(link.rel.toLowerCase(), "stylesheet") && link.href != null && System.String.contains(link.href.toLowerCase(),content)) {
                                 return true;
                             }
                         }
                     }
 
                     return false;
+                },
+                IsUsingBootStrap: function () {
+                    if (System.Settings._hasLoaded) {
+                        return System.Settings._isUsingBootStrap;
+                    }
+                    return System.Settings.ContainsCssLink("bootstrap");
+                },
+                IsUsingMaterial: function () {
+                    if (System.Settings._hasLoaded) {
+                        return System.Settings._isUsingMaterial;
+                    }
+                    return System.Settings.ContainsCssLink("material");
                 }
             }
         }
@@ -10574,6 +10614,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 },
                 ctor: function () {
                     document.body.style.overflow = "hidden";
+                    document.body.style.boxSizing = "border-box";
                     window.onmousemove = function (ev) {
                         if (System.Windows.Forms.Control.ClickedOnControl != null) {
                             ev.stopPropagation();
@@ -10982,6 +11023,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return this._tag;
                 },
                 set: function (value) {
+                    if (value != null && Bridge.referenceEquals(System.String.concat(value, ""), "")) {
+                        return;
+                    }
+
                     this._tag = value;
                     if (Bridge.is(this._tag, System.String)) {
                         this.Element.className = (System.String.concat(this._tag, ""));
@@ -11128,6 +11173,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 this.Element.style.fontSize = "inherit";
                 this.Element.style.fontFamily = "inherit";
+                this.Element.style.boxSizing = "border-box";
 
                 this.Visible = true;
 
@@ -11474,6 +11520,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (!Bridge.staticEquals(this.Load, null)) {
                     this.Load(this, e);
                 }
+
+                var defaultTag = this.GetDefaultTag();
+                if (!System.String.isNullOrWhiteSpace(defaultTag)) {
+                    this.Tag = defaultTag;
+                }
+            },
+            GetDefaultTag: function () {
+                return null;
             },
             OnMouseUp: function (e) {
                 if (!Bridge.staticEquals(this.MouseUp, null)) {
@@ -12774,6 +12828,23 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             }
         },
         methods: {
+            GetDefaultTag: function () {
+                var currentTag = Bridge.as(this.Tag, System.String);
+
+                if (System.Settings.IsUsingMaterial()) {
+                    if (System.String.isNullOrWhiteSpace(currentTag) || !System.String.contains(currentTag.toLowerCase(),"btn-primary")) {
+                        return "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect";
+                    } else {
+                        return "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent";
+                    }
+                } else if (System.Settings.IsUsingBootStrap()) {
+                    if (System.String.isNullOrWhiteSpace(currentTag) || !System.String.contains(currentTag.toLowerCase(),"btn")) {
+                        return "btn btn-default";
+                    }
+                }
+
+                return System.Windows.Forms.ButtonBase.prototype.GetDefaultTag.call(this);
+            },
             OnClick: function (e) {
                 if (this.DialogResult !== System.Windows.Forms.DialogResult.None) {
                     var frm = this.GetForm();
@@ -13339,6 +13410,16 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             }
         },
         methods: {
+            GetDefaultTag: function () {
+                if (System.Settings.IsUsingBootStrap()) {
+                    return "modal-content";
+                } else {
+                    if (System.Settings.IsUsingMaterial()) {
+                        return "mdl-dialog";
+                    }
+                }
+                return System.Windows.Forms.ContainerControl.prototype.GetDefaultTag.call(this);
+            },
             SetActiveControl: function (control) {
                 if (this._activeControl != null) {
                     this._activeControl.Element.blur();
@@ -13659,7 +13740,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         break;
                 }
                 div.onmousedown = function (ev) {
-                    ev.stopPropagation();
+                    if (System.Windows.Forms.Control.ClickedOnControl == null) {
+                        ev.stopPropagation();
+                    }
                     return null;
                 };
                 div.onmousemove = function (ev) {
@@ -13673,9 +13756,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return null;
                 };
                 div.onmouseenter = function (ev) {
-                    ev.stopPropagation();
-
-                    document.body.style.cursor = null;
+                    if (System.Windows.Forms.Control.ClickedOnControl == null) {
+                        ev.stopPropagation();
+                        document.body.style.cursor = null;
+                    }
 
                     return null;
 
@@ -14005,6 +14089,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.CalculateFormWindowButtons();
             },
             _setBorderWidth: function () {
+                this.Element.style.borderStyle = "solid";
                 this.Element.style.borderTopWidth = this._formTopBorder + "px";
                 this.Element.style.borderBottomWidth = this._formBottonBorder + "px";
                 this.Element.style.borderLeftWidth = this._formLeftBorder + "px";

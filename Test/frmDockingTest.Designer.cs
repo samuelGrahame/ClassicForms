@@ -68,7 +68,6 @@
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(77, 67);
             this.button4.TabIndex = 3;
-            this.button4.Tag = "btn btn-warning";
             this.button4.Text = "Close";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
@@ -79,7 +78,6 @@
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(77, 67);
             this.button3.TabIndex = 2;
-            this.button3.Tag = "btn btn-light";
             this.button3.Text = "Delete";
             this.button3.UseVisualStyleBackColor = true;
             // 
@@ -89,7 +87,6 @@
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(77, 67);
             this.button2.TabIndex = 1;
-            this.button2.Tag = "btn btn-light";
             this.button2.Text = "New";
             this.button2.UseVisualStyleBackColor = true;
             // 
@@ -99,7 +96,6 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(77, 67);
             this.button1.TabIndex = 0;
-            this.button1.Tag = "btn btn-primary";
             this.button1.Text = "Save";
             this.button1.UseVisualStyleBackColor = true;
             // 
@@ -209,8 +205,9 @@
             this.Controls.Add(this.panel1);
             this.Name = "frmDockingTest";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Tag = "modal-content";
+            this.Tag = "";
             this.Text = "frmDockingTest";
+            this.Load += new System.EventHandler(this.frmDockingTest_Load);
             this.panel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();

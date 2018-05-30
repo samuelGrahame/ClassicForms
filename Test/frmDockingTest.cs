@@ -21,5 +21,10 @@ namespace Test
         {
             this.Close();
         }
+
+        private void frmDockingTest_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

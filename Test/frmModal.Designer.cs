@@ -79,7 +79,7 @@
             this.Controls.Add(this.button8);
             this.Name = "frmModal";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Tag = "modal-content";
+            this.Tag = "";
             this.Text = "frmModal";
             this.ResumeLayout(false);
 

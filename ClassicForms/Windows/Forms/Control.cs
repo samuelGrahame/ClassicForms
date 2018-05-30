@@ -489,9 +489,12 @@ namespace System.Windows.Forms
             get { return _tag; }
             set
             {
+                if (value != null && value + "" == "")
+                    return;
+
                 _tag = value;
                 if (_tag is string)
-                {
+                {                    
                     Element.className = (_tag + "");
                 }
                 else
@@ -534,6 +537,7 @@ namespace System.Windows.Forms
         static Control()
         {
             document.body.style.overflow = "hidden";
+            document.body.style.boxSizing = "border-box";
             window.onmousemove = (ev) =>
             {
                 if (ClickedOnControl != null)
@@ -689,6 +693,7 @@ namespace System.Windows.Forms
 
             Element.style.fontSize = "inherit";
             Element.style.fontFamily = "inherit";
+            Element.style.boxSizing = "border-box";
 
             Visible = true;
 
@@ -861,6 +866,15 @@ namespace System.Windows.Forms
 
             if (Load != null)
                 Load(this, e);
+
+            var defaultTag = GetDefaultTag();
+            if (!string.IsNullOrWhiteSpace(defaultTag))
+                Tag = defaultTag;
+        }
+
+        protected virtual string GetDefaultTag()
+        {
+            return null;
         }
 
         public event EventHandler Load;        

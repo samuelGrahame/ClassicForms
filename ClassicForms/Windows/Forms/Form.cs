@@ -18,6 +18,17 @@ namespace System.Windows.Forms
         private bool _allowSizeChange = true;
         private bool _allowMoveChange = true;
 
+        protected override string GetDefaultTag()
+        {
+            if (Settings.IsUsingBootStrap())
+                return "modal-content";
+            else if (Settings.IsUsingMaterial())
+            {
+                return "mdl-dialog";
+            }
+            return base.GetDefaultTag();
+        }
+
         private bool _mouseDownOnBorder = false;
         private FormMovementModes _formMovementModes = FormMovementModes.None;
         public static HTMLDivElement _formOverLay = null;
@@ -1305,6 +1316,7 @@ namespace System.Windows.Forms
 
         private void _setBorderWidth()
         {
+            Element.style.borderStyle = "solid";
             Element.style.borderTopWidth = _formTopBorder + "px";
             Element.style.borderBottomWidth = _formBottonBorder + "px";
             Element.style.borderLeftWidth = _formLeftBorder + "px";
