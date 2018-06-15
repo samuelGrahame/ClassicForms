@@ -546,7 +546,6 @@ namespace System.Windows.Forms
 
                     ClickedOnControl.OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev, ClickedOnControl));
                 }
-                return null;
             };
 
             window.onkeydown = (ev) =>
@@ -618,9 +617,7 @@ namespace System.Windows.Forms
                             //}                            
                         }
                     }
-                }
-                
-                return null;
+                }                
             };
 
             window.onmouseup = (ev) =>
@@ -633,7 +630,6 @@ namespace System.Windows.Forms
 
                     ClickedOnControl = null;
                 }
-                return null;
             };
             window.onresize = (ev) =>
             {
@@ -648,8 +644,6 @@ namespace System.Windows.Forms
                 }
                 if (containsMin)
                     Form.CalculateMinmizedFormsLocation();
-
-                return null;
             };
         }
 
@@ -702,7 +696,6 @@ namespace System.Windows.Forms
             Element.onclick = (ev) =>
             {
                 OnClick(EventArgs.Empty);
-                return null;
             };
 
             Element.onmousedown = (ev) =>
@@ -732,10 +725,7 @@ namespace System.Windows.Forms
                 else
                 {
                     OnMouseDown(evar);
-                }
-                
-
-                return null;
+                }                
             };
 
             if (!Settings.IsFF)
@@ -744,8 +734,6 @@ namespace System.Windows.Forms
                 {
                     var evar = MouseEventArgs.CreateFromMouseEvent(ev, this);                    
                     OnMouseDoubleClick(evar);
-
-                    return null;
                 };
             }
 
@@ -762,15 +750,11 @@ namespace System.Windows.Forms
                 }
 
                 OnGotFocus(EventArgs.Empty);
-
-                return null;
             };
 
             Element.onblur = (ev) =>
             {                
                 OnLostFocus(EventArgs.Empty);
-
-                return null;
             };
 
             Element.onmouseleave = (ev) =>
@@ -783,8 +767,6 @@ namespace System.Windows.Forms
                 }
 
                 OnMouseLeave(EventArgs.Empty);
-
-                return null;
             };
 
             Element.onmouseenter = (ev) =>
@@ -792,8 +774,6 @@ namespace System.Windows.Forms
                 ev.stopPropagation();
 
                 OnMouseEnter(EventArgs.Empty);
-
-                return null;
             };
 
             Element.onmousemove = (ev) =>
@@ -804,8 +784,6 @@ namespace System.Windows.Forms
 
                     OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev, this));
                 }
-
-                return null;
             };
             SetMargins(GetDefaultMargins());
             AutoSizeMode = AutoSizeMode.GrowOnly;

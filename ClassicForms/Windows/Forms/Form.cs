@@ -80,7 +80,6 @@ namespace System.Windows.Forms
                     document.activeElement.As<HTMLElement>().focus();
                     ev.preventDefault();                    
                 }
-                return null;
             };
 
 
@@ -771,18 +770,15 @@ namespace System.Windows.Forms
             {
                 if (ClickedOnControl == null)
                     ev.stopPropagation();
-                return null;
             };
             div.onmousemove = (ev) =>
             {
                 if (ClickedOnControl == null)
                     ev.stopPropagation();
-                return null;
             };
             div.onmouseup = (ev) =>
             {
                 ev.stopPropagation();
-                return null;
             };
             div.onmouseenter = (ev) =>
             {
@@ -790,10 +786,7 @@ namespace System.Windows.Forms
                 {
                     ev.stopPropagation();
                     document.body.style.cursor = null;
-                }
-                    
-                return null;
-
+                }                
             };
             
             div.onclick = (ev) =>
@@ -801,7 +794,6 @@ namespace System.Windows.Forms
                 ev.stopPropagation();
                 if(onClick != null)
                     onClick();
-                return null;
             };
 
             Element.appendChild(div);

@@ -60,7 +60,7 @@ namespace System.Data
                 }
                 else
                 {
-                    Element.children[columnIndex].As<HTMLElement>().innerText = (value + "");
+                    Element.children[(uint)columnIndex].As<HTMLElement>().innerText = (value + "");
                     data[columnIndex] = value;
                 }                
             } }       

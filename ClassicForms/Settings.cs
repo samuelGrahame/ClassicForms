@@ -63,7 +63,7 @@ namespace System
                 return false;
 
             content = content.Trim().ToLower();
-            for (int i = 0; i < document.head.childElementCount; i++)
+            for (uint i = 0; i < document.head.childElementCount; i++)
             {
                 var child = document.head.children[i];
                 if (child is HTMLLinkElement)
