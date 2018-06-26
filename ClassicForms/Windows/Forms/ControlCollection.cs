@@ -19,7 +19,7 @@ namespace System.Windows.Forms
         public ControlCollection(Control owner)
         {
             _owner = owner;
-            layer = layer;
+            layer = owner.Element;
             _items = new List<Control>();
         }
 

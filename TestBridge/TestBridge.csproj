@@ -70,7 +70,6 @@
     <Content Include="bin\Debug\bridge\bridge.meta.js" />
     <Content Include="bin\Debug\bridge\ClassicForms.js" />
     <Content Include="bin\Debug\bridge\ClassicForms.meta.js" />
-    <Content Include="bin\Debug\bridge\index.mdl.html" />
     <Content Include="bin\Debug\bridge\index.windows10.html" />
     <Content Include="bin\Debug\bridge\index.bootstrap.html" />
     <Content Include="bin\Debug\bridge\index.html" />

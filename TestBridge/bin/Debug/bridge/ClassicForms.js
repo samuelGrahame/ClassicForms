@@ -11198,7 +11198,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             ctor: function (owner) {
                 this.$initialize();
                 this._owner = owner;
-                this.layer = this.layer;
+                this.layer = owner.Element;
                 this._items = new (System.Collections.Generic.List$1(System.Windows.Forms.Control)).ctor();
             }
         },
@@ -12425,6 +12425,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _formRightBorder: 0,
             _allowSizeChange: false,
             _allowMoveChange: false,
+            HeadingTitle: null,
             _mouseDownOnBorder: false,
             _formMovementModes: 0,
             _activeControl: null,
@@ -12442,6 +12443,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             prev_width: 0,
             prev_height: 0,
             DialogResult: 0,
+            _allowStateChangeInPre: false,
             _prevX: 0,
             _prevY: 0,
             _prevFormX: 0,
@@ -12452,8 +12454,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _maximizeBox: false,
             _minimizeBox: false,
             _controlBox: false,
-            _formBorderStyle: 0,
-            Text: null
+            _formBorderStyle: 0
         },
         props: {
             ActiveControl: {
@@ -12552,6 +12553,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 set: function (value) {
                     this.Size = this.SetSize(value.$clone());
                 }
+            },
+            Text: {
+                get: function () {
+                    return this.HeadingTitle.innerText;
+                },
+                set: function (value) {
+                    this.HeadingTitle.innerText = value;
+                }
             }
         },
         ctors: {
@@ -12568,6 +12577,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this._inDialogResult = false;
                 this._hasShown = false;
                 this.DialogResult = System.Windows.Forms.DialogResult.None;
+                this._allowStateChangeInPre = false;
                 this._maximizeBox = true;
                 this._minimizeBox = true;
                 this._controlBox = true;
@@ -12586,6 +12596,15 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 formBase.style.top = "0";
                 formBase.style.width = "100%";
                 formBase.style.height = "100%";
+
+                this.HeadingTitle = document.createElement("span");
+                this.HeadingTitle.style.marginRight = "0";
+                this.HeadingTitle.style.left = "3px";
+                this.HeadingTitle.setAttribute("scope", "form-title");
+                this.HeadingTitle.style.position = "absolute";
+                this.HeadingTitle.style.color = "white";
+
+                this.Element.appendChild(this.HeadingTitle);
 
                 this.Controls.layer = formBase;
 
@@ -12669,9 +12688,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     System.Windows.Forms.Form.CalculateMinmizedFormsLocation();
                 }
 
-                if (!this._allowSizeChange) {
+                if (!this._allowSizeChange && !this._allowStateChangeInPre) {
                     return;
                 }
+
+                this._htmlMinimizeButton.style.display = "";
+                this._htmlwindowMaxAndRestoreStateButton.style.display = "";
 
                 if (((this._windowState = state)) === System.Windows.Forms.FormWindowState.Normal) {
                     this.Element.style.overflow = "visible";
@@ -12709,7 +12731,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     //HeadingTitle.style.transform = "translate(0, -50%)";
 
                     //var offset = (ShowClose ? 45.5f : 0);                
-                    this.Element.style.overflow = "hidden";
+                    //Element.style.overflow = "hidden";
                     this.Width = 150; //  (float)Math.Max(GetTextWidth(Text, "10pt Tahoma") + 32, 100) + offset;
                     this.Height = 30;
 
@@ -12719,7 +12741,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     //{
                     //    ButtonMinimize.innerHTML = "+";
                     //}
-
+                    this._htmlMinimizeButton.style.display = "none";
+                    this._htmlwindowMaxAndRestoreStateButton.style.display = "none";
                     //previousDisplay = Body.style.display;
                     //Body.style.display = "none";
 
@@ -12845,7 +12868,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.OnLoad({ });
 
                 if (this._preWindowState !== this._windowState) {
+                    this._allowStateChangeInPre = true;
                     this.SetWindowState(this._preWindowState);
+                    this._allowStateChangeInPre = false;
                 }
 
                 this.CalculateFormWindowButtons();
@@ -13291,6 +13316,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.Element.style.borderLeftWidth = this._formLeftBorder + "px";
                 this.Element.style.borderRightWidth = this._formRightBorder + "px";
 
+                this.HeadingTitle.style.top = ((-(((this._formTopBorder - 3) | 0))) | 0) + "px";
+                //HeadingTitle.style.lineHeight = _formTopBorder + "px";
+                this.HeadingTitle.style.display = this.ControlBox ? "" : "none";
+                this.HeadingTitle.style.transform = "translate(0, 50%)";
 
             },
             GetClientSize: function (size) {

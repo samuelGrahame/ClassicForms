@@ -161,6 +161,7 @@ namespace Test
             this.Name = "frmAnchorTest";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Tag = "modal-content";
+            this.Text = "Main Menu";
             this.Load += new System.EventHandler(this.frmAnchorTest_Load);
             this.MouseEnter += new System.EventHandler(this.frmAnchorTest_MouseEnter);
             this.MouseLeave += new System.EventHandler(this.frmAnchorTest_MouseLeave);

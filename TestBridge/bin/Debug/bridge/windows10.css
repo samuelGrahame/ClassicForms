@@ -461,3 +461,7 @@ div[scope=form-max]:before {
 div[scope=form-max]:hover {
     background-color: rgb(26, 134, 219);
 }
+
+span[scope=form-title] {
+    color: white;
+}

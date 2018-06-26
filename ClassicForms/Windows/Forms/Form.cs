@@ -17,6 +17,7 @@ namespace System.Windows.Forms
         private int _formRightBorder = 1;
         private bool _allowSizeChange = true;
         private bool _allowMoveChange = true;
+        protected HTMLSpanElement HeadingTitle;
 
         protected override string GetDefaultTag()
         {
@@ -212,8 +213,11 @@ namespace System.Windows.Forms
                 CalculateMinmizedFormsLocation();
             }
 
-            if (!_allowSizeChange)
+            if (!_allowSizeChange && !_allowStateChangeInPre)
                 return;
+
+            _htmlMinimizeButton.style.display = "";
+            _htmlwindowMaxAndRestoreStateButton.style.display = "";
 
             if ((_windowState = state) == FormWindowState.Normal)
             {
@@ -260,7 +264,7 @@ namespace System.Windows.Forms
                 //HeadingTitle.style.transform = "translate(0, -50%)";
 
                 //var offset = (ShowClose ? 45.5f : 0);                
-                Element.style.overflow = "hidden";
+                //Element.style.overflow = "hidden";
                 Width = 150; //  (float)Math.Max(GetTextWidth(Text, "10pt Tahoma") + 32, 100) + offset;
                 Height = 30;
 
@@ -270,7 +274,8 @@ namespace System.Windows.Forms
                 //{
                 //    ButtonMinimize.innerHTML = "+";
                 //}
-
+                _htmlMinimizeButton.style.display = "none";
+                _htmlwindowMaxAndRestoreStateButton.style.display = "none";
                 //previousDisplay = Body.style.display;
                 //Body.style.display = "none";
 
@@ -608,7 +613,7 @@ namespace System.Windows.Forms
                 CalculateZOrder();
             }
         }
-
+        bool _allowStateChangeInPre = false;
         private void PreShown()
         {
             _showForm();
@@ -625,7 +630,9 @@ namespace System.Windows.Forms
 
             if (_preWindowState != _windowState)
             {
+                _allowStateChangeInPre = true;
                 SetWindowState(_preWindowState);
+                _allowStateChangeInPre = false;
             }
 
             CalculateFormWindowButtons();
@@ -940,6 +947,15 @@ namespace System.Windows.Forms
             formBase.style.top = "0";
             formBase.style.width = "100%";
             formBase.style.height = "100%";
+
+            HeadingTitle = new HTMLSpanElement();
+            HeadingTitle.style.marginRight = "0";
+            HeadingTitle.style.left = "3px";            
+            HeadingTitle.setAttribute("scope", "form-title");
+            HeadingTitle.style.position = "absolute";
+            HeadingTitle.style.color = "white";
+
+            Element.appendChild(HeadingTitle);
 
             this.Controls.layer = formBase;
 
@@ -1326,6 +1342,10 @@ namespace System.Windows.Forms
             Element.style.borderLeftWidth = _formLeftBorder + "px";
             Element.style.borderRightWidth = _formRightBorder + "px";
 
+            HeadingTitle.style.top = -(_formTopBorder - 3) + "px";
+            //HeadingTitle.style.lineHeight = _formTopBorder + "px";
+            HeadingTitle.style.display = ControlBox ? "" : "none";
+            HeadingTitle.style.transform = "translate(0, 50%)";
 
         }
         
@@ -1348,6 +1368,6 @@ namespace System.Windows.Forms
 
         }
         public override Size ClientSize { get { return GetClientSize(Size); } set { Size = SetSize(value); } }
-        public override string Text { get; set; }        
+        public override string Text { get => HeadingTitle.innerText; set => HeadingTitle.innerText = value; }        
     }
 }
