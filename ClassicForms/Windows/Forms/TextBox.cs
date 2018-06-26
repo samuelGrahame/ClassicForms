@@ -13,15 +13,13 @@ namespace System.Windows.Forms
         public TextBox() : base(new HTMLInputElement() { type = "text" })
         {
             //TextChanged
-            Func<Event, object> workOutEvent = (ev) =>
+            Action<Event> workOutEvent = (ev) =>
             {
                 if(Text != prevString)
                 {
                     prevString = Text;
                     OnTextChanged(EventArgs.Empty);
                 }
-                
-                return null;
             };
 
             Element.onchange = new HTMLElement.onactivateFn(workOutEvent);

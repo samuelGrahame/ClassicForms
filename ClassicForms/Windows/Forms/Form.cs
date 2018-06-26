@@ -48,7 +48,6 @@ namespace System.Windows.Forms
                     document.activeElement.As<HTMLElement>().focus();
                     ev.preventDefault();                    
                 }
-                return null;
             };
 
 

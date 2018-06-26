@@ -1364,11 +1364,11 @@ namespace System.Drawing
             {
                 if (A != 255)
                 {
-                    return string.Format("#{0}{1}{2}{3}", componentToHex(A), componentToHex(R), componentToHex(G), componentToHex(B));
+                    return string.Format("rgba({1},{2},{3},{0})", A, R, G, B);
                 }
                 else
                 {
-                    return string.Format("#{0}{1}{2}", componentToHex(R), componentToHex(G), componentToHex(B));
+                    return string.Format("rgb({0},{1},{2})", R, G, B);
                 }
             }   
         }

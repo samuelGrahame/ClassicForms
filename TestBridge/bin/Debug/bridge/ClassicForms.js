@@ -1,7 +1,7 @@
 /**
  * @version 1.0.0.0
  * @copyright Copyright ©  2018
- * @compiler Bridge.NET 17.0.0
+ * @compiler Bridge.NET 17.1.1
  */
 Bridge.assembly("ClassicForms", function ($asm, globals) {
     "use strict";
@@ -89,12 +89,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (value < this._size) {
                         throw new System.ArgumentOutOfRangeException.$ctor4("value", System.EnvironmentV2.GetResourceString("ArgumentOutOfRange_SmallCapacity"));
                     }
+
                     if (value !== this._items.length) {
                         if (value > 0) {
                             var destinationArray = System.Array.init(value, null, System.Object);
                             if (this._size > 0) {
                                 System.Array.copy(this._items, 0, destinationArray, 0, this._size);
                             }
+
                             this._items = destinationArray;
                         } else {
                             this._items = System.Array.init(4, null, System.Object);
@@ -714,7 +716,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             IsReadOnly: {
                 get: function () {
-                    return System.Array.getIsReadOnly(this._list);
+                    return System.Array.getIsReadOnly(this._list, Object);
                 }
             },
             IsSynchronized: {
@@ -977,12 +979,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             IsFixedSize: {
                 get: function () {
-                    return this._list.System$Collections$IList$IsFixedSize;
+                    return System.Array.isFixedSize(this._list);
                 }
             },
             IsReadOnly: {
                 get: function () {
-                    return System.Array.getIsReadOnly(this._list);
+                    return System.Array.getIsReadOnly(this._list, Object);
                 }
             },
             IsSynchronized: {
@@ -1040,14 +1042,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 var obj2 = this._root;
                 obj2;
                 {
-                    return System.Array.add(this._list, value);
+                    return System.Array.add(this._list, value, Object);
                 }
             },
             clear: function () {
                 var obj2 = this._root;
                 obj2;
                 {
-                    System.Array.clear(this._list);
+                    System.Array.clear(this._list, Object);
                 }
             },
             contains: function (item) {
@@ -1082,21 +1084,21 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 var obj2 = this._root;
                 obj2;
                 {
-                    System.Array.insert(this._list, index, value);
+                    System.Array.insert(this._list, index, value, Object);
                 }
             },
             remove: function (value) {
                 var obj2 = this._root;
                 obj2;
                 {
-                    System.Array.remove(this._list, value);
+                    System.Array.remove(this._list, value, Object);
                 }
             },
             removeAt: function (index) {
                 var obj2 = this._root;
                 obj2;
                 {
-                    this._list.System$Collections$IList$removeAt(index);
+                    System.Array.removeAt(this._list, index, Object);
                 }
             }
         }
@@ -1637,7 +1639,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         }
                     }
                 } else {
-                    this.Element.children[columnIndex].innerText = (System.String.concat(value, ""));
+                    this.Element.children[(columnIndex >>> 0)].innerText = (System.String.concat(value, ""));
                     this.data.setItem(columnIndex, value);
                 }
             }
@@ -2612,9 +2614,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return System.Drawing.Color.FromArgb(System.Drawing.KnownColorTable.KnownColorToArgb(this.knownColor)).ToHtml();
                 } else {
                     if (this.A !== 255) {
-                        return System.String.format("#{0}{1}{2}{3}", this.componentToHex(this.A), this.componentToHex(this.R), this.componentToHex(this.G), this.componentToHex(this.B));
+                        return System.String.format("rgba({1},{2},{3},{0})", Bridge.box(this.A, System.Byte), Bridge.box(this.R, System.Byte), Bridge.box(this.G, System.Byte), Bridge.box(this.B, System.Byte));
                     } else {
-                        return System.String.format("#{0}{1}{2}", this.componentToHex(this.R), this.componentToHex(this.G), this.componentToHex(this.B));
+                        return System.String.format("rgb({0},{1},{2})", Bridge.box(this.R, System.Byte), Bridge.box(this.G, System.Byte), Bridge.box(this.B, System.Byte));
                     }
                 }
             },
@@ -6285,7 +6287,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         }
                     }
 
-                    var button = Bridge.Int.clip32(original.button);
+                    var button = original.button;
                     return ($t = new System.Windows.Forms.MouseEventArgs(button === 1 ? System.Windows.Forms.MouseButtons.Left : button === 2 ? System.Windows.Forms.MouseButtons.Right : button === 4 ? System.Windows.Forms.MouseButtons.Middle : button === 8 ? System.Windows.Forms.MouseButtons.XButton2 : System.Windows.Forms.MouseButtons.XButton2, 1, mousePoint.X, mousePoint.Y, 0), $t.Original = original, $t);
                 }
             }
@@ -6433,7 +6435,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             insert: function (index, item) {
                 var $t;
-                this._owner.Element.insertBefore(($t = document.createElement("option"), $t.value = Bridge.toString(this._controls.Count), $t.textContent = (System.String.concat(item, "")), $t), Bridge.cast(this._owner.Element.childNodes[index], Node));
+                this._owner.Element.insertBefore(($t = document.createElement("option"), $t.value = Bridge.toString(this._controls.Count), $t.textContent = (System.String.concat(item, "")), $t), this._owner.Element.childNodes[index]);
                 this._controls.insert(index, item);
             },
             remove: function (item) {
@@ -7607,12 +7609,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             IsFixedSize: {
                 get: function () {
-                    return this._list.System$Collections$IList$IsFixedSize;
+                    return System.Array.isFixedSize(this._list);
                 }
             },
             IsReadOnly: {
                 get: function () {
-                    return System.Array.getIsReadOnly(this._list);
+                    return System.Array.getIsReadOnly(this._list, Object);
                 }
             },
             IsSynchronized: {
@@ -7662,7 +7664,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this._version = (this._version + 1) | 0;
             },
             add: function (obj) {
-                var num = System.Array.add(this._list, obj);
+                var num = System.Array.add(this._list, obj, Object);
                 this._version = (this._version + 1) | 0;
                 return num;
             },
@@ -7696,10 +7698,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 return ~num;
             },
             clear: function () {
-                if (this._list.System$Collections$IList$IsFixedSize) {
+                if (System.Array.isFixedSize(this._list)) {
                     throw new System.NotSupportedException.$ctor1(System.EnvironmentV2.GetResourceString("NotSupported_FixedSizeCollection"));
                 }
-                System.Array.clear(this._list);
+                System.Array.clear(this._list, Object);
                 this._version = (this._version + 1) | 0;
             },
             clone: function () {
@@ -7785,7 +7787,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 return -1;
             },
             insert: function (index, obj) {
-                System.Array.insert(this._list, index, obj);
+                System.Array.insert(this._list, index, obj, Object);
                 this._version = (this._version + 1) | 0;
             },
             InsertRange: function (index, c) {
@@ -7802,7 +7804,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     } else {
                         var enumerator = Bridge.getEnumerator(c);
                         while (enumerator.System$Collections$IEnumerator$moveNext()) {
-                            System.Array.insert(this._list, Bridge.identity(index, (index = (index + 1) | 0)), enumerator.System$Collections$IEnumerator$Current);
+                            System.Array.insert(this._list, Bridge.identity(index, (index = (index + 1) | 0)), enumerator.System$Collections$IEnumerator$Current, Object);
                         }
                     }
                     this._version = (this._version + 1) | 0;
@@ -7846,7 +7848,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 }
             },
             removeAt: function (index) {
-                this._list.System$Collections$IList$removeAt(index);
+                System.Array.removeAt(this._list, index, Object);
                 this._version = (this._version + 1) | 0;
             },
             RemoveRange: function (index, count) {
@@ -7860,7 +7862,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this._version = (this._version + 1) | 0;
                 }
                 while (count > 0) {
-                    this._list.System$Collections$IList$removeAt(index);
+                    System.Array.removeAt(this._list, index, Object);
                     count = (count - 1) | 0;
                 }
             },
@@ -9650,7 +9652,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 return this._controls.indexOf(item);
             },
             insert: function (index, item) {
-                this.header.insertBefore(item.Element, Bridge.cast(this.header.childNodes[index], Node));
+                this.header.insertBefore(item.Element, this.header.childNodes[index]);
                 this._controls.insert(index, item);
             },
             remove: function (item) {
@@ -9786,7 +9788,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 return this._controls.indexOf(item);
             },
             insert: function (index, item) {
-                this.body.insertBefore(item.Element, Bridge.cast(this.body.childNodes[index], Node));
+                this.body.insertBefore(item.Element, this.body.childNodes[index]);
                 this._controls.insert(index, item);
             },
             remove: function (item) {
@@ -10411,7 +10413,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                             System.Windows.Forms.Control.ClickedOnControl.OnMouseMove(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, System.Windows.Forms.Control.ClickedOnControl));
                         }
-                        return null;
                     };
 
                     window.onmouseup = function (ev) {
@@ -10422,7 +10423,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                             System.Windows.Forms.Control.ClickedOnControl = null;
                         }
-                        return null;
                     };
 
                 }
@@ -10493,12 +10493,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (!System.Windows.Forms.ClientUtils.IsEnumValid(Bridge.box(value, System.Windows.Forms.AutoSizeMode, System.Enum.toStringFn(System.Windows.Forms.AutoSizeMode)), value, 0, 1)) {
                         throw new System.ComponentModel.InvalidEnumArgumentException.$ctor3("value", value, System.Windows.Forms.AutoSizeMode);
                     }
+
                     if (this.GetAutoSizeMode() !== value) {
                         this.SetAutoSizeMode(value);
                         if (this.ParentInternal != null) {
                             if (Bridge.referenceEquals(this.ParentInternal.LayoutEngine, System.Windows.Forms.Layout.DefaultLayout.Instance)) {
                                 this.ParentInternal.LayoutEngine.InitLayout(this, System.Windows.Forms.BoundsSpecified.Size);
                             }
+
                             System.Windows.Forms.Layout.LayoutTransaction.DoLayout(this.ParentInternal, this, System.Windows.Forms.Layout.PropertyNames.AutoSize);
                         }
                     }
@@ -10825,7 +10827,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 this.Element.onclick = Bridge.fn.bind(this, function (ev) {
                     this.OnClick({ });
-                    return null;
                 });
 
                 this.Element.onmousedown = Bridge.fn.bind(this, function (ev) {
@@ -10833,8 +10834,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     ev.stopPropagation();
 
                     this.OnMouseDown(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this));
-
-                    return null;
                 });
 
                 this.Element.onmouseleave = Bridge.fn.bind(this, function (ev) {
@@ -10845,16 +10844,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
 
                     this.OnMouseLeave({ });
-
-                    return null;
                 });
 
                 this.Element.onmouseenter = Bridge.fn.bind(this, function (ev) {
                     ev.stopPropagation();
 
                     this.OnMouseEnter({ });
-
-                    return null;
                 });
 
                 this.Element.onmousemove = Bridge.fn.bind(this, function (ev) {
@@ -10863,8 +10858,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                         this.OnMouseMove(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this));
                     }
-
-                    return null;
                 });
                 this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowOnly;
                 this._init = true;
@@ -11512,7 +11505,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 return this._items.indexOf(item);
             },
             insert: function (index, item) {
-                this._owner.Element.insertBefore(item.Element, Bridge.cast(this._owner.Element.childNodes[index], Node));
+                this._owner.Element.insertBefore(item.Element, this._owner.Element.childNodes[index]);
                 this._items.insert(index, item);
                 this._owner.OnControlAdded(item);
             },
@@ -11632,6 +11625,17 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             OnNewRowEvent: function (sender, args) {
                 this.Rows.add(args.Row);
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.FlowLayoutPanel", {
+        inherits: [System.Windows.Forms.Control],
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+                System.Windows.Forms.Control.ctor.call(this, document.createElement("div"));
+
             }
         }
     });
@@ -12168,8 +12172,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         this.prevString = this.Text;
                         this.OnTextChanged({ });
                     }
-
-                    return null;
                 });
 
                 this.Element.onchange = workOutEvent;
@@ -12380,7 +12382,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             document.activeElement.focus();
                             ev.preventDefault();
                         }
-                        return null;
                     };
 
 

@@ -10,6 +10,7 @@ using static Retyped.dom;
 
 namespace System.Windows.Forms
 {
+    [Serializable]
     public class Control : IArrangedElement, IComponent
     {
         public string Name { get { return Element.getAttribute("Name"); } set { Element.setAttribute("Name", value); } }
@@ -439,7 +440,6 @@ namespace System.Windows.Forms
 
                     ClickedOnControl.OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev, ClickedOnControl));
                 }
-                return null;
             };
 
             window.onmouseup = (ev) =>
@@ -452,7 +452,6 @@ namespace System.Windows.Forms
 
                     ClickedOnControl = null;
                 }
-                return null;
             };
 
         }
@@ -481,7 +480,6 @@ namespace System.Windows.Forms
             Element.onclick = (ev) =>
             {
                 OnClick(EventArgs.Empty);
-                return null;
             };
 
             Element.onmousedown = (ev) =>
@@ -490,8 +488,6 @@ namespace System.Windows.Forms
                 ev.stopPropagation();
 
                 OnMouseDown(MouseEventArgs.CreateFromMouseEvent(ev, this));
-
-                return null;
             };
 
             Element.onmouseleave = (ev) =>
@@ -504,8 +500,6 @@ namespace System.Windows.Forms
                 }
 
                 OnMouseLeave(EventArgs.Empty);
-
-                return null;
             };
 
             Element.onmouseenter = (ev) =>
@@ -513,8 +507,6 @@ namespace System.Windows.Forms
                 ev.stopPropagation();
 
                 OnMouseEnter(EventArgs.Empty);
-
-                return null;
             };
 
             Element.onmousemove = (ev) =>
@@ -525,8 +517,6 @@ namespace System.Windows.Forms
 
                     OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev, this));
                 }
-
-                return null;
             };
             AutoSizeMode = AutoSizeMode.GrowOnly;
             _init = true;
