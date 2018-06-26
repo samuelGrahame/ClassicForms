@@ -42,6 +42,7 @@
     <Compile Include="ComponentModel\InvalidEnumArgumentException.cs" />
     <Compile Include="IServiceProviderV2.cs" />
     <Compile Include="OrdinalRandomizedComparer.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="StringComparer.cs" />
     <Compile Include="Collections\ArrayList.cs" />
     <Compile Include="Collections\Generic\Specialized\BitVector32.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="IWellKnownStringEqualityComparer.cs" />
     <Compile Include="OrdinalComparer.cs" />
     <Compile Include="StringUtils.cs" />
+    <Compile Include="Windows\Forms\BorderStyle.cs" />
     <Compile Include="Windows\Forms\DpiHelper.cs" />
     <Compile Include="Windows\Forms\AnchorStyles.cs" />
     <Compile Include="Windows\Forms\AutoScaleMode.cs" />
@@ -87,6 +89,7 @@
     <Compile Include="Windows\Forms\FormStartPosition.cs" />
     <Compile Include="Windows\Forms\Layout\LayoutTransaction.cs" />
     <Compile Include="Windows\Forms\Layout\PropertyNames.cs" />
+    <Compile Include="Windows\Forms\TableLayoutPanel.cs" />
     <Compile Include="Windows\Forms\TextFormatFlags.cs" />
     <Compile Include="Windows\Forms\ComboBox.cs" />
     <Compile Include="Windows\Forms\ContainerControl.cs" />
@@ -139,11 +142,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Bridge\windows10.css" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Bridge, Version=17.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Bridge.Core.17.1.1\lib\net40\Bridge.dll</HintPath>
+    <Reference Include="Bridge, Version=17.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bridge.Core.17.0.0\lib\net40\Bridge.dll</HintPath>
     </Reference>
     <Reference Include="Retyped.Core, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Retyped.Core.1.6.6733\lib\net40\Retyped.Core.dll</HintPath>

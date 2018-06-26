@@ -8,20 +8,20 @@ namespace System.Windows.Forms
 {
     //
     // Summary:
-    //     Specifies how a form window is displayed.
-    public enum FormWindowState
+    //     Specifies the border style for a control.
+    public enum BorderStyle
     {
         //
         // Summary:
-        //     A default sized window.
-        Normal = 0,
+        //     No border.
+        None = 0,
         //
         // Summary:
-        //     A minimized window.
-        Minimized = 1,
+        //     A single-line border.
+        FixedSingle = 1,
         //
         // Summary:
-        //     A maximized window.
-        Maximized = 2
+        //     A three-dimensional border.
+        Fixed3D = 2
     }
 }

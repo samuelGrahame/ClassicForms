@@ -7,8 +7,8 @@ using static Retyped.dom;
 namespace System.Windows.Forms
 {
     public class TextBox : Control
-    {                
-        
+    {
+        public bool Multiline { get; set; }
 
         public TextBox() : base(new HTMLInputElement() { type = "text" })
         {

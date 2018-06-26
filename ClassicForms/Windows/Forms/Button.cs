@@ -16,6 +16,26 @@ namespace System.Windows.Forms
 
         }
 
+        protected override string GetDefaultTag()
+        {
+            var currentTag = Tag as string;
+
+            if (Settings.IsUsingMaterial())
+            {
+                if (string.IsNullOrWhiteSpace(currentTag) || !currentTag.ToLower().Contains("btn-primary"))
+                    return "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect";
+                else
+                    return "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent";
+            }                
+            else if(Settings.IsUsingBootStrap())
+            {
+                if(string.IsNullOrWhiteSpace(currentTag) || !currentTag.ToLower().Contains("btn"))
+                    return "btn btn-default";
+            }
+
+            return base.GetDefaultTag();
+        }
+
         protected override void OnClick(EventArgs e)
         {
             if(DialogResult != DialogResult.None)

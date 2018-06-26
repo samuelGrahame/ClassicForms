@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,6 +52,8 @@ namespace System.Windows.Forms
                 return pages.ToArray();                
             } }
 
+        public override Font Font { get => base.Font; set { base.Font = value; ResizeTabHeaderSize(); } }
+
         internal void ResizeTabHeaderSize()
         {
             int i = 0;
@@ -63,6 +66,8 @@ namespace System.Windows.Forms
                 div.Element.style.visibility = "hidden";
                 div.Element.style.outline = "none";
                 div.Element.style.margin = "none";
+
+                Font.SetFont(page.GetCurrentInheritFont(), div.Element);
 
                 document.body.appendChild(div.Element);
                 
@@ -187,12 +192,47 @@ namespace System.Windows.Forms
             set {
                 if(_selectedIndex != value)
                 {
-                    _selectedIndex = value;
+                    _selectedIndex = value;                    
                     PerformLayout();
+                    OnSelectedIndexChanged(EventArgs.Empty);
                 }                
             }
         }
 
+        protected override bool GetDefaultTabStop()
+        {
+            return false;
+        }
+
+        public event EventHandler SelectedIndexChanged;
+
+        protected void OnSelectedIndexChanged(EventArgs args)
+        {
+            if (SelectedIndexChanged != null)
+                SelectedIndexChanged(this, args);
+        }
+
+        public TabPage SelectedPage
+        {
+            get { return _selectedIndex < 0 ? null : TabPages[_selectedIndex]; }
+            set
+            {
+                if (value == null)
+                {
+                    SelectedIndex = -1;
+                    return;
+                }                
+                for (int i = 0; i < TabPages.Length; i++)
+                {
+                    if (TabPages[i] == value)
+                    {
+                        SelectedIndex = i;
+                        return;
+                    }                        
+                }
+                SelectedIndex = -1;
+            }
+        }
         private string _linkTag;
         private string LinkTag
         {

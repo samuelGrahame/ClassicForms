@@ -17,23 +17,23 @@ namespace System.Windows.Forms
             Header.Click += Header_Click;
          
             Element.setAttribute("scope", "tabpage");           
-        }        
+        }
 
         private void Header_Click(object sender, EventArgs e)
         {
-            if(Parent is TabControl)
+            if(Parent != null && Parent is TabControl)
             {
-                var pages = Parent.As<TabControl>().TabPages;
-                for (int i = 0; i < pages.Length; i++)
-                {
-                    if(pages[i] == this)
-                    {
-                        Parent.As<TabControl>().SelectedIndex = i;
-                        return;
-                    }
-                }
-                Parent.As<TabControl>().SelectedIndex = -1;                
+                Parent.As<TabControl>().SelectedPage = this;                
             }
+        }
+
+        protected override void OnChildGotTabbed()
+        {
+            if (Parent != null && Parent is TabControl)
+            {
+                Parent.As<TabControl>().SelectedPage = this;
+            }
+            base.OnChildGotTabbed();
         }
 
         public override string Text

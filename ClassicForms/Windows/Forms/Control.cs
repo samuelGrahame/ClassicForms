@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,93 @@ namespace System.Windows.Forms
     {
         public string Name { get { return Element.getAttribute("Name"); } set { Element.setAttribute("Name", value); } }
         private Point _location;
+
+        protected virtual void OnChildGotTabbed()
+        {
+            if (this.Parent != null)
+                this.Parent.OnChildGotTabbed();
+        }
+
+        public Control GetNextControl(Control ctl, bool forward, bool isParent = false)
+        {
+            if (ctl == null)
+                return null;
+            if (ctl.Parent == null)
+                return null;
+            Control diffControl = null;
+            int diff = int.MaxValue;
+            foreach (Control child in ctl.Parent.Children)
+            {
+                if (child == ctl)
+                    continue;                
+                // change to once closest
+                if ((child.TabStop || isParent) && (forward ? child.TabIndex > ctl.TabIndex : child.TabIndex <= ctl.TabIndex))
+                {
+                    int preDiff;
+                    if(forward)
+                    {
+                        preDiff = child.TabIndex - ctl.TabIndex;
+                    }
+                    else
+                    {
+                        preDiff = ctl.TabIndex - child.TabIndex;
+                    }
+                    if(preDiff < diff)
+                    {
+                        diffControl = child;
+                        diff = preDiff;
+                    }
+                }
+            }
+            if(diffControl == null)
+            {
+                if (ctl.Parent.Parent == null)
+                    return null;
+                var control = GetNextControl(ctl.Parent, forward, true);
+
+                if (control == null)
+                    return null;
+                Control controlFound = null;
+                while((controlFound = control.TabIndexControl(forward)) == null)
+                {
+                    control = GetNextControl(control, forward, true);
+                    if (control == null)
+                        return null;
+                }
+                return controlFound;
+            }
+            else
+            {
+                return diffControl;
+            }
+        }
+
+        public void Focus()
+        {
+            var frm = FindForm();
+            if(frm != null)
+            {
+                frm.ActiveControl = this;
+            }
+        }
+
+        public string AccessibleName { get => Element.getAttribute("placeholder"); set => Element.setAttribute("placeholder", value); }
+
+        internal Control TabIndexControl(bool forward, bool checkAll = false)
+        {
+            Control selected = null;
+            int index = forward ? int.MaxValue : int.MinValue;
+            foreach (Control item in Controls)
+            {
+                if((checkAll || item.TabStop) && (forward ? item.TabIndex < index : item.TabIndex > index))
+                {
+                    index = item.TabIndex;
+                    selected = item;
+                }
+            }
+
+            return selected;
+        }
 
         protected AutoSizeMode GetAutoSizeMode() =>
     CommonProperties.GetAutoSizeMode(this);
@@ -50,12 +138,12 @@ namespace System.Windows.Forms
 
         public Point Location
         {
-            get { return _location; }
+            get { return _location; } // new Point(_location.X - Margin.Left, _location.Y - Margin.Top);
             set
             {
                 var prev = _location;
-                _location = value;
-
+                _location = value;// new Point(value.X + Margin.Left, value.Y + Margin.Top);
+                
                 Element.style.left = _location.X + "px";
                 Element.style.top = _location.Y + "px";
 
@@ -251,9 +339,11 @@ namespace System.Windows.Forms
         }
 
         private Size _size;
+        // new Size(_size.Width + Margin.Right, _size.Height + Margin.Bottom); 
         public Size Size { get { return _size; } set {
                 var prev = _size;
-                _size = value;
+                _size = value;// new Size(value.Width - Margin.Right, value.Height - Margin.Bottom);
+
                 if (_autoSize)
                 {
                     Element.style.width = "auto";
@@ -273,8 +363,13 @@ namespace System.Windows.Forms
                 }
             } }
 
-        private bool _tabStop;
-        public bool TabStop { get { return _tabStop; } set {
+        protected virtual bool GetDefaultTabStop()
+        {
+            return true;
+        }
+
+        protected bool _tabStop;
+        public virtual bool TabStop { get { return _tabStop; } set {
                 _tabStop = value;
                 TabIndex = _tabIndex;
             } }
@@ -288,7 +383,7 @@ namespace System.Windows.Forms
                 }
                 else
                 {
-                    Element.removeAttribute("TabIndex");
+                    Element.removeAttribute("tabIndex");
                 }
             } }
         public virtual string Text { get; set; }
@@ -350,8 +445,16 @@ namespace System.Windows.Forms
             }
         }
 
-
-        public virtual Color ForeColor { get; set; }
+        private Color _foreColor;
+        public virtual Color ForeColor
+        {
+            get { return _foreColor; }
+            set
+            {
+                _foreColor = value;
+                Element.style.color = _foreColor.ToHtml();
+            }
+        }
 
         protected void ApplyReadonly(HTMLElement element = null)
         {
@@ -387,9 +490,12 @@ namespace System.Windows.Forms
             get { return _tag; }
             set
             {
+                if (value != null && value + "" == "")
+                    return;
+
                 _tag = value;
                 if (_tag is string)
-                {
+                {                    
                     Element.className = (_tag + "");
                 }
                 else
@@ -404,17 +510,7 @@ namespace System.Windows.Forms
         private Font _font;
         public virtual Font Font { get { return _font; } set {
                 _font = value;
-                if (_font == null)
-                {
-                    Element.style.fontSize = "inherit";
-                    Element.style.fontFamily = "inherit";
-                }
-                else
-                {
-                    Element.style.fontSize = _font.EmSize.ToString() + "pt";
-                    Element.style.fontFamily = _font.FamilyName;
-                }
-
+                Font.SetFont(_font, Element);                
             } }
         private bool _autoSize;
         protected bool _init;
@@ -427,11 +523,22 @@ namespace System.Windows.Forms
                 }
             } }
 
+        public Font GetCurrentInheritFont()
+        {
+            if (Font != null)
+                return Font;
+            if (Parent == null)
+                return null;
+            return Parent.GetCurrentInheritFont();
+        }
+
         internal HTMLElement Element;
         internal static Control ClickedOnControl;
 
         static Control()
         {
+            document.body.style.overflow = "hidden";
+            document.body.style.boxSizing = "border-box";
             window.onmousemove = (ev) =>
             {
                 if (ClickedOnControl != null)
@@ -440,20 +547,58 @@ namespace System.Windows.Forms
 
                     ClickedOnControl.OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev, ClickedOnControl));
                 }
+                return null;
             };
 
             window.onmouseup = (ev) =>
             {
                 if (ClickedOnControl != null)
                 {
-                    ev.stopPropagation();
+                   ev.stopPropagation();
 
                     ClickedOnControl.OnMouseUp(MouseEventArgs.CreateFromMouseEvent(ev, ClickedOnControl));
 
                     ClickedOnControl = null;
                 }
             };
+            window.onresize = (ev) =>
+            {
+                bool containsMin = false;
+                foreach (var item in AllOpenedForms())
+                {
+                    if (item.WindowState == FormWindowState.Maximized)
+                        item.SnapToWindow();
+                    else if (item.WindowState == FormWindowState.Minimized)
+                        containsMin = true;
 
+                }
+                if (containsMin)
+                    Form.CalculateMinmizedFormsLocation();
+            };
+        }
+
+        public static List<Form> AllOpenedForms()
+        {
+            var list = new List<Form>();
+
+            foreach (var item in Form._formCollections)
+            {
+                list.Add(item.FormOwner);
+                if (item.VisibleForms != null && item.VisibleForms.Count > 0)
+                    list.AddRange(item.VisibleForms);
+            }
+
+            return list;
+        }
+
+        public Form FindForm()
+        {
+            if (Parent == null)
+                return null;
+            if (Parent is Form)
+                return Parent.As<Form>();
+            else
+                return Parent.FindForm();
         }
 
         internal Control(HTMLElement element)
@@ -468,14 +613,15 @@ namespace System.Windows.Forms
             Element.style.boxSizing = "borderbox";
 
             Element.style.padding = "0";
-
+           // Element.style.margin = "1px";
 
             Element.style.fontSize = "inherit";
             Element.style.fontFamily = "inherit";
+            Element.style.boxSizing = "border-box";
 
             Visible = true;
 
-            TabStop = true;
+            TabStop = GetDefaultTabStop();
 
             Element.onclick = (ev) =>
             {
@@ -488,6 +634,8 @@ namespace System.Windows.Forms
                 ev.stopPropagation();
 
                 OnMouseDown(MouseEventArgs.CreateFromMouseEvent(ev, this));
+
+                return null;
             };
 
             Element.onmouseleave = (ev) =>
@@ -518,9 +666,35 @@ namespace System.Windows.Forms
                     OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev, this));
                 }
             };
+            SetMargins(GetDefaultMargins());
             AutoSizeMode = AutoSizeMode.GrowOnly;
             _init = true;
         }
+
+        protected virtual Padding GetDefaultMargins()
+        {
+            return new Padding(3);
+        }
+
+        internal void SetMargins(Padding margin)
+        {
+            margin = LayoutUtils.ClampNegativePaddingToZero(margin);
+            //if(margin == Padding.Empty)
+            //{
+            //    Element.style.marginLeft = null;
+            //    Element.style.marginTop = null;
+            //    Element.style.marginRight = null;
+            //    Element.style.marginBottom = null;
+            //}
+            //else
+            //{
+            //    Element.style.marginLeft = margin.Left + "px";
+            //    Element.style.marginTop = margin.Top + "px";
+            //    Element.style.marginRight = margin.Right + "px";
+            //    Element.style.marginBottom = margin.Bottom + "px";
+            //}
+            CommonProperties.SetMargin(this, margin);
+        }        
 
         protected virtual void OnClick(EventArgs e)
         {
@@ -551,6 +725,15 @@ namespace System.Windows.Forms
 
             if (Load != null)
                 Load(this, e);
+
+            var defaultTag = GetDefaultTag();
+            if (!string.IsNullOrWhiteSpace(defaultTag))
+                Tag = defaultTag;
+        }
+
+        protected virtual string GetDefaultTag()
+        {
+            return null;
         }
 
         public event EventHandler Load;        
@@ -560,8 +743,35 @@ namespace System.Windows.Forms
             if (MouseUp != null)
                 MouseUp(this, e);
         }
+        
+        public Padding Margin
+        {
+            get =>
+                CommonProperties.GetMargin(this);
+            set
+            {                
+                //var prevlocation = Location;
+                //var prevSize = Size;
 
-        public Padding Margin { get; set; }
+                SetMargins(value);
+
+                this.OnMarginChanged(EventArgs.Empty);
+
+                //Location = prevlocation;
+                //Size = prevSize;
+            }
+        }
+
+        protected virtual void OnMarginChanged(EventArgs e)
+        {
+            if (MarginChanged != null)
+            {
+                MarginChanged(this, e);
+            }
+        }
+
+        public event EventHandler MarginChanged;
+
         public Padding Padding { get; set; }
 
         public Rectangle Bounds => new Rectangle(Location, Size);
@@ -589,9 +799,26 @@ namespace System.Windows.Forms
         public event MouseEventHandler MouseDown;
         public event MouseEventHandler MouseMove;
         public event MouseEventHandler MouseUp;
+        public event MouseEventHandler MouseDoubleClick;
         public event EventHandler Disposed;
         public event EventHandler MouseLeave;
         public event EventHandler MouseEnter;
+        public event EventHandler GotFocus;
+        public event EventHandler LostFocus;
+
+        private Stopwatch lastMouseDownEvent;
+
+        protected virtual void OnGotFocus(EventArgs e)
+        {
+            if (GotFocus != null)
+                GotFocus(this, e);
+        }
+
+        protected virtual void OnLostFocus(EventArgs e)
+        {
+            if (LostFocus != null)
+                LostFocus(this, e);
+        }
 
         protected virtual void OnMouseLeave(EventArgs e)
         {
@@ -603,6 +830,12 @@ namespace System.Windows.Forms
         {
             if (MouseEnter != null)
                 MouseEnter(this, e);
+        }
+
+        protected virtual void OnMouseDoubleClick(MouseEventArgs e)
+        {
+            if (MouseDoubleClick != null)
+                MouseDoubleClick(this, e);
         }
 
         protected byte layoutSuspendCount;
@@ -1023,8 +1256,8 @@ namespace System.Windows.Forms
         {
             if (_disposing)
                 return;
-
             _disposing = true;
+
             if (Disposed != null)
                 Disposed(this, EventArgs.Empty);
 

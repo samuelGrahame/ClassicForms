@@ -26,7 +26,7 @@ namespace System.Windows.Forms
             do
             {
                 dynamic dym = element;
-                if(IsFF)
+                if(Settings.IsFF)
                 {
                     var rec = element.getBoundingClientRect().As<ClientRect>();
                     top += rec.top;
@@ -46,14 +46,13 @@ namespace System.Windows.Forms
 
             return new Point((int)left, (int)top);
         }
-        static bool IsEdge;
-        static bool IsFF;
+        
 
         static MouseEventArgs()
         {
             var userAgent = window.navigator.userAgent.ToLower();
-            IsEdge = userAgent.IndexOf("edge") > -1;
-            IsFF = userAgent.IndexOf("firefox") > -1;
+            Settings.IsEdge = userAgent.IndexOf("edge") > -1;
+            Settings.IsFF = userAgent.IndexOf("firefox") > -1;
         }
 
         public static PointF GetClientMouseLocation(object e)
@@ -81,9 +80,9 @@ namespace System.Windows.Forms
             // what we need to do is get the local x, y off from the target.            
             Point mousePoint;
 
-            if(!IsFF && original.currentTarget == target.Element)
+            if(!Settings.IsFF && original.currentTarget == target.Element)
             {
-                if(Browser.IsIE || IsEdge)                    
+                if(Browser.IsIE || Settings.IsEdge)                    
                 {
                     var offset = GetOffsetPoint(target.Element);
                     mousePoint = new Point((int)(original.clientX - offset.X), (int)(original.clientY - offset.Y));
@@ -95,7 +94,7 @@ namespace System.Windows.Forms
             }
             else
             {                
-                if (IsFF)
+                if (Settings.IsFF)
                 {
                     var vect = GetClientMouseLocation(original);
                     var rec = target.Element.getBoundingClientRect().As<ClientRect>();

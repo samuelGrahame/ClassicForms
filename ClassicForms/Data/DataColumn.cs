@@ -10,6 +10,8 @@ namespace System.Data
     {
         public string Name { get; }
         public DataTable Table { get; }
+        public Type DataType { get; set; }
+
         public DataColumn(DataTable table, string name)
         {
             Name = name;
