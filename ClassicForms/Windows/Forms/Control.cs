@@ -547,7 +547,6 @@ namespace System.Windows.Forms
 
                     ClickedOnControl.OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev, ClickedOnControl));
                 }
-                return null;
             };
 
             window.onmouseup = (ev) =>
@@ -634,8 +633,6 @@ namespace System.Windows.Forms
                 ev.stopPropagation();
 
                 OnMouseDown(MouseEventArgs.CreateFromMouseEvent(ev, this));
-
-                return null;
             };
 
             Element.onmouseleave = (ev) =>
