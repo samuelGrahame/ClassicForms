@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Drawing;
@@ -25,14 +26,15 @@
                     return;
                 }
             }
-            IDict dictionary = (IDict)container.Properties.GetObject(_cachedBoundsProperty);
+            IDictionary dictionary = (IDictionary)container.Properties.GetObject(_cachedBoundsProperty);
             if (dictionary != null)
             {
                 foreach (dynamic entry in dictionary)
                 {
-                    IArrangedElement key = (IArrangedElement)entry.Key;
-                    Rectangle bounds = (Rectangle)entry.Value;
-                    key.SetBounds(bounds, BoundsSpecified.None);
+                    IArrangedElement key = (IArrangedElement)entry.key;
+                    Rectangle bounds = (Rectangle)entry.value;
+                    if(key != null)
+                        key.SetBounds(bounds, BoundsSpecified.None);
                 }
                 ClearCachedBounds(container);
             }
@@ -179,14 +181,17 @@
         {
             if (element.Container != null)
             {
-                IDict dictionary = (IDict)element.Container.Properties.GetObject(_cachedBoundsProperty);
+                var dictionary = (Dictionary<object, object>)element.Container.Properties.GetObject(_cachedBoundsProperty);
                 if (dictionary != null)
                 {
-                    object obj2 = dictionary[element];
-                    if (obj2 != null)
+                    if(dictionary.ContainsKey(element))
                     {
-                        return (Rectangle)obj2;
-                    }
+                        object obj2 = dictionary[element];
+                        if (obj2 != null)
+                        {
+                            return (Rectangle)obj2;
+                        }
+                    }                    
                 }
             }
             return element.Bounds;
@@ -463,10 +468,10 @@
         {
             if (bounds != GetCachedBounds(element))
             {
-                IDict dictionary = (IDict)element.Container.Properties.GetObject(_cachedBoundsProperty);
+                IDictionary dictionary = (IDictionary)element.Container.Properties.GetObject(_cachedBoundsProperty);
                 if (dictionary == null)
                 {
-                    dictionary = new HybridDictionary();
+                    dictionary = new Dictionary<object, object>();
                     element.Container.Properties.SetObject(_cachedBoundsProperty, dictionary);
                 }
                 dictionary[element] = bounds;

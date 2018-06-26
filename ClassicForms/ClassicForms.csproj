@@ -36,9 +36,6 @@
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Collections\DictionaryEntryV2.cs" />
-    <Compile Include="Collections\IDict.cs" />
-    <Compile Include="Collections\IDictEnumrator.cs" />
     <Compile Include="ComponentModel\InvalidEnumArgumentException.cs" />
     <Compile Include="IServiceProviderV2.cs" />
     <Compile Include="OrdinalRandomizedComparer.cs" />
@@ -46,8 +43,6 @@
     <Compile Include="StringComparer.cs" />
     <Compile Include="Collections\ArrayList.cs" />
     <Compile Include="Collections\Generic\Specialized\BitVector32.cs" />
-    <Compile Include="Collections\Generic\Specialized\HybridDictionary.cs" />
-    <Compile Include="Collections\Generic\Specialized\ListDictionary.cs" />
     <Compile Include="ComponentModel\Container.cs" />
     <Compile Include="ComponentModel\IComponent.cs" />
     <Compile Include="ComponentModel\IContainer.cs" />

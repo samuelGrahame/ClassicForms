@@ -1104,47 +1104,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
-    Bridge.define("System.Collections.DictionaryEntryV2", {
-        $kind: "struct",
-        statics: {
-            methods: {
-                getDefaultValue: function () { return new System.Collections.DictionaryEntryV2(); }
-            }
-        },
-        fields: {
-            Key: null,
-            Value: null
-        },
-        ctors: {
-            $ctor1: function (key, value) {
-                this.$initialize();
-                this.Key = key;
-                this.Value = value;
-            },
-            ctor: function () {
-                this.$initialize();
-            }
-        },
-        methods: {
-            getHashCode: function () {
-                var h = Bridge.addHash([6888146117, this.Key, this.Value]);
-                return h;
-            },
-            equals: function (o) {
-                if (!Bridge.is(o, System.Collections.DictionaryEntryV2)) {
-                    return false;
-                }
-                return Bridge.equals(this.Key, o.Key) && Bridge.equals(this.Value, o.Value);
-            },
-            $clone: function (to) {
-                var s = to || new System.Collections.DictionaryEntryV2();
-                s.Key = this.Key;
-                s.Value = this.Value;
-                return s;
-            }
-        }
-    });
-
     Bridge.define("System.Collections.EmptyArray$1", function (T) { return {
         statics: {
             fields: {
@@ -1159,16 +1118,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             }
         }
     }; });
-
-    Bridge.define("System.Collections.IDict", {
-        inherits: [System.Collections.ICollection,System.Collections.IEnumerable],
-        $kind: "interface"
-    });
-
-    Bridge.define("System.Collections.IDictEnumrator", {
-        inherits: [System.Collections.IEnumerator],
-        $kind: "interface"
-    });
 
     Bridge.define("System.Collections.Specialized.BitVector32", {
         $kind: "struct",
@@ -1363,130 +1312,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 s.mask = this.mask;
                 s.offset = this.offset;
                 return s;
-            }
-        }
-    });
-
-    Bridge.define("System.Collections.Specialized.ListDictionary.DictionaryNode", {
-        $kind: "nested class",
-        fields: {
-            key: null,
-            next: null,
-            value: null
-        }
-    });
-
-    Bridge.define("System.Collections.Specialized.ListDictionary.NodeKeyValueCollection", {
-        inherits: [System.Collections.ICollection,System.Collections.IEnumerable],
-        $kind: "nested class",
-        fields: {
-            isKeys: false,
-            list: null
-        },
-        props: {
-            System$Collections$ICollection$Count: {
-                get: function () {
-                    var num = 0;
-                    for (var node = this.list.head; node != null; node = node.next) {
-                        num = (num + 1) | 0;
-                    }
-                    return num;
-                }
-            },
-            System$Collections$ICollection$IsSynchronized: {
-                get: function () {
-                    return false;
-                }
-            },
-            System$Collections$ICollection$SyncRoot: {
-                get: function () {
-                    return this.list.SyncRoot;
-                }
-            }
-        },
-        ctors: {
-            ctor: function (list, isKeys) {
-                this.$initialize();
-                this.list = list;
-                this.isKeys = isKeys;
-            }
-        },
-        methods: {
-            System$Collections$ICollection$copyTo: function (array, index) {
-                if (array == null) {
-                    throw new System.ArgumentNullException.$ctor1("array");
-                }
-                if (index < 0) {
-                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.Windows.Forms.SR.GetString("ArgumentOutOfRange_NeedNonNegNum"));
-                }
-                for (var node = this.list.head; node != null; node = node.next) {
-                    System.Array.set(array, this.isKeys ? node.key : node.value, index);
-                    index = (index + 1) | 0;
-                }
-            },
-            System$Collections$IEnumerable$GetEnumerator: function () {
-                return new System.Collections.Specialized.ListDictionary.NodeKeyValueCollection.NodeKeyValueEnumerator(this.list, this.isKeys);
-            }
-        }
-    });
-
-    Bridge.define("System.Collections.Specialized.ListDictionary.NodeKeyValueCollection.NodeKeyValueEnumerator", {
-        inherits: [System.Collections.IEnumerator],
-        $kind: "nested class",
-        fields: {
-            current: null,
-            isKeys: false,
-            list: null,
-            start: false,
-            version: 0
-        },
-        props: {
-            Current: {
-                get: function () {
-                    if (this.current == null) {
-                        throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumOpCantHappen"));
-                    }
-                    if (!this.isKeys) {
-                        return this.current.value;
-                    }
-                    return this.current.key;
-                }
-            }
-        },
-        alias: [
-            "moveNext", "System$Collections$IEnumerator$moveNext",
-            "reset", "System$Collections$IEnumerator$reset",
-            "Current", "System$Collections$IEnumerator$Current"
-        ],
-        ctors: {
-            ctor: function (list, isKeys) {
-                this.$initialize();
-                this.list = list;
-                this.isKeys = isKeys;
-                this.version = list.version;
-                this.start = true;
-                this.current = null;
-            }
-        },
-        methods: {
-            moveNext: function () {
-                if (this.version !== this.list.version) {
-                    throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumFailedVersion"));
-                }
-                if (this.start) {
-                    this.current = this.list.head;
-                    this.start = false;
-                } else if (this.current != null) {
-                    this.current = this.current.next;
-                }
-                return (this.current != null);
-            },
-            reset: function () {
-                if (this.version !== this.list.version) {
-                    throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumFailedVersion"));
-                }
-                this.start = true;
-                this.current = null;
             }
         }
     });
@@ -9021,538 +8846,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
-    Bridge.define("System.Collections.Specialized.HybridDictionary", {
-        inherits: [System.Collections.IDict,System.Collections.ICollection,System.Collections.IEnumerable],
-        statics: {
-            fields: {
-                CutoverPoint: 0,
-                FixedSizeCutoverPoint: 0,
-                InitialHashtableSize: 0
-            },
-            ctors: {
-                init: function () {
-                    this.CutoverPoint = 9;
-                    this.FixedSizeCutoverPoint = 6;
-                    this.InitialHashtableSize = 13;
-                }
-            }
-        },
-        fields: {
-            caseInsensitive: false,
-            hashtable: null,
-            list: null
-        },
-        props: {
-            Count: {
-                get: function () {
-                    var list = this.list;
-                    if (this.hashtable != null) {
-                        return this.hashtable.count;
-                    }
-                    if (list != null) {
-                        return list.Count;
-                    }
-                    return 0;
-                }
-            },
-            IsFixedSize: {
-                get: function () {
-                    return false;
-                }
-            },
-            IsReadOnly: {
-                get: function () {
-                    return false;
-                }
-            },
-            IsSynchronized: {
-                get: function () {
-                    return false;
-                }
-            },
-            Keys: {
-                get: function () {
-                    if (this.hashtable != null) {
-                        return this.hashtable.getKeys();
-                    }
-                    return this.List.Keys;
-                }
-            },
-            List: {
-                get: function () {
-                    if (this.list == null) {
-                        this.list = new System.Collections.Specialized.ListDictionary.$ctor1(this.caseInsensitive ? System.StringComparer.OrdinalIgnoreCase : null);
-                    }
-                    return this.list;
-                }
-            },
-            SyncRoot: {
-                get: function () {
-                    return this;
-                }
-            },
-            Values: {
-                get: function () {
-                    if (this.hashtable != null) {
-                        return this.hashtable.getValues();
-                    }
-                    return this.List.Values;
-                }
-            }
-        },
-        alias: [
-            "add", "System$Collections$IDict$add",
-            "clear", "System$Collections$IDict$clear",
-            "contains", "System$Collections$IDict$contains",
-            "copyTo", "System$Collections$ICollection$copyTo",
-            "remove", "System$Collections$IDict$remove",
-            "Count", "System$Collections$ICollection$Count",
-            "IsFixedSize", "System$Collections$IDict$IsFixedSize",
-            "IsReadOnly", "System$Collections$IDict$IsReadOnly",
-            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
-            "getItem", "System$Collections$IDict$getItem",
-            "setItem", "System$Collections$IDict$setItem",
-            "Keys", "System$Collections$IDict$Keys",
-            "SyncRoot", "System$Collections$ICollection$SyncRoot",
-            "Values", "System$Collections$IDict$Values"
-        ],
-        ctors: {
-            ctor: function () {
-                this.$initialize();
-            },
-            $ctor1: function (caseInsensitive) {
-                this.$initialize();
-                this.caseInsensitive = caseInsensitive;
-            },
-            $ctor2: function (initialSize) {
-                System.Collections.Specialized.HybridDictionary.$ctor3.call(this, initialSize, false);
-            },
-            $ctor3: function (initialSize, caseInsensitive) {
-                this.$initialize();
-                this.caseInsensitive = caseInsensitive;
-                if (initialSize >= 6) {
-                    if (caseInsensitive) {
-                        this.hashtable = new (System.Collections.Generic.Dictionary$2(System.String, System.Object))(null, System.StringComparer.OrdinalIgnoreCase);
-                    } else {
-                        this.hashtable = new (System.Collections.Generic.Dictionary$2(System.String, System.Object))();
-                    }
-                }
-            }
-        },
-        methods: {
-            getItem: function (key) {
-                var list = this.list;
-                if (this.hashtable != null) {
-                    return this.hashtable.get(Bridge.as(key, System.String));
-                }
-                if (list != null) {
-                    return list.getItem(key);
-                }
-                if (key == null) {
-                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
-                }
-                return null;
-            },
-            setItem: function (key, value) {
-                if (this.hashtable != null) {
-                    this.hashtable.set(Bridge.as(key, System.String), value);
-                } else if (this.list != null) {
-                    if (this.list.Count >= 8) {
-                        this.ChangeOver();
-                        this.hashtable.set(Bridge.as(key, System.String), value);
-                    } else {
-                        this.list.setItem(key, value);
-                    }
-                } else {
-                    this.list = new System.Collections.Specialized.ListDictionary.$ctor1(this.caseInsensitive ? System.StringComparer.OrdinalIgnoreCase : null);
-                    this.list.setItem(key, value);
-                }
-            },
-            add: function (key, value) {
-                if (this.hashtable != null) {
-                    this.hashtable.add(Bridge.as(key, System.String), value);
-                } else if (this.list == null) {
-                    this.list = new System.Collections.Specialized.ListDictionary.$ctor1(this.caseInsensitive ? System.StringComparer.OrdinalIgnoreCase : null);
-                    this.list.add(key, value);
-                } else if ((((this.list.Count + 1) | 0)) >= 9) {
-                    this.ChangeOver();
-                    this.hashtable.add(Bridge.as(key, System.String), value);
-                } else {
-                    this.list.add(key, value);
-                }
-            },
-            ChangeOver: function () {
-                var hashtable;
-                var enumerator = Bridge.cast(this.list.GetEnumerator(), System.Collections.IDictEnumrator);
-                if (this.caseInsensitive) {
-                    hashtable = new (System.Collections.Generic.Dictionary$2(System.String, System.Object))(null, System.StringComparer.OrdinalIgnoreCase);
-                } else {
-                    hashtable = new (System.Collections.Generic.Dictionary$2(System.String, System.Object))();
-                }
-                while (enumerator.System$Collections$IEnumerator$moveNext()) {
-                    hashtable.add(Bridge.as(enumerator.System$Collections$IDictEnumrator$Key, System.String), enumerator.System$Collections$IDictEnumrator$Value);
-                }
-                this.hashtable = hashtable;
-                this.list = null;
-            },
-            clear: function () {
-                if (this.hashtable != null) {
-                    var hashtable = this.hashtable;
-                    this.hashtable = null;
-                    hashtable.clear();
-                }
-                if (this.list != null) {
-                    var list = this.list;
-                    this.list = null;
-                    list.clear();
-                }
-            },
-            contains: function (key) {
-                var list = this.list;
-                if (this.hashtable != null) {
-                    return this.hashtable.containsKey(Bridge.as(key, System.String));
-                }
-                if (list != null) {
-                    return list.contains(key);
-                }
-                if (key == null) {
-                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
-                }
-                return false;
-            },
-            copyTo: function (array, index) {
-                var $t;
-                if (this.hashtable != null) {
-                    ($t = this.hashtable.getValues(), System.Array.copy($t, 0, array, index, $t.length));
-                } else {
-                    this.List.copyTo(array, index);
-                }
-            },
-            GetEnumerator: function () {
-                if (this.hashtable != null) {
-                    return this.hashtable.GetEnumerator();
-                }
-                if (this.list == null) {
-                    this.list = new System.Collections.Specialized.ListDictionary.$ctor1(this.caseInsensitive ? System.StringComparer.OrdinalIgnoreCase : null);
-                }
-                return Bridge.cast(this.list.GetEnumerator(), System.Collections.IDictEnumrator);
-            },
-            System$Collections$IEnumerable$GetEnumerator: function () {
-                if (this.hashtable != null) {
-                    return this.hashtable.GetEnumerator();
-                }
-                if (this.list == null) {
-                    this.list = new System.Collections.Specialized.ListDictionary.$ctor1(this.caseInsensitive ? System.StringComparer.OrdinalIgnoreCase : null);
-                }
-                return this.list.GetEnumerator();
-            },
-            remove: function (key) {
-                if (this.hashtable != null) {
-                    this.hashtable.remove(Bridge.as(key, System.String));
-                } else if (this.list != null) {
-                    this.list.remove(key);
-                } else if (key == null) {
-                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
-                }
-                return true;
-            }
-        }
-    });
-
-    Bridge.define("System.Collections.Specialized.ListDictionary", {
-        inherits: [System.Collections.IDict],
-        fields: {
-            _syncRoot: null,
-            comparer: null,
-            count: 0,
-            head: null,
-            version: 0
-        },
-        props: {
-            Count: {
-                get: function () {
-                    return this.count;
-                }
-            },
-            IsFixedSize: {
-                get: function () {
-                    return false;
-                }
-            },
-            IsReadOnly: {
-                get: function () {
-                    return false;
-                }
-            },
-            IsSynchronized: {
-                get: function () {
-                    return false;
-                }
-            },
-            Keys: {
-                get: function () {
-                    return new System.Collections.Specialized.ListDictionary.NodeKeyValueCollection(this, true);
-                }
-            },
-            SyncRoot: {
-                get: function () {
-                    if (this._syncRoot == null) {
-                        this._syncRoot = { };
-                        //Interlocked.CompareExchange(ref this._syncRoot, new object(), null);
-                    }
-                    return this._syncRoot;
-                }
-            },
-            Values: {
-                get: function () {
-                    return new System.Collections.Specialized.ListDictionary.NodeKeyValueCollection(this, false);
-                }
-            }
-        },
-        alias: [
-            "add", "System$Collections$IDict$add",
-            "clear", "System$Collections$IDict$clear",
-            "contains", "System$Collections$IDict$contains",
-            "copyTo", "System$Collections$ICollection$copyTo",
-            "GetEnumerator", "System$Collections$IEnumerable$GetEnumerator",
-            "remove", "System$Collections$IDict$remove",
-            "Count", "System$Collections$ICollection$Count",
-            "IsFixedSize", "System$Collections$IDict$IsFixedSize",
-            "IsReadOnly", "System$Collections$IDict$IsReadOnly",
-            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
-            "getItem", "System$Collections$IDict$getItem",
-            "setItem", "System$Collections$IDict$setItem",
-            "Keys", "System$Collections$IDict$Keys",
-            "SyncRoot", "System$Collections$ICollection$SyncRoot",
-            "Values", "System$Collections$IDict$Values"
-        ],
-        ctors: {
-            ctor: function () {
-                this.$initialize();
-            },
-            $ctor1: function (comparer) {
-                this.$initialize();
-                this.comparer = comparer;
-            }
-        },
-        methods: {
-            getItem: function (key) {
-                if (key == null) {
-                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
-                }
-                var head = this.head;
-                if (this.comparer != null) {
-                    while (head != null) {
-                        var x = head.key;
-                        if ((x != null) && (this.comparer.System$Collections$IComparer$compare(x, key) === 0)) {
-                            return head.value;
-                        }
-                        head = head.next;
-                    }
-                } else {
-                    while (head != null) {
-                        var obj2 = head.key;
-                        if ((obj2 != null) && Bridge.equals(obj2, key)) {
-                            return head.value;
-                        }
-                        head = head.next;
-                    }
-                }
-                return null;
-            },
-            setItem: function (key, value) {
-                var $t;
-                if (key == null) {
-                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
-                }
-                this.version = (this.version + 1) | 0;
-                var node = null;
-                var head = this.head;
-                while (head != null) {
-                    var x = head.key;
-                    if ((this.comparer == null) ? Bridge.equals(x, key) : (this.comparer.System$Collections$IComparer$compare(x, key) === 0)) {
-                        break;
-                    }
-                    node = head;
-                    head = head.next;
-                }
-                if (head != null) {
-                    head.value = value;
-                } else {
-                    var node3 = ($t = new System.Collections.Specialized.ListDictionary.DictionaryNode(), $t.key = key, $t.value = value, $t);
-                    if (node != null) {
-                        node.next = node3;
-                    } else {
-                        this.head = node3;
-                    }
-                    this.count = (this.count + 1) | 0;
-                }
-            },
-            add: function (key, value) {
-                var $t;
-                if (key == null) {
-                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
-                }
-                this.version = (this.version + 1) | 0;
-                var node = null;
-                for (var node2 = this.head; node2 != null; node2 = node2.next) {
-                    var x = node2.key;
-                    if ((this.comparer == null) ? Bridge.equals(x, key) : (this.comparer.System$Collections$IComparer$compare(x, key) === 0)) {
-                        throw new System.ArgumentException.$ctor1(System.Windows.Forms.SR.GetString("Argument_AddingDuplicate"));
-                    }
-                    node = node2;
-                }
-                var node3 = ($t = new System.Collections.Specialized.ListDictionary.DictionaryNode(), $t.key = key, $t.value = value, $t);
-                if (node != null) {
-                    node.next = node3;
-                } else {
-                    this.head = node3;
-                }
-                this.count = (this.count + 1) | 0;
-            },
-            clear: function () {
-                this.count = 0;
-                this.head = null;
-                this.version = (this.version + 1) | 0;
-            },
-            contains: function (key) {
-                if (key == null) {
-                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
-                }
-                for (var node = this.head; node != null; node = node.next) {
-                    var x = node.key;
-                    if ((this.comparer == null) ? Bridge.equals(x, key) : (this.comparer.System$Collections$IComparer$compare(x, key) === 0)) {
-                        return true;
-                    }
-                }
-                return false;
-            },
-            copyTo: function (array, index) {
-                if (array == null) {
-                    throw new System.ArgumentNullException.$ctor1("array");
-                }
-                if (index < 0) {
-                    throw new System.ArgumentOutOfRangeException.$ctor4("index", System.Windows.Forms.SR.GetString("ArgumentOutOfRange_NeedNonNegNum"));
-                }
-                if ((((array.length - index) | 0)) < this.count) {
-                    throw new System.ArgumentException.$ctor1(System.Windows.Forms.SR.GetString("Arg_InsufficientSpace"));
-                }
-                for (var node = this.head; node != null; node = node.next) {
-                    System.Array.set(array, new System.Collections.DictionaryEntry.$ctor1(node.key, node.value).$clone(), index);
-                    index = (index + 1) | 0;
-                }
-            },
-            GetEnumerator: function () {
-                return new System.Collections.Specialized.ListDictionary.NodeEnumerator(this);
-            },
-            remove: function (key) {
-                if (key == null) {
-                    throw new System.ArgumentNullException.$ctor3("key", System.Windows.Forms.SR.GetString("ArgumentNull_Key"));
-                }
-                this.version = (this.version + 1) | 0;
-                var node = null;
-                var head = this.head;
-                while (head != null) {
-                    var x = head.key;
-                    if ((this.comparer == null) ? Bridge.equals(x, key) : (this.comparer.System$Collections$IComparer$compare(x, key) === 0)) {
-                        break;
-                    }
-                    node = head;
-                    head = head.next;
-                }
-                if (head != null) {
-                    if (Bridge.referenceEquals(head, this.head)) {
-                        this.head = head.next;
-                    } else {
-                        node.next = head.next;
-                    }
-                    this.count = (this.count - 1) | 0;
-                }
-                return true;
-            }
-        }
-    });
-
-    Bridge.define("System.Collections.Specialized.ListDictionary.NodeEnumerator", {
-        inherits: [System.Collections.IDictEnumrator],
-        $kind: "nested class",
-        fields: {
-            current: null,
-            list: null,
-            start: false,
-            version: 0
-        },
-        props: {
-            Current: {
-                get: function () {
-                    return this.Entry.$clone();
-                }
-            },
-            Entry: {
-                get: function () {
-                    if (this.current == null) {
-                        throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumOpCantHappen"));
-                    }
-                    return new System.Collections.DictionaryEntryV2.$ctor1(this.current.key, this.current.value);
-                }
-            },
-            Key: {
-                get: function () {
-                    if (this.current == null) {
-                        throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumOpCantHappen"));
-                    }
-                    return this.current.key;
-                }
-            },
-            Value: {
-                get: function () {
-                    if (this.current == null) {
-                        throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumOpCantHappen"));
-                    }
-                    return this.current.value;
-                }
-            }
-        },
-        alias: [
-            "moveNext", "System$Collections$IEnumerator$moveNext",
-            "reset", "System$Collections$IEnumerator$reset",
-            "Current", "System$Collections$IEnumerator$Current",
-            "Entry", "System$Collections$IDictEnumrator$Entry",
-            "Key", "System$Collections$IDictEnumrator$Key",
-            "Value", "System$Collections$IDictEnumrator$Value"
-        ],
-        ctors: {
-            ctor: function (list) {
-                this.$initialize();
-                this.list = list;
-                this.version = list.version;
-                this.start = true;
-                this.current = null;
-            }
-        },
-        methods: {
-            moveNext: function () {
-                if (this.version !== this.list.version) {
-                    throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumFailedVersion"));
-                }
-                if (this.start) {
-                    this.current = this.list.head;
-                    this.start = false;
-                } else if (this.current != null) {
-                    this.current = this.current.next;
-                }
-                return (this.current != null);
-            },
-            reset: function () {
-                if (this.version !== this.list.version) {
-                    throw new System.InvalidOperationException.$ctor1(System.Windows.Forms.SR.GetString("InvalidOperation_EnumFailedVersion"));
-                }
-                this.start = true;
-                this.current = null;
-            }
-        }
-    });
-
     Bridge.define("System.ComponentModel.Container", {
         inherits: [System.ComponentModel.IContainer],
         alias: ["Dispose", "System$IDisposable$Dispose"],
@@ -10039,15 +9332,17 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             return;
                         }
                     }
-                    var dictionary = Bridge.cast(container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty), System.Collections.IDict);
+                    var dictionary = Bridge.cast(container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty), System.Collections.IDictionary);
                     if (dictionary != null) {
-                        $t = Bridge.getEnumerator(dictionary);
+                        $t = Bridge.getEnumerator(dictionary, "System$Collections$IDictionary$GetEnumerator");
                         try {
                             while ($t.moveNext()) {
                                 var entry = Bridge.cast($t.Current, System.Object);
-                                var key = Bridge.cast(entry.Key, System.Windows.Forms.Layout.IArrangedElement);
-                                var bounds = Bridge.cast(entry.Value, System.Drawing.Rectangle);
-                                key.System$Windows$Forms$Layout$IArrangedElement$SetBounds(bounds.$clone(), System.Windows.Forms.BoundsSpecified.None);
+                                var key = Bridge.cast(entry.key, System.Windows.Forms.Layout.IArrangedElement);
+                                var bounds = Bridge.cast(entry.value, System.Drawing.Rectangle);
+                                if (key != null) {
+                                    key.System$Windows$Forms$Layout$IArrangedElement$SetBounds(bounds.$clone(), System.Windows.Forms.BoundsSpecified.None);
+                                }
                             }
                         } finally {
                             if (Bridge.is($t, System.IDisposable)) {
@@ -10156,11 +9451,13 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 },
                 GetCachedBounds: function (element) {
                     if (element.System$Windows$Forms$Layout$IArrangedElement$Container != null) {
-                        var dictionary = Bridge.cast(element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty), System.Collections.IDict);
+                        var dictionary = Bridge.cast(element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty), System.Collections.Generic.Dictionary$2(System.Object,System.Object));
                         if (dictionary != null) {
-                            var obj2 = dictionary.System$Collections$IDict$getItem(element);
-                            if (obj2 != null) {
-                                return System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj2), System.Drawing.Rectangle));
+                            if (dictionary.containsKey(element)) {
+                                var obj2 = dictionary.get(element);
+                                if (obj2 != null) {
+                                    return System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj2), System.Drawing.Rectangle));
+                                }
                             }
                         }
                     }
@@ -10415,12 +9712,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 },
                 SetCachedBounds: function (element, bounds) {
                     if (System.Drawing.Rectangle.op_Inequality(bounds.$clone(), System.Windows.Forms.Layout.DefaultLayout.GetCachedBounds(element))) {
-                        var dictionary = Bridge.cast(element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty), System.Collections.IDict);
+                        var dictionary = Bridge.cast(element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty), System.Collections.IDictionary);
                         if (dictionary == null) {
-                            dictionary = new System.Collections.Specialized.HybridDictionary.ctor();
+                            dictionary = new (System.Collections.Generic.Dictionary$2(System.Object,System.Object))();
                             element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Properties.SetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty, dictionary);
                         }
-                        dictionary.System$Collections$IDict$setItem(element, bounds.$clone());
+                        dictionary.System$Collections$IDictionary$setItem(element, bounds.$clone());
                     }
                 },
                 SetDock: function (element, value) {
@@ -11121,6 +10418,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     ev.stopPropagation();
 
                     this.OnMouseDown(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this));
+                });
+
+                this.Element.ondblclick = Bridge.fn.bind(this, function (ev) {
+                    ev.stopPropagation();
+
+                    this.OnMouseDoubleClick(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this));
                 });
 
                 this.Element.onmouseleave = Bridge.fn.bind(this, function (ev) {
@@ -11842,6 +11145,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         inherits: [System.Collections.Generic.IList$1(System.Windows.Forms.Control),System.Collections.ICollection,System.Collections.IEnumerable],
         fields: {
             _owner: null,
+            layer: null,
             _items: null
         },
         props: {
@@ -11894,6 +11198,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             ctor: function (owner) {
                 this.$initialize();
                 this._owner = owner;
+                this.layer = this.layer;
                 this._items = new (System.Collections.Generic.List$1(System.Windows.Forms.Control)).ctor();
             }
         },
@@ -11905,7 +11210,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this._items.setItem(index, value);
             },
             add: function (item) {
-                this._owner.Element.appendChild(item.Element);
+                this.layer.appendChild(item.Element);
                 item._parent = this.Owner;
                 item.InvokeLoad();
                 this._items.add(item);
@@ -11923,13 +11228,13 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this._items.add(item[System.Array.index(i, item)]);
                     this._owner.OnControlAdded(item[System.Array.index(i, item)]);
                 }
-                this._owner.Element.appendChild(frag);
+                this.layer.appendChild(frag);
             },
             clear: function () {
-                			var len = _owner.Element.childNodes.length;
+                			var len = layer.childNodes.length;
                 			while(len--)
                 			{
-                				_owner.Element.removeChild(_owner.Element.lastChild);
+                				layer.removeChild(layer.lastChild);
                 			};
                 			
                 this._items.clear();
@@ -11953,19 +11258,19 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 return this._items.indexOf(item);
             },
             insert: function (index, item) {
-                this._owner.Element.insertBefore(item.Element, this._owner.Element.childNodes[index]);
+                this.layer.insertBefore(item.Element, this.layer.childNodes[index]);
                 this._items.insert(index, item);
                 this._owner.OnControlAdded(item);
             },
             remove: function (item) {
-                this._owner.Element.removeChild(item.Element);
+                this.layer.removeChild(item.Element);
 
                 this._owner.OnControlRemoved(item);
 
                 return this._items.remove(item);
             },
             removeAt: function (index) {
-                this._owner.Element.removeChild(this._owner.Element.childNodes[index]);
+                this.layer.removeChild(this.layer.childNodes[index]);
 
                 this._owner.OnControlRemoved(this._items.getItem(index));
 
@@ -13273,6 +12578,18 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 System.Windows.Forms.ContainerControl.ctor.call(this);
                 this.Element.setAttribute("scope", "form");
                 this.Element.style.overflow = "visible";
+
+                var formBase = document.createElement("div");
+                formBase.style.overflow = "hidden";
+                formBase.style.position = "absolute";
+                formBase.style.left = "0";
+                formBase.style.top = "0";
+                formBase.style.width = "100%";
+                formBase.style.height = "100%";
+
+                this.Controls.layer = formBase;
+
+                this.Element.appendChild(formBase);
 
                 this.TabStop = false;
 

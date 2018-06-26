@@ -932,7 +932,19 @@ namespace System.Windows.Forms
         {            
             Element.setAttribute("scope", "form");
             Element.style.overflow = "visible";
-            
+
+            var formBase = new HTMLDivElement();
+            formBase.style.overflow = "hidden";
+            formBase.style.position = "absolute";
+            formBase.style.left = "0";
+            formBase.style.top = "0";
+            formBase.style.width = "100%";
+            formBase.style.height = "100%";
+
+            this.Controls.layer = formBase;
+
+            this.Element.appendChild(formBase);
+
             TabStop = false;
 
             this.Location = new Point(0, 0);

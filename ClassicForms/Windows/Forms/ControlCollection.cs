@@ -14,10 +14,12 @@ namespace System.Windows.Forms
     public class ControlCollection : IList<Control>, ICollection, IEnumerable
     {
         internal Control _owner;
+        internal HTMLElement layer;
 
         public ControlCollection(Control owner)
         {
             _owner = owner;
+            layer = layer;
             _items = new List<Control>();
         }
 
@@ -44,7 +46,7 @@ namespace System.Windows.Forms
 
         public void Add(Control item)
         {
-            _owner.Element.appendChild(item.Element);
+            layer.appendChild(item.Element);
             item._parent = Owner;
             item.InvokeLoad();
             _items.Add(item);
@@ -64,16 +66,16 @@ namespace System.Windows.Forms
                 _items.Add(item[i]);
                 _owner.OnControlAdded(item[i]);
             }
-            _owner.Element.appendChild(frag);
+            layer.appendChild(frag);
         }
 
         public void Clear()
         {
             /*@
-			var len = _owner.Element.childNodes.length;
+			var len = layer.childNodes.length;
 			while(len--)
 			{
-				_owner.Element.removeChild(_owner.Element.lastChild);
+				layer.removeChild(layer.lastChild);
 			};
 			*/
             _items.Clear();
@@ -106,14 +108,14 @@ namespace System.Windows.Forms
 
         public void Insert(int index, Control item)
         {
-            _owner.Element.insertBefore(item.Element, (Node)_owner.Element.childNodes[index]);
+            layer.insertBefore(item.Element, (Node)layer.childNodes[index]);
             _items.Insert(index, item);
             _owner.OnControlAdded(item);
         }
 
         public bool Remove(Control item)
         {
-            _owner.Element.removeChild(item.Element);
+            layer.removeChild(item.Element);
 
             _owner.OnControlRemoved(item);
 
@@ -122,7 +124,7 @@ namespace System.Windows.Forms
 
         public void RemoveAt(int index)
         {
-            _owner.Element.removeChild(_owner.Element.childNodes[index]);
+            layer.removeChild(layer.childNodes[index]);
 
             _owner.OnControlRemoved(_items[index]);
 

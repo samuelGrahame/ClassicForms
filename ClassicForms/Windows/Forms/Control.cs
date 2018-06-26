@@ -635,6 +635,13 @@ namespace System.Windows.Forms
                 OnMouseDown(MouseEventArgs.CreateFromMouseEvent(ev, this));
             };
 
+            Element.ondblclick = (ev) =>
+            {
+                ev.stopPropagation();
+
+                OnMouseDoubleClick(MouseEventArgs.CreateFromMouseEvent(ev, this));
+            };
+
             Element.onmouseleave = (ev) =>
             {
                 ev.stopPropagation();
