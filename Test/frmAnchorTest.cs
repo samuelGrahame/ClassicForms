@@ -16,7 +16,6 @@ namespace Test
         private Button button7;
         private Button button8;
         private Button button9;
-        private Button button4;
         private Button button1;
 
         public frmAnchorTest() : base()
@@ -34,13 +33,12 @@ namespace Test
             this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
             // 
             this.button1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button1.Location = new System.Drawing.Point(262, 144);
+            this.button1.Location = new System.Drawing.Point(268, 173);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(160, 55);
             this.button1.TabIndex = 0;
@@ -52,7 +50,7 @@ namespace Test
             // button2
             // 
             this.button2.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button2.Location = new System.Drawing.Point(262, 83);
+            this.button2.Location = new System.Drawing.Point(268, 112);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(160, 55);
             this.button2.TabIndex = 1;
@@ -124,7 +122,7 @@ namespace Test
             // button9
             // 
             this.button9.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button9.Location = new System.Drawing.Point(262, 205);
+            this.button9.Location = new System.Drawing.Point(268, 234);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(160, 55);
             this.button9.TabIndex = 8;
@@ -133,22 +131,9 @@ namespace Test
             this.button9.UseVisualStyleBackColor = true;
             this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
-            // button4
-            // 
-            this.button4.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button4.Location = new System.Drawing.Point(262, 266);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(160, 55);
-            this.button4.TabIndex = 9;
-            this.button4.Tag = "btn btn-primary";
-            this.button4.Text = "Open Flow Panel Test";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
-            // 
             // frmAnchorTest
             // 
             this.ClientSize = new System.Drawing.Size(697, 413);
-            this.Controls.Add(this.button4);
             this.Controls.Add(this.button9);
             this.Controls.Add(this.button8);
             this.Controls.Add(this.button7);
@@ -225,12 +210,6 @@ namespace Test
         private void button9_Click(object sender, EventArgs e)
         {
             var x = new frmDockingTest();
-            x.Show();
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            var x = new StackPanelTest();
             x.Show();
         }
     }

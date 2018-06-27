@@ -51,13 +51,6 @@
       <Link>UI\frmModal.designer.cs</Link>
       <DependentUpon>frmModal.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\Test\StackPanelTest.cs">
-      <Link>UI\StackPanelTest.cs</Link>
-    </Compile>
-    <Compile Include="..\Test\StackPanelTest.designer.cs">
-      <Link>UI\StackPanelTest.designer.cs</Link>
-      <DependentUpon>StackPanelTest.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
