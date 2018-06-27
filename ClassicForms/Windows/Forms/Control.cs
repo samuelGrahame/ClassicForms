@@ -23,6 +23,11 @@ namespace System.Windows.Forms
                 this.Parent.OnChildGotTabbed();
         }
 
+        protected virtual bool OnRequestMouseEvent(MouseEvent mouseEvent)
+        {
+            return true;
+        }
+
         public Control GetNextControl(Control ctl, bool forward, bool isParent = false)
         {
             if (ctl == null)
@@ -340,7 +345,7 @@ namespace System.Windows.Forms
 
         private Size _size;
         // new Size(_size.Width + Margin.Right, _size.Height + Margin.Bottom); 
-        public Size Size { get { return _size; } set {
+        public virtual Size Size { get { return _size; } set {
                 var prev = _size;
                 _size = value;// new Size(value.Width - Margin.Right, value.Height - Margin.Bottom);
 
@@ -543,6 +548,9 @@ namespace System.Windows.Forms
             {
                 if (ClickedOnControl != null)
                 {
+                    if (!ClickedOnControl.OnRequestMouseEvent(ev))
+                        return;
+
                     ev.stopPropagation();
 
                     ClickedOnControl.OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev, ClickedOnControl));
@@ -553,7 +561,10 @@ namespace System.Windows.Forms
             {
                 if (ClickedOnControl != null)
                 {
-                   ev.stopPropagation();
+                    if (!ClickedOnControl.OnRequestMouseEvent(ev))
+                        return;
+
+                    ev.stopPropagation();
 
                     ClickedOnControl.OnMouseUp(MouseEventArgs.CreateFromMouseEvent(ev, ClickedOnControl));
 
@@ -600,23 +611,29 @@ namespace System.Windows.Forms
                 return Parent.FindForm();
         }
 
-        internal Control(HTMLElement element)
+        internal Control(HTMLElement element, bool isRegularBox = true)
         {
+            if (element == null)
+                element = new HTMLDivElement();
+
             Element = element;
 
             Controls = new ControlCollection(this);
 
             Element.style.overflow = "hidden";
-
-            Element.style.position = "absolute";
-            Element.style.boxSizing = "borderbox";
+            if(isRegularBox)
+            {
+                Element.style.position = "absolute";
+                Element.style.boxSizing = "borderbox";
+                Element.style.boxSizing = "border-box";
+            }
+            
 
             Element.style.padding = "0";
-           // Element.style.margin = "1px";
-
+           
             Element.style.fontSize = "inherit";
             Element.style.fontFamily = "inherit";
-            Element.style.boxSizing = "border-box";
+            
 
             Visible = true;
 
@@ -624,11 +641,15 @@ namespace System.Windows.Forms
 
             Element.onclick = (ev) =>
             {
+                if (!OnRequestMouseEvent(ev))
+                    return;
                 OnClick(EventArgs.Empty);
             };
 
             Element.onmousedown = (ev) =>
             {
+                if (!OnRequestMouseEvent(ev))
+                    return;
                 ClickedOnControl = this;
                 ev.stopPropagation();
 
@@ -637,6 +658,8 @@ namespace System.Windows.Forms
 
             Element.ondblclick = (ev) =>
             {
+                if (!OnRequestMouseEvent(ev))
+                    return;
                 ev.stopPropagation();
 
                 OnMouseDoubleClick(MouseEventArgs.CreateFromMouseEvent(ev, this));
@@ -644,6 +667,8 @@ namespace System.Windows.Forms
 
             Element.onmouseleave = (ev) =>
             {
+                if (!OnRequestMouseEvent(ev))
+                    return;
                 ev.stopPropagation();
 
                 if (ClickedOnControl == null)
@@ -656,6 +681,8 @@ namespace System.Windows.Forms
 
             Element.onmouseenter = (ev) =>
             {
+                if (!OnRequestMouseEvent(ev))
+                    return;
                 ev.stopPropagation();
 
                 OnMouseEnter(EventArgs.Empty);
@@ -665,6 +692,9 @@ namespace System.Windows.Forms
             {
                 if (ClickedOnControl == null)
                 {
+                    if (!OnRequestMouseEvent(ev))
+                        return;
+
                     ev.stopPropagation();
 
                     OnMouseMove(MouseEventArgs.CreateFromMouseEvent(ev, this));

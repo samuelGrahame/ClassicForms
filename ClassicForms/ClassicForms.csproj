@@ -84,6 +84,7 @@
     <Compile Include="Windows\Forms\FormStartPosition.cs" />
     <Compile Include="Windows\Forms\Layout\LayoutTransaction.cs" />
     <Compile Include="Windows\Forms\Layout\PropertyNames.cs" />
+    <Compile Include="Windows\Forms\MenuStrip.cs" />
     <Compile Include="Windows\Forms\TableLayoutPanel.cs" />
     <Compile Include="Windows\Forms\TextFormatFlags.cs" />
     <Compile Include="Windows\Forms\ComboBox.cs" />
@@ -129,6 +130,10 @@
     <Compile Include="Windows\Forms\TabPageHeader.cs" />
     <Compile Include="Windows\Forms\TextBox.cs" />
     <Compile Include="Windows\Forms\TextImageRelation.cs" />
+    <Compile Include="Windows\Forms\ToolStripDropDownItem.cs" />
+    <Compile Include="Windows\Forms\ToolStripItem.cs" />
+    <Compile Include="Windows\Forms\ToolStripItemCollection.cs" />
+    <Compile Include="Windows\Forms\ToolStripMenuItem.cs" />
     <Compile Include="Windows\Forms\WindowsFormsUtils.cs" />
     <Compile Include="Windows\Forms\WindowState.cs" />
   </ItemGroup>

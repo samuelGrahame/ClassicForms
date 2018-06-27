@@ -9916,6 +9916,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     document.body.style.boxSizing = "border-box";
                     window.onmousemove = function (ev) {
                         if (System.Windows.Forms.Control.ClickedOnControl != null) {
+                            if (!System.Windows.Forms.Control.ClickedOnControl.OnRequestMouseEvent(ev)) {
+                                return;
+                            }
+
                             ev.stopPropagation();
 
                             System.Windows.Forms.Control.ClickedOnControl.OnMouseMove(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, System.Windows.Forms.Control.ClickedOnControl));
@@ -9924,6 +9928,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                     window.onmouseup = function (ev) {
                         if (System.Windows.Forms.Control.ClickedOnControl != null) {
+                            if (!System.Windows.Forms.Control.ClickedOnControl.OnRequestMouseEvent(ev)) {
+                                return;
+                            }
+
                             ev.stopPropagation();
 
                             System.Windows.Forms.Control.ClickedOnControl.OnMouseUp(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, System.Windows.Forms.Control.ClickedOnControl));
@@ -10387,33 +10395,47 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.LayoutEngine = new System.Windows.Forms.Layout.DefaultLayout();
                 this._disposing = false;
             },
-            ctor: function (element) {
+            ctor: function (element, isRegularBox) {
+                if (isRegularBox === void 0) { isRegularBox = true; }
+
                 this.$initialize();
+                if (element == null) {
+                    element = document.createElement("div");
+                }
+
                 this.Element = element;
 
                 this.Controls = new System.Windows.Forms.ControlCollection(this);
 
                 this.Element.style.overflow = "hidden";
+                if (isRegularBox) {
+                    this.Element.style.position = "absolute";
+                    this.Element.style.boxSizing = "borderbox";
+                    this.Element.style.boxSizing = "border-box";
+                }
 
-                this.Element.style.position = "absolute";
-                this.Element.style.boxSizing = "borderbox";
 
                 this.Element.style.padding = "0";
-                // Element.style.margin = "1px";
 
                 this.Element.style.fontSize = "inherit";
                 this.Element.style.fontFamily = "inherit";
-                this.Element.style.boxSizing = "border-box";
+
 
                 this.Visible = true;
 
                 this.TabStop = this.GetDefaultTabStop();
 
                 this.Element.onclick = Bridge.fn.bind(this, function (ev) {
+                    if (!this.OnRequestMouseEvent(ev)) {
+                        return;
+                    }
                     this.OnClick({ });
                 });
 
                 this.Element.onmousedown = Bridge.fn.bind(this, function (ev) {
+                    if (!this.OnRequestMouseEvent(ev)) {
+                        return;
+                    }
                     System.Windows.Forms.Control.ClickedOnControl = this;
                     ev.stopPropagation();
 
@@ -10421,12 +10443,18 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 });
 
                 this.Element.ondblclick = Bridge.fn.bind(this, function (ev) {
+                    if (!this.OnRequestMouseEvent(ev)) {
+                        return;
+                    }
                     ev.stopPropagation();
 
                     this.OnMouseDoubleClick(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this));
                 });
 
                 this.Element.onmouseleave = Bridge.fn.bind(this, function (ev) {
+                    if (!this.OnRequestMouseEvent(ev)) {
+                        return;
+                    }
                     ev.stopPropagation();
 
                     if (System.Windows.Forms.Control.ClickedOnControl == null) {
@@ -10437,6 +10465,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 });
 
                 this.Element.onmouseenter = Bridge.fn.bind(this, function (ev) {
+                    if (!this.OnRequestMouseEvent(ev)) {
+                        return;
+                    }
                     ev.stopPropagation();
 
                     this.OnMouseEnter({ });
@@ -10444,6 +10475,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 this.Element.onmousemove = Bridge.fn.bind(this, function (ev) {
                     if (System.Windows.Forms.Control.ClickedOnControl == null) {
+                        if (!this.OnRequestMouseEvent(ev)) {
+                            return;
+                        }
+
                         ev.stopPropagation();
 
                         this.OnMouseMove(System.Windows.Forms.MouseEventArgs.CreateFromMouseEvent(ev, this));
@@ -10459,6 +10494,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (this.Parent != null) {
                     this.Parent.OnChildGotTabbed();
                 }
+            },
+            OnRequestMouseEvent: function (mouseEvent) {
+                return true;
             },
             GetNextControl: function (ctl, forward, isParent) {
                 var $t;
@@ -11539,6 +11577,28 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.Windows.Forms.MenuStrip", {
+        inherits: [System.Windows.Forms.Control],
+        fields: {
+            Items: null
+        },
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+                System.Windows.Forms.Control.ctor.call(this, document.createElement("div"));
+                this.Element.style.overflow = "hidden";
+                var div = document.createElement("div");
+                div.style.overflow = "hidden";
+                div.style.cursor = "default";
+                div.style.height = "100%";
+                this.Items = new System.Windows.Forms.ToolStripItemCollection(div);
+                this.Dock = System.Windows.Forms.DockStyle.Top;
+
+                this.Element.appendChild(div);
+            }
+        }
+    });
+
     Bridge.define("System.Windows.Forms.ProgressBar", {
         inherits: [System.Windows.Forms.Control],
         fields: {
@@ -12007,6 +12067,31 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.Windows.Forms.ToolStripItem", {
+        inherits: [System.Windows.Forms.Control],
+        props: {
+            Text: {
+                get: function () {
+                    return this.Element.innerText;
+                },
+                set: function (value) {
+                    this.Element.innerText = value;
+                }
+            }
+        },
+        ctors: {
+            $ctor1: function (element) {
+                this.$initialize();
+                System.Windows.Forms.Control.ctor.call(this, element, false);
+
+            },
+            ctor: function () {
+                System.Windows.Forms.ToolStripItem.$ctor1.call(this, null);
+
+            }
+        }
+    });
+
     Bridge.define("System.Windows.Forms.Button", {
         inherits: [System.Windows.Forms.ButtonBase],
         fields: {
@@ -12426,6 +12511,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _allowSizeChange: false,
             _allowMoveChange: false,
             HeadingTitle: null,
+            MainMenuStrip: null,
             _mouseDownOnBorder: false,
             _formMovementModes: 0,
             _activeControl: null,
@@ -12590,19 +12676,21 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.Element.style.overflow = "visible";
 
                 var formBase = document.createElement("div");
+                var dummyControl = new System.Windows.Forms.Control(formBase, false);
                 formBase.style.overflow = "hidden";
                 formBase.style.position = "absolute";
-                formBase.style.left = "0";
-                formBase.style.top = "0";
-                formBase.style.width = "100%";
-                formBase.style.height = "100%";
+                formBase.style.left = "2px";
+                formBase.style.top = "2px";
+                formBase.style.width = "calc(100% - 4px)";
+                formBase.style.height = "calc(100% - 4px)";
+                formBase.style.cursor = "default";
+                formBase.style.outline = "none";
 
                 this.HeadingTitle = document.createElement("span");
                 this.HeadingTitle.style.marginRight = "0";
                 this.HeadingTitle.style.left = "3px";
                 this.HeadingTitle.setAttribute("scope", "form-title");
                 this.HeadingTitle.style.position = "absolute";
-                this.HeadingTitle.style.color = "white";
 
                 this.Element.appendChild(this.HeadingTitle);
 
@@ -13075,6 +13163,13 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
 
             },
+            OnRequestMouseEvent: function (mouseEvent) {
+                if (Bridge.referenceEquals(mouseEvent.currentTarget, this.HeadingTitle)) {
+                    return false;
+                }
+
+                return System.Windows.Forms.ContainerControl.prototype.OnRequestMouseEvent.call(this, mouseEvent);
+            },
             GetMovementMode: function (e) {
                 if (this.WindowState === System.Windows.Forms.FormWindowState.Minimized) {
                     document.body.style.cursor = null;
@@ -13167,8 +13262,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     var newY = ((((this.Location.Y + e.Y) | 0)) + this._prevY) | 0;
                     var newX = ((((this.Location.X + e.X) | 0)) + this._prevX) | 0;
 
+                    // for some reason chrome pass a mouse move on mouse down now...
+                    if (newY === 0 && newX === 0) {
+                        return;
+                    }
+
                     if (this._formMovementModes === System.Windows.Forms.Form.FormMovementModes.Move) {
                         if (this.WindowState === System.Windows.Forms.FormWindowState.Maximized) {
+
                             this.WindowState = System.Windows.Forms.FormWindowState.Normal;
                             newX = (e.X - (((Bridge.Int.div(this.prev_width, 2)) | 0))) | 0;
                             this._prevX = (newX - e.X) | 0;
@@ -13371,6 +13472,141 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.Windows.Forms.ToolStripDropDownItem", {
+        inherits: [System.Windows.Forms.ToolStripItem],
+        fields: {
+            DropDownItems: null
+        },
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+                System.Windows.Forms.ToolStripItem.ctor.call(this);
+                this.DropDownItems = new System.Windows.Forms.ToolStripItemCollection(this.Element);
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.ToolStripItemCollection", {
+        inherits: [System.Collections.Generic.IList$1(System.Windows.Forms.ToolStripItem),System.Collections.ICollection,System.Collections.IEnumerable],
+        fields: {
+            layer: null,
+            _items: null
+        },
+        props: {
+            Count: {
+                get: function () {
+                    return this._items.Count;
+                }
+            },
+            IsReadOnly: {
+                get: function () {
+                    return false;
+                }
+            },
+            IsSynchronized: {
+                get: function () {
+                    return false;
+                }
+            },
+            SyncRoot: {
+                get: function () {
+                    throw new System.NotImplementedException.ctor();
+                }
+            }
+        },
+        alias: [
+            "getItem", "System$Collections$Generic$IList$1$System$Windows$Forms$ToolStripItem$getItem",
+            "setItem", "System$Collections$Generic$IList$1$System$Windows$Forms$ToolStripItem$setItem",
+            "Count", "System$Collections$ICollection$Count",
+            "Count", "System$Collections$Generic$ICollection$1$System$Windows$Forms$ToolStripItem$Count",
+            "IsReadOnly", "System$Collections$Generic$ICollection$1$System$Windows$Forms$ToolStripItem$IsReadOnly",
+            "IsSynchronized", "System$Collections$ICollection$IsSynchronized",
+            "SyncRoot", "System$Collections$ICollection$SyncRoot",
+            "add", "System$Collections$Generic$ICollection$1$System$Windows$Forms$ToolStripItem$add",
+            "clear", "System$Collections$Generic$ICollection$1$System$Windows$Forms$ToolStripItem$clear",
+            "contains", "System$Collections$Generic$ICollection$1$System$Windows$Forms$ToolStripItem$contains",
+            "copyTo$1", "System$Collections$Generic$ICollection$1$System$Windows$Forms$ToolStripItem$copyTo",
+            "copyTo", "System$Collections$ICollection$copyTo",
+            "GetEnumerator", ["System$Collections$Generic$IEnumerable$1$System$Windows$Forms$ToolStripItem$GetEnumerator", "System$Collections$Generic$IEnumerable$1$GetEnumerator"],
+            "indexOf", "System$Collections$Generic$IList$1$System$Windows$Forms$ToolStripItem$indexOf",
+            "insert", "System$Collections$Generic$IList$1$System$Windows$Forms$ToolStripItem$insert",
+            "remove", "System$Collections$Generic$ICollection$1$System$Windows$Forms$ToolStripItem$remove",
+            "removeAt", "System$Collections$Generic$IList$1$System$Windows$Forms$ToolStripItem$removeAt"
+        ],
+        ctors: {
+            ctor: function (owner) {
+                this.$initialize();
+                //_owner = owner;
+                this.layer = owner;
+                this._items = new (System.Collections.Generic.List$1(System.Windows.Forms.ToolStripItem)).ctor();
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                return this._items.getItem(index);
+            },
+            setItem: function (index, value) {
+                this._items.setItem(index, value);
+            },
+            add: function (item) {
+                this.layer.appendChild(item.Element);
+                this._items.add(item);
+            },
+            AddRange: function (item) {
+                if (item == null || item.length === 0) {
+                    return;
+                }
+                var frag = document.createDocumentFragment();
+                for (var i = 0; i < item.length; i = (i + 1) | 0) {
+                    frag.appendChild(item[System.Array.index(i, item)].Element);
+                    this._items.add(item[System.Array.index(i, item)]);
+                }
+                this.layer.appendChild(frag);
+            },
+            clear: function () {
+                			var len = layer.childNodes.length;
+                			while(len--)
+                			{
+                				layer.removeChild(layer.lastChild);
+                			};
+                			
+                this._items.clear();
+            },
+            contains: function (item) {
+                return this._items.contains(item);
+            },
+            copyTo$1: function (array, arrayIndex) {
+                this._items.copyTo(array, arrayIndex);
+            },
+            copyTo: function (array, arrayIndex) {
+                this._items.copyTo(Bridge.cast(array, System.Array.type(System.Windows.Forms.ToolStripItem)), arrayIndex);
+            },
+            GetEnumerator: function () {
+                return this._items.GetEnumerator().$clone();
+            },
+            System$Collections$IEnumerable$GetEnumerator: function () {
+                return this._items.GetEnumerator().$clone();
+            },
+            indexOf: function (item) {
+                return this._items.indexOf(item);
+            },
+            insert: function (index, item) {
+                this.layer.insertBefore(item.Element, this.layer.childNodes[index]);
+                this._items.insert(index, item);
+            },
+            remove: function (item) {
+                this.layer.removeChild(item.Element);
+
+                return this._items.remove(item);
+            },
+            removeAt: function (index) {
+                this.layer.removeChild(this.layer.childNodes[index]);
+
+                this._items.removeAt(index);
+            }
+        }
+    });
+
     Bridge.define("System.Windows.Forms.TabPage", {
         inherits: [System.Windows.Forms.Panel],
         fields: {
@@ -13413,6 +13649,33 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this.Parent.SelectedPage = this;
                 }
                 System.Windows.Forms.Panel.prototype.OnChildGotTabbed.call(this);
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.ToolStripMenuItem", {
+        inherits: [System.Windows.Forms.ToolStripDropDownItem],
+        props: {
+            Size: {
+                get: function () {
+                    return Bridge.ensureBaseProperty(this, "Size").$System$Windows$Forms$Control$Size.$clone();
+                },
+                set: function (value) {
+                    Bridge.ensureBaseProperty(this, "Size").$System$Windows$Forms$Control$Size = value.$clone();
+                    if (this.Element != null) {
+                        this.Element.style.width = value.Width + "px";
+                        this.Element.style.height = value.Height + "px";
+                        this.Element.style.lineHeight = this.Element.style.height;
+                    }
+                }
+            }
+        },
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+                System.Windows.Forms.ToolStripDropDownItem.ctor.call(this);
+                this.Element.style.cssFloat = "left";
+                this.Element.setAttribute("scope", "tool-strip-menu-item");
             }
         }
     });

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Retyped;
 using static Retyped.dom;
 
 namespace System.Windows.Forms
@@ -18,6 +19,8 @@ namespace System.Windows.Forms
         private bool _allowSizeChange = true;
         private bool _allowMoveChange = true;
         protected HTMLSpanElement HeadingTitle;
+
+        public MenuStrip MainMenuStrip { get; set; }
 
         protected override string GetDefaultTag()
         {
@@ -941,19 +944,21 @@ namespace System.Windows.Forms
             Element.style.overflow = "visible";
 
             var formBase = new HTMLDivElement();
+            var dummyControl = new Control(formBase, false);           
             formBase.style.overflow = "hidden";
             formBase.style.position = "absolute";
-            formBase.style.left = "0";
-            formBase.style.top = "0";
-            formBase.style.width = "100%";
-            formBase.style.height = "100%";
+            formBase.style.left = "2px";
+            formBase.style.top = "2px";
+            formBase.style.width = "calc(100% - 4px)";
+            formBase.style.height = "calc(100% - 4px)";
+            formBase.style.cursor = "default";
+            formBase.style.outline = "none";
 
             HeadingTitle = new HTMLSpanElement();
             HeadingTitle.style.marginRight = "0";
             HeadingTitle.style.left = "3px";            
             HeadingTitle.setAttribute("scope", "form-title");
             HeadingTitle.style.position = "absolute";
-            HeadingTitle.style.color = "white";
 
             Element.appendChild(HeadingTitle);
 
@@ -1025,6 +1030,15 @@ namespace System.Windows.Forms
             Right,
             BottomRight,
             Bottom
+        }
+
+
+        protected override bool OnRequestMouseEvent(MouseEvent mouseEvent)
+        {
+            if (mouseEvent.currentTarget == HeadingTitle)
+                return false;
+               
+            return base.OnRequestMouseEvent(mouseEvent);
         }
 
         private FormMovementModes GetMovementMode(MouseEventArgs e)
@@ -1152,10 +1166,15 @@ namespace System.Windows.Forms
                 var newY = (Location.Y + e.Y) + _prevY;
                 var newX = (Location.X + e.X) + _prevX;
 
+                // for some reason chrome pass a mouse move on mouse down now...
+                if (newY == 0 && newX == 0)
+                    return;
+
                 if (_formMovementModes == FormMovementModes.Move)
                 {
                     if (WindowState == FormWindowState.Maximized)
                     {
+                        
                         WindowState = FormWindowState.Normal;                        
                         newX = e.X - (prev_width / 2);
                         _prevX = newX - e.X;
