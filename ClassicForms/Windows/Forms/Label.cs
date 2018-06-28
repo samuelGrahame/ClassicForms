@@ -21,11 +21,11 @@ namespace System.Windows.Forms
 
         public override string Text
         {
-            get { return Element.textContent; }
+            get { return Element.innerText; }
             set
             {
                 base.Text = value;
-                Element.textContent = value;
+                Element.innerText = value;
             }
         }
     }

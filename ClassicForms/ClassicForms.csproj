@@ -70,6 +70,7 @@
     <Compile Include="IWellKnownStringEqualityComparer.cs" />
     <Compile Include="OrdinalComparer.cs" />
     <Compile Include="StringUtils.cs" />
+    <Compile Include="Windows\Forms\ArrowDirection.cs" />
     <Compile Include="Windows\Forms\BorderStyle.cs" />
     <Compile Include="Windows\Forms\DpiHelper.cs" />
     <Compile Include="Windows\Forms\AnchorStyles.cs" />
@@ -82,9 +83,17 @@
     <Compile Include="Windows\Forms\ClientUtils.cs" />
     <Compile Include="Windows\Forms\FlowLayoutPanel.cs" />
     <Compile Include="Windows\Forms\FormStartPosition.cs" />
+    <Compile Include="Windows\Forms\HelpInfo.cs" />
+    <Compile Include="Windows\Forms\HelpNavigator.cs" />
+    <Compile Include="Windows\Forms\IWin32Window.cs" />
     <Compile Include="Windows\Forms\Layout\LayoutTransaction.cs" />
     <Compile Include="Windows\Forms\Layout\PropertyNames.cs" />
     <Compile Include="Windows\Forms\MenuStrip.cs" />
+    <Compile Include="Windows\Forms\MessageBox.cs" />
+    <Compile Include="Windows\Forms\MessageBoxButtons.cs" />
+    <Compile Include="Windows\Forms\MessageBoxDefaultButton.cs" />
+    <Compile Include="Windows\Forms\MessageBoxIcon.cs" />
+    <Compile Include="Windows\Forms\MessageBoxOptions.cs" />
     <Compile Include="Windows\Forms\TableLayoutPanel.cs" />
     <Compile Include="Windows\Forms\TextFormatFlags.cs" />
     <Compile Include="Windows\Forms\ComboBox.cs" />

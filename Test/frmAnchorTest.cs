@@ -189,7 +189,8 @@ namespace Test
 
         private void button8_Click(object sender, EventArgs e)
         {
-            this.Close();
+            MessageBox.Show("asdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasddddddddddddddddddd");
+            //this.Close();
         }
 
         private void frmAnchorTest_Load(object sender, EventArgs e)

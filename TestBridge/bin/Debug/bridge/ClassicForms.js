@@ -4679,6 +4679,18 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         $flags: true
     });
 
+    Bridge.define("System.Windows.Forms.ArrowDirection", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                Down: 17,
+                Left: 0,
+                Right: 16,
+                Up: 1
+            }
+        }
+    });
+
     Bridge.define("System.Windows.Forms.AutoScaleMode", {
         $kind: "enum",
         statics: {
@@ -4734,6 +4746,17 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             methods: {
                 IsEnumValid: function (enumValue, value, minValue, maxValue) {
                     return ((value >= minValue) && (value <= maxValue));
+                },
+                IsEnumValid$1: function (enumValue, value, minValue, maxValue, maxNumberOfBitsOn) {
+                    return (((value >= minValue) && (value <= maxValue)) && (System.Windows.Forms.ClientUtils.GetBitCount((value >>> 0)) <= maxNumberOfBitsOn));
+                },
+                GetBitCount: function (x) {
+                    var num = 0;
+                    while (x > 0) {
+                        x = (x & (((x - 1) >>> 0))) >>> 0;
+                        num = (num + 1) | 0;
+                    }
+                    return num;
                 }
             }
         }
@@ -4937,6 +4960,102 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 Maximized: 2
             }
         }
+    });
+
+    Bridge.define("System.Windows.Forms.HelpInfo", {
+        fields: {
+            helpFilePath: null,
+            keyword: null,
+            navigator: 0,
+            option: 0,
+            param: null
+        },
+        props: {
+            HelpFilePath: {
+                get: function () {
+                    return this.helpFilePath;
+                }
+            },
+            Keyword: {
+                get: function () {
+                    return this.keyword;
+                }
+            },
+            Navigator: {
+                get: function () {
+                    return this.navigator;
+                }
+            },
+            Option: {
+                get: function () {
+                    return this.option;
+                }
+            },
+            Param: {
+                get: function () {
+                    return this.param;
+                }
+            }
+        },
+        ctors: {
+            ctor: function (helpfilepath) {
+                this.$initialize();
+                this.helpFilePath = helpfilepath;
+                this.keyword = "";
+                this.navigator = System.Windows.Forms.HelpNavigator.TableOfContents;
+                this.param = null;
+                this.option = 1;
+            },
+            $ctor1: function (helpfilepath, keyword) {
+                this.$initialize();
+                this.helpFilePath = helpfilepath;
+                this.keyword = keyword;
+                this.navigator = System.Windows.Forms.HelpNavigator.TableOfContents;
+                this.param = null;
+                this.option = 2;
+            },
+            $ctor2: function (helpfilepath, navigator) {
+                this.$initialize();
+                this.helpFilePath = helpfilepath;
+                this.keyword = "";
+                this.navigator = navigator;
+                this.param = null;
+                this.option = 3;
+            },
+            $ctor3: function (helpfilepath, navigator, param) {
+                this.$initialize();
+                this.helpFilePath = helpfilepath;
+                this.keyword = "";
+                this.navigator = navigator;
+                this.param = param;
+                this.option = 4;
+            }
+        },
+        methods: {
+            toString: function () {
+                var textArray1 = System.Array.init(["{HelpFilePath=", this.helpFilePath, ", keyword =", this.keyword, ", navigator=", System.Enum.toString(System.Windows.Forms.HelpNavigator, this.navigator), "}"], System.String);
+                return System.String.concat(textArray1);
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.HelpNavigator", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                AssociateIndex: -2147483643,
+                Find: -2147483644,
+                Index: -2147483645,
+                KeywordIndex: -2147483642,
+                TableOfContents: -2147483646,
+                Topic: -2147483647,
+                TopicId: -2147483641
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.IWin32Window", {
+        $kind: "interface"
     });
 
     Bridge.define("System.Windows.Forms.Layout.ArrangedElementCollection", {
@@ -6243,6 +6362,326 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.Windows.Forms.MessageBox", {
+        statics: {
+            fields: {
+                HELP_BUTTON: 0,
+                helpInfoTable: null,
+                IDABORT: 0,
+                IDCANCEL: 0,
+                IDIGNORE: 0,
+                IDNO: 0,
+                IDOK: 0,
+                IDRETRY: 0,
+                IDYES: 0
+            },
+            props: {
+                HelpInfo: {
+                    get: function () {
+                        if ((System.Windows.Forms.MessageBox.helpInfoTable != null) && (System.Windows.Forms.MessageBox.helpInfoTable.length !== 0)) {
+                            return System.Windows.Forms.MessageBox.helpInfoTable[System.Array.index(((System.Windows.Forms.MessageBox.helpInfoTable.length - 1) | 0), System.Windows.Forms.MessageBox.helpInfoTable)];
+                        }
+                        return null;
+                    }
+                }
+            },
+            ctors: {
+                init: function () {
+                    this.HELP_BUTTON = 16384;
+                    this.IDABORT = 3;
+                    this.IDCANCEL = 2;
+                    this.IDIGNORE = 5;
+                    this.IDNO = 7;
+                    this.IDOK = 1;
+                    this.IDRETRY = 4;
+                    this.IDYES = 6;
+                }
+            },
+            methods: {
+                PopHelpInfo: function () {
+                    if (System.Windows.Forms.MessageBox.helpInfoTable != null) {
+                        if (System.Windows.Forms.MessageBox.helpInfoTable.length === 1) {
+                            System.Windows.Forms.MessageBox.helpInfoTable = null;
+                        } else {
+                            var length = (System.Windows.Forms.MessageBox.helpInfoTable.length - 1) | 0;
+                            var destinationArray = System.Array.init(length, null, System.Windows.Forms.HelpInfo);
+                            System.Array.copy(System.Windows.Forms.MessageBox.helpInfoTable, 0, destinationArray, 0, length);
+                            System.Windows.Forms.MessageBox.helpInfoTable = destinationArray;
+                        }
+                    }
+                },
+                PushHelpInfo: function (hpi) {
+                    var infoArray;
+                    var length = 0;
+                    if (System.Windows.Forms.MessageBox.helpInfoTable == null) {
+                        infoArray = System.Array.init(((length + 1) | 0), null, System.Windows.Forms.HelpInfo);
+                    } else {
+                        length = System.Windows.Forms.MessageBox.helpInfoTable.length;
+                        infoArray = System.Array.init(((length + 1) | 0), null, System.Windows.Forms.HelpInfo);
+                        System.Array.copy(System.Windows.Forms.MessageBox.helpInfoTable, 0, infoArray, 0, length);
+                    }
+                    infoArray[System.Array.index(length, infoArray)] = hpi;
+                    System.Windows.Forms.MessageBox.helpInfoTable = infoArray;
+                },
+                Show: function (text) {
+                    return System.Windows.Forms.MessageBox.ShowCore(null, text, "", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.None, System.Windows.Forms.MessageBoxDefaultButton.Button1, 0, false);
+                },
+                Show$1: function (text, caption) {
+                    return System.Windows.Forms.MessageBox.ShowCore(null, text, caption, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.None, System.Windows.Forms.MessageBoxDefaultButton.Button1, 0, false);
+                },
+                Show$11: function (owner, text) {
+                    return System.Windows.Forms.MessageBox.ShowCore(owner, text, "", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.None, System.Windows.Forms.MessageBoxDefaultButton.Button1, 0, false);
+                },
+                Show$2: function (text, caption, buttons) {
+                    return System.Windows.Forms.MessageBox.ShowCore(null, text, caption, buttons, System.Windows.Forms.MessageBoxIcon.None, System.Windows.Forms.MessageBoxDefaultButton.Button1, 0, false);
+                },
+                Show$12: function (owner, text, caption) {
+                    return System.Windows.Forms.MessageBox.ShowCore(owner, text, caption, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.None, System.Windows.Forms.MessageBoxDefaultButton.Button1, 0, false);
+                },
+                Show$3: function (text, caption, buttons, icon) {
+                    return System.Windows.Forms.MessageBox.ShowCore(null, text, caption, buttons, icon, System.Windows.Forms.MessageBoxDefaultButton.Button1, 0, false);
+                },
+                Show$13: function (owner, text, caption, buttons) {
+                    return System.Windows.Forms.MessageBox.ShowCore(owner, text, caption, buttons, System.Windows.Forms.MessageBoxIcon.None, System.Windows.Forms.MessageBoxDefaultButton.Button1, 0, false);
+                },
+                Show$4: function (text, caption, buttons, icon, defaultButton) {
+                    return System.Windows.Forms.MessageBox.ShowCore(null, text, caption, buttons, icon, defaultButton, 0, false);
+                },
+                Show$14: function (owner, text, caption, buttons, icon) {
+                    return System.Windows.Forms.MessageBox.ShowCore(owner, text, caption, buttons, icon, System.Windows.Forms.MessageBoxDefaultButton.Button1, 0, false);
+                },
+                Show$5: function (text, caption, buttons, icon, defaultButton, options) {
+                    return System.Windows.Forms.MessageBox.ShowCore(null, text, caption, buttons, icon, defaultButton, options, false);
+                },
+                Show$15: function (owner, text, caption, buttons, icon, defaultButton) {
+                    return System.Windows.Forms.MessageBox.ShowCore(owner, text, caption, buttons, icon, defaultButton, 0, false);
+                },
+                Show$6: function (text, caption, buttons, icon, defaultButton, options, displayHelpButton) {
+                    return System.Windows.Forms.MessageBox.ShowCore(null, text, caption, buttons, icon, defaultButton, options, displayHelpButton);
+                },
+                Show$7: function (text, caption, buttons, icon, defaultButton, options, helpFilePath) {
+                    var hpi = new System.Windows.Forms.HelpInfo.ctor(helpFilePath);
+                    return System.Windows.Forms.MessageBox.ShowCore$1(null, text, caption, buttons, icon, defaultButton, options, hpi);
+                },
+                Show$16: function (owner, text, caption, buttons, icon, defaultButton, options) {
+                    return System.Windows.Forms.MessageBox.ShowCore(owner, text, caption, buttons, icon, defaultButton, options, false);
+                },
+                Show$8: function (text, caption, buttons, icon, defaultButton, options, helpFilePath, keyword) {
+                    var hpi = new System.Windows.Forms.HelpInfo.$ctor1(helpFilePath, keyword);
+                    return System.Windows.Forms.MessageBox.ShowCore$1(null, text, caption, buttons, icon, defaultButton, options, hpi);
+                },
+                Show$9: function (text, caption, buttons, icon, defaultButton, options, helpFilePath, navigator) {
+                    var hpi = new System.Windows.Forms.HelpInfo.$ctor2(helpFilePath, navigator);
+                    return System.Windows.Forms.MessageBox.ShowCore$1(null, text, caption, buttons, icon, defaultButton, options, hpi);
+                },
+                Show$17: function (owner, text, caption, buttons, icon, defaultButton, options, helpFilePath) {
+                    var hpi = new System.Windows.Forms.HelpInfo.ctor(helpFilePath);
+                    return System.Windows.Forms.MessageBox.ShowCore$1(owner, text, caption, buttons, icon, defaultButton, options, hpi);
+                },
+                Show$10: function (text, caption, buttons, icon, defaultButton, options, helpFilePath, navigator, param) {
+                    var hpi = new System.Windows.Forms.HelpInfo.$ctor3(helpFilePath, navigator, param);
+                    return System.Windows.Forms.MessageBox.ShowCore$1(null, text, caption, buttons, icon, defaultButton, options, hpi);
+                },
+                Show$18: function (owner, text, caption, buttons, icon, defaultButton, options, helpFilePath, keyword) {
+                    var hpi = new System.Windows.Forms.HelpInfo.$ctor1(helpFilePath, keyword);
+                    return System.Windows.Forms.MessageBox.ShowCore$1(owner, text, caption, buttons, icon, defaultButton, options, hpi);
+                },
+                Show$19: function (owner, text, caption, buttons, icon, defaultButton, options, helpFilePath, navigator) {
+                    var hpi = new System.Windows.Forms.HelpInfo.$ctor2(helpFilePath, navigator);
+                    return System.Windows.Forms.MessageBox.ShowCore$1(owner, text, caption, buttons, icon, defaultButton, options, hpi);
+                },
+                Show$20: function (owner, text, caption, buttons, icon, defaultButton, options, helpFilePath, navigator, param) {
+                    var hpi = new System.Windows.Forms.HelpInfo.$ctor3(helpFilePath, navigator, param);
+                    return System.Windows.Forms.MessageBox.ShowCore$1(owner, text, caption, buttons, icon, defaultButton, options, hpi);
+                },
+                ShowCore: function (owner, text, caption, buttons, icon, defaultButton, options, showHelp) {
+                    var $t;
+                    var result = new System.Windows.Forms.DialogResult();
+                    if (!System.Windows.Forms.ClientUtils.IsEnumValid(Bridge.box(buttons, System.Windows.Forms.MessageBoxButtons, System.Enum.toStringFn(System.Windows.Forms.MessageBoxButtons)), buttons, 0, 5)) {
+                        throw new System.ComponentModel.InvalidEnumArgumentException.$ctor3("buttons", buttons, System.Windows.Forms.MessageBoxButtons);
+                    }
+                    if (!System.Windows.Forms.WindowsFormsUtils.EnumValidator.IsEnumWithinShiftedRange(Bridge.box(icon, System.Windows.Forms.MessageBoxIcon, System.Enum.toStringFn(System.Windows.Forms.MessageBoxIcon)), 4, 0, 4)) {
+                        throw new System.ComponentModel.InvalidEnumArgumentException.$ctor3("icon", icon, System.Windows.Forms.MessageBoxIcon);
+                    }
+                    if (!System.Windows.Forms.WindowsFormsUtils.EnumValidator.IsEnumWithinShiftedRange(Bridge.box(defaultButton, System.Windows.Forms.MessageBoxDefaultButton, System.Enum.toStringFn(System.Windows.Forms.MessageBoxDefaultButton)), 8, 0, 2)) {
+                        throw new System.ComponentModel.InvalidEnumArgumentException.$ctor3("defaultButton", defaultButton, System.Windows.Forms.DialogResult);
+                    }
+                    //if (((options & (MessageBoxOptions.ServiceNotification | MessageBoxOptions.DefaultDesktopOnly)) == 0))
+                    //{
+                    //    throw new InvalidOperationException(System.Windows.Forms.SR.GetString("CantShowModalOnNonInteractive"));
+                    //}
+                    //if ((owner != null) && ((options & (MessageBoxOptions.ServiceNotification | MessageBoxOptions.DefaultDesktopOnly)) != 0))
+                    //{
+                    //    throw new ArgumentException(System.Windows.Forms.SR.GetString("CantShowMBServiceWithOwner"), "options");
+                    //}
+                    //if (showHelp && ((options & (MessageBoxOptions.ServiceNotification | MessageBoxOptions.DefaultDesktopOnly)) != 0))
+                    //{
+                    //    throw new ArgumentException(System.Windows.Forms.SR.GetString("CantShowMBServiceWithHelp"), "options");
+                    //}
+                    //if ((options & ~(MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign)) != 0)
+                    //{
+                    //    //System.Windows.Forms.IntSecurity.UnmanagedCode.Demand();
+                    //}
+                    //System.Windows.Forms.IntSecurity.SafeSubWindows.Demand();
+                    var type = showHelp ? 16384 : 0;
+                    type |= ((buttons | icon) | defaultButton) | options;
+
+
+                    var msgForm = new System.Windows.Forms.Form();
+                    msgForm.SuspendLayout();
+                    msgForm.Size = new System.Drawing.Size.$ctor2(413, 142);
+                    msgForm.BackColor = System.Drawing.Color.White.$clone();
+                    msgForm.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+                    msgForm.MaximizeBox = false;
+                    msgForm.MinimizeBox = false;
+                    msgForm.Text = caption;
+
+                    var label = ($t = new System.Windows.Forms.Label(), $t.Size = new System.Drawing.Size.$ctor2(374, 14), $t.Location = new System.Drawing.Point.$ctor1(14, 28), $t.Anchor = 15, $t.Text = text, $t);
+                    label.Element.style.userSelect = "text";
+                    label.Element.style.cursor = text;
+                    var panel = ($t = new System.Windows.Forms.Panel(), $t.BackColor = System.Drawing.Color.FromArgb$2(240, 240, 240), $t);
+                    panel.SuspendLayout();
+                    panel.Dock = System.Windows.Forms.DockStyle.Bottom;
+                    panel.Size = new System.Drawing.Size.$ctor2(410, 42);
+
+                    var button = ($t = new System.Windows.Forms.Button(), $t.Text = "OK", $t.Size = new System.Drawing.Size.$ctor2(72, 21), $t.Location = new System.Drawing.Point.$ctor1(325, 10), $t.Anchor = 9, $t.DialogResult = System.Windows.Forms.DialogResult.OK, $t);
+
+                    panel.Controls.add(button);
+
+                    msgForm.Controls.add(label);
+                    msgForm.Controls.add(panel);
+
+                    panel.ResumeLayout$1(false);
+                    msgForm.ResumeLayout$1(false);
+
+                    msgForm.ShowDialog();
+                    // workout height..
+                    var prev = label.Element.style.height;
+                    label.Element.style.height = "auto";
+                    label.Element.style.wordWrap = "break-word";
+                    var rect = label.Element.getBoundingClientRect();
+                    label.Element.style.height = prev;
+
+                    msgForm.Size = new System.Drawing.Size.$ctor2(msgForm.Width, ((msgForm.Height + Bridge.Int.clip32(rect.height)) | 0));
+
+
+                    //IntPtr userCookie = IntPtr.Zero;
+                    //if (Application.UseVisualStyles)
+                    //{
+                    //    if ((UnsafeNativeMethods.GetModuleHandle("shell32.dll") == IntPtr.Zero) && (UnsafeNativeMethods.LoadLibraryFromSystemPathIfAvailable("shell32.dll") == IntPtr.Zero))
+                    //    {
+                    //        object[] args = new object[] { "shell32.dll" };
+                    //        throw new Win32Exception(Marshal.GetLastWin32Error(), System.Windows.Forms.SR.GetString("LoadDLLError", args));
+                    //    }
+                    //    userCookie = UnsafeNativeMethods.ThemingScope.Activate();
+                    //}
+                    //Application.BeginModalMessageLoop();
+                    //try
+                    //{
+                    //    result = Win32ToDialogResult(SafeNativeMethods.MessageBox(new HandleRef(owner, zero), text, caption, type));
+                    //}
+                    //finally
+                    //{
+                    //    Application.EndModalMessageLoop();
+                    //    UnsafeNativeMethods.ThemingScope.Deactivate(userCookie);
+                    //}
+                    //UnsafeNativeMethods.SendMessage(new HandleRef(owner, zero), 7, 0, 0);
+                    return System.Windows.Forms.DialogResult.None;
+                },
+                ShowCore$1: function (owner, text, caption, buttons, icon, defaultButton, options, hpi) {
+                    var none = System.Windows.Forms.DialogResult.None;
+                    try {
+                        System.Windows.Forms.MessageBox.PushHelpInfo(hpi);
+                        none = System.Windows.Forms.MessageBox.ShowCore(owner, text, caption, buttons, icon, defaultButton, options, true);
+                    }
+                    finally {
+                        System.Windows.Forms.MessageBox.PopHelpInfo();
+                    }
+                    return none;
+                },
+                Win32ToDialogResult: function (value) {
+                    switch (value) {
+                        case 1: 
+                            return System.Windows.Forms.DialogResult.OK;
+                        case 2: 
+                            return System.Windows.Forms.DialogResult.Cancel;
+                        case 3: 
+                            return System.Windows.Forms.DialogResult.Abort;
+                        case 4: 
+                            return System.Windows.Forms.DialogResult.Retry;
+                        case 5: 
+                            return System.Windows.Forms.DialogResult.Ignore;
+                        case 6: 
+                            return System.Windows.Forms.DialogResult.Yes;
+                        case 7: 
+                            return System.Windows.Forms.DialogResult.No;
+                    }
+                    return System.Windows.Forms.DialogResult.No;
+                }
+            }
+        },
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.MessageBoxButtons", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                OK: 0,
+                OKCancel: 1,
+                AbortRetryIgnore: 2,
+                YesNoCancel: 3,
+                YesNo: 4,
+                RetryCancel: 5
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.MessageBoxDefaultButton", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                Button1: 0,
+                Button2: 256,
+                Button3: 512
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.MessageBoxIcon", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                Asterisk: 64,
+                Error: 16,
+                Exclamation: 48,
+                Hand: 16,
+                Information: 64,
+                None: 0,
+                Question: 32,
+                Stop: 16,
+                Warning: 48
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.MessageBoxOptions", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                DefaultDesktopOnly: 131072,
+                RightAlign: 524288,
+                RtlReading: 1048576,
+                ServiceNotification: 2097152
+            }
+        },
+        $flags: true
+    });
+
     Bridge.define("System.Windows.Forms.MouseButtons", {
         $kind: "enum",
         statics: {
@@ -7440,6 +7879,93 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 RotateLeft: function (value, nBits) {
                     nBits = nBits % 32;
                     return ((value << nBits) | (value >> (((32 - nBits) | 0))));
+                }
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.WindowsFormsUtils.EnumValidator", {
+        $kind: "nested class",
+        statics: {
+            methods: {
+                IsEnumWithinShiftedRange: function (enumValue, numBitsToShift, minValAfterShift, maxValAfterShift) {
+                    var num = System.Convert.toInt32(enumValue, System.Globalization.CultureInfo.invariantCulture);
+                    var num2 = num >> numBitsToShift;
+                    if ((num2 << numBitsToShift) !== num) {
+                        return false;
+                    }
+                    return ((num2 >= minValAfterShift) && (num2 <= maxValAfterShift));
+                },
+                IsValidArrowDirection: function (direction) {
+                    var $step = 0,
+                        $jumpFromFinally, 
+                        $asyncBody = Bridge.fn.bind(this, function () {
+                            for (;;) {
+                                $step = System.Array.min([0,1,2,3,4,5,6,7,8], $step);
+                                switch ($step) {
+                                    case 0: {
+                                        if (direction <= System.Windows.Forms.ArrowDirection.Up) {
+                                            $step = 1;
+                                            continue;
+                                        } 
+                                        $step = 4;
+                                        continue;
+                                    }
+                                    case 1: {
+                                        if ((direction === System.Windows.Forms.ArrowDirection.Left) || (direction === System.Windows.Forms.ArrowDirection.Up)) {
+                                            $step = 2;
+                                            continue;
+                                        } 
+                                        $step = 3;
+                                        continue;
+                                    }
+                                    case 2: {
+                                        $step = 7;
+                                        continue;
+                                    }
+                                    case 3: {
+                                        $step = 8;
+                                        continue;
+                                    }
+                                    case 4: {
+                                        if ((direction !== System.Windows.Forms.ArrowDirection.Right) && (direction !== System.Windows.Forms.ArrowDirection.Down)) {
+                                            $step = 5;
+                                            continue;
+                                        } 
+                                        $step = 6;
+                                        continue;
+                                    }
+                                    case 5: {
+                                        $step = 8;
+                                        continue;
+                                    }
+                                    case 6: {
+
+                                    }
+                                    case 7: {
+                                        return true;
+                                    }
+                                    case 8: {
+                                        return false;
+                                    }
+                                    default: {
+                                        return;
+                                    }
+                                }
+                            }
+                        }, arguments);
+
+                    return $asyncBody();
+                },
+                IsValidContentAlignment: function (contentAlign) {
+                    if (System.Windows.Forms.ClientUtils.GetBitCount((contentAlign >>> 0)) !== 1) {
+                        return false;
+                    }
+                    var num = 1911;
+                    return ((System.Int64(num).and(System.Int64((contentAlign >>> 0)))).gt(System.Int64(0)));
+                },
+                IsValidTextImageRelation: function (relation) {
+                    return System.Windows.Forms.ClientUtils.IsEnumValid$1(Bridge.box(relation, System.Windows.Forms.TextImageRelation, System.Enum.toStringFn(System.Windows.Forms.TextImageRelation)), relation, 0, 8, 1);
                 }
             }
         }
@@ -11502,11 +12028,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         props: {
             Text: {
                 get: function () {
-                    return this.Element.textContent;
+                    return this.Element.innerText;
                 },
                 set: function (value) {
                     Bridge.ensureBaseProperty(this, "Text").$System$Windows$Forms$Control$Text = value;
-                    this.Element.textContent = value;
+                    this.Element.innerText = value;
                 }
             }
         },
