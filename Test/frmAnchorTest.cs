@@ -189,7 +189,7 @@ namespace Test
 
         private void button8_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("asdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasdddddddddddddddddddasddddddddddddddddddd");
+            MessageBox.Show("Clicked the close button...");
             //this.Close();
         }
 

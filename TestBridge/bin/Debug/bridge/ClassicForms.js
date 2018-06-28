@@ -6537,8 +6537,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     msgForm.Text = caption;
 
                     var label = ($t = new System.Windows.Forms.Label(), $t.Size = new System.Drawing.Size.$ctor2(374, 14), $t.Location = new System.Drawing.Point.$ctor1(14, 28), $t.Anchor = 15, $t.Text = text, $t);
-                    label.Element.style.userSelect = "text";
-                    label.Element.style.cursor = text;
+                    var el = label.Element;
+                    el.style.userSelect = "text";
+                    label.Element.style.cursor = "text";
                     var panel = ($t = new System.Windows.Forms.Panel(), $t.BackColor = System.Drawing.Color.FromArgb$2(240, 240, 240), $t);
                     panel.SuspendLayout();
                     panel.Dock = System.Windows.Forms.DockStyle.Bottom;

@@ -201,8 +201,9 @@ namespace System.Windows.Forms
                 Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom,
                 Text = text
             };
-            label.Element.style.userSelect = "text";
-            label.Element.style.cursor = text;
+            dynamic el = label.Element;
+            el.style.userSelect = "text";
+            label.Element.style.cursor = "text";
             var panel = new Panel()
             {
                 BackColor = Color.FromArgb(240, 240, 240),                
