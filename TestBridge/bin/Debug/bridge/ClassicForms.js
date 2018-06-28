@@ -6535,6 +6535,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     msgForm.MaximizeBox = false;
                     msgForm.MinimizeBox = false;
                     msgForm.Text = caption;
+                    msgForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 
                     var label = ($t = new System.Windows.Forms.Label(), $t.Size = new System.Drawing.Size.$ctor2(374, 14), $t.Location = new System.Drawing.Point.$ctor1(14, 28), $t.Anchor = 15, $t.Text = text, $t);
                     var el = label.Element;

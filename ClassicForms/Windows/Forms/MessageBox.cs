@@ -193,6 +193,7 @@ namespace System.Windows.Forms
             msgForm.MaximizeBox = false;
             msgForm.MinimizeBox = false;
             msgForm.Text = caption;
+            msgForm.FormBorderStyle = FormBorderStyle.FixedDialog;
 
             var label = new Label()
             {
