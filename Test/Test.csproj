@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Examples\frmCalculator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Examples\frmCalculator.Designer.cs">
+      <DependentUpon>frmCalculator.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmAnchorTest.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -65,6 +71,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Examples\frmCalculator.resx">
+      <DependentUpon>frmCalculator.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmAnchorTest.resx">
       <DependentUpon>frmAnchorTest.cs</DependentUpon>
     </EmbeddedResource>

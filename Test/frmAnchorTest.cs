@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Test.Examples;
 
 namespace Test
 {
@@ -16,6 +17,7 @@ namespace Test
         private Button button7;
         private Button button8;
         private Button button9;
+        private Button button4;
         private Button button1;
 
         public frmAnchorTest() : base()
@@ -33,6 +35,7 @@ namespace Test
             this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -131,9 +134,21 @@ namespace Test
             this.button9.UseVisualStyleBackColor = true;
             this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(102, 83);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(64, 57);
+            this.button4.TabIndex = 9;
+            this.button4.Tag = "btn btn-primary";
+            this.button4.Text = "Calculator";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
             // frmAnchorTest
             // 
             this.ClientSize = new System.Drawing.Size(697, 413);
+            this.Controls.Add(this.button4);
             this.Controls.Add(this.button9);
             this.Controls.Add(this.button8);
             this.Controls.Add(this.button7);
@@ -147,6 +162,7 @@ namespace Test
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Tag = "modal-content";
             this.Text = "Main Menu";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.frmAnchorTest_Load);
             this.MouseEnter += new System.EventHandler(this.frmAnchorTest_MouseEnter);
             this.MouseLeave += new System.EventHandler(this.frmAnchorTest_MouseLeave);
@@ -211,6 +227,12 @@ namespace Test
         private void button9_Click(object sender, EventArgs e)
         {
             var x = new frmDockingTest();
+            x.Show();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            var x = new frmCalculator();
             x.Show();
         }
     }

@@ -34,6 +34,13 @@
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Test\Examples\frmCalculator.cs">
+      <Link>UI\Examples\frmCalculator.cs</Link>
+    </Compile>
+    <Compile Include="..\Test\Examples\frmCalculator.designer.cs">
+      <Link>UI\Examples\frmCalculator.designer.cs</Link>
+      <DependentUpon>frmCalculator.cs</DependentUpon>
+    </Compile>
     <Compile Include="..\Test\frmAnchorTest.cs">
       <Link>UI\frmAnchorTest.cs</Link>
     </Compile>
@@ -79,6 +86,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\Test\Examples\frmCalculator.resx">
+      <Link>UI\Examples\frmCalculator.resx</Link>
+      <DependentUpon>frmCalculator.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\Test\frmAnchorTest.resx">
       <Link>UI\frmAnchorTest.resx</Link>
       <DependentUpon>frmAnchorTest.cs</DependentUpon>

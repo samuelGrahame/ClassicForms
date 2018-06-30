@@ -947,10 +947,10 @@ namespace System.Windows.Forms
             var dummyControl = new Control(formBase, false);           
             formBase.style.overflow = "hidden";
             formBase.style.position = "absolute";
-            formBase.style.left = "2px";
-            formBase.style.top = "2px";
-            formBase.style.width = "calc(100% - 4px)";
-            formBase.style.height = "calc(100% - 4px)";
+            formBase.style.left = "1px";
+            formBase.style.top = "1px";
+            formBase.style.width = "calc(100% - 2px)";
+            formBase.style.height = "calc(100% - 2px)";
             formBase.style.cursor = "default";
             formBase.style.outline = "none";
 
