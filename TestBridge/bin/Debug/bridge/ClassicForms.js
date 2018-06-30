@@ -12644,7 +12644,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                 } else if (System.Settings.IsUsingBootStrap()) {
                     if (System.String.isNullOrWhiteSpace(currentTag) || !System.String.contains(currentTag.toLowerCase(),"btn")) {
-                        return "btn btn-default";
+                        return "btn btn-secondary";
                     }
                 }
 
@@ -13219,6 +13219,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.HeadingTitle.style.left = "3px";
                 this.HeadingTitle.setAttribute("scope", "form-title");
                 this.HeadingTitle.style.position = "absolute";
+                this.HeadingTitle.style.fontSize = "8.25pt";
+                if (System.Settings.IsUsingBootStrap()) {
+                    this.HeadingTitle.style.color = "white";
+                }
 
                 this.Element.appendChild(this.HeadingTitle);
 
@@ -13944,8 +13948,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.Element.style.borderBottomWidth = this._formBottonBorder + "px";
                 this.Element.style.borderLeftWidth = this._formLeftBorder + "px";
                 this.Element.style.borderRightWidth = this._formRightBorder + "px";
+                if (System.Settings.IsUsingBootStrap()) {
+                    this.HeadingTitle.style.top = ((-(this._formTopBorder)) | 0) + "px";
+                } else {
+                    this.HeadingTitle.style.top = ((-(((this._formTopBorder - 3) | 0))) | 0) + "px";
+                }
 
-                this.HeadingTitle.style.top = ((-(((this._formTopBorder - 3) | 0))) | 0) + "px";
                 //HeadingTitle.style.lineHeight = _formTopBorder + "px";
                 this.HeadingTitle.style.display = this.ControlBox ? "" : "none";
                 this.HeadingTitle.style.transform = "translate(0, 50%)";

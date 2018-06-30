@@ -959,6 +959,9 @@ namespace System.Windows.Forms
             HeadingTitle.style.left = "3px";            
             HeadingTitle.setAttribute("scope", "form-title");
             HeadingTitle.style.position = "absolute";
+            HeadingTitle.style.fontSize = "8.25pt";
+            if (Settings.IsUsingBootStrap())
+                HeadingTitle.style.color = "white";
 
             Element.appendChild(HeadingTitle);
 
@@ -1360,8 +1363,15 @@ namespace System.Windows.Forms
             Element.style.borderBottomWidth = _formBottonBorder + "px";
             Element.style.borderLeftWidth = _formLeftBorder + "px";
             Element.style.borderRightWidth = _formRightBorder + "px";
-
-            HeadingTitle.style.top = -(_formTopBorder - 3) + "px";
+            if(Settings.IsUsingBootStrap())
+            {
+                HeadingTitle.style.top = -(_formTopBorder) + "px";
+            }
+            else
+            {
+                HeadingTitle.style.top = -(_formTopBorder - 3) + "px";
+            }
+            
             //HeadingTitle.style.lineHeight = _formTopBorder + "px";
             HeadingTitle.style.display = ControlBox ? "" : "none";
             HeadingTitle.style.transform = "translate(0, 50%)";

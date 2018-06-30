@@ -30,7 +30,7 @@ namespace System.Windows.Forms
             else if(Settings.IsUsingBootStrap())
             {
                 if(string.IsNullOrWhiteSpace(currentTag) || !currentTag.ToLower().Contains("btn"))
-                    return "btn btn-default";
+                    return "btn btn-secondary";
             }
 
             return base.GetDefaultTag();
