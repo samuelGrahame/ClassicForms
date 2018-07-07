@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Retyped.dom;
+using Retyped;
+
 namespace System.Windows.Forms
 {
     public class TextBox : Control
@@ -21,12 +23,22 @@ namespace System.Windows.Forms
                     OnTextChanged(EventArgs.Empty);
                 }
             };
-
+#if BLAZOR
+            Element.onchange = workOutEvent;
+            Element.onpaste = workOutEvent;
+            Element.onkeydown = workOutEvent;
+            Element.onkeyup = workOutEvent;
+            Element.onblur = workOutEvent;
+#else
             Element.onchange = new HTMLElement.onactivateFn(workOutEvent);
             Element.onpaste = new HTMLElement.oncopyFn(workOutEvent);
             Element.onkeydown = new HTMLElement.onkeydownFn(workOutEvent);
             Element.onkeyup = new HTMLElement.onkeydownFn(workOutEvent);
             Element.onblur = new HTMLElement.onblurFn(workOutEvent);
+#endif
+
+
+
         }
         private string prevString;
         public override string Text { get { return Element.As<HTMLInputElement>().value; } set

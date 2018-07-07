@@ -11,6 +11,7 @@ namespace System
     {
         public static bool IsEdge;
         public static bool IsFF;
+        public static bool IsIE;
         /// <summary>
         /// enabled override the default font name.
         /// </summary>
@@ -59,6 +60,8 @@ namespace System
 
         public static bool ContainsCssLink(string content)
         {
+            // TODO SUPPORT BLAZOR
+#if BRIDGE
             if (string.IsNullOrWhiteSpace(content))
                 return false;
 
@@ -75,14 +78,22 @@ namespace System
             }
 
             return false;
+#else
+            return false;
+#endif
         }
 
         private static bool _isUsingBootStrap;
         public static bool IsUsingBootStrap()
         {
+#if BLAZOR
+            return true;
+#else
+
             if (_hasLoaded)
                 return _isUsingBootStrap;
             return ContainsCssLink("bootstrap");
+#endif
         }
 
         private static bool _isUsingMaterial;

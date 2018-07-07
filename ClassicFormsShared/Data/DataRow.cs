@@ -1,9 +1,11 @@
-﻿using System;
+﻿#if BRIDGE
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Retyped.dom;
+using Retyped;
 
 namespace System.Data
 {
@@ -66,3 +68,4 @@ namespace System.Data
             } }       
     }
 }
+#endif

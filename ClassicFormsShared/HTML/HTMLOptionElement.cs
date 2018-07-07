@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ClassicForms.HTML
+namespace Retyped
 {
     public class HTMLOptionElement : HTMLElement
     {

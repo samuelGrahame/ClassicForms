@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ClassicForms.HTML
+namespace Retyped
 {
-    public class DomRect
+    public class DOMRect
     {
         public double left, top, right, bottom, x, y, width, height;
     }

@@ -1,4 +1,5 @@
-﻿using Bridge;
+﻿#if BRIDGE
+using Bridge;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -2246,3 +2247,4 @@ namespace System.Drawing
         }    
     }
 }
+#endif

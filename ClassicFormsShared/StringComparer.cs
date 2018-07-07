@@ -1,4 +1,5 @@
-﻿namespace System
+﻿#if BRIDGE
+namespace System
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -123,3 +124,4 @@
             _ordinalIgnoreCase;
     }
 }
+#endif

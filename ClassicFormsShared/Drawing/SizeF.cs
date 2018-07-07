@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if BRIDGE
+using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -102,3 +103,4 @@ namespace System.Drawing
         }
     }
 }
+#endif

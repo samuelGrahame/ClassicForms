@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if BRIDGE
+using System;
 using System.Runtime.InteropServices;
 
 
@@ -15,3 +16,4 @@ namespace System.ComponentModel
         string Name { get; set; }
     }
 }
+#endif

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Retyped.dom;
+using Retyped;
 
 namespace System.Windows.Forms
 {
@@ -104,7 +105,12 @@ namespace System.Windows.Forms
 
         public void Insert(int index, object item)
         {
+#if BRIDGE
             _owner.Element.insertBefore(new HTMLOptionElement() { value = _controls.Count.ToString(), textContent = (item + "") }, (Node)_owner.Element.childNodes[index]);
+#else
+            _owner.Element.insertBefore(new HTMLOptionElement() { value = _controls.Count.ToString(), textContent = (item + "") }, _owner.Element.childNodes[index]);
+#endif
+
             _controls.Insert(index, item);
         }
 

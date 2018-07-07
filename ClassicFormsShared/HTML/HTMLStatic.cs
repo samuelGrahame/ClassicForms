@@ -6,14 +6,14 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ClassicForms.HTML
+namespace Retyped
 {
-    public static class HTMLStatic
+    public static class dom
     {
         public static HTMLDocumentElement document;
         public static HTMLWindow window;
 
-        static HTMLStatic()
+        static dom()
         {
             document = new HTMLDocumentElement();
             window = new HTMLWindow();

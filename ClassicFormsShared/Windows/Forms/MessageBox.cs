@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Retyped.dom;
+using Retyped;
 
 namespace System.Windows.Forms
 {
@@ -151,7 +152,7 @@ namespace System.Windows.Forms
 
         private static DialogResult ShowCore(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton, MessageBoxOptions options, bool showHelp)
         {
-            DialogResult result;
+            //DialogResult result;
             if (!System.Windows.Forms.ClientUtils.IsEnumValid(buttons, (int)buttons, 0, 5))
             {
                 throw new InvalidEnumArgumentException("buttons", (int)buttons, typeof(MessageBoxButtons));
@@ -202,8 +203,8 @@ namespace System.Windows.Forms
                 Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom,
                 Text = text
             };
-            dynamic el = label.Element;
-            el.style.userSelect = "text";
+            label.Element.style.userSelect = "text";
+            //el.style.userSelect = "text";
             label.Element.style.cursor = "text";
             var panel = new Panel()
             {
@@ -235,7 +236,7 @@ namespace System.Windows.Forms
             var prev = label.Element.style.height;
             label.Element.style.height = "auto";
             label.Element.style.wordWrap = "break-word";
-            var rect = label.Element.getBoundingClientRect().As<DOMRect>();
+            var rect = (DOMRect)label.Element.getBoundingClientRect();
             label.Element.style.height = prev;
 
             msgForm.Size = new Drawing.Size(msgForm.Width, msgForm.Height + (int)rect.height);

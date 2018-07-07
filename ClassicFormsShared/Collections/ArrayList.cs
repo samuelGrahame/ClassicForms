@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if BRIDGE
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -19,7 +20,7 @@ namespace System.Collections
         }
     }
 
-    [Serializable, DebuggerTypeProxy(typeof(ArrayList.ArrayListDebugView)), DebuggerDisplay("Count = {Count}"), ComVisible(true)]
+    [Serializable, DebuggerTypeProxy(typeof(ArrayListDebugView)), DebuggerDisplay("Count = {Count}"), ComVisible(true)]
     public class ArrayList : IList, ICollection, IEnumerable, ICloneable
     {
         private const int _defaultCapacity = 4;
@@ -2803,3 +2804,4 @@ namespace System.Collections
         }
     }
 }
+#endif

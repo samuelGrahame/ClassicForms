@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ClassicForms.HTML
+namespace Retyped
 {
     public class HTMLElement
     {
@@ -35,8 +35,17 @@ namespace ClassicForms.HTML
         {
             set {
                 string hash = Guid.NewGuid().ToString();
-                HTMLStatic.normalMouseEvent.Add(hash, value);
+                dom.normalMouseEvent.Add(hash, value);
                 RegisteredFunction.Invoke<object>("onmousedown", uid, hash);
+            }                
+        }
+
+        public Action<MouseEvent> ondblclick
+        {
+            set {
+                string hash = Guid.NewGuid().ToString();
+                dom.normalMouseEvent.Add(hash, value);
+                RegisteredFunction.Invoke<object>("ondblclick", uid, hash);
             }                
         }
 
@@ -45,7 +54,7 @@ namespace ClassicForms.HTML
             set
             {
                 string hash = Guid.NewGuid().ToString();
-                HTMLStatic.normalEvent.Add(hash, value);
+                dom.normalEvent.Add(hash, value);
                 RegisteredFunction.Invoke<object>("onchange", uid, hash);
             }
         }
@@ -54,7 +63,7 @@ namespace ClassicForms.HTML
             set
             {
                 string hash = Guid.NewGuid().ToString();
-                HTMLStatic.normalEvent.Add(hash, value);
+                dom.normalEvent.Add(hash, value);
                 RegisteredFunction.Invoke<object>("onpaste", uid, hash);
             }
         }
@@ -64,7 +73,7 @@ namespace ClassicForms.HTML
             set
             {
                 string hash = Guid.NewGuid().ToString();
-                HTMLStatic.normalEvent.Add(hash, value);
+                dom.normalEvent.Add(hash, value);
                 RegisteredFunction.Invoke<object>("onkeydown", uid, hash);
             }
         }
@@ -74,7 +83,7 @@ namespace ClassicForms.HTML
             set
             {
                 string hash = Guid.NewGuid().ToString();
-                HTMLStatic.normalEvent.Add(hash, value);
+                dom.normalEvent.Add(hash, value);
                 RegisteredFunction.Invoke<object>("onkeyup", uid, hash);
             }
         }
@@ -84,7 +93,7 @@ namespace ClassicForms.HTML
             set
             {
                 string hash = Guid.NewGuid().ToString();
-                HTMLStatic.normalEvent.Add(hash, value);
+                dom.normalEvent.Add(hash, value);
                 RegisteredFunction.Invoke<object>("onclick", uid, hash);
             }
         }
@@ -93,7 +102,7 @@ namespace ClassicForms.HTML
             set
             {
                 string hash = Guid.NewGuid().ToString();
-                HTMLStatic.normalEvent.Add(hash, value);
+                dom.normalEvent.Add(hash, value);
                 RegisteredFunction.Invoke<object>("onblur", uid, hash);
             }
         }
@@ -102,7 +111,7 @@ namespace ClassicForms.HTML
             set
             {
                 string hash = Guid.NewGuid().ToString();
-                HTMLStatic.normalMouseEvent.Add(hash, value);
+                dom.normalMouseEvent.Add(hash, value);
                 RegisteredFunction.Invoke<object>("onmouseenter", uid, hash);
             }
         }
@@ -111,7 +120,7 @@ namespace ClassicForms.HTML
             set
             {
                 string hash = Guid.NewGuid().ToString();
-                HTMLStatic.normalMouseEvent.Add(hash, value);
+                dom.normalMouseEvent.Add(hash, value);
                 RegisteredFunction.Invoke<object>("onmouseleave", uid, hash);
             }
         }
@@ -120,8 +129,17 @@ namespace ClassicForms.HTML
             set
             {
                 string hash = Guid.NewGuid().ToString();
-                HTMLStatic.normalMouseEvent.Add(hash, value);
+                dom.normalMouseEvent.Add(hash, value);
                 RegisteredFunction.Invoke<object>("onmousemove", uid, hash);
+            }
+        }
+        public Action<MouseEvent> onmouseup
+        {
+            set
+            {
+                string hash = Guid.NewGuid().ToString();
+                dom.normalMouseEvent.Add(hash, value);
+                RegisteredFunction.Invoke<object>("onmouseup", uid, hash);
             }
         }
         //innerText
@@ -214,10 +232,10 @@ RegisteredFunction.Invoke<string>("element_get", uid, nameof(className));
         }
 
 
-        public DomRect getBoundingClientRect()
+        public DOMRect getBoundingClientRect()
         {
             var domRect = RegisteredFunction.Invoke<string>("getBoundingClientRect", uid).Split(',');
-            var domRectR = new DomRect();
+            var domRectR = new DOMRect();
             domRectR.left = Convert.ToDouble(domRect[0]);
             domRectR.top = Convert.ToDouble(domRect[1]);
             domRectR.right = Convert.ToDouble(domRect[2]);

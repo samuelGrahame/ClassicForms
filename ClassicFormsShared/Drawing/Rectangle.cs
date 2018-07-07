@@ -1,4 +1,5 @@
-﻿namespace System.Drawing
+﻿#if BRIDGE
+namespace System.Drawing
 {
     using System;
     using System.ComponentModel;
@@ -217,3 +218,4 @@
         }
     }
 }
+#endif

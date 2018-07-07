@@ -1,4 +1,5 @@
-﻿namespace System.ComponentModel
+﻿#if BRIDGE
+namespace System.ComponentModel
 {
     using System;
     using System.Globalization;
@@ -30,3 +31,4 @@
         }
     }
 }
+#endif

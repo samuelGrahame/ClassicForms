@@ -1,4 +1,10 @@
-﻿using Bridge;
+﻿
+#if BLAZOR
+using Microsoft.AspNetCore.Blazor.Browser.Interop;
+#elif BRIDGE
+using Bridge;
+#endif
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,6 +12,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Retyped;
 using static Retyped.dom;
 
 namespace System.Windows.Forms
@@ -18,10 +25,10 @@ namespace System.Windows.Forms
     {
         public MouseEvent Original;
 
-        private static Point GetOffsetPoint(Element element)
+        private static Point GetOffsetPoint(HTMLElement element)
         {
 #if BLAZOR
-            var rev = RegisteredFunction.Invoke<string>("getOffsetPoint", element.uid, IsFF).Split(',');
+            var rev = RegisteredFunction.Invoke<string>("getOffsetPoint", element.uid, Settings.IsFF).Split(',');
             return new Point(Convert.ToInt32(rev[0]), Convert.ToInt32(rev[1]));
 #else
             double top = 0;
@@ -57,6 +64,7 @@ namespace System.Windows.Forms
         {
             var userAgent = window.navigator.userAgent.ToLower();
             Settings.IsEdge = userAgent.IndexOf("edge") > -1;
+            Settings.IsIE = userAgent.IndexOf("msie") > -1;
             Settings.IsFF = userAgent.IndexOf("firefox") > -1;
         }
 
@@ -87,7 +95,7 @@ namespace System.Windows.Forms
 
             if(!Settings.IsFF && original.currentTarget == target.Element)
             {
-                if(Browser.IsIE || Settings.IsEdge)                    
+                if(Settings.IsIE || Settings.IsEdge)                    
                 {
                     var offset = GetOffsetPoint(target.Element);
                     mousePoint = new Point((int)(original.clientX - offset.X), (int)(original.clientY - offset.Y));
@@ -102,7 +110,7 @@ namespace System.Windows.Forms
                 if (Settings.IsFF)
                 {
                     var vect = GetClientMouseLocation(original);
-                    var rec = target.Element.getBoundingClientRect().As<ClientRect>();
+                    var rec = (DOMRect)target.Element.getBoundingClientRect();
                     mousePoint = new Point((int)(vect.X - rec.left), (int)(vect.Y - rec.top));
                 }
                 else

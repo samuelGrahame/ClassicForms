@@ -4426,6 +4426,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             fields: {
                 IsEdge: false,
                 IsFF: false,
+                IsIE: false,
                 /**
                  * enabled override the default font name.
                  *
@@ -4523,6 +4524,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return System.Settings.ContainsCssLink("windows10.css");
                 },
                 ContainsCssLink: function (content) {
+                    // TODO SUPPORT BLAZOR
                     if (System.String.isNullOrWhiteSpace(content)) {
                         return false;
                     }
@@ -4541,6 +4543,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return false;
                 },
                 IsUsingBootStrap: function () {
+
                     if (System.Settings._hasLoaded) {
                         return System.Settings._isUsingBootStrap;
                     }
@@ -6496,7 +6499,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 },
                 ShowCore: function (owner, text, caption, buttons, icon, defaultButton, options, showHelp) {
                     var $t;
-                    var result = new System.Windows.Forms.DialogResult();
+                    //DialogResult result;
                     if (!System.Windows.Forms.ClientUtils.IsEnumValid(Bridge.box(buttons, System.Windows.Forms.MessageBoxButtons, System.Enum.toStringFn(System.Windows.Forms.MessageBoxButtons)), buttons, 0, 5)) {
                         throw new System.ComponentModel.InvalidEnumArgumentException.$ctor3("buttons", buttons, System.Windows.Forms.MessageBoxButtons);
                     }
@@ -6538,8 +6541,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     msgForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 
                     var label = ($t = new System.Windows.Forms.Label(), $t.Size = new System.Drawing.Size.$ctor2(374, 14), $t.Location = new System.Drawing.Point.$ctor1(14, 28), $t.Anchor = 15, $t.Text = text, $t);
-                    var el = label.Element;
-                    el.style.userSelect = "text";
+                    label.Element.style.userSelect = "text";
+                    //el.style.userSelect = "text";
                     label.Element.style.cursor = "text";
                     var panel = ($t = new System.Windows.Forms.Panel(), $t.BackColor = System.Drawing.Color.FromArgb$2(240, 240, 240), $t);
                     panel.SuspendLayout();
@@ -6705,6 +6708,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 ctor: function () {
                     var userAgent = window.navigator.userAgent.toLowerCase();
                     System.Settings.IsEdge = System.String.indexOf(userAgent, "edge") > -1;
+                    System.Settings.IsIE = System.String.indexOf(userAgent, "msie") > -1;
                     System.Settings.IsFF = System.String.indexOf(userAgent, "firefox") > -1;
                 }
             },
@@ -6755,7 +6759,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     var mousePoint = new System.Drawing.Point();
 
                     if (!System.Settings.IsFF && Bridge.referenceEquals(original.currentTarget, target.Element)) {
-                        if (Bridge.Browser.isIE || System.Settings.IsEdge) {
+                        if (System.Settings.IsIE || System.Settings.IsEdge) {
                             var offset = System.Windows.Forms.MouseEventArgs.GetOffsetPoint(target.Element);
                             mousePoint = new System.Drawing.Point.$ctor1(Bridge.Int.clip32(original.clientX - offset.X), Bridge.Int.clip32(original.clientY - offset.Y));
                         } else {
@@ -6921,6 +6925,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             insert: function (index, item) {
                 var $t;
                 this._owner.Element.insertBefore(($t = document.createElement("option"), $t.value = Bridge.toString(this._controls.Count), $t.textContent = (System.String.concat(item, "")), $t), this._owner.Element.childNodes[index]);
+
                 this._controls.insert(index, item);
             },
             remove: function (item) {
@@ -9862,6 +9867,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                     var dictionary = Bridge.cast(container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty), System.Collections.IDictionary);
                     if (dictionary != null) {
+                        // Blazor supports keys properly
                         $t = Bridge.getEnumerator(dictionary, "System$Collections$IDictionary$GetEnumerator");
                         try {
                             while ($t.moveNext()) {
@@ -9876,7 +9882,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             if (Bridge.is($t, System.IDisposable)) {
                                 $t.System$IDisposable$Dispose();
                             }
-                        }System.Windows.Forms.Layout.DefaultLayout.ClearCachedBounds(container);
+                        }
+                        System.Windows.Forms.Layout.DefaultLayout.ClearCachedBounds(container);
                     }
                 },
                 ClearCachedBounds: function (container) {
@@ -10093,7 +10100,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         element, 
                         children, 
                         i, 
-                        size6, 
                         element2, 
                         size2, 
                         rectangle2, 
@@ -10125,7 +10131,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                                         continue;
                                     }
                                     case 2: {
-                                        size6 = new System.Drawing.Size();
                                         element2 = children.getItem(i);
                                         if (System.Windows.Forms.Layout.CommonProperties.GetNeedsDockLayout(element2)) {
                                             switch (System.Windows.Forms.Layout.DefaultLayout.GetDock(element2)) {
@@ -10540,7 +10545,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             Padding: null,
             _participatesInLayout: false,
             _properties: null,
-            lastMouseDownEvent: null,
             layoutSuspendCount: 0,
             LayoutEngine: null,
             LayoutChanged: null,
@@ -11160,7 +11164,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 }
 
                 if (Bridge.is(this.Parent, System.Windows.Forms.Form)) {
-                    return this.Parent;
+                    return Bridge.cast(this.Parent, System.Windows.Forms.Form);
                 } else {
                     return this.Parent.GetForm();
                 }
@@ -11216,7 +11220,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return null;
                 }
                 if (Bridge.is(this.Parent, System.Windows.Forms.Form)) {
-                    return this.Parent;
+                    return Bridge.cast(this.Parent, System.Windows.Forms.Form);
                 } else {
                     return this.Parent.FindForm();
                 }
@@ -12578,12 +12582,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         this.OnTextChanged({ });
                     }
                 });
-
                 this.Element.onchange = workOutEvent;
                 this.Element.onpaste = workOutEvent;
                 this.Element.onkeydown = workOutEvent;
                 this.Element.onkeyup = workOutEvent;
                 this.Element.onblur = workOutEvent;
+
+
+
             }
         },
         methods: {

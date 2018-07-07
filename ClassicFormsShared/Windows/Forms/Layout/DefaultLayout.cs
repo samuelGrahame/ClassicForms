@@ -29,6 +29,15 @@
             IDictionary dictionary = (IDictionary)container.Properties.GetObject(_cachedBoundsProperty);
             if (dictionary != null)
             {
+                // Blazor supports keys properly
+#if BLAZOR
+                foreach (DictionaryEntry entry in dictionary)
+                {
+                    IArrangedElement key = (IArrangedElement)entry.Key;
+                    Rectangle bounds = (Rectangle)entry.Value;
+                    key.SetBounds(bounds, BoundsSpecified.None);
+                }
+#elif BRIDGE
                 foreach (dynamic entry in dictionary)
                 {
                     IArrangedElement key = (IArrangedElement)entry.key;
@@ -36,6 +45,8 @@
                     if(key != null)
                         key.SetBounds(bounds, BoundsSpecified.None);
                 }
+#endif
+
                 ClearCachedBounds(container);
             }
         }
@@ -351,7 +362,6 @@
             ArrangedElementCollection children = container.Children;
             for (int i = children.Count - 1; i >= 0; i--)
             {
-                Size size6;
                 IArrangedElement element2 = children[i];
                 if (CommonProperties.GetNeedsDockLayout(element2))
                 {

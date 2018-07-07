@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ClassicForms.HTML
+namespace Retyped
 {
     public class HTMLStyleCollection
     {
@@ -34,6 +34,11 @@ namespace ClassicForms.HTML
         public string fontFamily { get => Get(nameof(fontFamily)); set => Set(nameof(fontFamily), value); }
         public string backgroundColor { get => Get(nameof(backgroundColor)); set => Set(nameof(backgroundColor), value); }
 
+        public string cssFloat { get => Get(nameof(cssFloat)); set => Set(nameof(cssFloat), value); }
+        public string wordWrap { get => Get(nameof(wordWrap)); set => Set(nameof(wordWrap), value); }
+
+        public string border { get => Get(nameof(border)); set => Set(nameof(border), value); }
+        public string borderStyle { get => Get(nameof(borderStyle)); set => Set(nameof(borderStyle), value); }
         public string borderTopWidth { get => Get(nameof(borderTopWidth)); set => Set(nameof(borderTopWidth), value); }
         public string borderBottomWidth { get => Get(nameof(borderBottomWidth)); set => Set(nameof(borderBottomWidth), value); }
         public string borderLeftWidth { get => Get(nameof(borderLeftWidth)); set => Set(nameof(borderLeftWidth), value); }
@@ -52,10 +57,14 @@ namespace ClassicForms.HTML
         public string userSelect { get => Get(nameof(userSelect)); set => Set(nameof(userSelect), value); }        
         public string outline { get => Get(nameof(outline)); set => Set(nameof(outline), value); }        
         public string margin { get => Get(nameof(margin)); set => Set(nameof(margin), value); }  
-        public string borderBottom { get => Get(nameof(borderBottom)); set => Set(nameof(borderBottom), value); } 
+        public string marginRight { get => Get(nameof(marginRight)); set => Set(nameof(marginRight), value); }  
 
+        public string borderBottom { get => Get(nameof(borderBottom)); set => Set(nameof(borderBottom), value); }
 
-
+        public string display { get => Get(nameof(display)); set => Set(nameof(display), value); }
+        public string lineHeight { get => Get(nameof(lineHeight)); set => Set(nameof(lineHeight), value); }
+        public string color { get => Get(nameof(color)); set => Set(nameof(color), value); }
+        public string transform { get => Get(nameof(transform)); set => Set(nameof(transform), value); }
     }
 }
 #endif

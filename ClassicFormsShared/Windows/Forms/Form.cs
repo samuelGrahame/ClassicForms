@@ -529,7 +529,7 @@ namespace System.Windows.Forms
             float widthTotal = 0;
             int y = 30;
 
-            var viewSize = document.body.getBoundingClientRect().As<ClientRect>();
+            var viewSize = (DOMRect)document.body.getBoundingClientRect();
 
             foreach (var item in _minimizedForms)
             {
@@ -1036,7 +1036,7 @@ namespace System.Windows.Forms
         }
 
 
-        protected override bool OnRequestMouseEvent(MouseEvent mouseEvent)
+        protected override bool OnRequestMouseEvent(Event mouseEvent)
         {
             if (mouseEvent.currentTarget == HeadingTitle)
                 return false;

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Retyped.dom;
+using Retyped;
 
 namespace System.Windows.Forms
 {
@@ -71,7 +72,7 @@ namespace System.Windows.Forms
 
                 document.body.appendChild(div.Element);
                 
-                var rec = div.Element.getBoundingClientRect().As<ClientRect>();
+                var rec = (DOMRect)div.Element.getBoundingClientRect();
 
                 //page.Header.Location = new Drawing.Point((int)x, i == _selectedIndex ? 0 : 4);
                 page.Header.Element.style.left = x + "px";

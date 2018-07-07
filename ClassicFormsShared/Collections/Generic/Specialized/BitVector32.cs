@@ -1,4 +1,5 @@
-﻿namespace System.Collections.Specialized
+﻿#if BRIDGE
+namespace System.Collections.Specialized
 {
     using System;
     using System.Reflection;
@@ -183,3 +184,4 @@
         }
     }
 }
+#endif

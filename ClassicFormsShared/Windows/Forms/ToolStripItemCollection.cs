@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Retyped.dom;
+using Retyped;
 
 namespace System.Windows.Forms
 {    
@@ -104,7 +105,11 @@ namespace System.Windows.Forms
 
         public void Insert(int index, ToolStripItem item)
         {
+#if BLAZOR
+            layer.insertBefore(item.Element, layer.childNodes[index]);
+#else
             layer.insertBefore(item.Element, (Node)layer.childNodes[index]);
+#endif
             _items.Insert(index, item);
         }
 

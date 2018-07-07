@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if BRIDGE
+// TODO - SUPPORT BLAZOR GridView
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -119,3 +121,4 @@ namespace System.Windows.Forms
             } }
     }
 }
+#endif

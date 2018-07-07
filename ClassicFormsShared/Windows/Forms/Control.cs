@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Retyped;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -23,10 +24,18 @@ namespace System.Windows.Forms
                 this.Parent.OnChildGotTabbed();
         }
 
-        protected virtual bool OnRequestMouseEvent(MouseEvent mouseEvent)
+        protected virtual bool OnRequestMouseEvent(Event mouseEvent)
         {
             return true;
         }
+
+#if BLAZOR
+        // Support As - this is in Bridge
+        public T As<T>() where T : Control
+        {
+            return (T)this;
+        }
+#endif
 
         public Control GetNextControl(Control ctl, bool forward, bool isParent = false)
         {
@@ -335,7 +344,7 @@ namespace System.Windows.Forms
 
             if (this.Parent is Form)
             {
-                return this.Parent.As<Form>();
+                return (Form)this.Parent;
             }
             else
             {
@@ -606,7 +615,7 @@ namespace System.Windows.Forms
             if (Parent == null)
                 return null;
             if (Parent is Form)
-                return Parent.As<Form>();
+                return (Form)Parent;
             else
                 return Parent.FindForm();
         }
@@ -840,8 +849,6 @@ namespace System.Windows.Forms
         public event EventHandler GotFocus;
         public event EventHandler LostFocus;
 
-        private Stopwatch lastMouseDownEvent;
-
         protected virtual void OnGotFocus(EventArgs e)
         {
             if (GotFocus != null)
@@ -987,6 +994,7 @@ namespace System.Windows.Forms
         private bool _disposing = false;
 
         public bool Disposing => _disposing;
+
         internal bool GetAnyDisposingInHierarchy()
         {
             Control parent = this;
