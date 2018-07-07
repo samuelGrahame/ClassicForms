@@ -36,7 +36,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\SystemColors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Drawing\TextRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enviroment.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)HTML\DomRect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HTML\DOMRect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HTML\Event.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HTML\HTMLAnchorELement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HTML\HTMLButtonElement.cs" />
