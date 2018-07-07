@@ -8,9 +8,9 @@
             }
             return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
         }
-        const assemblyName = 'ClassicFormsCore';
-        const namespace = 'ClassicFormsCore.HTML';
-        const typeName = 'HTMLStatic';
+        const assemblyName = 'ClassicForms';
+        const namespace = 'Retyped';
+        const typeName = 'dom';
         function CallEvent(uid) {           
             var methodName = 'InvokeEvent';
 
