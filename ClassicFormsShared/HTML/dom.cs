@@ -33,11 +33,11 @@ namespace Retyped
         public static Dictionary<string, Action<Event>> normalEvent = new Dictionary<string, Action<Event>>();
         public static Dictionary<string, Action<MouseEvent>> normalMouseEvent = new Dictionary<string, Action<MouseEvent>>();
 
-        public static void InvokeEvent(string uid)
+        public static void InvokeEvent(string uid, string ev)
         {
             try
             {
-                normalEvent[uid](null);
+                normalEvent[uid](new Event() { uid = ev });
             }
             catch (Exception)
             {

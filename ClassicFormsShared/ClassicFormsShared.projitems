@@ -54,7 +54,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)HTML\HTMLOptionElement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HTML\HTMLSelectElement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HTML\HTMLSpanElement.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)HTML\HTMLStatic.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HTML\dom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HTML\HTMLStyleCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HTML\HTMLTableElement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HTML\HTMLTableHeaderCellElement.cs" />

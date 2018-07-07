@@ -19,10 +19,36 @@ namespace System.Windows.Forms
         public virtual bool FormattingEnabled { get; set; }
         public virtual int ItemHeight { get; set; }
         public DrawMode DrawMode { get; set; }
+
+        protected override string GetDefaultTag()
+        {
+            var currentTag = Tag as string;
+
+            if (Settings.IsUsingBootStrap())
+            {
+                if (string.IsNullOrWhiteSpace(currentTag))
+                    return "form-control";
+            }
+
+            return base.GetDefaultTag();
+        }
     }
 
     public class ListBox : Control
     {
+        protected override string GetDefaultTag()
+        {
+            var currentTag = Tag as string;
+
+            if (Settings.IsUsingBootStrap())
+            {
+                if (string.IsNullOrWhiteSpace(currentTag))
+                    return "form-control";
+            }
+
+            return base.GetDefaultTag();
+        }
+
         public ListBox() : base(new HTMLSelectElement())
         {
             Element.As<HTMLSelectElement>().multiple = true;

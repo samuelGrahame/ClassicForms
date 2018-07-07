@@ -738,25 +738,26 @@ namespace System.Windows.Forms
             div.style.position = "absolute";
             div.classList.add("form-button");
 
-            Action onClick = null;
-
             switch (formWindowButton)
             {
                 case FormWindowButton.Close:
                     div.setAttribute("scope", "form-close");
-                    onClick = () =>
+                    div.onclick = (ev) =>
                     {
+                        ev.stopPropagation();
                         this.Close();
                     };
                     break;
                 case FormWindowButton.MaxAndRestore:
                     div.setAttribute("scope", "form-max");
-                    onClick = () =>
+                    div.onclick = (ev) =>
                     {
-                        if(WindowState == FormWindowState.Maximized)
+                        ev.stopPropagation();
+                        if (WindowState == FormWindowState.Maximized)
                         {
                             WindowState = FormWindowState.Normal;
-                        }else if (WindowState == FormWindowState.Minimized)
+                        }
+                        else if (WindowState == FormWindowState.Minimized)
                         {
                             WindowState = _prevwindowState;
                         }
@@ -764,12 +765,13 @@ namespace System.Windows.Forms
                         {
                             WindowState = FormWindowState.Maximized;
                         }
-                    };
+                    };                    
                     break;
                 case FormWindowButton.Minimize:
-                    div.setAttribute("scope", "form-min");
-                    onClick = () =>
+                    div.setAttribute("scope", "form-min");                    
+                    div.onclick = (ev) =>
                     {
+                        ev.stopPropagation();
                         WindowState = FormWindowState.Minimized;
                     };
                     break;
@@ -799,12 +801,7 @@ namespace System.Windows.Forms
                 }                
             };
             
-            div.onclick = (ev) =>
-            {
-                ev.stopPropagation();
-                if(onClick != null)
-                    onClick();
-            };
+            
 
             Element.appendChild(div);
 

@@ -18,17 +18,17 @@ namespace Retyped
         private HTMLNavigator _nav;
         public HTMLNavigator navigator => _nav;
 
-        public double innerHeight { get => Get<double>(nameof(innerHeight)); set => Set(nameof(innerHeight), value); }
-        public double innerWidth { get => Get<double>(nameof(innerWidth)); set => Set(nameof(innerWidth), value); }
+        public double innerHeight { get => Convert.ToDouble(Get(nameof(innerHeight))); set => Set(nameof(innerHeight), (long)value); }
+        public double innerWidth { get => Convert.ToDouble(Get(nameof(innerWidth))); set => Set(nameof(innerWidth), (long)value); }
 
-        private void Set<T>(string name, T value)
+        private void Set(string name, long value)
         {
-            RegisteredFunction.Invoke<T>("element_style_set", uid, name, value);
+            RegisteredFunction.Invoke<object>("element_set", uid, name, value);
         }
 
-        private T Get<T>(string name)
+        private long Get(string name)
         {
-            return RegisteredFunction.Invoke<T>("element_style_get", uid, name);
+            return RegisteredFunction.Invoke<long>("element_get", uid, name);
         }
 
         public Action<MouseEvent> onmousemove

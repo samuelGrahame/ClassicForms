@@ -12,6 +12,19 @@ namespace System.Windows.Forms
     {
         public bool Multiline { get; set; }
 
+        protected override string GetDefaultTag()
+        {
+            var currentTag = Tag as string;
+
+            if (Settings.IsUsingBootStrap())
+            {
+                if (string.IsNullOrWhiteSpace(currentTag))
+                    return "form-control";
+            }
+
+            return base.GetDefaultTag();
+        }
+
         public TextBox() : base(new HTMLInputElement() { type = "text" })
         {
             //TextChanged
