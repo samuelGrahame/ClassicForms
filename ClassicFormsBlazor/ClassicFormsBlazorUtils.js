@@ -159,7 +159,7 @@ Blazor.registerFunction('onclick', (instance, value) => {
 });
 Blazor.registerFunction('ondblclick', (instance, value) => {
     return guidArray[instance].ondblclick = (ev) => {
-        CallEvent(value, ev);
+        CallMouseEvent(value, ev);
     };
 });
 Blazor.registerFunction('onmousemove', (instance, value) => {
