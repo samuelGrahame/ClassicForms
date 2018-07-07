@@ -56,9 +56,9 @@ namespace System.Windows.Forms
         private string prevString;
         public override string Text { get { return Element.As<HTMLInputElement>().value; } set
             {
-                if (Text != prevString)
+                if (Element.As<HTMLInputElement>().value != value)
                 {
-                    prevString = Text;
+                    prevString = value;
                     Element.As<HTMLInputElement>().value = value;
                     OnTextChanged(EventArgs.Empty);
                 }              
