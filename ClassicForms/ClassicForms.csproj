@@ -30,13 +30,39 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;BRIDGE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ComponentModel\InvalidEnumArgumentException.cs" />
+    <Compile Include="HTML\DomRect.cs" />
+    <Compile Include="HTML\Event.cs" />
+    <Compile Include="HTML\HTMLAnchorELement.cs" />
+    <Compile Include="HTML\HTMLButtonElement.cs" />
+    <Compile Include="HTML\HTMLChildNodes.cs" />
+    <Compile Include="HTML\HTMLClassList.cs" />
+    <Compile Include="HTML\HTMLDivElement.cs" />
+    <Compile Include="HTML\HTMLDocumentElement.cs" />
+    <Compile Include="HTML\HTMLDocumentFragement.cs" />
+    <Compile Include="HTML\HTMLElement.cs" />
+    <Compile Include="HTML\HTMLFieldSetElement.cs" />
+    <Compile Include="HTML\HTMLInputElement.cs" />
+    <Compile Include="HTML\HTMLLabelElement.cs" />
+    <Compile Include="HTML\HTMLLegendElement.cs" />
+    <Compile Include="HTML\HTMLNavigator.cs" />
+    <Compile Include="HTML\HTMLOptionElement.cs" />
+    <Compile Include="HTML\HTMLSelectElement.cs" />
+    <Compile Include="HTML\HTMLSpanElement.cs" />
+    <Compile Include="HTML\HTMLStatic.cs" />
+    <Compile Include="HTML\HTMLStyleCollection.cs" />
+    <Compile Include="HTML\HTMLTableElement.cs" />
+    <Compile Include="HTML\HTMLTableHeaderCellElement.cs" />
+    <Compile Include="HTML\HTMLTableSectionElement.cs" />
+    <Compile Include="HTML\HTMLUListElement.cs" />
+    <Compile Include="HTML\HTMLWindow.cs" />
+    <Compile Include="HTML\MouseEvent.cs" />
     <Compile Include="IServiceProviderV2.cs" />
     <Compile Include="OrdinalRandomizedComparer.cs" />
     <Compile Include="Settings.cs" />
@@ -167,6 +193,7 @@
       <HintPath>..\packages\Retyped.scripthost.2.8.6733\lib\net40\Retyped.scripthost.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Bridge.Min.17.1.1\build\Bridge.Min.targets" Condition="Exists('..\packages\Bridge.Min.17.1.1\build\Bridge.Min.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -9,7 +9,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBridge", "TestBridge\TestBridge.csproj", "{9C228AB6-D9C3-4AD9-B2F5-2F71CB3EFB56}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ClassicFormsShared", "ClassicFormsShared\ClassicFormsShared.shproj", "{DF235827-8A79-4462-97A3-6F4D41D5F32D}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		ClassicFormsShared\ClassicFormsShared.projitems*{df235827-8a79-4462-97a3-6f4d41d5f32d}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
