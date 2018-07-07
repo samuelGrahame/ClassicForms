@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.71.0</Version>
+    <Version>0.72.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/samuelGrahame/ClassicForms</PackageProjectUrl>
     <RepositoryUrl>https://github.com/samuelGrahame/ClassicForms</RepositoryUrl>
