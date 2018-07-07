@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>ClassicForms</id>
-    <version>0.65</version>
+    <version>0.70</version>
     <title>ClassicForms (For Bridge.Net)</title>
     <authors>SG - BL - PH</authors>
     <owners>SG - BL - PH</owners>
@@ -11,19 +11,19 @@
     <description>ClassicForms (For Bridge.Net) - Create a Windows Application using ClassicForms UI and Bridge for the Browser..
 </description>
     <releaseNotes>
-		ClassicForms now supports WindowState, Form Buttons - Maximize, Minimize and Close
+		ClassicForms now supports Form title
 	</releaseNotes>
     <copyright>Copyright 2018</copyright>
     <tags>Bridge Bridge.net Javascript Forms ExpressCraft C# UI jQuery HTML</tags>
 	<dependencies>
-		<dependency id="Bridge" version="[17.0.0]"/>
-		<dependency id="Bridge.Core" version="[17.0.0]"/>		
-		<dependency id="Bridge.Min" version="[17.0.0]"/>		
-		<dependency id="Retyped" version="[1.5.6685]"/>
-		<dependency id="Retyped.Core" version="[1.5.6685]"/>		
-		<dependency id="Retyped.dom" version="[2.8.6685]"/>
-		<dependency id="Retyped.es5" version="[2.8.6685]"/>
-		<dependency id="Retyped.scripthost" version="[2.8.6685]"/>
+		<dependency id="Bridge" version="[17.1.1]"/>
+		<dependency id="Bridge.Core" version="[17.1.1]"/>		
+		<dependency id="Bridge.Min" version="[17.1.1]"/>		
+		<dependency id="Retyped" version="[1.6.6733]"/>
+		<dependency id="Retyped.Core" version="[1.6.6733]"/>		
+		<dependency id="Retyped.dom" version="[2.8.6733]"/>
+		<dependency id="Retyped.es5" version="[2.8.6733]"/>
+		<dependency id="Retyped.scripthost" version="[2.8.6733]"/>
 	  </dependencies>
   </metadata>
   <files>

@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>0.70.0</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/samuelGrahame/ClassicForms</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/samuelGrahame/ClassicForms</RepositoryUrl>
+    <Description>ClassicForms (For Bridge.Net) - Create a Windows Application using ClassicForms UI and Bridge for the Browser..
+Using Blazor</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -12,6 +18,15 @@
     <DefineConstants>TRACE;RELEASE;NETSTANDARD;NETSTANDARD2_0;BLAZOR;</DefineConstants>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="ClassicFormsBlazorUtils.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="ClassicFormsBlazorUtils.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Browser" Version="0.4.0" />
   </ItemGroup>
