@@ -14,6 +14,8 @@ ClassicForms can also be installed using the NuGet Command Line tool by running 
 Install-Package ClassicForms
 ```
 
+Compile and Run your Windows Forms applications on the browser.
+
 ### Set out to do
 
 I wanted to create a repo for bridge, That I could use the speed of RAPID Development from WinForms in my cload based applications.
