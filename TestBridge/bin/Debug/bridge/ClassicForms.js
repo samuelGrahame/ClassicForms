@@ -11676,6 +11676,19 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 System.Windows.Forms.Control.ctor.call(this, document.createElement("select"));
                 this.Items = new System.Windows.Forms.ObjectCollection(this);
             }
+        },
+        methods: {
+            GetDefaultTag: function () {
+                var currentTag = Bridge.as(this.Tag, System.String);
+
+                if (System.Settings.IsUsingBootStrap()) {
+                    if (System.String.isNullOrWhiteSpace(currentTag)) {
+                        return "form-control";
+                    }
+                }
+
+                return System.Windows.Forms.Control.prototype.GetDefaultTag.call(this);
+            }
         }
     });
 
@@ -12105,6 +12118,19 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 System.Windows.Forms.Control.ctor.call(this, document.createElement("select"));
                 this.Element.multiple = true;
                 this.Items = new System.Windows.Forms.ObjectCollection(this);
+            }
+        },
+        methods: {
+            GetDefaultTag: function () {
+                var currentTag = Bridge.as(this.Tag, System.String);
+
+                if (System.Settings.IsUsingBootStrap()) {
+                    if (System.String.isNullOrWhiteSpace(currentTag)) {
+                        return "form-control";
+                    }
+                }
+
+                return System.Windows.Forms.Control.prototype.GetDefaultTag.call(this);
             }
         }
     });
@@ -12552,8 +12578,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return this.Element.value;
                 },
                 set: function (value) {
-                    Bridge.ensureBaseProperty(this, "Text").$System$Windows$Forms$Control$Text = value;
-                    this.Element.value = value;
+                    if (!Bridge.referenceEquals(this.Element.value, value)) {
+                        this.prevString = value;
+                        this.Element.value = value;
+                        this.OnTextChanged({ });
+                    }
                 }
             },
             UseSystemPasswordChar: {
@@ -12593,6 +12622,17 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             }
         },
         methods: {
+            GetDefaultTag: function () {
+                var currentTag = Bridge.as(this.Tag, System.String);
+
+                if (System.Settings.IsUsingBootStrap()) {
+                    if (System.String.isNullOrWhiteSpace(currentTag)) {
+                        return "form-control";
+                    }
+                }
+
+                return System.Windows.Forms.Control.prototype.GetDefaultTag.call(this);
+            },
             OnTextChanged: function (e) {
                 if (!Bridge.staticEquals(this.TextChanged, null)) {
                     this.TextChanged(this, e);
@@ -13563,18 +13603,18 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 div.style.position = "absolute";
                 div.classList.add("form-button");
 
-                var onClick = null;
-
                 switch (formWindowButton) {
                     case System.Windows.Forms.Form.FormWindowButton.Close: 
                         div.setAttribute("scope", "form-close");
-                        onClick = Bridge.fn.bind(this, function () {
+                        div.onclick = Bridge.fn.bind(this, function (ev) {
+                            ev.stopPropagation();
                             this.Close();
                         });
                         break;
                     case System.Windows.Forms.Form.FormWindowButton.MaxAndRestore: 
                         div.setAttribute("scope", "form-max");
-                        onClick = Bridge.fn.bind(this, function () {
+                        div.onclick = Bridge.fn.bind(this, function (ev) {
+                            ev.stopPropagation();
                             if (this.WindowState === System.Windows.Forms.FormWindowState.Maximized) {
                                 this.WindowState = System.Windows.Forms.FormWindowState.Normal;
                             } else if (this.WindowState === System.Windows.Forms.FormWindowState.Minimized) {
@@ -13586,7 +13626,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         break;
                     case System.Windows.Forms.Form.FormWindowButton.Minimize: 
                         div.setAttribute("scope", "form-min");
-                        onClick = Bridge.fn.bind(this, function () {
+                        div.onclick = Bridge.fn.bind(this, function (ev) {
+                            ev.stopPropagation();
                             this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
                         });
                         break;
@@ -13613,12 +13654,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                 };
 
-                div.onclick = function (ev) {
-                    ev.stopPropagation();
-                    if (!Bridge.staticEquals(onClick, null)) {
-                        onClick();
-                    }
-                };
+
 
                 this.Element.appendChild(div);
 

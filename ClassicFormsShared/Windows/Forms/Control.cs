@@ -546,7 +546,7 @@ namespace System.Windows.Forms
             return Parent.GetCurrentInheritFont();
         }
 
-        internal HTMLElement Element;
+        public HTMLElement Element;
         internal static Control ClickedOnControl;
 
         static Control()
