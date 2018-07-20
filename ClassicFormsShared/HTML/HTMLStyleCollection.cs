@@ -65,6 +65,8 @@ namespace Retyped
         public string lineHeight { get => Get(nameof(lineHeight)); set => Set(nameof(lineHeight), value); }
         public string color { get => Get(nameof(color)); set => Set(nameof(color), value); }
         public string transform { get => Get(nameof(transform)); set => Set(nameof(transform), value); }
+
+        public string textAlign { get => Get(nameof(textAlign)); set => Set(nameof(textAlign), value); }
     }
 }
 #endif

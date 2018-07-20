@@ -78,6 +78,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Windows\Forms\Button.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windows\Forms\ButtonBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windows\Forms\CheckBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\Forms\HorizontalAlignment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windows\Forms\ClientUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windows\Forms\ComboBox.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windows\Forms\ContainerControl.cs" />

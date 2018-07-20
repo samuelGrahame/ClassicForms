@@ -5057,6 +5057,17 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.Windows.Forms.HorizontalAlignment", {
+        $kind: "enum",
+        statics: {
+            fields: {
+                Left: 0,
+                Right: 1,
+                Center: 2
+            }
+        }
+    });
+
     Bridge.define("System.Windows.Forms.IWin32Window", {
         $kind: "interface"
     });
@@ -12566,6 +12577,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         inherits: [System.Windows.Forms.Control],
         fields: {
             Multiline: false,
+            _textAlign: 0,
             prevString: null,
             _useSystemPasswordChar: false
         },
@@ -12573,6 +12585,18 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             TextChanged: null
         },
         props: {
+            TextAlign: {
+                get: function () {
+                    return this._textAlign;
+                },
+                set: function (value) {
+                    if (this._textAlign !== value) {
+                        this._textAlign = value;
+                        this.Element.style.textAlign = System.Enum.format(System.Windows.Forms.HorizontalAlignment, this._textAlign, "G").toLowerCase();
+
+                    }
+                }
+            },
             Text: {
                 get: function () {
                     return this.Element.value;
@@ -12600,6 +12624,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             }
         },
         ctors: {
+            init: function () {
+                this._textAlign = System.Windows.Forms.HorizontalAlignment.Left;
+            },
             ctor: function () {
                 var $t;
                 this.$initialize();
@@ -13253,10 +13280,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 var dummyControl = new System.Windows.Forms.Control(formBase, false);
                 formBase.style.overflow = "hidden";
                 formBase.style.position = "absolute";
-                formBase.style.left = "1px";
-                formBase.style.top = "1px";
-                formBase.style.width = "calc(100% - 2px)";
-                formBase.style.height = "calc(100% - 2px)";
+                formBase.style.left = "0";
+                formBase.style.top = "0";
+                formBase.style.width = "100%";
+                formBase.style.height = "100%";
                 formBase.style.cursor = "default";
                 formBase.style.outline = "none";
 

@@ -12,6 +12,22 @@ namespace System.Windows.Forms
     {
         public bool Multiline { get; set; }
 
+        private HorizontalAlignment _textAlign = HorizontalAlignment.Left;
+        public HorizontalAlignment TextAlign { get
+            {
+                return _textAlign;
+            }
+            set
+            {
+                if(_textAlign != value)
+                {                    
+                    _textAlign = value;
+                    Element.style.textAlign = _textAlign.ToString("G").ToLower();
+
+                }
+            }
+        }
+
         protected override string GetDefaultTag()
         {
             var currentTag = Tag as string;
