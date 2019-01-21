@@ -12,11 +12,15 @@ namespace System
         public static bool IsEdge;
         public static bool IsFF;
         public static bool IsIE;
+
+        public static bool IsChrome => !IsEdge && !IsFF && !IsIE;
+        public static int MaximumPixelScrollingRows = 500000;
+        public static int GridViewRowScrollPadding = 0;
         /// <summary>
         /// enabled override the default font name.
         /// </summary>
         public static bool WinFormIgnoreFontName = false;
-
+        public static string DefaultFont = "8.25pt \"Tahoma\"";
         /// <summary>
         ///  enabled override the default font size.
         /// </summary>

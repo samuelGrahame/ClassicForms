@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace System.Windows.Forms
 {
-    public class DataGridViewTextBoxColumn : DataGridViewColumn
-    {
+    //public class DataGridViewTextBoxColumn : DataGridViewColumn
+    //{
 
-    }
+    //}
 }
 #endif

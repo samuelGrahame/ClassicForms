@@ -849,6 +849,36 @@ namespace System.Windows.Forms
         public event EventHandler GotFocus;
         public event EventHandler LostFocus;
 
+        private static HTMLCanvasElement cva = null;
+
+        /// <summary>
+        /// Returns Text Metrics for a given string
+        /// </summary>
+        /// <param name="t">the string</param>
+        /// <param name="f">the font used</param>
+        /// <returns>TextMetrics</returns>
+		public static TextMetrics GetTextMetrics(string t, string f)
+        {
+            if (f == "")
+            {
+                f = "8.25pt Tahoma";
+            }
+            var c = (cva ?? (cva = new HTMLCanvasElement())).getContext("2d").As<CanvasRenderingContext2D>();
+            c.font = f;
+            return c.measureText(t);
+        }
+
+        /// <summary>
+        /// Returns text width
+        /// </summary>
+        /// <param name="t">the string</param>
+        /// <param name="f">the font used</param>
+        /// <returns>double</returns>
+		public static double GetTextWidth(string t, string f)
+        {
+            return GetTextMetrics(t, f).width;
+        }
+
         protected virtual void OnGotFocus(EventArgs e)
         {
             if (GotFocus != null)
