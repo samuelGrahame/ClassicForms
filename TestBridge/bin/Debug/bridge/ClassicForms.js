@@ -13526,7 +13526,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             var dr = document.createElement("tr"); // Helper.Div();
                             dr.style.height = System.Helper.ToPx(Bridge.box(this.UnitHeight, System.Single, System.Single.format, System.Single.getHashCode));
                             //(i % 2 == 0 ? "cellrow even" : "cellrow") + 
-                            dr.className = ((this.SelectedRows.GetValue(DataRowhandle1, true) ? "table-primary" : "") || "") + ((DataRowhandle1 === this.FocusedDataHandle ? " table-active" : "") || "");
+                            dr.className = ((i3 % 2 === 0 ? "" : "odd") || "") + ((this.SelectedRows.GetValue(DataRowhandle1, true) ? " table-primary" : "") || "") + ((DataRowhandle1 === this.FocusedDataHandle ? " table-active" : "") || "");
                             dr.style.position = "absolute";
                             System.Helper.SetBounds(dr, 0, Y, this._columnAutoWidth ? ClientWidth : MaxWidth + 1, this.UnitHeight);
                             dr.setAttribute("i", System.Convert.toString(Bridge.box(DataRowhandle1, System.Int32)));
@@ -14713,6 +14713,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 for (var i = 0; i < this.Columns.Count; i = (i + 1) | 0) {
                     if (this.Columns.getItem(i).Visible) {
                         this.Columns.getItem(i).Width = this.GetBestFitForColumn(this.Columns.getItem(i), includeColumnHeader);
+
+                        if (System.Settings.IsUsingBootStrap()) {
+                            this.Columns.getItem(i).Width = (this.Columns.getItem(i).Width + 24) | 0;
+                        }
                     }
                 }
                 this._disableRender = false;

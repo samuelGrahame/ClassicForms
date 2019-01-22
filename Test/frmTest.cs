@@ -21,14 +21,15 @@ namespace Test
         {
             var dt = new DataTable();
             dt.Columns.Add("Name", typeof(int));
-
-            for (int i = 0; i < 1000; i++)
+#if BRIDGE
+            dt.BeginNewRow(10000);
+#endif
+            for (int i = 0; i < 10000; i++)
             {
                 var dr = dt.NewRow();
 
                 dr[0] = r.Next();
 
-                dt.Rows.Add(dr);
             }
 
             dt.AcceptChanges();
@@ -42,7 +43,10 @@ namespace Test
             dt.Columns.Add("Data3", typeof(string));
             dt.Columns.Add("Data4", typeof(DateTime));
 
-            for (int i = 0; i < 1000; i++)
+#if BRIDGE
+            dt.BeginNewRow(10000);
+#endif
+            for (int i = 0; i < 10000; i++)
             {
                 var dr = dt.NewRow();
 
@@ -51,17 +55,18 @@ namespace Test
                 dr[2] = r.Next().ToString() + " string";
                 dr[3] = DateTime.Now.AddDays(r.NextDouble());
 
-                dt.Rows.Add(dr);
             }
 
             dt.AcceptChanges();
 
             dataGridView2.DataSource = dt;
 
-            
+
 #if BRIDGE
-            dataGridView1.BestFitAllColumns(true);
+            dataGridView1.ColumnAutoWidth = true;
+
             dataGridView2.BestFitAllColumns(true);
+
 #endif
         }
 

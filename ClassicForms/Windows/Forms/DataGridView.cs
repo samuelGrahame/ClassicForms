@@ -1139,6 +1139,11 @@ namespace System.Windows.Forms
                 if (Columns[i].Visible)
                 {
                     Columns[i].Width = GetBestFitForColumn(Columns[i], includeColumnHeader);
+
+                    if(Settings.IsUsingBootStrap())
+                    {
+                        Columns[i].Width += 24;
+                    }
                 }
             }
             _disableRender = false;
@@ -1565,7 +1570,7 @@ namespace System.Windows.Forms
                         var dr = document.createElement("tr"); // Helper.Div();
                         dr.style.height = UnitHeight.ToPx();
                         //(i % 2 == 0 ? "cellrow even" : "cellrow") + 
-                        dr.className = (SelectedRows.GetValue(DataRowhandle, true) ? "table-primary" : "") + (DataRowhandle == FocusedDataHandle ? " table-active" : "");
+                        dr.className = (i % 2 == 0 ? "" : "odd") + (SelectedRows.GetValue(DataRowhandle, true) ? " table-primary" : "") + (DataRowhandle == FocusedDataHandle ? " table-active" : "");
                         dr.style.position = "absolute";
                         dr.SetBounds(0, Y, _columnAutoWidth ? ClientWidth : MaxWidth + 1, UnitHeight);
                         dr.setAttribute("i", Convert.ToString(DataRowhandle));
