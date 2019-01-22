@@ -52,20 +52,11 @@
     <Compile Include="Examples\frmCalculator.Designer.cs">
       <DependentUpon>frmCalculator.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmAnchorTest.cs">
+    <Compile Include="frmTest.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmDockingTest.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmDockingTest.Designer.cs">
-      <DependentUpon>frmDockingTest.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmModal.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmModal.Designer.cs">
-      <DependentUpon>frmModal.cs</DependentUpon>
+    <Compile Include="frmTest.Designer.cs">
+      <DependentUpon>frmTest.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -74,14 +65,8 @@
     <EmbeddedResource Include="Examples\frmCalculator.resx">
       <DependentUpon>frmCalculator.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmAnchorTest.resx">
-      <DependentUpon>frmAnchorTest.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmDockingTest.resx">
-      <DependentUpon>frmDockingTest.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmModal.resx">
-      <DependentUpon>frmModal.cs</DependentUpon>
+    <EmbeddedResource Include="frmTest.resx">
+      <DependentUpon>frmTest.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

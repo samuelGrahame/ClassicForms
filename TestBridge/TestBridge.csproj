@@ -41,22 +41,12 @@
       <Link>UI\Examples\frmCalculator.designer.cs</Link>
       <DependentUpon>frmCalculator.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\Test\frmAnchorTest.cs">
-      <Link>UI\frmAnchorTest.cs</Link>
+    <Compile Include="..\Test\frmTest.cs">
+      <Link>UI\frmTest.cs</Link>
     </Compile>
-    <Compile Include="..\Test\frmDockingTest.cs">
-      <Link>UI\frmDockingTest.cs</Link>
-    </Compile>
-    <Compile Include="..\Test\frmDockingTest.designer.cs">
-      <Link>UI\frmDockingTest.designer.cs</Link>
-      <DependentUpon>frmDockingTest.cs</DependentUpon>
-    </Compile>
-    <Compile Include="..\Test\frmModal.cs">
-      <Link>UI\frmModal.cs</Link>
-    </Compile>
-    <Compile Include="..\Test\frmModal.designer.cs">
-      <Link>UI\frmModal.designer.cs</Link>
-      <DependentUpon>frmModal.cs</DependentUpon>
+    <Compile Include="..\Test\frmTest.designer.cs">
+      <Link>UI\frmTest.designer.cs</Link>
+      <DependentUpon>frmTest.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -89,18 +79,6 @@
     <EmbeddedResource Include="..\Test\Examples\frmCalculator.resx">
       <Link>UI\Examples\frmCalculator.resx</Link>
       <DependentUpon>frmCalculator.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Test\frmAnchorTest.resx">
-      <Link>UI\frmAnchorTest.resx</Link>
-      <DependentUpon>frmAnchorTest.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Test\frmDockingTest.resx">
-      <Link>UI\frmDockingTest.resx</Link>
-      <DependentUpon>frmDockingTest.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Test\frmModal.resx">
-      <Link>UI\frmModal.resx</Link>
-      <DependentUpon>frmModal.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

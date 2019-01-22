@@ -121,6 +121,11 @@ namespace System
                 _isUsingMaterial = IsUsingMaterial();
                 _isUsingBootStrap = IsUsingBootStrap();
                 _isUsingWindowsCSS = IsUsingWindowsCSS();
+
+                if(_isUsingBootStrap)
+                {
+                    DefaultFont = "16px -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"";
+                }                
             }
             catch (Exception)
             {

@@ -11,7 +11,7 @@ namespace TestBridge
     {
         public static void Main()
         {
-            var x = new frmAnchorTest();
+            var x = new frmTest();
             x.Show();
         }
     }

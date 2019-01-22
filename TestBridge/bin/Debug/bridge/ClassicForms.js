@@ -5188,6 +5188,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         System.Settings._isUsingMaterial = System.Settings.IsUsingMaterial();
                         System.Settings._isUsingBootStrap = System.Settings.IsUsingBootStrap();
                         System.Settings._isUsingWindowsCSS = System.Settings.IsUsingWindowsCSS();
+
+                        if (System.Settings._isUsingBootStrap) {
+                            System.Settings.DefaultFont = "16px -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"";
+                        }
                     }
                     catch ($e1) {
                         $e1 = System.Exception.create($e1);
@@ -12976,6 +12980,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             CountOfDeletion: 0,
             _searchTimer: 0,
             _useDrawNotDom: false,
+            oTag: null,
             DragIndex: 0,
             ResizeIndex: 0,
             ResizePageX: 0,
@@ -13214,10 +13219,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             Tag: {
                 get: function () {
-                    return Bridge.ensureBaseProperty(this, "Tag").$System$Windows$Forms$Control$Tag;
+                    return this.oTag;
                 },
                 set: function (value) {
-                    Bridge.ensureBaseProperty(this, "Tag").$System$Windows$Forms$Control$Tag = value;
+                    this.oTag = System.String.concat(value, "");
                     this.GridBodyContainer.className = System.String.concat(value, "");
                     this.GridHeaderContainer.className = System.String.concat(value, "");
                 }
@@ -13253,6 +13258,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.CacheRow = new (System.Collections.Generic.Dictionary$2(System.Int32,HTMLElement))();
                 this.CountOfDeletion = 0;
                 this._searchTimer = -1;
+                this.oTag = "";
                 this.DragIndex = -1;
                 this.ResizeIndex = -1;
                 this.ResizePageX = 0;
@@ -13769,6 +13775,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 //GridFindPanel.AppendChildren(btnClose, SearchTextInput, btnFind, btnClear);
 
                 this.SetDefaultSizes();
+
+                if (System.Settings.IsUsingBootStrap()) {
+                    this.Tag = "table";
+                }
 
                 this.Element.onmouseup = Bridge.fn.bind(this, function (ev) {
                     if (this.ResizeIndex < 0 || isNaN(this.ResizeIndex)) {

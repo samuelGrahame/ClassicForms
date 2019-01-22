@@ -1268,12 +1268,12 @@ namespace System.Windows.Forms
             else                 //other browser not tested on IE 11
                 window.open("data:application/vnd.ms-excel," + encodeURIComponent(builder.ToString()));
         }
-
+        private string oTag = "";
         public override object Tag { get =>
-                base.Tag;
+                oTag;
             set
             {
-                base.Tag = value;                
+                oTag = value + "";
                 GridBodyContainer.className = value + "";
                 GridHeaderContainer.className = value + "";
             }
@@ -1838,6 +1838,11 @@ namespace System.Windows.Forms
             //GridFindPanel.AppendChildren(btnClose, SearchTextInput, btnFind, btnClear);
 
             SetDefaultSizes();
+
+            if (Settings.IsUsingBootStrap())
+            {
+                Tag = "table";
+            }            
 
             Element.onmouseup = (ev) =>
             {
