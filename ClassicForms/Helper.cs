@@ -66,51 +66,68 @@ namespace System
             };
         }
 
-        public static HTMLDivElement Div(string classname = "")
-        {
-            var dv = new HTMLDivElement();
-            dv.className = classname;
+        public static T Element<T>(T element, string classname = "") where T : HTMLElement
+        {            
+            element.className = classname;
 
-            dv.style.position = "absolute";
-            dv.style.boxSizing = "borderbox";
-            dv.style.boxSizing = "border-box";
+            element.style.position = "absolute";
+            element.style.boxSizing = "borderbox";
+            element.style.boxSizing = "border-box";
 
-            return dv;
-
+            return element;
         }
 
-        public static HTMLSpanElement Label(string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true)
+        public static HTMLDivElement Div(string classname = "")
         {
-            var lbl = new HTMLSpanElement();
-            lbl.className = classr;
+            return Element(new HTMLDivElement(), classname);
+        }
 
-            lbl.style.position = "absolute";
-            lbl.style.boxSizing = "borderbox";
-            lbl.style.boxSizing = "border-box";
+        public static HTMLTableCellElement Cell(string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true)
+        {
+            return Element(new HTMLTableCellElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
+        }
 
-            lbl.textContent = Caption;
-            lbl.style.left = X.ToPx();
-            lbl.style.top = Y.ToPx();
-            lbl.style.width = width.ToPx();
+        public static HTMLTableHeaderCellElement HeaderCell(string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true)
+        {            
+            return Element(new HTMLTableHeaderCellElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
+        }
+
+        public static T Element<T>(T element, string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true) where T : HTMLElement
+        {
+            element.className = classr;
+
+            element.style.position = "absolute";
+            element.style.boxSizing = "borderbox";
+            element.style.boxSizing = "border-box";
+
+            element.textContent = Caption;
+            element.style.left = X.ToPx();
+            element.style.top = Y.ToPx();
+            element.style.width = width.ToPx();
 
             if (Alignment != "left")
             {
                 if (Alignment == "right")
                 {
-                    lbl.style.direction = "rtl";
+                    element.style.direction = "rtl";
                 }
                 else
                 {
-                    lbl.style.textAlign = Alignment;
+                    element.style.textAlign = Alignment;
                 }
             }
             //SetBT(lbl, IsBold, IsTiny);
             if (Forecolor != null)
             {
-                lbl.style.color = Forecolor;
+                element.style.color = Forecolor;
             }
 
-            return lbl;
+            return element;
+        }
+
+        public static HTMLSpanElement Label(string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true)
+        {            
+            return Element(new HTMLSpanElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac); ;
         }
 
         public static Control AppendChild(this Control c, Control Node)

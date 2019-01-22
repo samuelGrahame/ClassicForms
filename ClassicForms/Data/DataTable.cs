@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace System.Data
 {
-    public enum DataType
+    public enum DataTypeCode
     {
         Object,
         DateTime,
@@ -26,9 +26,17 @@ namespace System.Data
     public class DataTable
     {
 
+        public DataTable()
+        {
+            Columns = new DataColumnCollection(this);
+            Rows = new DataRowCollection(this);
+        }
+
         public static bool DynamicGetValue = false;
-        public List<DataColumn> Columns = new List<DataColumn>();
+        public DataColumnCollection Columns;
         public List<int> _searchResults = new List<int>();
+
+        public DataRowCollection Rows;
 
         public bool _searchActive = false;
         private string _searchString;
@@ -139,17 +147,7 @@ namespace System.Data
                 ClearCells(Columns[i]);
             }
         }
-
-        private int _ColCount;
-
-        public int ColumnCount
-        {
-            get
-            {
-                return _ColCount;
-            }
-        }
-
+        
         public int _RowCount;
 
         public int RowCount
@@ -165,115 +163,12 @@ namespace System.Data
         }
 
         private List<DataRow> NewRows = new List<DataRow>();
-
-        public void ClearCells<T>(DataColumn _column)
-        {
-            dynamic _col = _column;
-            _col.Cells = new List<T>();
-        }
-
+        
         public void ClearCells(DataColumn _column)
         {
-            switch (_column.DataType)
-            {
-                default:
-                case DataType.Object:
-                    ClearCells<object>(_column);
-                    break;
-
-                case DataType.DateTime:
-                    ClearCells<DateTime?>(_column);
-                    break;
-
-                case DataType.String:
-                    ClearCells<string>(_column);
-                    break;
-
-                case DataType.Integer:
-                    ClearCells<int?>(_column);
-                    break;
-
-                case DataType.Long:
-                    ClearCells<long?>(_column);
-                    break;
-
-                case DataType.Float:
-                    ClearCells<float?>(_column);
-                    break;
-
-                case DataType.Double:
-                    ClearCells<double?>(_column);
-                    break;
-
-                case DataType.Decimal:
-                    ClearCells<decimal?>(_column);
-                    break;
-
-                case DataType.Bool:
-                    ClearCells<bool?>(_column);
-                    break;
-
-                case DataType.Byte:
-                    ClearCells<byte?>(_column);
-                    break;
-
-                case DataType.Short:
-                    ClearCells<short?>(_column);
-                    break;
-            }
-            RequireOnDataChangeEvent();
-        }
-
-        public DataColumn GetColumnByDataType(DataType type = DataType.Object)
-        {
-            switch (type)
-            {
-                default:
-                case DataType.Object:
-                    return new DataColumnObject();
-
-                case DataType.DateTime:
-                    return new DataColumnDateTime();
-
-                case DataType.String:
-                    return new DataColumnString();
-
-                case DataType.Integer:
-                    return new DataColumnInteger();
-
-                case DataType.Long:
-                    return new DataColumnLong();
-
-                case DataType.Float:
-                    return new DataColumnFloat();
-
-                case DataType.Double:
-                    return new DataColumnDouble();
-
-                case DataType.Decimal:
-                    return new DataColumnDecimal();
-
-                case DataType.Bool:
-                    return new DataColumnBool();
-
-                case DataType.Byte:
-                    return new DataColumnByte();
-
-                case DataType.Short:
-                    return new DataColumnShort();
-            }
-        }
-
-        public void AddColumn(string fieldName, DataType type = DataType.Object)
-        {
-            var col = GetColumnByDataType(type);
-            col.FieldName = fieldName;
-
-            Columns.Add(col);
-            _ColCount = Columns.Count;
-
-            RequireOnDataChangeEvent();
-        }
+            _column.Cells.Clear();
+            Rows.Clear();
+        }        
 
         public DataRow this[int rowIndex]
         {
@@ -295,8 +190,7 @@ namespace System.Data
             int colLength = Columns.Count;
             for (int x = 0; x < colLength; x++)
             {
-                dynamic col = Columns[x];
-                col.Cells.add(null);
+                Columns[x].Cells.Add(null);                
             }
 
             RequireOnDataChangeEvent();
@@ -306,16 +200,15 @@ namespace System.Data
 
         public void AddRow(params object[] row)
         {
-            if (row.Length == ColumnCount)
+            if (row.Length == Columns.Count)
             {
-                _RowCount++;
+                var dr = new DataRow(this, _RowCount++);
                 int colLength = Columns.Count;
                 for (int x = 0; x < colLength; x++)
                 {
-                    dynamic col = Columns[x];
-                    col.Cells.add(row[x]);
+                    Columns[x].Cells.Add(row[x]);                    
                 }
-                RequireOnDataChangeEvent();
+                Rows.Add(dr);
             }
         }
 
@@ -328,7 +221,7 @@ namespace System.Data
             return dr;
         }
 
-        public void AcceptNewRows()
+        public void AcceptChanges()
         {
             if (NewRows == null || NewRows.Count == 0)
                 return;
@@ -366,6 +259,9 @@ namespace System.Data
                 }
                 col.Cells.AddRange(DataCells);
             }
+
+            Rows.AddRange(NewRows.ToArray());
+
             NewRows.Clear();
 
             EndDataUpdate();
@@ -403,9 +299,9 @@ namespace System.Data
 
         public DataRow GetOfflineDataRow()
         {
-            var dr = new DataRow(ParentTable.ColumnCount);
-            var data = new object[ParentTable.ColumnCount];
-            for (int i = 0; i < ParentTable.ColumnCount; i++)
+            var dr = new DataRow(ParentTable.Columns.Count);
+            var data = new object[ParentTable.Columns.Count];
+            for (int i = 0; i < ParentTable.Columns.Count; i++)
             {
                 data[i] = this[i];
             }
@@ -430,13 +326,13 @@ namespace System.Data
             RowIndex = rowIndex;
             if (rowIndex == -1)
             {
-                batchData = new object[parentTable.ColumnCount];
+                batchData = new object[parentTable.Columns.Count];
             }
         }
 
         public void SetValue(string fieldName, object value)
         {
-            for (int i = 0; i < ParentTable.ColumnCount; i++)
+            for (int i = 0; i < ParentTable.Columns.Count; i++)
             {
                 if (ParentTable.Columns[i].FieldName == fieldName)
                 {
@@ -463,7 +359,7 @@ namespace System.Data
 
         public object GetValue(string fieldName)
         {
-            for (int i = 0; i < ParentTable.ColumnCount; i++)
+            for (int i = 0; i < ParentTable.Columns.Count; i++)
             {
                 if (ParentTable.Columns[i].FieldName == fieldName)
                 {
@@ -524,25 +420,93 @@ namespace System.Data
     public class DataColumn
     {
         public string FieldName;
-        public DataType DataType;
-        public dynamic Self;
+        public Type DataType;
+        private DataTypeCode dataTypeCode;
+        public List<dynamic> Cells = new List<dynamic>();
 
-        public DataColumn()
+        private bool HasTypeCode = false;
+
+        public DataTypeCode GetTypeCode()
         {
-            Self = this;
+            if(HasTypeCode)
+            {
+                if(DataType == typeof(object))
+                {
+                    HasTypeCode = true;
+                    return dataTypeCode = Data.DataTypeCode.Object;
+                }
+                if (DataType == typeof(DateTime))
+                {
+                    HasTypeCode = true;
+                    return dataTypeCode = Data.DataTypeCode.DateTime;
+                }
+                if (DataType == typeof(string))
+                {
+                    HasTypeCode = true;
+                    return dataTypeCode = Data.DataTypeCode.String;
+                }
+                if (DataType == typeof(int))
+                {
+                    HasTypeCode = true;
+                    return dataTypeCode = Data.DataTypeCode.Integer;
+                }
+                if (DataType == typeof(long))
+                {
+                    HasTypeCode = true;
+                    return dataTypeCode = Data.DataTypeCode.Long;
+                }
+                if (DataType == typeof(float))
+                {
+                    HasTypeCode = true;
+                    return dataTypeCode = Data.DataTypeCode.Float;
+                }
+                if (DataType == typeof(double))
+                {
+                    HasTypeCode = true;
+                    return dataTypeCode = Data.DataTypeCode.Double;
+                }
+                if (DataType == typeof(decimal))
+                {
+                    HasTypeCode = true;
+                    return dataTypeCode = Data.DataTypeCode.Decimal;
+                }
+                if (DataType == typeof(bool))
+                {
+                    HasTypeCode = true;
+                    return dataTypeCode = Data.DataTypeCode.Bool;
+                }
+                if (DataType == typeof(byte))
+                {
+                    HasTypeCode = true;
+                    return dataTypeCode = Data.DataTypeCode.Byte;
+                }
+                if (DataType == typeof(short))
+                {
+                    HasTypeCode = true;
+                    return dataTypeCode = Data.DataTypeCode.Short;
+                }
+                HasTypeCode = true;
+                return dataTypeCode = Data.DataTypeCode.Object;
+            }
+            else
+            {
+                return dataTypeCode;
+            }
+            //DataType
         }
+
 
         //public List<object> Cells = new List<object>();
         public string GetDisplayValue(int rowIndex, string formatString)
         {
-            switch (DataType)
+            switch (GetTypeCode())
             {
                 default:
-                case DataType.Object:
-                    return string.Format(formatString, (((DataColumnObject)this).Cells[rowIndex]));
+                case DataTypeCode.Object:
+                    return string.Format(formatString, Cells[rowIndex]);
 
-                case DataType.DateTime:
-                    dynamic obj = ((DataColumnDateTime)this).Cells[rowIndex];
+                case DataTypeCode.DateTime:
+                    dynamic obj = Cells[rowIndex];
                     if (obj == null)
                     {
                         return string.Empty;
@@ -568,84 +532,48 @@ namespace System.Data
                     }
                     return string.Format(formatString, str);
 
-                case DataType.String:
-                    return string.Format(formatString, ((DataColumnString)this).Cells[rowIndex]);
+                case DataTypeCode.String:
+                    return string.Format(formatString, Cells[rowIndex]);
 
-                case DataType.Integer:
-                    return string.Format(formatString, ((DataColumnInteger)this).Cells[rowIndex]);
+                case DataTypeCode.Integer:
+                    return string.Format(formatString, Cells[rowIndex]);
 
-                case DataType.Long:
-                    return string.Format(formatString, ((DataColumnLong)this).Cells[rowIndex]);
+                case DataTypeCode.Long:
+                    return string.Format(formatString, Cells[rowIndex]);
 
-                case DataType.Float:
-                    return string.Format(formatString, ((DataColumnFloat)this).Cells[rowIndex]);
+                case DataTypeCode.Float:
+                    return string.Format(formatString, Cells[rowIndex]);
 
-                case DataType.Double:
-                    return string.Format(formatString, ((DataColumnDouble)this).Cells[rowIndex]);
+                case DataTypeCode.Double:
+                    return string.Format(formatString, Cells[rowIndex]);
 
-                case DataType.Decimal:
-                    return string.Format(formatString, ((DataColumnDecimal)this).Cells[rowIndex]);
+                case DataTypeCode.Decimal:
+                    return string.Format(formatString, Cells[rowIndex]);
 
-                case DataType.Byte:
-                    return string.Format(formatString, ((DataColumnByte)this).Cells[rowIndex]);
+                case DataTypeCode.Byte:
+                    return string.Format(formatString, Cells[rowIndex]);
 
-                case DataType.Short:
-                    return string.Format(formatString, ((DataColumnShort)this).Cells[rowIndex]);
+                case DataTypeCode.Short:
+                    return string.Format(formatString, Cells[rowIndex]);
 
-                case DataType.Bool:
-                    return string.Format(formatString, ((DataColumnBool)this).Cells[rowIndex]);
+                case DataTypeCode.Bool:
+                    return string.Format(formatString, Cells[rowIndex]);
             }
         }
 
         public object GetCellValue(int rowIndex)
         {
-            if (Self.Cells.Count <= rowIndex)
+            if (Cells.Count <= rowIndex)
             {
                 return null;
             }
-
-            switch (DataType)
-            {
-                default:
-                case DataType.Object:
-                    return ((DataColumnObject)this).Cells[rowIndex];
-
-                case DataType.DateTime:
-                    return ((DataColumnDateTime)this).Cells[rowIndex];
-
-                case DataType.String:
-                    return ((DataColumnString)this).Cells[rowIndex];
-
-                case DataType.Integer:
-                    return (((DataColumnInteger)this).Cells[rowIndex]);
-
-                case DataType.Long:
-                    return (((DataColumnLong)this).Cells[rowIndex]);
-
-                case DataType.Float:
-                    return (((DataColumnFloat)this).Cells[rowIndex]);
-
-                case DataType.Double:
-                    return (((DataColumnDouble)this).Cells[rowIndex]);
-
-                case DataType.Decimal:
-                    return (((DataColumnDecimal)this).Cells[rowIndex]);
-
-                case DataType.Byte:
-                    return (((DataColumnByte)this).Cells[rowIndex]);
-
-                case DataType.Bool:
-                    return (((DataColumnBool)this).Cells[rowIndex]);
-
-                case DataType.Short:
-                    return (((DataColumnShort)this).Cells[rowIndex]);
-            }
+            return Cells[rowIndex];            
         }
 
 
         public string GetDisplayValue(int rowIndex)
         {
-            if (Self.Cells.Count <= rowIndex)
+            if (Cells.Count <= rowIndex)
             {
                 return null;
             }
@@ -653,156 +581,11 @@ namespace System.Data
                 return this.ToDynamic().Cells.getItem(rowIndex);
             else
             {
-                switch (DataType)
-                {
-                    default:
-                    case DataType.Object:
-                        return Convert.ToString(((DataColumnObject)this).Cells[rowIndex]);
-
-                    case DataType.DateTime:
-                        return Convert.ToString(((DataColumnDateTime)this).Cells[rowIndex]);
-
-                    case DataType.String:
-                        return ((DataColumnString)this).Cells[rowIndex];
-
-                    case DataType.Integer:
-                        return Convert.ToString(((DataColumnInteger)this).Cells[rowIndex]);
-
-                    case DataType.Long:
-                        return Convert.ToString(((DataColumnLong)this).Cells[rowIndex]);
-
-                    case DataType.Float:
-                        return Convert.ToString(((DataColumnFloat)this).Cells[rowIndex]);
-
-                    case DataType.Double:
-                        return Convert.ToString(((DataColumnDouble)this).Cells[rowIndex]);
-
-                    case DataType.Decimal:
-                        return Convert.ToString(((DataColumnDecimal)this).Cells[rowIndex]);
-
-                    case DataType.Byte:
-                        return Convert.ToString(((DataColumnByte)this).Cells[rowIndex]);
-
-                    case DataType.Bool:
-                        return Convert.ToString(((DataColumnBool)this).Cells[rowIndex]);
-
-                    case DataType.Short:
-                        return Convert.ToString(((DataColumnShort)this).Cells[rowIndex]);
-                }
+                return Convert.ToString(Cells[rowIndex]);
             }
 
 
         }
-    }
-
-    public class DataColumnString : DataColumn
-    {
-        public DataColumnString()
-        {
-            base.DataType = DataType.String;
-        }
-
-        public List<string> Cells = new List<string>();
-    }
-
-    public class DataColumnDateTime : DataColumn
-    {
-        public DataColumnDateTime()
-        {
-            base.DataType = DataType.DateTime;
-        }
-
-        public List<DateTime?> Cells = new List<DateTime?>();
-    }
-
-    public class DataColumnInteger : DataColumn
-    {
-        public DataColumnInteger()
-        {
-            base.DataType = DataType.Integer;
-        }
-
-        public List<int?> Cells = new List<int?>();
-    }
-
-    public class DataColumnLong : DataColumn
-    {
-        public DataColumnLong()
-        {
-            base.DataType = DataType.Long;
-        }
-
-        public List<long?> Cells = new List<long?>();
-    }
-
-    public class DataColumnObject : DataColumn
-    {
-        public DataColumnObject()
-        {
-            base.DataType = DataType.Object;
-        }
-
-        public List<object> Cells = new List<object>();
-    }
-
-    public class DataColumnDecimal : DataColumn
-    {
-        public DataColumnDecimal()
-        {
-            base.DataType = DataType.Decimal;
-        }
-
-        public List<decimal?> Cells = new List<decimal?>();
-    }
-
-    public class DataColumnFloat : DataColumn
-    {
-        public DataColumnFloat()
-        {
-            base.DataType = DataType.Float;
-        }
-
-        public List<float?> Cells = new List<float?>();
-    }
-
-    public class DataColumnDouble : DataColumn
-    {
-        public DataColumnDouble()
-        {
-            base.DataType = DataType.Double;
-        }
-
-        public List<double?> Cells = new List<double?>();
-    }
-
-    public class DataColumnBool : DataColumn
-    {
-        public DataColumnBool()
-        {
-            base.DataType = DataType.Bool;
-        }
-
-        public List<bool?> Cells = new List<bool?>();
-    }
-
-    public class DataColumnByte : DataColumn
-    {
-        public DataColumnByte()
-        {
-            base.DataType = DataType.Byte;
-        }
-
-        public List<byte?> Cells = new List<byte?>();
-    }
-
-    public class DataColumnShort : DataColumn
-    {
-        public DataColumnShort()
-        {
-            base.DataType = DataType.Short;
-        }
-
-        public List<short?> Cells = new List<short?>();
     }
 }
 #endif

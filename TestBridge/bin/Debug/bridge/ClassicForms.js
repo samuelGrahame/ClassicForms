@@ -1359,23 +1359,78 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
     Bridge.define("System.Data.DataColumn", {
         fields: {
             FieldName: null,
-            DataType: 0,
-            Self: null
+            DataType: null,
+            dataTypeCode: 0,
+            Cells: null,
+            HasTypeCode: false
         },
         ctors: {
-            ctor: function () {
-                this.$initialize();
-                this.Self = this;
+            init: function () {
+                this.Cells = new (System.Collections.Generic.List$1(System.Object)).ctor();
+                this.HasTypeCode = false;
             }
         },
         methods: {
+            GetTypeCode: function () {
+                if (this.HasTypeCode) {
+                    if (Bridge.referenceEquals(this.DataType, System.Object)) {
+                        this.HasTypeCode = true;
+                        return (this.dataTypeCode = System.Data.DataTypeCode.Object);
+                    }
+                    if (Bridge.referenceEquals(this.DataType, System.DateTime)) {
+                        this.HasTypeCode = true;
+                        return (this.dataTypeCode = System.Data.DataTypeCode.DateTime);
+                    }
+                    if (Bridge.referenceEquals(this.DataType, System.String)) {
+                        this.HasTypeCode = true;
+                        return (this.dataTypeCode = System.Data.DataTypeCode.String);
+                    }
+                    if (Bridge.referenceEquals(this.DataType, System.Int32)) {
+                        this.HasTypeCode = true;
+                        return (this.dataTypeCode = System.Data.DataTypeCode.Integer);
+                    }
+                    if (Bridge.referenceEquals(this.DataType, System.Int64)) {
+                        this.HasTypeCode = true;
+                        return (this.dataTypeCode = System.Data.DataTypeCode.Long);
+                    }
+                    if (Bridge.referenceEquals(this.DataType, System.Single)) {
+                        this.HasTypeCode = true;
+                        return (this.dataTypeCode = System.Data.DataTypeCode.Float);
+                    }
+                    if (Bridge.referenceEquals(this.DataType, System.Double)) {
+                        this.HasTypeCode = true;
+                        return (this.dataTypeCode = System.Data.DataTypeCode.Double);
+                    }
+                    if (Bridge.referenceEquals(this.DataType, System.Decimal)) {
+                        this.HasTypeCode = true;
+                        return (this.dataTypeCode = System.Data.DataTypeCode.Decimal);
+                    }
+                    if (Bridge.referenceEquals(this.DataType, System.Boolean)) {
+                        this.HasTypeCode = true;
+                        return (this.dataTypeCode = System.Data.DataTypeCode.Bool);
+                    }
+                    if (Bridge.referenceEquals(this.DataType, System.Byte)) {
+                        this.HasTypeCode = true;
+                        return (this.dataTypeCode = System.Data.DataTypeCode.Byte);
+                    }
+                    if (Bridge.referenceEquals(this.DataType, System.Int16)) {
+                        this.HasTypeCode = true;
+                        return (this.dataTypeCode = System.Data.DataTypeCode.Short);
+                    }
+                    this.HasTypeCode = true;
+                    return (this.dataTypeCode = System.Data.DataTypeCode.Object);
+                } else {
+                    return this.dataTypeCode;
+                }
+                //DataType
+            },
             GetDisplayValue$1: function (rowIndex, formatString) {
-                switch (this.DataType) {
+                switch (this.GetTypeCode()) {
                     default: 
-                    case System.Data.DataType.Object: 
-                        return System.String.format(formatString, [(Bridge.cast(this, System.Data.DataColumnObject).Cells.getItem(rowIndex))]);
-                    case System.Data.DataType.DateTime: 
-                        var obj = Bridge.cast(this, System.Data.DataColumnDateTime).Cells.getItem(rowIndex);
+                    case System.Data.DataTypeCode.Object: 
+                        return System.String.format(formatString, [this.Cells.getItem(rowIndex)]);
+                    case System.Data.DataTypeCode.DateTime: 
+                        var obj = this.Cells.getItem(rowIndex);
                         if (obj == null) {
                             return "";
                         }
@@ -1398,92 +1453,74 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             return "";
                         }
                         return System.String.format(formatString, [str]);
-                    case System.Data.DataType.String: 
-                        return System.String.format(formatString, [Bridge.cast(this, System.Data.DataColumnString).Cells.getItem(rowIndex)]);
-                    case System.Data.DataType.Integer: 
-                        return System.String.format(formatString, [Bridge.box(Bridge.cast(this, System.Data.DataColumnInteger).Cells.getItem(rowIndex), System.Int32, System.Nullable.toString, System.Nullable.getHashCode)]);
-                    case System.Data.DataType.Long: 
-                        return System.String.format(formatString, [Bridge.cast(this, System.Data.DataColumnLong).Cells.getItem(rowIndex)]);
-                    case System.Data.DataType.Float: 
-                        return System.String.format(formatString, [Bridge.box(Bridge.cast(this, System.Data.DataColumnFloat).Cells.getItem(rowIndex), System.Single, System.Nullable.toStringFn(System.Single.format), System.Nullable.getHashCodeFn(System.Single.getHashCode))]);
-                    case System.Data.DataType.Double: 
-                        return System.String.format(formatString, [Bridge.box(Bridge.cast(this, System.Data.DataColumnDouble).Cells.getItem(rowIndex), System.Double, System.Nullable.toStringFn(System.Double.format), System.Nullable.getHashCodeFn(System.Double.getHashCode))]);
-                    case System.Data.DataType.Decimal: 
-                        return System.String.format(formatString, [Bridge.cast(this, System.Data.DataColumnDecimal).Cells.getItem(rowIndex)]);
-                    case System.Data.DataType.Byte: 
-                        return System.String.format(formatString, [Bridge.box(Bridge.cast(this, System.Data.DataColumnByte).Cells.getItem(rowIndex), System.Byte, System.Nullable.toString, System.Nullable.getHashCode)]);
-                    case System.Data.DataType.Short: 
-                        return System.String.format(formatString, [Bridge.box(Bridge.cast(this, System.Data.DataColumnShort).Cells.getItem(rowIndex), System.Int16, System.Nullable.toString, System.Nullable.getHashCode)]);
-                    case System.Data.DataType.Bool: 
-                        return System.String.format(formatString, [Bridge.box(Bridge.cast(this, System.Data.DataColumnBool).Cells.getItem(rowIndex), System.Boolean, System.Nullable.toStringFn(System.Boolean.toString), System.Nullable.getHashCode)]);
+                    case System.Data.DataTypeCode.String: 
+                        return System.String.format(formatString, [this.Cells.getItem(rowIndex)]);
+                    case System.Data.DataTypeCode.Integer: 
+                        return System.String.format(formatString, [this.Cells.getItem(rowIndex)]);
+                    case System.Data.DataTypeCode.Long: 
+                        return System.String.format(formatString, [this.Cells.getItem(rowIndex)]);
+                    case System.Data.DataTypeCode.Float: 
+                        return System.String.format(formatString, [this.Cells.getItem(rowIndex)]);
+                    case System.Data.DataTypeCode.Double: 
+                        return System.String.format(formatString, [this.Cells.getItem(rowIndex)]);
+                    case System.Data.DataTypeCode.Decimal: 
+                        return System.String.format(formatString, [this.Cells.getItem(rowIndex)]);
+                    case System.Data.DataTypeCode.Byte: 
+                        return System.String.format(formatString, [this.Cells.getItem(rowIndex)]);
+                    case System.Data.DataTypeCode.Short: 
+                        return System.String.format(formatString, [this.Cells.getItem(rowIndex)]);
+                    case System.Data.DataTypeCode.Bool: 
+                        return System.String.format(formatString, [this.Cells.getItem(rowIndex)]);
                 }
             },
             GetDisplayValue: function (rowIndex) {
-                if (this.Self.Cells.Count <= rowIndex) {
+                if (this.Cells.Count <= rowIndex) {
                     return null;
                 }
                 if (System.Data.DataTable.DynamicGetValue) {
                     return this.Cells.getItem(rowIndex);
                 } else {
-                    switch (this.DataType) {
-                        default: 
-                        case System.Data.DataType.Object: 
-                            return System.Convert.toString(Bridge.cast(this, System.Data.DataColumnObject).Cells.getItem(rowIndex));
-                        case System.Data.DataType.DateTime: 
-                            return System.Convert.toString(Bridge.box(Bridge.cast(this, System.Data.DataColumnDateTime).Cells.getItem(rowIndex), System.DateTime, System.Nullable.toStringFn(System.DateTime.format), System.Nullable.getHashCode));
-                        case System.Data.DataType.String: 
-                            return Bridge.cast(this, System.Data.DataColumnString).Cells.getItem(rowIndex);
-                        case System.Data.DataType.Integer: 
-                            return System.Convert.toString(Bridge.box(Bridge.cast(this, System.Data.DataColumnInteger).Cells.getItem(rowIndex), System.Int32, System.Nullable.toString, System.Nullable.getHashCode));
-                        case System.Data.DataType.Long: 
-                            return System.Convert.toString(Bridge.cast(this, System.Data.DataColumnLong).Cells.getItem(rowIndex));
-                        case System.Data.DataType.Float: 
-                            return System.Convert.toString(Bridge.box(Bridge.cast(this, System.Data.DataColumnFloat).Cells.getItem(rowIndex), System.Single, System.Nullable.toStringFn(System.Single.format), System.Nullable.getHashCodeFn(System.Single.getHashCode)));
-                        case System.Data.DataType.Double: 
-                            return System.Convert.toString(Bridge.box(Bridge.cast(this, System.Data.DataColumnDouble).Cells.getItem(rowIndex), System.Double, System.Nullable.toStringFn(System.Double.format), System.Nullable.getHashCodeFn(System.Double.getHashCode)));
-                        case System.Data.DataType.Decimal: 
-                            return System.Convert.toString(Bridge.cast(this, System.Data.DataColumnDecimal).Cells.getItem(rowIndex));
-                        case System.Data.DataType.Byte: 
-                            return System.Convert.toString(Bridge.box(Bridge.cast(this, System.Data.DataColumnByte).Cells.getItem(rowIndex), System.Byte, System.Nullable.toString, System.Nullable.getHashCode));
-                        case System.Data.DataType.Bool: 
-                            return System.Convert.toString(Bridge.box(Bridge.cast(this, System.Data.DataColumnBool).Cells.getItem(rowIndex), System.Boolean, System.Nullable.toStringFn(System.Boolean.toString), System.Nullable.getHashCode));
-                        case System.Data.DataType.Short: 
-                            return System.Convert.toString(Bridge.box(Bridge.cast(this, System.Data.DataColumnShort).Cells.getItem(rowIndex), System.Int16, System.Nullable.toString, System.Nullable.getHashCode));
-                    }
+                    return System.Convert.toString(this.Cells.getItem(rowIndex));
                 }
 
 
             },
             GetCellValue: function (rowIndex) {
-                if (this.Self.Cells.Count <= rowIndex) {
+                if (this.Cells.Count <= rowIndex) {
                     return null;
                 }
+                return this.Cells.getItem(rowIndex);
+            }
+        }
+    });
 
-                switch (this.DataType) {
-                    default: 
-                    case System.Data.DataType.Object: 
-                        return Bridge.cast(this, System.Data.DataColumnObject).Cells.getItem(rowIndex);
-                    case System.Data.DataType.DateTime: 
-                        return Bridge.box(Bridge.cast(this, System.Data.DataColumnDateTime).Cells.getItem(rowIndex), System.DateTime, System.Nullable.toStringFn(System.DateTime.format), System.Nullable.getHashCode);
-                    case System.Data.DataType.String: 
-                        return Bridge.cast(this, System.Data.DataColumnString).Cells.getItem(rowIndex);
-                    case System.Data.DataType.Integer: 
-                        return Bridge.box((Bridge.cast(this, System.Data.DataColumnInteger).Cells.getItem(rowIndex)), System.Int32, System.Nullable.toString, System.Nullable.getHashCode);
-                    case System.Data.DataType.Long: 
-                        return (Bridge.cast(this, System.Data.DataColumnLong).Cells.getItem(rowIndex));
-                    case System.Data.DataType.Float: 
-                        return Bridge.box((Bridge.cast(this, System.Data.DataColumnFloat).Cells.getItem(rowIndex)), System.Single, System.Nullable.toStringFn(System.Single.format), System.Nullable.getHashCodeFn(System.Single.getHashCode));
-                    case System.Data.DataType.Double: 
-                        return Bridge.box((Bridge.cast(this, System.Data.DataColumnDouble).Cells.getItem(rowIndex)), System.Double, System.Nullable.toStringFn(System.Double.format), System.Nullable.getHashCodeFn(System.Double.getHashCode));
-                    case System.Data.DataType.Decimal: 
-                        return (Bridge.cast(this, System.Data.DataColumnDecimal).Cells.getItem(rowIndex));
-                    case System.Data.DataType.Byte: 
-                        return Bridge.box((Bridge.cast(this, System.Data.DataColumnByte).Cells.getItem(rowIndex)), System.Byte, System.Nullable.toString, System.Nullable.getHashCode);
-                    case System.Data.DataType.Bool: 
-                        return Bridge.box((Bridge.cast(this, System.Data.DataColumnBool).Cells.getItem(rowIndex)), System.Boolean, System.Nullable.toStringFn(System.Boolean.toString), System.Nullable.getHashCode);
-                    case System.Data.DataType.Short: 
-                        return Bridge.box((Bridge.cast(this, System.Data.DataColumnShort).Cells.getItem(rowIndex)), System.Int16, System.Nullable.toString, System.Nullable.getHashCode);
+    Bridge.define("System.Data.DataColumnCollection", {
+        fields: {
+            columns: null,
+            owner: null
+        },
+        props: {
+            Count: {
+                get: function () {
+                    return this.columns.Count;
                 }
+            }
+        },
+        ctors: {
+            ctor: function (_owner) {
+                this.$initialize();
+                this.owner = _owner;
+                this.columns = new (System.Collections.Generic.List$1(System.Data.DataColumn)).ctor();
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                return this.columns.getItem(index);
+            },
+            Add: function (name, type) {
+                var $t;
+                this.columns.add(($t = new System.Data.DataColumn(), $t.DataType = type, $t.FieldName = name, $t));
+                this.owner.RequireOnDataChangeEvent();
             }
         }
     });
@@ -1514,7 +1551,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.ParentTable = parentTable;
                 this.RowIndex = rowIndex;
                 if (rowIndex === -1) {
-                    this.batchData = System.Array.init(parentTable.ColumnCount, null, System.Object);
+                    this.batchData = System.Array.init(parentTable.Columns.Count, null, System.Object);
                 }
             }
         },
@@ -1526,16 +1563,16 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.SetValue(columnIndex, value);
             },
             GetOfflineDataRow: function () {
-                var dr = new System.Data.DataRow.$ctor2(this.ParentTable.ColumnCount);
-                var data = System.Array.init(this.ParentTable.ColumnCount, null, System.Object);
-                for (var i = 0; i < this.ParentTable.ColumnCount; i = (i + 1) | 0) {
+                var dr = new System.Data.DataRow.$ctor2(this.ParentTable.Columns.Count);
+                var data = System.Array.init(this.ParentTable.Columns.Count, null, System.Object);
+                for (var i = 0; i < this.ParentTable.Columns.Count; i = (i + 1) | 0) {
                     data[System.Array.index(i, data)] = this.getItem(i);
                 }
                 dr.batchData = data;
                 return dr;
             },
             SetValue$1: function (fieldName, value) {
-                for (var i = 0; i < this.ParentTable.ColumnCount; i = (i + 1) | 0) {
+                for (var i = 0; i < this.ParentTable.Columns.Count; i = (i + 1) | 0) {
                     if (Bridge.referenceEquals(this.ParentTable.Columns.getItem(i).FieldName, fieldName)) {
                         if (this.RowIndex === -1) {
                             if (!Bridge.referenceEquals(this.batchData[System.Array.index(i, this.batchData)], value)) {
@@ -1570,7 +1607,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 }
             },
             GetValue$1: function (fieldName) {
-                for (var i = 0; i < this.ParentTable.ColumnCount; i = (i + 1) | 0) {
+                for (var i = 0; i < this.ParentTable.Columns.Count; i = (i + 1) | 0) {
                     if (Bridge.referenceEquals(this.ParentTable.Columns.getItem(i).FieldName, fieldName)) {
                         if (this.RowIndex === -1) {
                             return this.batchData[System.Array.index(i, this.batchData)];
@@ -1591,6 +1628,44 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
+    Bridge.define("System.Data.DataRowCollection", {
+        fields: {
+            rows: null,
+            owner: null
+        },
+        props: {
+            Count: {
+                get: function () {
+                    return this.rows.Count;
+                }
+            }
+        },
+        ctors: {
+            ctor: function (_owner) {
+                this.$initialize();
+                this.owner = _owner;
+                this.rows = new (System.Collections.Generic.List$1(System.Data.DataRow)).ctor();
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                return this.rows.getItem(index);
+            },
+            Add: function (dr) {
+                this.rows.add(dr);
+                this.owner.RequireOnDataChangeEvent();
+            },
+            AddRange: function (dataRows) {
+                this.rows.AddRange(dataRows);
+                this.owner.RequireOnDataChangeEvent();
+            },
+            Clear: function () {
+                this.rows.clear();
+                this.owner.RequireOnDataChangeEvent();
+            }
+        }
+    });
+
     Bridge.define("System.Data.DataTable", {
         statics: {
             fields: {
@@ -1605,11 +1680,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         fields: {
             Columns: null,
             _searchResults: null,
+            Rows: null,
             _searchActive: false,
             _searchString: null,
             _inDataChange: false,
             _requestedOnDataChange: false,
-            _ColCount: 0,
             _RowCount: 0,
             NewRows: null
         },
@@ -1620,11 +1695,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             SearchString: {
                 get: function () {
                     return this._searchString;
-                }
-            },
-            ColumnCount: {
-                get: function () {
-                    return this._ColCount;
                 }
             },
             RowCount: {
@@ -1638,12 +1708,16 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         },
         ctors: {
             init: function () {
-                this.Columns = new (System.Collections.Generic.List$1(System.Data.DataColumn)).ctor();
                 this._searchResults = new (System.Collections.Generic.List$1(System.Int32)).ctor();
                 this._searchActive = false;
                 this._inDataChange = false;
                 this._requestedOnDataChange = false;
                 this.NewRows = new (System.Collections.Generic.List$1(System.Data.DataRow)).ctor();
+            },
+            ctor: function () {
+                this.$initialize();
+                this.Columns = new System.Data.DataColumnCollection(this);
+                this.Rows = new System.Data.DataRowCollection(this);
             }
         },
         methods: {
@@ -1722,86 +1796,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this.ClearCells(this.Columns.getItem(i));
                 }
             },
-            ClearCells$1: function (T, _column) {
-                var _col = _column;
-                _col.Cells = new (System.Collections.Generic.List$1(T)).ctor();
-            },
             ClearCells: function (_column) {
-                switch (_column.DataType) {
-                    default: 
-                    case System.Data.DataType.Object: 
-                        this.ClearCells$1(System.Object, _column);
-                        break;
-                    case System.Data.DataType.DateTime: 
-                        this.ClearCells$1(System.Nullable$1(System.DateTime), _column);
-                        break;
-                    case System.Data.DataType.String: 
-                        this.ClearCells$1(System.String, _column);
-                        break;
-                    case System.Data.DataType.Integer: 
-                        this.ClearCells$1(System.Nullable$1(System.Int32), _column);
-                        break;
-                    case System.Data.DataType.Long: 
-                        this.ClearCells$1(System.Nullable$1(System.Int64), _column);
-                        break;
-                    case System.Data.DataType.Float: 
-                        this.ClearCells$1(System.Nullable$1(System.Single), _column);
-                        break;
-                    case System.Data.DataType.Double: 
-                        this.ClearCells$1(System.Nullable$1(System.Double), _column);
-                        break;
-                    case System.Data.DataType.Decimal: 
-                        this.ClearCells$1(System.Nullable$1(System.Decimal), _column);
-                        break;
-                    case System.Data.DataType.Bool: 
-                        this.ClearCells$1(System.Nullable$1(System.Boolean), _column);
-                        break;
-                    case System.Data.DataType.Byte: 
-                        this.ClearCells$1(System.Nullable$1(System.Byte), _column);
-                        break;
-                    case System.Data.DataType.Short: 
-                        this.ClearCells$1(System.Nullable$1(System.Int16), _column);
-                        break;
-                }
-                this.RequireOnDataChangeEvent();
-            },
-            GetColumnByDataType: function (type) {
-                if (type === void 0) { type = 0; }
-                switch (type) {
-                    default: 
-                    case System.Data.DataType.Object: 
-                        return new System.Data.DataColumnObject();
-                    case System.Data.DataType.DateTime: 
-                        return new System.Data.DataColumnDateTime();
-                    case System.Data.DataType.String: 
-                        return new System.Data.DataColumnString();
-                    case System.Data.DataType.Integer: 
-                        return new System.Data.DataColumnInteger();
-                    case System.Data.DataType.Long: 
-                        return new System.Data.DataColumnLong();
-                    case System.Data.DataType.Float: 
-                        return new System.Data.DataColumnFloat();
-                    case System.Data.DataType.Double: 
-                        return new System.Data.DataColumnDouble();
-                    case System.Data.DataType.Decimal: 
-                        return new System.Data.DataColumnDecimal();
-                    case System.Data.DataType.Bool: 
-                        return new System.Data.DataColumnBool();
-                    case System.Data.DataType.Byte: 
-                        return new System.Data.DataColumnByte();
-                    case System.Data.DataType.Short: 
-                        return new System.Data.DataColumnShort();
-                }
-            },
-            AddColumn: function (fieldName, type) {
-                if (type === void 0) { type = 0; }
-                var col = this.GetColumnByDataType(type);
-                col.FieldName = fieldName;
-
-                this.Columns.add(col);
-                this._ColCount = this.Columns.Count;
-
-                this.RequireOnDataChangeEvent();
+                _column.Cells.clear();
+                this.Rows.Clear();
             },
             BeginNewRow: function (EstimatedNewRows) {
                 this.NewRows = new (System.Collections.Generic.List$1(System.Data.DataRow)).$ctor2(EstimatedNewRows);
@@ -1811,8 +1808,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 var dr = new System.Data.DataRow.$ctor1(this, Bridge.identity(this._RowCount, (this._RowCount = (this._RowCount + 1) | 0)));
                 var colLength = this.Columns.Count;
                 for (var x = 0; x < colLength; x = (x + 1) | 0) {
-                    var col = this.Columns.getItem(x);
-                    col.Cells.add(null);
+                    this.Columns.getItem(x).Cells.add(null);
                 }
 
                 this.RequireOnDataChangeEvent();
@@ -1821,14 +1817,13 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             AddRow$1: function (row) {
                 if (row === void 0) { row = []; }
-                if (row.length === this.ColumnCount) {
-                    this._RowCount = (this._RowCount + 1) | 0;
+                if (row.length === this.Columns.Count) {
+                    var dr = new System.Data.DataRow.$ctor1(this, Bridge.identity(this._RowCount, (this._RowCount = (this._RowCount + 1) | 0)));
                     var colLength = this.Columns.Count;
                     for (var x = 0; x < colLength; x = (x + 1) | 0) {
-                        var col = this.Columns.getItem(x);
-                        col.Cells.add(Bridge.unbox(row[System.Array.index(x, row)]));
+                        this.Columns.getItem(x).Cells.add(row[System.Array.index(x, row)]);
                     }
-                    this.RequireOnDataChangeEvent();
+                    this.Rows.Add(dr);
                 }
             },
             NewRow: function () {
@@ -1838,7 +1833,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                 return dr;
             },
-            AcceptNewRows: function () {
+            AcceptChanges: function () {
                 var $t, $t1, $t2;
                 if (this.NewRows == null || this.NewRows.Count === 0) {
                     return;
@@ -1868,6 +1863,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                     col.Cells.AddRange(Bridge.unbox(DataCells));
                 }
+
+                this.Rows.AddRange(this.NewRows.ToArray());
+
                 this.NewRows.clear();
 
                 this.EndDataUpdate();
@@ -1892,7 +1890,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         }
     });
 
-    Bridge.define("System.Data.DataType", {
+    Bridge.define("System.Data.DataTypeCode", {
         $kind: "enum",
         statics: {
             fields: {
@@ -4708,17 +4706,69 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                     ;
                 },
+                Element$1: function (T, element, classname) {
+                    if (classname === void 0) { classname = ""; }
+                    element.className = classname;
+
+                    element.style.position = "absolute";
+                    element.style.boxSizing = "borderbox";
+                    element.style.boxSizing = "border-box";
+
+                    return element;
+                },
+                Element: function (T, element, Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
+                    if (IsBold === void 0) { IsBold = false; }
+                    if (IsTiny === void 0) { IsTiny = false; }
+                    if (classr === void 0) { classr = ""; }
+                    if (Alignment === void 0) { Alignment = "left"; }
+                    if (Forecolor === void 0) { Forecolor = null; }
+                    if (ac === void 0) { ac = true; }
+                    element.className = classr;
+
+                    element.style.position = "absolute";
+                    element.style.boxSizing = "borderbox";
+                    element.style.boxSizing = "border-box";
+
+                    element.textContent = Caption;
+                    element.style.left = System.Helper.ToPx(Bridge.box(X, System.Single, System.Single.format, System.Single.getHashCode));
+                    element.style.top = System.Helper.ToPx(Bridge.box(Y, System.Single, System.Single.format, System.Single.getHashCode));
+                    element.style.width = System.Helper.ToPx(Bridge.box(width, System.Single, System.Single.format, System.Single.getHashCode));
+
+                    if (!Bridge.referenceEquals(Alignment, "left")) {
+                        if (Bridge.referenceEquals(Alignment, "right")) {
+                            element.style.direction = "rtl";
+                        } else {
+                            element.style.textAlign = Alignment;
+                        }
+                    }
+                    //SetBT(lbl, IsBold, IsTiny);
+                    if (Forecolor != null) {
+                        element.style.color = Forecolor;
+                    }
+
+                    return element;
+                },
                 Div: function (classname) {
                     if (classname === void 0) { classname = ""; }
-                    var dv = document.createElement("div");
-                    dv.className = classname;
-
-                    dv.style.position = "absolute";
-                    dv.style.boxSizing = "borderbox";
-                    dv.style.boxSizing = "border-box";
-
-                    return dv;
-
+                    return System.Helper.Element$1(Bridge.global.HTMLDivElement, document.createElement("div"), classname);
+                },
+                Cell: function (Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
+                    if (IsBold === void 0) { IsBold = false; }
+                    if (IsTiny === void 0) { IsTiny = false; }
+                    if (classr === void 0) { classr = ""; }
+                    if (Alignment === void 0) { Alignment = "left"; }
+                    if (Forecolor === void 0) { Forecolor = null; }
+                    if (ac === void 0) { ac = true; }
+                    return System.Helper.Element(Bridge.global.HTMLTableCellElement, new HTMLTableCellElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
+                },
+                HeaderCell: function (Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
+                    if (IsBold === void 0) { IsBold = false; }
+                    if (IsTiny === void 0) { IsTiny = false; }
+                    if (classr === void 0) { classr = ""; }
+                    if (Alignment === void 0) { Alignment = "left"; }
+                    if (Forecolor === void 0) { Forecolor = null; }
+                    if (ac === void 0) { ac = true; }
+                    return System.Helper.Element(Bridge.global.HTMLTableHeaderCellElement, document.createElement("th"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
                 },
                 Label: function (Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
                     if (IsBold === void 0) { IsBold = false; }
@@ -4727,31 +4777,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Alignment === void 0) { Alignment = "left"; }
                     if (Forecolor === void 0) { Forecolor = null; }
                     if (ac === void 0) { ac = true; }
-                    var lbl = document.createElement("span");
-                    lbl.className = classr;
-
-                    lbl.style.position = "absolute";
-                    lbl.style.boxSizing = "borderbox";
-                    lbl.style.boxSizing = "border-box";
-
-                    lbl.textContent = Caption;
-                    lbl.style.left = System.Helper.ToPx(Bridge.box(X, System.Single, System.Single.format, System.Single.getHashCode));
-                    lbl.style.top = System.Helper.ToPx(Bridge.box(Y, System.Single, System.Single.format, System.Single.getHashCode));
-                    lbl.style.width = System.Helper.ToPx(Bridge.box(width, System.Single, System.Single.format, System.Single.getHashCode));
-
-                    if (!Bridge.referenceEquals(Alignment, "left")) {
-                        if (Bridge.referenceEquals(Alignment, "right")) {
-                            lbl.style.direction = "rtl";
-                        } else {
-                            lbl.style.textAlign = Alignment;
-                        }
-                    }
-                    //SetBT(lbl, IsBold, IsTiny);
-                    if (Forecolor != null) {
-                        lbl.style.color = Forecolor;
-                    }
-
-                    return lbl;
+                    return System.Helper.Element(Bridge.global.HTMLSpanElement, document.createElement("span"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
                 },
                 AppendChild: function (c, Node) {
                     c.Element.appendChild(Node.Element);
@@ -5076,6 +5102,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 IsIE: false,
                 MaximumPixelScrollingRows: 0,
                 GridViewRowScrollPadding: 0,
+                GridViewAutoColumnGenerateFormatAsDate: false,
+                GridViewAutoColumnFormatDates: false,
                 /**
                  * enabled override the default font name.
                  *
@@ -5145,6 +5173,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 init: function () {
                     this.MaximumPixelScrollingRows = 500000;
                     this.GridViewRowScrollPadding = 0;
+                    this.GridViewAutoColumnGenerateFormatAsDate = false;
+                    this.GridViewAutoColumnFormatDates = true;
                     this.WinFormIgnoreFontName = false;
                     this.DefaultFont = "8.25pt \"Tahoma\"";
                     this.WinFormIgnoreFontSize = false;
@@ -5447,9 +5477,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
     Bridge.define("System.Windows.Forms.DataGridViewColumn", {
         fields: {
+            Name: null,
             Column: null,
             View: null,
-            Caption: null,
+            HeaderText: null,
             Visible: false,
             CachedX: 0,
             FormatString: null,
@@ -5510,6 +5541,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         },
         ctors: {
             init: function () {
+                this.Visible = true;
                 this.FormatString = "";
                 this.HeadingApparence = new System.Windows.Forms.GridViewCellApparence.ctor();
                 this.BodyApparence = new System.Windows.Forms.GridViewCellApparence.ctor();
@@ -5531,27 +5563,33 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return true;
                 }
 
+                if (this.Column == null) {
+                    return false;
+                }
+
                 var abc = this.GetDisplayValueByDataRowHandle(index);
 
-                switch (this.Column.DataType) {
+
+
+                switch (this.Column.GetTypeCode()) {
                     default: 
-                    case System.Data.DataType.Object: 
-                    case System.Data.DataType.Integer: 
-                    case System.Data.DataType.Long: 
-                    case System.Data.DataType.Float: 
-                    case System.Data.DataType.Double: 
-                    case System.Data.DataType.Decimal: 
-                    case System.Data.DataType.Bool: 
-                    case System.Data.DataType.Byte: 
-                    case System.Data.DataType.Short: 
+                    case System.Data.DataTypeCode.Object: 
+                    case System.Data.DataTypeCode.Integer: 
+                    case System.Data.DataTypeCode.Long: 
+                    case System.Data.DataTypeCode.Float: 
+                    case System.Data.DataTypeCode.Double: 
+                    case System.Data.DataTypeCode.Decimal: 
+                    case System.Data.DataTypeCode.Bool: 
+                    case System.Data.DataTypeCode.Byte: 
+                    case System.Data.DataTypeCode.Short: 
                         return Bridge.referenceEquals(abc, this.filterValue);
-                    case System.Data.DataType.DateTime: 
-                    case System.Data.DataType.String: 
-                        return System.String.startsWith((System.String.concat(abc, "")), System.String.concat(this.filterValue, ""));
+                    case System.Data.DataTypeCode.DateTime: 
+                    case System.Data.DataTypeCode.String: 
+                        return System.String.startsWith((System.String.concat(abc, "")).toLowerCase(), (System.String.concat(this.filterValue, "")).toLowerCase());
                 }
             },
             GetDataColumnIndex: function () {
-                var length = this.View.DataSource.ColumnCount;
+                var length = this.View.DataSource.Columns.Count;
                 for (var i = 0; i < length; i = (i + 1) | 0) {
                     if (Bridge.referenceEquals(this.View.DataSource.Columns.getItem(i), this.Column)) {
                         return i;
@@ -5601,6 +5639,75 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 } else {
                     return this.Column.GetDisplayValue$1(RowHandle, this.FormatString);
                 }
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.DataGridViewColumnCollection", {
+        fields: {
+            dataGridViewColumns: null,
+            owner: null
+        },
+        props: {
+            Count: {
+                get: function () {
+                    return this.dataGridViewColumns.Count;
+                }
+            }
+        },
+        ctors: {
+            ctor: function (dataGridView) {
+                this.$initialize();
+                this.owner = dataGridView;
+                this.dataGridViewColumns = new (System.Collections.Generic.List$1(System.Windows.Forms.DataGridViewColumn)).ctor();
+            }
+        },
+        methods: {
+            getItem: function (index) {
+                return this.dataGridViewColumns.getItem(index);
+            },
+            IndexOf: function (dataGridViewColumn) {
+                return this.dataGridViewColumns.indexOf(dataGridViewColumn);
+            },
+            Insert: function (index, dataGridViewColumn) {
+                if (dataGridViewColumn == null) {
+                    return;
+                }
+
+                this.dataGridViewColumns.insert(index, dataGridViewColumn);
+            },
+            Remove: function (dataGridViewColumn) {
+                if (dataGridViewColumn == null) {
+                    return;
+                }
+                this.dataGridViewColumns.remove(dataGridViewColumn);
+            },
+            Add: function (dataGridViewColumn) {
+                if (dataGridViewColumn == null) {
+                    return;
+                }
+
+                dataGridViewColumn.View = this.owner;
+                this.dataGridViewColumns.add(dataGridViewColumn);
+            },
+            AddRange: function (gridViewColumns) {
+                var $t;
+                if (gridViewColumns === void 0) { gridViewColumns = []; }
+                if (gridViewColumns == null || gridViewColumns.length === 0) {
+                    return;
+                }
+
+                $t = Bridge.getEnumerator(gridViewColumns);
+                try {
+                    while ($t.moveNext()) {
+                        var item = $t.Current;
+                        item.View = this.owner;
+                    }
+                } finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$Dispose();
+                    }
+                }this.dataGridViewColumns.AddRange(gridViewColumns);
             }
         }
     });
@@ -10525,193 +10632,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         $kind: "interface"
     });
 
-    Bridge.define("System.Data.DataColumnBool", {
-        inherits: [System.Data.DataColumn],
-        fields: {
-            Cells: null
-        },
-        ctors: {
-            init: function () {
-                this.Cells = new (System.Collections.Generic.List$1(System.Nullable$1(System.Boolean))).ctor();
-            },
-            ctor: function () {
-                this.$initialize();
-                System.Data.DataColumn.ctor.call(this);
-                this.DataType = System.Data.DataType.Bool;
-            }
-        }
-    });
-
-    Bridge.define("System.Data.DataColumnByte", {
-        inherits: [System.Data.DataColumn],
-        fields: {
-            Cells: null
-        },
-        ctors: {
-            init: function () {
-                this.Cells = new (System.Collections.Generic.List$1(System.Nullable$1(System.Byte))).ctor();
-            },
-            ctor: function () {
-                this.$initialize();
-                System.Data.DataColumn.ctor.call(this);
-                this.DataType = System.Data.DataType.Byte;
-            }
-        }
-    });
-
-    Bridge.define("System.Data.DataColumnDateTime", {
-        inherits: [System.Data.DataColumn],
-        fields: {
-            Cells: null
-        },
-        ctors: {
-            init: function () {
-                this.Cells = new (System.Collections.Generic.List$1(System.Nullable$1(System.DateTime))).ctor();
-            },
-            ctor: function () {
-                this.$initialize();
-                System.Data.DataColumn.ctor.call(this);
-                this.DataType = System.Data.DataType.DateTime;
-            }
-        }
-    });
-
-    Bridge.define("System.Data.DataColumnDecimal", {
-        inherits: [System.Data.DataColumn],
-        fields: {
-            Cells: null
-        },
-        ctors: {
-            init: function () {
-                this.Cells = new (System.Collections.Generic.List$1(System.Nullable$1(System.Decimal))).ctor();
-            },
-            ctor: function () {
-                this.$initialize();
-                System.Data.DataColumn.ctor.call(this);
-                this.DataType = System.Data.DataType.Decimal;
-            }
-        }
-    });
-
-    Bridge.define("System.Data.DataColumnDouble", {
-        inherits: [System.Data.DataColumn],
-        fields: {
-            Cells: null
-        },
-        ctors: {
-            init: function () {
-                this.Cells = new (System.Collections.Generic.List$1(System.Nullable$1(System.Double))).ctor();
-            },
-            ctor: function () {
-                this.$initialize();
-                System.Data.DataColumn.ctor.call(this);
-                this.DataType = System.Data.DataType.Double;
-            }
-        }
-    });
-
-    Bridge.define("System.Data.DataColumnFloat", {
-        inherits: [System.Data.DataColumn],
-        fields: {
-            Cells: null
-        },
-        ctors: {
-            init: function () {
-                this.Cells = new (System.Collections.Generic.List$1(System.Nullable$1(System.Single))).ctor();
-            },
-            ctor: function () {
-                this.$initialize();
-                System.Data.DataColumn.ctor.call(this);
-                this.DataType = System.Data.DataType.Float;
-            }
-        }
-    });
-
-    Bridge.define("System.Data.DataColumnInteger", {
-        inherits: [System.Data.DataColumn],
-        fields: {
-            Cells: null
-        },
-        ctors: {
-            init: function () {
-                this.Cells = new (System.Collections.Generic.List$1(System.Nullable$1(System.Int32))).ctor();
-            },
-            ctor: function () {
-                this.$initialize();
-                System.Data.DataColumn.ctor.call(this);
-                this.DataType = System.Data.DataType.Integer;
-            }
-        }
-    });
-
-    Bridge.define("System.Data.DataColumnLong", {
-        inherits: [System.Data.DataColumn],
-        fields: {
-            Cells: null
-        },
-        ctors: {
-            init: function () {
-                this.Cells = new (System.Collections.Generic.List$1(System.Nullable$1(System.Int64))).ctor();
-            },
-            ctor: function () {
-                this.$initialize();
-                System.Data.DataColumn.ctor.call(this);
-                this.DataType = System.Data.DataType.Long;
-            }
-        }
-    });
-
-    Bridge.define("System.Data.DataColumnObject", {
-        inherits: [System.Data.DataColumn],
-        fields: {
-            Cells: null
-        },
-        ctors: {
-            init: function () {
-                this.Cells = new (System.Collections.Generic.List$1(System.Object)).ctor();
-            },
-            ctor: function () {
-                this.$initialize();
-                System.Data.DataColumn.ctor.call(this);
-                this.DataType = System.Data.DataType.Object;
-            }
-        }
-    });
-
-    Bridge.define("System.Data.DataColumnShort", {
-        inherits: [System.Data.DataColumn],
-        fields: {
-            Cells: null
-        },
-        ctors: {
-            init: function () {
-                this.Cells = new (System.Collections.Generic.List$1(System.Nullable$1(System.Int16))).ctor();
-            },
-            ctor: function () {
-                this.$initialize();
-                System.Data.DataColumn.ctor.call(this);
-                this.DataType = System.Data.DataType.Short;
-            }
-        }
-    });
-
-    Bridge.define("System.Data.DataColumnString", {
-        inherits: [System.Data.DataColumn],
-        fields: {
-            Cells: null
-        },
-        ctors: {
-            init: function () {
-                this.Cells = new (System.Collections.Generic.List$1(System.String)).ctor();
-            },
-            ctor: function () {
-                this.$initialize();
-                System.Data.DataColumn.ctor.call(this);
-                this.DataType = System.Data.DataType.String;
-            }
-        }
-    });
-
     Bridge.define("System.OrdinalComparer", {
         inherits: [System.StringComparer,System.IWellKnownStringEqualityComparer],
         fields: {
@@ -10877,6 +10797,54 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
     Bridge.define("System.Windows.Forms.Layout.IArrangedElement", {
         inherits: [System.ComponentModel.IComponent,System.IDisposable],
         $kind: "interface"
+    });
+
+    Bridge.define("System.Windows.Forms.DataGridViewTextBoxColumn", {
+        inherits: [System.Windows.Forms.DataGridViewColumn],
+        ctors: {
+            ctor: function (width) {
+                if (width === void 0) { width = 100; }
+
+                this.$initialize();
+                System.Windows.Forms.DataGridViewColumn.ctor.call(this, null, width);
+
+            },
+            $ctor1: function (view, width) {
+                if (width === void 0) { width = 100; }
+
+                this.$initialize();
+                System.Windows.Forms.DataGridViewColumn.ctor.call(this, view, width);
+
+            }
+        }
+    });
+
+    Bridge.define("System.Windows.Forms.GridViewCellDisplayCheckBox", {
+        inherits: [System.Windows.Forms.GridViewCellDisplay],
+        statics: {
+            fields: {
+                resource_checked: null
+            },
+            ctors: {
+                init: function () {
+                    this.resource_checked = "checked";
+                }
+            }
+        },
+        methods: {
+            OnCreate: function (gridView, dataRowIndex, columnIndex) {
+                var value = gridView.GetRowCellValue$1(dataRowIndex, columnIndex);
+
+                var cell = System.Helper.Element$1(Bridge.global.HTMLTableCellElement, new HTMLTableCellElement());
+                var input = new System.Windows.Forms.CheckBox();
+                System.Helper.SetBoundsFull$1(input);
+                input.Checked = Bridge.unbox(value);
+                input.Element.style.margin = "0";
+                cell.appendChild(input);
+
+                return cell;
+            }
+        }
     });
 
     Bridge.define("System.Windows.Forms.Layout.DefaultLayout", {
@@ -12959,6 +12927,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             BottonOfTable: null,
             RightOfTable: null,
             RightOfTableHeader: null,
+            ColumnHeadersHeightSizeMode: 0,
             _highlighSearchResults: false,
             _dataSource: null,
             OnFocusedRowChanged: null,
@@ -13003,8 +12972,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             Columns: null,
             PrevRenderGridScrollId: 0,
             clickTimeDiff: null,
-            headingClass: null,
-            cellClass: null,
             CacheRow: null,
             CountOfDeletion: 0,
             _searchTimer: 0,
@@ -13180,38 +13147,37 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         this._dataSource.addOnDataSourceChanged(Bridge.fn.cacheBind(this, this.DataSource_OnDataSourceChanged));
 
                         if (this.Columns.Count === 0 && this.AutoGenerateColumnsFromSource) {
-                            for (var i = 0; i < this._dataSource.ColumnCount; i = (i + 1) | 0) {
+                            for (var i = 0; i < this._dataSource.Columns.Count; i = (i + 1) | 0) {
                                 var gvc = new System.Windows.Forms.DataGridViewColumn(this);
-                                gvc.Caption = this._dataSource.Columns.getItem(i).FieldName;
+                                gvc.HeaderText = this._dataSource.Columns.getItem(i).FieldName;
                                 gvc.Column = this._dataSource.Columns.getItem(i);
                                 gvc.Visible = true;
 
-                                switch (this._dataSource.Columns.getItem(i).DataType) {
-                                    case System.Data.DataType.Byte: 
-                                    case System.Data.DataType.Short: 
-                                    case System.Data.DataType.Integer: 
-                                    case System.Data.DataType.Long: 
-                                    case System.Data.DataType.Float: 
-                                    case System.Data.DataType.Double: 
-                                    case System.Data.DataType.Decimal: 
-                                        //gvc.BodyApparence.Alignment = "right";
+                                switch (this._dataSource.Columns.getItem(i).GetTypeCode()) {
+                                    case System.Data.DataTypeCode.Byte: 
+                                    case System.Data.DataTypeCode.Short: 
+                                    case System.Data.DataTypeCode.Integer: 
+                                    case System.Data.DataTypeCode.Long: 
+                                    case System.Data.DataTypeCode.Float: 
+                                    case System.Data.DataTypeCode.Double: 
+                                    case System.Data.DataTypeCode.Decimal: 
+                                        gvc.BodyApparence.Alignment = "right";
                                         break;
-                                    case System.Data.DataType.DateTime: 
-                                        //if (Settings.GridViewAutoColumnFormatDates)
-                                        //{
-                                        //    if (Settings.GridViewAutoColumnGenerateFormatAsDate)
-                                        //        gvc.FormatString = "{0:d}";
-                                        //    else
-                                        //        gvc.FormatString = "{0:yyyy-MM-dd}";
-                                        //}
-                                        gvc.FormatString = "{0:yyyy-MM-dd}";
+                                    case System.Data.DataTypeCode.DateTime: 
+                                        if (System.Settings.GridViewAutoColumnFormatDates) {
+                                            if (System.Settings.GridViewAutoColumnGenerateFormatAsDate) {
+                                                gvc.FormatString = "{0:d}";
+                                            } else {
+                                                gvc.FormatString = "{0:yyyy-MM-dd}";
+                                            }
+                                        }
                                         break;
-                                    case System.Data.DataType.Bool: 
-                                        //   gvc.CellDisplay = new GridViewCellDisplayCheckBox();
+                                    case System.Data.DataTypeCode.Bool: 
+                                        gvc.CellDisplay = new System.Windows.Forms.GridViewCellDisplayCheckBox();
                                         break;
                                 }
 
-                                this.Columns.add(gvc);
+                                this.Columns.Add(gvc);
                             }
                         } else if (this.Columns.Count > 0) {
                             for (var i1 = 0; i1 < this.Columns.Count; i1 = (i1 + 1) | 0) {
@@ -13219,7 +13185,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                                 var field = this.Columns.getItem(i1).DataPropertyName;
 
                                 if (!System.String.isNullOrWhiteSpace(field)) {
-                                    for (var d = 0; d < this._dataSource.ColumnCount; d = (d + 1) | 0) {
+                                    for (var d = 0; d < this._dataSource.Columns.Count; d = (d + 1) | 0) {
                                         var col = this._dataSource.Columns.getItem(i1);
 
                                         if (Bridge.referenceEquals(col.FieldName, field)) {
@@ -13244,6 +13210,16 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         this._useDrawNotDom = value;
                         this.RenderGrid();
                     }
+                }
+            },
+            Tag: {
+                get: function () {
+                    return Bridge.ensureBaseProperty(this, "Tag").$System$Windows$Forms$Control$Tag;
+                },
+                set: function (value) {
+                    Bridge.ensureBaseProperty(this, "Tag").$System$Windows$Forms$Control$Tag = value;
+                    this.GridBodyContainer.className = System.String.concat(value, "");
+                    this.GridHeaderContainer.className = System.String.concat(value, "");
                 }
             }
         },
@@ -13273,7 +13249,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this._focusedDataHandle = -1;
                 this._columnHeadersVisible = true;
                 this._useEditForm = true;
-                this.Columns = new (System.Collections.Generic.List$1(System.Windows.Forms.DataGridViewColumn)).ctor();
                 this.PrevRenderGridScrollId = -1;
                 this.CacheRow = new (System.Collections.Generic.Dictionary$2(System.Int32,HTMLElement))();
                 this.CountOfDeletion = 0;
@@ -13308,10 +13283,13 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 //{
 
                 //}
+                if (System.Settings.IsUsingBootStrap()) {
+                    this.UnitHeight = 48;
+                } else {
+                    this.UnitHeight = 20;
+                }
 
-                this.UnitHeight = 20;
-                this.headingClass = "heading";
-                this.cellClass = "cell";
+                this.Columns = new System.Windows.Forms.DataGridViewColumnCollection(this);
 
                 this.Element.style.overflow = "hidden";
                 // #FIND #RENDER#
@@ -13397,7 +13375,19 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             var colIndex = x1;
                             var apparence = gcol.HeadingApparence;
 
-                            var col = System.Helper.Label(gcol.Caption, (this._columnAutoWidth ? gcol.CachedX : gcol.CachedX), 0, (this._columnAutoWidth ? _columnAutoWidthSingle : gcol.Width) - (x1 === uboundRowCount ? 0 : 1), apparence.IsBold, false, this.headingClass, apparence.Alignment, apparence.Forecolor);
+                            var col = System.Helper.HeaderCell(gcol.HeaderText, (this._columnAutoWidth ? gcol.CachedX : gcol.CachedX), 0, (this._columnAutoWidth ? _columnAutoWidthSingle : gcol.Width) - (x1 === uboundRowCount ? 0 : 1), apparence.IsBold, false, "", apparence.Alignment, apparence.Forecolor);
+
+                            //                    border-left: 0;
+                            //border-bottom: 0;
+
+                            if (x1 > 0) {
+                                col.style.borderLeft = "0";
+                            }
+                            col.style.borderBottom = "0";
+
+                            // col.style.lineHeight = UnitHeight.ToPx();
+                            col.style.height = System.Helper.ToPx(Bridge.box(this.UnitHeight, System.Single, System.Single.format, System.Single.getHashCode));
+
                             if (!System.String.isNullOrWhiteSpace(apparence.Backcolor)) {
                                 col.style.backgroundColor = apparence.Backcolor;
                             }
@@ -13418,8 +13408,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
 
 
-                    if (this._dataSource == null || this._dataSource.RowCount === 0 || this._dataSource.ColumnCount === 0) {
+                    if (this._dataSource == null || this._dataSource.RowCount === 0 || this._dataSource.Columns.Count === 0) {
                         this.ClearGrid();
+
                         this.GridHeader.appendChild(colFragment);
                         return;
                     }
@@ -13526,13 +13517,13 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     for (var i3 = start; i3 < Length; i3 = (i3 + 1) | 0) {
                         if (!this.CacheRow.containsKey(i3)) {
                             var DataRowhandle1 = this.GetDataSourceRow(i3);
-                            var dr = document.createElement("row"); // Helper.Div();
-                            dr.className = ((i3 % 2 === 0 ? "cellrow even" : "cellrow") || "") + ((this.SelectedRows.GetValue(DataRowhandle1, true) ? " cellrow-selected" : "") || "") + ((DataRowhandle1 === this.FocusedDataHandle ? " focusedrow" : "") || "");
+                            var dr = document.createElement("tr"); // Helper.Div();
+                            dr.style.height = System.Helper.ToPx(Bridge.box(this.UnitHeight, System.Single, System.Single.format, System.Single.getHashCode));
+                            //(i % 2 == 0 ? "cellrow even" : "cellrow") + 
+                            dr.className = ((this.SelectedRows.GetValue(DataRowhandle1, true) ? "table-primary" : "") || "") + ((DataRowhandle1 === this.FocusedDataHandle ? " table-active" : "") || "");
                             dr.style.position = "absolute";
                             System.Helper.SetBounds(dr, 0, Y, this._columnAutoWidth ? ClientWidth : MaxWidth + 1, this.UnitHeight);
                             dr.setAttribute("i", System.Convert.toString(Bridge.box(DataRowhandle1, System.Int32)));
-
-
 
                             dr.onclick = this.OnRowClick;
                             if (System.Settings.IsChrome) {
@@ -13553,13 +13544,20 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                                 if (col1.CellDisplay == null || ((useDefault = col1.CellDisplay.UseDefaultElement))) {
                                     var displayValue = col1.GetDisplayValueByDataRowHandle(DataRowhandle1);
 
-                                    cell = document.createElement("cell"); // new HTMLSpanElement();
-                                    cell.className = this.cellClass; // + " control";
+                                    cell = document.createElement("td"); // new HTMLSpanElement();
+                                    //cell.className = cellClass;// + " control";
+                                    // cell.style.lineHeight = UnitHeight.ToPx();
+                                    cell.style.height = System.Helper.ToPx(Bridge.box(this.UnitHeight, System.Single, System.Single.format, System.Single.getHashCode));
                                     cell.style.position = "absolute";
                                     cell.style.left = System.Single.format(col1.CachedX) + "px";
                                     cell.style.width = System.Single.format((this._columnAutoWidth ? _columnAutoWidthSingle : ((col1.Width + (x4 === ((this.Columns.Count - 1) | 0) ? 1 : 0)) | 0))) + "px";
                                     cell.setAttribute("x", System.Convert.toString(Bridge.box(x4, System.Int32)));
                                     cell.onclick = this.OnCellRowMouseDown;
+
+                                    if (x4 > 0) {
+                                        cell.style.borderLeft = "0";
+                                    }
+                                    cell.style.borderBottom = "0";
 
                                     if (!System.String.isNullOrWhiteSpace(displayValue)) {
                                         cell.textContent = displayValue;
@@ -13671,6 +13669,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         }
                     }
 
+                    this.ClearHeader();
+
                     this.GridHeader.appendChild(colFragment);
                     this.GridBody.appendChild(rowFragment);
 
@@ -13680,19 +13680,25 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                     this.RenderTime = -1;
                 });
+                this.Element.style.outline = "0";
 
-                this.GridHeaderContainer = System.Helper.Div("heading-container");
+                this.GridHeaderContainer = System.Helper.Element$1(Bridge.global.HTMLElement, document.createElement("table"));
 
-                this.GridHeader = System.Helper.Div();
-                System.Helper.SetBounds(this.GridHeader, 0, 0, 0, "29px");
-                this.GridBodyContainer = System.Helper.Div();
-
-                this.GridBodyContainer.style.overflowX = "auto !important";
-                this.GridBodyContainer.style.overflowY = "auto !important";
+                this.GridHeader = System.Helper.Element$1(Bridge.global.HTMLElement, document.createElement("thead"));
+                System.Helper.SetBounds(this.GridHeader, 0, 0, 0, System.Helper.ToPx(Bridge.box(this.UnitHeight, System.Single, System.Single.format, System.Single.getHashCode)));
+                this.GridBodyContainer = System.Helper.Element$1(Bridge.global.HTMLElement, document.createElement("table"));
+                this.GridBodyContainer.style.display = "block";
+                this.GridBodyContainer.style.overflowX = "auto";
+                this.GridBodyContainer.style.overflowY = "auto";
 
                 this.GridHeaderContainer.style.overflow = "hidden";
 
-                this.GridBody = System.Helper.Div();
+                this.GridBody = System.Helper.Element$1(Bridge.global.HTMLElement, document.createElement("tbody"));
+                //            border-top: 0;
+                //border-left: 0;
+                this.GridBodyContainer.style.borderTop = "0";
+                this.GridBodyContainer.style.borderLeft = "0";
+
                 System.Helper.SetBounds(this.GridBody, 0, 0, 0, 0);
 
                 this.GridBodyContainer.appendChild(this.GridBody);
@@ -13816,23 +13822,25 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         prevleft = Bridge.Int.clip32(this.GridBodyContainer.scrollLeft);
                         this.DelayedRenderGrid();
                     } else {
-                        if (!System.Settings.IsEdge && !System.Settings.IsFF && !System.Settings.IsIE) {
-                            //(window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 2
-                            if (this.GridBodyContainer.scrollTop !== 0 && this.GridBodyContainer.scrollTop + this.GridBodyContainer.clientHeight !== this.GridBodyContainer.scrollHeight) {
-                                var diff = this.GridBodyContainer.scrollTop % this.UnitHeight;
-                                if (diff !== 0) {
-                                    ignoreScroll = true;
-                                    this.GridBodyContainer.scrollTop -= diff;
-                                    ignoreScroll = false;
-                                }
-                            }
-                        }
+                        //if (!Settings.IsEdge && !Settings.IsFF && !Settings.IsIE)
+                        //{
+                        //    //(window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 2
+                        //    if (GridBodyContainer.scrollTop != 0 && GridBodyContainer.scrollTop + GridBodyContainer.clientHeight != GridBodyContainer.scrollHeight)
+                        //    {
+                        //        var diff = GridBodyContainer.scrollTop % UnitHeight;
+                        //        if (diff != 0)
+                        //        {
+                        //            ignoreScroll = true;
+                        //            GridBodyContainer.scrollTop -= diff;
+                        //            ignoreScroll = false;
+                        //        }
+                        //    }
+                        //}
 
                         this.DelayedRenderGrid(true);
                     }
                 });
                 this.addLoad(Bridge.fn.bind(this, function (sender, ev) {
-
                     this.RenderGrid();
                 }));
 
@@ -14146,12 +14154,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                     var col = this.Columns.getItem(SelectedIndex);
                     if (this.DragIndex === this.Columns.Count) {
-                        this.Columns.remove(col);
-                        this.Columns.add(col);
+                        this.Columns.Remove(col);
+                        this.Columns.Add(col);
                     } else {
                         var col1 = this.Columns.getItem(this.DragIndex);
-                        this.Columns.remove(col);
-                        this.Columns.insert(this.Columns.indexOf(col1), col);
+                        this.Columns.Remove(col);
+                        this.Columns.Insert(this.Columns.IndexOf(col1), col);
                     }
 
                     this.RenderGrid();
@@ -14359,8 +14367,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     //}
                     //else
                     //{
-                    System.Helper.SetBounds(this.GridHeaderContainer, 0, 0, "100%", this.UnitHeight + 1);
-                    System.Helper.SetBounds(this.GridBodyContainer, 0, this.UnitHeight + 2, "100%", "(100% - " + System.Single.format((this.UnitHeight + 2)) + "px)");
+                    System.Helper.SetBounds(this.GridHeaderContainer, 0, 0, "100%", this.UnitHeight);
+                    System.Helper.SetBounds(this.GridBodyContainer, 0, this.UnitHeight, "100%", "(100% - " + System.Single.format((this.UnitHeight)) + "px)");
                     //}
                 } else {
                     this.GridHeader.style.visibility = "hidden";
@@ -14384,6 +14392,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             SortColumn$1: function (column, sort) {
                 var $t;
                 if (sort === void 0) { sort = 1; }
+                if (column.Column == null) {
+                    return;
+                }
+
                 column.SortedMode = sort;
 
                 if (this.SortSettings != null && !Bridge.referenceEquals(this.SortSettings.Column, column)) {
@@ -14396,40 +14408,41 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 } else {
                     var sort1 = sort === System.Windows.Forms.GridViewSortMode.Asc;
 
-                    switch (column.Column.DataType) {
+
+                    switch (column.Column.GetTypeCode()) {
                         default: 
-                        case System.Data.DataType.Object: 
-                            this.SetVisibleRowHandles(System.Object, (Bridge.as(column.Column, System.Data.DataColumnObject)).Cells, sort1);
+                        case System.Data.DataTypeCode.Object: 
+                            this.SetVisibleRowHandles(System.Object, column.Column.Cells, sort1);
                             break;
-                        case System.Data.DataType.Bool: 
-                            this.SetVisibleRowHandles(System.Nullable$1(System.Boolean), (Bridge.as(column.Column, System.Data.DataColumnBool)).Cells, sort1);
+                        case System.Data.DataTypeCode.Bool: 
+                            this.SetVisibleRowHandles(System.Boolean, column.Column.Cells, sort1);
                             break;
-                        case System.Data.DataType.DateTime: 
-                            this.SetVisibleRowHandles(Bridge.global.System.Nullable$1(System.DateTime), (Bridge.as(column.Column, System.Data.DataColumnDateTime)).Cells, sort1);
+                        case System.Data.DataTypeCode.DateTime: 
+                            this.SetVisibleRowHandles(Bridge.global.System.DateTime, column.Column.Cells, sort1);
                             break;
-                        case System.Data.DataType.String: 
-                            this.SetVisibleRowHandles(System.String, (Bridge.as(column.Column, System.Data.DataColumnString)).Cells, sort1);
+                        case System.Data.DataTypeCode.String: 
+                            this.SetVisibleRowHandles(System.String, column.Column.Cells, sort1);
                             break;
-                        case System.Data.DataType.Byte: 
-                            this.SetVisibleRowHandles(System.Nullable$1(System.Byte), (Bridge.as(column.Column, System.Data.DataColumnByte)).Cells, sort1);
+                        case System.Data.DataTypeCode.Byte: 
+                            this.SetVisibleRowHandles(System.Byte, column.Column.Cells, sort1);
                             break;
-                        case System.Data.DataType.Short: 
-                            this.SetVisibleRowHandles(System.Nullable$1(System.Int16), (Bridge.as(column.Column, System.Data.DataColumnShort)).Cells, sort1);
+                        case System.Data.DataTypeCode.Short: 
+                            this.SetVisibleRowHandles(System.Int16, column.Column.Cells, sort1);
                             break;
-                        case System.Data.DataType.Integer: 
-                            this.SetVisibleRowHandles(System.Nullable$1(System.Int32), (Bridge.as(column.Column, System.Data.DataColumnInteger)).Cells, sort1);
+                        case System.Data.DataTypeCode.Integer: 
+                            this.SetVisibleRowHandles(System.Int32, column.Column.Cells, sort1);
                             break;
-                        case System.Data.DataType.Long: 
-                            this.SetVisibleRowHandles(System.Nullable$1(System.Int64), (Bridge.as(column.Column, System.Data.DataColumnLong)).Cells, sort1);
+                        case System.Data.DataTypeCode.Long: 
+                            this.SetVisibleRowHandles(System.Int64, column.Column.Cells, sort1);
                             break;
-                        case System.Data.DataType.Float: 
-                            this.SetVisibleRowHandles(System.Nullable$1(System.Single), (Bridge.as(column.Column, System.Data.DataColumnFloat)).Cells, sort1);
+                        case System.Data.DataTypeCode.Float: 
+                            this.SetVisibleRowHandles(System.Single, column.Column.Cells, sort1);
                             break;
-                        case System.Data.DataType.Double: 
-                            this.SetVisibleRowHandles(System.Nullable$1(System.Double), (Bridge.as(column.Column, System.Data.DataColumnDouble)).Cells, sort1);
+                        case System.Data.DataTypeCode.Double: 
+                            this.SetVisibleRowHandles(System.Double, column.Column.Cells, sort1);
                             break;
-                        case System.Data.DataType.Decimal: 
-                            this.SetVisibleRowHandles(System.Nullable$1(System.Decimal), (Bridge.as(column.Column, System.Data.DataColumnDecimal)).Cells, sort1);
+                        case System.Data.DataTypeCode.Decimal: 
+                            this.SetVisibleRowHandles(System.Decimal, column.Column.Cells, sort1);
                             break;
                     }
                 }
@@ -14511,7 +14524,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     return null;
                 }
 
-                for (var i = 0; i < this.DataSource.ColumnCount; i = (i + 1) | 0) {
+                for (var i = 0; i < this.DataSource.Columns.Count; i = (i + 1) | 0) {
                     if (this.DataSource.Columns.getItem(i) != null && System.String.compare(this.DataSource.Columns.getItem(i).FieldName, fieldName, IgnoreCase) === 0) {
                         return this.DataSource.Columns.getItem(i);
                     }
@@ -14541,14 +14554,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (isBold === void 0) { isBold = false; }
                 if (backcolor === void 0) { backcolor = null; }
                 //BodyApparence = new GridViewCellApparence(isBold, alignment, forecolor) { Backcolor = backcolor }
-                this.AddColumn$2(($t = new System.Windows.Forms.DataGridViewColumn(this, width), $t.Caption = caption, $t.FormatString = formatstring, $t.Column = column, $t));
+                this.AddColumn$2(($t = new System.Windows.Forms.DataGridViewColumn(this, width), $t.HeaderText = caption, $t.FormatString = formatstring, $t.Column = column, $t));
             },
             AddColumn$2: function (column) {
                 if (column == null) {
                     return;
                 }
 
-                this.Columns.add(column);
+                this.Columns.Add(column);
 
                 this.RenderGrid();
             },
@@ -14563,7 +14576,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.RenderGrid();
             },
             RemoveColumn: function (column) {
-                this.Columns.remove(column);
+                this.Columns.Remove(column);
 
                 this.RenderGrid();
             },
@@ -14662,9 +14675,9 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 var maxLength = 0;
                 var maxStr = "";
 
-                if (includeColumnHeader && !System.String.isNullOrWhiteSpace(column.Caption)) {
-                    maxStr = column.Caption;
-                    maxLength = column.Caption.length;
+                if (includeColumnHeader && !System.String.isNullOrWhiteSpace(column.HeaderText)) {
+                    maxStr = column.HeaderText;
+                    maxLength = column.HeaderText.length;
                 }
 
                 for (var i = 0; i < this.RowCount(); i = (i + 1) | 0) {
@@ -14732,7 +14745,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 for (var i = 0; i < columnLength; i = (i + 1) | 0) {
                     var col = this.Columns.getItem(i);
                     if (col.Visible) {
-                        builder.append(System.String.format("<th>{0}</th>", [this.Columns.getItem(i).Caption]));
+                        builder.append(System.String.format("<th>{0}</th>", [this.Columns.getItem(i).HeaderText]));
                     }
                 }
 
@@ -14796,11 +14809,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.GridBody.style.width = System.Helper.ToPx(Bridge.box((width), System.Single, System.Single.format, System.Single.getHashCode));
                 this.GridHeader.style.width = System.Helper.ToPx(Bridge.box(((width) + 24), System.Single, System.Single.format, System.Single.getHashCode)); // (width).ToPx();
                 if (this.RightOfTable == null) {
-                    this.RightOfTable = Bridge.cast(new System.Windows.Forms.Control(new HTMLElement()).Element, HTMLDivElement);
+                    this.RightOfTable = System.Helper.Div();
                     this.GridBody.appendChild(this.RightOfTable);
                 }
                 if (this.RightOfTableHeader == null) {
-                    this.RightOfTableHeader = Bridge.cast(new System.Windows.Forms.Control(new HTMLElement()).Element, HTMLDivElement);
+                    this.RightOfTableHeader = System.Helper.Div();
                     this.GridHeader.appendChild(this.RightOfTableHeader);
                 }
                 System.Helper.SetBounds(this.RightOfTable, width - 1, 0, 1, 1);
@@ -14838,11 +14851,11 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.GridHeader.appendChild(this.RightOfTableHeader);
             },
             ClearColumns: function () {
-                this.Columns = new (System.Collections.Generic.List$1(System.Windows.Forms.DataGridViewColumn)).ctor();
+                this.Columns = new System.Windows.Forms.DataGridViewColumnCollection(this);
             },
             ClearView: function () {
                 this._disableRender = true;
-                this.Columns = new (System.Collections.Generic.List$1(System.Windows.Forms.DataGridViewColumn)).ctor();
+                this.ClearColumns();
                 this.VisibleRowHandles = new (System.Collections.Generic.List$1(System.Int32)).ctor();
                 this.SelectedRows = new (System.Windows.Forms.HardSoftList$1(System.Boolean))(false);
                 this._dataSource = null;
@@ -14927,10 +14940,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 }
             },
             BeginInit: function () {
-                throw new System.NotImplementedException.ctor();
+                //throw new NotImplementedException();
             },
             EndInit: function () {
-                throw new System.NotImplementedException.ctor();
+                //throw new NotImplementedException();
             }
         }
     });

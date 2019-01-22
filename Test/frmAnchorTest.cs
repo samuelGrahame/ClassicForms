@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,9 @@ namespace Test
         private Button button8;
         private Button button9;
         private Button button4;
+        private DataGridView dataGridView1;
+        private DataGridViewTextBoxColumn Column1;
+        private DataGridViewTextBoxColumn Column2;
         private Button button1;
 
         public frmAnchorTest() : base()
@@ -36,12 +40,16 @@ namespace Test
             this.button8 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button1.Location = new System.Drawing.Point(268, 173);
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(931, 146);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(160, 55);
             this.button1.TabIndex = 0;
@@ -52,8 +60,8 @@ namespace Test
             // 
             // button2
             // 
-            this.button2.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button2.Location = new System.Drawing.Point(268, 112);
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button2.Location = new System.Drawing.Point(931, 85);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(160, 55);
             this.button2.TabIndex = 1;
@@ -66,9 +74,9 @@ namespace Test
             // 
             this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.button3.Location = new System.Drawing.Point(601, 83);
+            this.button3.Location = new System.Drawing.Point(1097, 83);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(84, 318);
+            this.button3.Size = new System.Drawing.Size(84, 479);
             this.button3.TabIndex = 2;
             this.button3.Tag = "btn btn-light";
             this.button3.Text = "Anchor Top, Bottom, Right";
@@ -78,9 +86,9 @@ namespace Test
             // 
             this.button5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.button5.Location = new System.Drawing.Point(102, 336);
+            this.button5.Location = new System.Drawing.Point(102, 497);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(493, 65);
+            this.button5.Size = new System.Drawing.Size(989, 65);
             this.button5.TabIndex = 4;
             this.button5.Tag = "btn btn-light";
             this.button5.Text = "Anchor Bottom, Left, Right";
@@ -92,7 +100,7 @@ namespace Test
             | System.Windows.Forms.AnchorStyles.Left)));
             this.button6.Location = new System.Drawing.Point(12, 12);
             this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(84, 389);
+            this.button6.Size = new System.Drawing.Size(84, 550);
             this.button6.TabIndex = 5;
             this.button6.Tag = "btn btn-light";
             this.button6.Text = "Anchor Top, Bottom, Left";
@@ -104,7 +112,7 @@ namespace Test
             | System.Windows.Forms.AnchorStyles.Right)));
             this.button7.Location = new System.Drawing.Point(102, 12);
             this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(493, 65);
+            this.button7.Size = new System.Drawing.Size(989, 65);
             this.button7.TabIndex = 6;
             this.button7.Tag = "btn btn-light";
             this.button7.Text = "Anchor Top, Left, Right";
@@ -113,7 +121,7 @@ namespace Test
             // button8
             // 
             this.button8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button8.Location = new System.Drawing.Point(601, 12);
+            this.button8.Location = new System.Drawing.Point(1097, 12);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(84, 65);
             this.button8.TabIndex = 7;
@@ -124,8 +132,8 @@ namespace Test
             // 
             // button9
             // 
-            this.button9.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button9.Location = new System.Drawing.Point(268, 234);
+            this.button9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button9.Location = new System.Drawing.Point(931, 207);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(160, 55);
             this.button9.TabIndex = 8;
@@ -145,9 +153,37 @@ namespace Test
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
+            // dataGridView1
+            // 
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column1,
+            this.Column2});
+            this.dataGridView1.Location = new System.Drawing.Point(102, 146);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(823, 345);
+            this.dataGridView1.TabIndex = 10;
+            this.dataGridView1.Tag = "table table-striped table-bordered table-hover";
+            // 
+            // Column1
+            // 
+            this.Column1.DataPropertyName = "Test1";
+            this.Column1.HeaderText = "Test 1";
+            this.Column1.Name = "Column1";
+            // 
+            // Column2
+            // 
+            this.Column2.DataPropertyName = "Test2";
+            this.Column2.HeaderText = "Test 2";
+            this.Column2.Name = "Column2";
+            // 
             // frmAnchorTest
             // 
-            this.ClientSize = new System.Drawing.Size(697, 413);
+            this.ClientSize = new System.Drawing.Size(1193, 574);
+            this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button9);
             this.Controls.Add(this.button8);
@@ -167,6 +203,7 @@ namespace Test
             this.MouseEnter += new System.EventHandler(this.frmAnchorTest_MouseEnter);
             this.MouseLeave += new System.EventHandler(this.frmAnchorTest_MouseLeave);
             this.Resize += new System.EventHandler(this.frmCustomer_Resize);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -211,7 +248,24 @@ namespace Test
 
         private void frmAnchorTest_Load(object sender, EventArgs e)
         {
+            var dt = new DataTable();
 
+            dt.Columns.Add("Test1", typeof(string));
+            dt.Columns.Add("Test2", typeof(string));
+
+            for (int i = 0; i < 1000; i++)
+            {
+                var dr = dt.NewRow();
+
+                dr[0] = i.ToString();
+                dr[1] = i.ToString();
+
+                dt.Rows.Add(dr);
+            }
+
+            dt.AcceptChanges();
+
+            dataGridView1.DataSource = dt;
         }
 
         private void frmAnchorTest_MouseLeave(object sender, EventArgs e)

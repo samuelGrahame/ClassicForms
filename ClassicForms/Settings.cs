@@ -16,6 +16,10 @@ namespace System
         public static bool IsChrome => !IsEdge && !IsFF && !IsIE;
         public static int MaximumPixelScrollingRows = 500000;
         public static int GridViewRowScrollPadding = 0;
+
+        public static bool GridViewAutoColumnGenerateFormatAsDate = false;
+        public static bool GridViewAutoColumnFormatDates = true;
+
         /// <summary>
         /// enabled override the default font name.
         /// </summary>

@@ -63,10 +63,11 @@ namespace System.Windows.Forms
 
     public class DataGridViewColumn
     {
+        public string Name;
         public DataColumn Column;
         public DataGridView View;
-        public string Caption;
-        public bool Visible;
+        public string HeaderText;
+        public bool Visible = true;
         public float CachedX;
         public string FormatString = string.Empty;
         public GridViewCellApparence HeadingApparence = new GridViewCellApparence();
@@ -123,25 +124,30 @@ namespace System.Windows.Forms
             if (filterValue == null)
                 return true;
 
+            if (Column == null)
+                return false;
+
             object abc = GetDisplayValueByDataRowHandle(index);
 
-            switch (Column.DataType)
+            
+
+            switch (Column.GetTypeCode())
             {
                 default:
-                case DataType.Object:
-                case DataType.Integer:
-                case DataType.Long:
-                case DataType.Float:
-                case DataType.Double:
-                case DataType.Decimal:
-                case DataType.Bool:
-                case DataType.Byte:
-                case DataType.Short:
+                case DataTypeCode.Object:
+                case DataTypeCode.Integer:
+                case DataTypeCode.Long:
+                case DataTypeCode.Float:
+                case DataTypeCode.Double:
+                case DataTypeCode.Decimal:
+                case DataTypeCode.Bool:
+                case DataTypeCode.Byte:
+                case DataTypeCode.Short:
                     return abc == filterValue;
 
-                case DataType.DateTime:
-                case DataType.String:
-                    return (abc + "").StartsWith(filterValue + "");
+                case DataTypeCode.DateTime:
+                case DataTypeCode.String:
+                    return (abc + "").ToLower().StartsWith((filterValue + "").ToLower());
             }
         }
 
@@ -187,7 +193,7 @@ namespace System.Windows.Forms
 
         public int GetDataColumnIndex()
         {
-            var length = View.DataSource.ColumnCount;
+            var length = View.DataSource.Columns.Count;
             for (int i = 0; i < length; i++)
             {
                 if (View.DataSource.Columns[i] == Column)

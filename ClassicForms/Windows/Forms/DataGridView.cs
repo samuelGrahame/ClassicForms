@@ -18,14 +18,16 @@ namespace System.Windows.Forms
     {
         public HTMLDivElement GridFindPanel;
 
-        public HTMLDivElement GridHeader;
-        public HTMLDivElement GridHeaderContainer;
-        public HTMLDivElement GridBodyContainer;
-        public HTMLDivElement GridBody;
+        public HTMLElement GridHeader;
+        public HTMLElement GridHeaderContainer;
+        public HTMLElement GridBodyContainer;
+        public HTMLElement GridBody;
 
         private HTMLDivElement BottonOfTable;
         private HTMLDivElement RightOfTable;
         private HTMLDivElement RightOfTableHeader;
+
+        public DataGridViewColumnHeadersHeightSizeMode ColumnHeadersHeightSizeMode;
 
         /// <summary>
         /// Data Row Html Element - Row handle
@@ -546,8 +548,8 @@ namespace System.Windows.Forms
                 //}
                 //else
                 //{
-                    GridHeaderContainer.SetBounds(0, 0, "100%", UnitHeight + 1);
-                    GridBodyContainer.SetBounds(0, UnitHeight + 2, "100%", "(100% - " + (UnitHeight + 2) + "px)");
+                    GridHeaderContainer.SetBounds(0, 0, "100%", UnitHeight);
+                    GridBodyContainer.SetBounds(0, UnitHeight, "100%", "(100% - " + (UnitHeight) + "px)");
                 //}
             }
             else
@@ -650,6 +652,11 @@ namespace System.Windows.Forms
 
         public void SortColumn(DataGridViewColumn column, GridViewSortMode sort = GridViewSortMode.Asc)
         {
+            if (column.Column == null)
+            {
+                return;
+            }
+
             column.SortedMode = sort;
 
             if (SortSettings != null && SortSettings.Column != column)
@@ -665,52 +672,53 @@ namespace System.Windows.Forms
             else
             {
                 bool sort1 = sort == GridViewSortMode.Asc;
+                
 
-                switch (column.Column.DataType)
+                switch (column.Column.GetTypeCode())
                 {
                     default:
-                    case DataType.Object:
-                        SetVisibleRowHandles((column.Column as DataColumnObject).Cells, sort1);
+                    case DataTypeCode.Object:
+                        SetVisibleRowHandles(column.Column.Cells.As<List<object>>(), sort1);
                         break;
 
-                    case DataType.Bool:
-                        SetVisibleRowHandles((column.Column as DataColumnBool).Cells, sort1);
+                    case DataTypeCode.Bool:
+                        SetVisibleRowHandles(column.Column.Cells.As<List<bool>>(), sort1);
                         break;
 
-                    case DataType.DateTime:
-                        SetVisibleRowHandles((column.Column as DataColumnDateTime).Cells, sort1);
+                    case DataTypeCode.DateTime:
+                        SetVisibleRowHandles(column.Column.Cells.As<List<DateTime>>(), sort1);
                         break;
 
-                    case DataType.String:
-                        SetVisibleRowHandles((column.Column as DataColumnString).Cells, sort1);
+                    case DataTypeCode.String:
+                        SetVisibleRowHandles(column.Column.Cells.As<List<string>>(), sort1);
                         break;
 
-                    case DataType.Byte:
-                        SetVisibleRowHandles((column.Column as DataColumnByte).Cells, sort1);
+                    case DataTypeCode.Byte:
+                        SetVisibleRowHandles(column.Column.Cells.As<List<byte>>(), sort1);
                         break;
 
-                    case DataType.Short:
-                        SetVisibleRowHandles((column.Column as DataColumnShort).Cells, sort1);
+                    case DataTypeCode.Short:
+                        SetVisibleRowHandles(column.Column.Cells.As<List<short>>(), sort1);
                         break;
 
-                    case DataType.Integer:
-                        SetVisibleRowHandles((column.Column as DataColumnInteger).Cells, sort1);
+                    case DataTypeCode.Integer:
+                        SetVisibleRowHandles(column.Column.Cells.As<List<int>>(), sort1);
                         break;
 
-                    case DataType.Long:
-                        SetVisibleRowHandles((column.Column as DataColumnLong).Cells, sort1);
+                    case DataTypeCode.Long:
+                        SetVisibleRowHandles(column.Column.Cells.As<List<long>>(), sort1);
                         break;
 
-                    case DataType.Float:
-                        SetVisibleRowHandles((column.Column as DataColumnFloat).Cells, sort1);
+                    case DataTypeCode.Float:
+                        SetVisibleRowHandles(column.Column.Cells.As<List<float>>(), sort1);
                         break;
 
-                    case DataType.Double:
-                        SetVisibleRowHandles((column.Column as DataColumnDouble).Cells, sort1);
+                    case DataTypeCode.Double:
+                        SetVisibleRowHandles(column.Column.Cells.As<List<double>>(), sort1);
                         break;
 
-                    case DataType.Decimal:
-                        SetVisibleRowHandles((column.Column as DataColumnDecimal).Cells, sort1);
+                    case DataTypeCode.Decimal:
+                        SetVisibleRowHandles(column.Column.Cells.As<List<decimal>>(), sort1);
                         break;
                 }
             }
@@ -773,39 +781,38 @@ namespace System.Windows.Forms
 
                     if (Columns.Count == 0 && AutoGenerateColumnsFromSource)
                     {
-                        for (int i = 0; i < _dataSource.ColumnCount; i++)
+                        for (int i = 0; i < _dataSource.Columns.Count; i++)
                         {
                             var gvc = new DataGridViewColumn(this);
-                            gvc.Caption = _dataSource.Columns[i].FieldName;
+                            gvc.HeaderText = _dataSource.Columns[i].FieldName;
                             gvc.Column = _dataSource.Columns[i];
                             gvc.Visible = true;
 
-                            switch (_dataSource.Columns[i].DataType)
+                            switch (_dataSource.Columns[i].GetTypeCode())
                             {
-                                case DataType.Byte:
-                                case DataType.Short:
-                                case DataType.Integer:
-                                case DataType.Long:
-                                case DataType.Float:
-                                case DataType.Double:
-                                case DataType.Decimal:
-                                    //gvc.BodyApparence.Alignment = "right";
+                                case DataTypeCode.Byte:
+                                case DataTypeCode.Short:
+                                case DataTypeCode.Integer:
+                                case DataTypeCode.Long:
+                                case DataTypeCode.Float:
+                                case DataTypeCode.Double:
+                                case DataTypeCode.Decimal:
+                                    gvc.BodyApparence.Alignment = "right";
                                     break;
 
-                                case DataType.DateTime:
-                                    //if (Settings.GridViewAutoColumnFormatDates)
-                                    //{
-                                    //    if (Settings.GridViewAutoColumnGenerateFormatAsDate)
-                                    //        gvc.FormatString = "{0:d}";
-                                    //    else
-                                    //        gvc.FormatString = "{0:yyyy-MM-dd}";
-                                    //}
-                                    gvc.FormatString = "{0:yyyy-MM-dd}";
+                                case DataTypeCode.DateTime:
+                                    if (Settings.GridViewAutoColumnFormatDates)
+                                    {
+                                        if (Settings.GridViewAutoColumnGenerateFormatAsDate)
+                                            gvc.FormatString = "{0:d}";
+                                        else
+                                            gvc.FormatString = "{0:yyyy-MM-dd}";
+                                    }
 
                                     break;
 
-                                case DataType.Bool:
-                                 //   gvc.CellDisplay = new GridViewCellDisplayCheckBox();
+                                case DataTypeCode.Bool:
+                                    gvc.CellDisplay = new GridViewCellDisplayCheckBox();
                                     break;
                             }
 
@@ -821,7 +828,7 @@ namespace System.Windows.Forms
 
                             if (!string.IsNullOrWhiteSpace(field))
                             {
-                                for (int d = 0; d < _dataSource.ColumnCount; d++)
+                                for (int d = 0; d < _dataSource.Columns.Count; d++)
                                 {
                                     var col = _dataSource.Columns[i];
 
@@ -840,7 +847,7 @@ namespace System.Windows.Forms
             }
         }
 
-        public List<DataGridViewColumn> Columns = new List<DataGridViewColumn>();
+        public DataGridViewColumnCollection Columns;
 
         public DataGridViewColumn GetColumn(int i)
         {
@@ -918,7 +925,7 @@ namespace System.Windows.Forms
             if (DataSource == null)
                 return null;
 
-            for (int i = 0; i < DataSource.ColumnCount; i++)
+            for (int i = 0; i < DataSource.Columns.Count; i++)
             {
                 if (DataSource.Columns[i] != null &&
                     string.Compare(DataSource.Columns[i].FieldName, fieldName, IgnoreCase) == 0)
@@ -939,7 +946,7 @@ namespace System.Windows.Forms
         public void AddColumn(string caption, DataColumn column, int width = 100, string formatstring = "", string alignment = "left", string forecolor = null, bool isBold = false, string backcolor = null)
         {
             //BodyApparence = new GridViewCellApparence(isBold, alignment, forecolor) { Backcolor = backcolor }
-            AddColumn(new DataGridViewColumn(this, width) { Caption = caption,  FormatString = formatstring, Column = column });
+            AddColumn(new DataGridViewColumn(this, width) { HeaderText = caption,  FormatString = formatstring, Column = column });
         }
 
         public void AddColumn( DataGridViewColumn column)
@@ -1094,10 +1101,10 @@ namespace System.Windows.Forms
             int maxLength = 0;
             string maxStr = "";
 
-            if (includeColumnHeader && !string.IsNullOrWhiteSpace(column.Caption))
+            if (includeColumnHeader && !string.IsNullOrWhiteSpace(column.HeaderText))
             {
-                maxStr = column.Caption;
-                maxLength = column.Caption.Length;
+                maxStr = column.HeaderText;
+                maxLength = column.HeaderText.Length;
             }
 
             for (int i = 0; i < RowCount(); i++)
@@ -1138,8 +1145,8 @@ namespace System.Windows.Forms
             RenderGrid();
         }
 
-        private string headingClass;
-        private string cellClass;
+     //   private string headingClass;
+     //   private string cellClass;
 
         private Dictionary<int, HTMLElement> CacheRow = new Dictionary<int, HTMLElement>();
         int CountOfDeletion = 0;
@@ -1210,7 +1217,7 @@ namespace System.Windows.Forms
                 var col = Columns[i];
                 if (col.Visible)
                 {
-                    builder.Append($"<th>{Columns[i].Caption}</th>");
+                    builder.Append($"<th>{Columns[i].HeaderText}</th>");
                 }
             }
 
@@ -1262,6 +1269,16 @@ namespace System.Windows.Forms
                 window.open("data:application/vnd.ms-excel," + encodeURIComponent(builder.ToString()));
         }
 
+        public override object Tag { get =>
+                base.Tag;
+            set
+            {
+                base.Tag = value;                
+                GridBodyContainer.className = value + "";
+                GridHeaderContainer.className = value + "";
+            }
+        }
+
         public DataGridView(bool autoGenerateColumns = true, bool columnAutoWidth = false) : base(new HTMLDivElement() { className = "grid" })
         {
             //if (Helper.NotDesktop)
@@ -1273,13 +1290,19 @@ namespace System.Windows.Forms
             //}
             //else
             //{
-               
+
             //}
+            if (Settings.IsUsingBootStrap())
+            {
+                UnitHeight = 48;
+            }
+            else
+            {
+                UnitHeight = 20;
+            }
 
-            UnitHeight = 20;
-            headingClass = "heading";
-            cellClass = "cell";
-
+            Columns = new DataGridViewColumnCollection(this);
+            
             this.Element.style.overflow = "hidden";
             // #FIND #RENDER#
             renderGridInternal = () =>
@@ -1370,9 +1393,22 @@ namespace System.Windows.Forms
                         var colIndex = x;
                         var apparence = gcol.HeadingApparence;
 
-                        var col = Helper.Label(gcol.Caption,
+                        var col = Helper.HeaderCell(gcol.HeaderText,
                             (_columnAutoWidth ? gcol.CachedX : gcol.CachedX), 0, (_columnAutoWidth ? _columnAutoWidthSingle : gcol.Width) - (x == uboundRowCount ? 0 : 1),
-                            apparence.IsBold, false, headingClass, apparence.Alignment, apparence.Forecolor);
+                            apparence.IsBold, false, "", apparence.Alignment, apparence.Forecolor);
+
+    //                    border-left: 0;
+    //border-bottom: 0;
+
+                        if(x > 0)
+                        {
+                            col.style.borderLeft = "0";
+                        }
+                        col.style.borderBottom = "0";
+
+                       // col.style.lineHeight = UnitHeight.ToPx();
+                        col.style.height = UnitHeight.ToPx();
+
                         if (!string.IsNullOrWhiteSpace(apparence.Backcolor))
                         {
                             col.style.backgroundColor = apparence.Backcolor;
@@ -1397,9 +1433,10 @@ namespace System.Windows.Forms
 
                 #endregion "Columns"
 
-                if (_dataSource == null || _dataSource.RowCount == 0 || _dataSource.ColumnCount == 0)
+                if (_dataSource == null || _dataSource.RowCount == 0 || _dataSource.Columns.Count == 0)
                 {
                     ClearGrid();
+
                     GridHeader.appendChild(colFragment);
                     return;
                 }
@@ -1525,14 +1562,14 @@ namespace System.Windows.Forms
                     if (!CacheRow.ContainsKey(i))
                     {
                         var DataRowhandle = GetDataSourceRow(i);
-                        var dr = document.createElement("row"); // Helper.Div();
-                        dr.className = (i % 2 == 0 ? "cellrow even" : "cellrow") + (SelectedRows.GetValue(DataRowhandle, true) ? " cellrow-selected" : "") + (DataRowhandle == FocusedDataHandle ? " focusedrow" : "");
+                        var dr = document.createElement("tr"); // Helper.Div();
+                        dr.style.height = UnitHeight.ToPx();
+                        //(i % 2 == 0 ? "cellrow even" : "cellrow") + 
+                        dr.className = (SelectedRows.GetValue(DataRowhandle, true) ? "table-primary" : "") + (DataRowhandle == FocusedDataHandle ? " table-active" : "");
                         dr.style.position = "absolute";
                         dr.SetBounds(0, Y, _columnAutoWidth ? ClientWidth : MaxWidth + 1, UnitHeight);
                         dr.setAttribute("i", Convert.ToString(DataRowhandle));
-
-
-
+                        
                         dr.onclick = new HTMLElement.onclickFn(OnRowClick);
                         if (Settings.IsChrome)
                         {
@@ -1554,13 +1591,21 @@ namespace System.Windows.Forms
                             {
                                 var displayValue = col.GetDisplayValueByDataRowHandle(DataRowhandle);
 
-                                cell = document.createElement("cell");// new HTMLSpanElement();
-                                cell.className = cellClass;// + " control";
+                                cell = document.createElement("td");// new HTMLSpanElement();
+                                //cell.className = cellClass;// + " control";
+                               // cell.style.lineHeight = UnitHeight.ToPx();
+                                cell.style.height = UnitHeight.ToPx();
                                 cell.style.position = "absolute";
                                 cell.style.left = col.CachedX + "px";
                                 cell.style.width = (_columnAutoWidth ? _columnAutoWidthSingle : col.Width + (x == Columns.Count - 1 ? 1 : 0)) + "px";
                                 cell.setAttribute("x", Convert.ToString(x));
                                 cell.onclick = new HTMLElement.onclickFn(OnCellRowMouseDown);
+
+                                if (x > 0)
+                                {
+                                    cell.style.borderLeft = "0";
+                                }
+                                cell.style.borderBottom = "0";
 
                                 if (!string.IsNullOrWhiteSpace(displayValue))
                                 {
@@ -1692,6 +1737,8 @@ namespace System.Windows.Forms
                     }
                 }
 
+                ClearHeader();
+
                 GridHeader.appendChild(colFragment);
                 GridBody.appendChild(rowFragment);
 
@@ -1702,19 +1749,25 @@ namespace System.Windows.Forms
 
                 RenderTime = -1;
             };
+            Element.style.outline = "0";
 
-            GridHeaderContainer = Helper.Div("heading-container");
+            GridHeaderContainer = Helper.Element(document.createElement("table"));
 
-            GridHeader = Helper.Div();
-            GridHeader.SetBounds(0, 0, 0, "29px");
-            GridBodyContainer = Helper.Div();
-
-            GridBodyContainer.style.overflowX = "auto !important";
-            GridBodyContainer.style.overflowY = "auto !important";
+            GridHeader = Helper.Element(document.createElement("thead"));
+            GridHeader.SetBounds(0, 0, 0, UnitHeight.ToPx());
+            GridBodyContainer = Helper.Element(document.createElement("table"));
+            GridBodyContainer.style.display = "block";            
+            GridBodyContainer.style.overflowX = "auto";
+            GridBodyContainer.style.overflowY = "auto";
 
             GridHeaderContainer.style.overflow = "hidden";
 
-            GridBody = Helper.Div();
+            GridBody = Helper.Element(document.createElement("tbody"));
+            //            border-top: 0;
+            //border-left: 0;
+            GridBodyContainer.style.borderTop = "0";
+            GridBodyContainer.style.borderLeft = "0";
+
             GridBody.SetBounds(0, 0, 0, 0);
 
             GridBodyContainer.appendChild(GridBody);
@@ -1844,27 +1897,26 @@ namespace System.Windows.Forms
                 }
                 else
                 {
-                    if (!Settings.IsEdge && !Settings.IsFF && !Settings.IsIE)
-                    {
-                        //(window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 2
-                        if (GridBodyContainer.scrollTop != 0 && GridBodyContainer.scrollTop + GridBodyContainer.clientHeight != GridBodyContainer.scrollHeight)
-                        {
-                            var diff = GridBodyContainer.scrollTop % UnitHeight;
-                            if (diff != 0)
-                            {
-                                ignoreScroll = true;
-                                GridBodyContainer.scrollTop -= diff;
-                                ignoreScroll = false;
-                            }
-                        }
-                    }
+                    //if (!Settings.IsEdge && !Settings.IsFF && !Settings.IsIE)
+                    //{
+                    //    //(window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 2
+                    //    if (GridBodyContainer.scrollTop != 0 && GridBodyContainer.scrollTop + GridBodyContainer.clientHeight != GridBodyContainer.scrollHeight)
+                    //    {
+                    //        var diff = GridBodyContainer.scrollTop % UnitHeight;
+                    //        if (diff != 0)
+                    //        {
+                    //            ignoreScroll = true;
+                    //            GridBodyContainer.scrollTop -= diff;
+                    //            ignoreScroll = false;
+                    //        }
+                    //    }
+                    //}
 
                     DelayedRenderGrid(true);
                 }
             };
             Load += (sender, ev) =>
             {
-
                 RenderGrid();
             };
 
@@ -2317,12 +2369,12 @@ namespace System.Windows.Forms
             GridHeader.style.width = ((width) + 24).ToPx(); // (width).ToPx();
             if (RightOfTable == null)
             {
-                RightOfTable = (HTMLDivElement)new Control(new HTMLElement()).Element;
+                RightOfTable = Helper.Div();
                 GridBody.appendChild(RightOfTable);
             }
             if (RightOfTableHeader == null)
             {
-                RightOfTableHeader = (HTMLDivElement)new Control(new HTMLElement()).Element;
+                RightOfTableHeader = Helper.Div();
                 GridHeader.appendChild(RightOfTableHeader);
             }
             RightOfTable.SetBounds(width - 1, 0, 1, 1);
@@ -2375,13 +2427,13 @@ namespace System.Windows.Forms
 
         public void ClearColumns()
         {
-            Columns = new List<DataGridViewColumn>();
+            Columns = new DataGridViewColumnCollection(this);
         }
 
         public void ClearView()
         {
             _disableRender = true;
-            Columns = new List< DataGridViewColumn>();
+            ClearColumns();
             VisibleRowHandles = new List<int>();
             SelectedRows = new HardSoftList<bool>(false);
             _dataSource = null;
@@ -2454,7 +2506,7 @@ namespace System.Windows.Forms
 
         private Action<Event> OnRowDragStart;
 
-        private void SetupColumn(HTMLSpanElement se, int index, DataGridViewColumn gcol)
+        private void SetupColumn(HTMLTableHeaderCellElement se, int index, DataGridViewColumn gcol)
         {
             se.setAttribute("i", Convert.ToString(index));
             se.setAttribute("draggable", "true");
@@ -2516,12 +2568,12 @@ namespace System.Windows.Forms
 
         public void BeginInit()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public void EndInit()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         //public List<Page> GetPages(Layout pageLayout, PageSize pageSize)

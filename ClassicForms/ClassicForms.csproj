@@ -44,6 +44,8 @@
     <Compile Include="ComponentModel\InvalidEnumArgumentException.cs" />
     <Compile Include="ComponentModel\ISite.cs" />
     <Compile Include="ComponentModel\ISupportInitialize.cs" />
+    <Compile Include="Data\DataColumnCollection.cs" />
+    <Compile Include="Data\DataRowCollection.cs" />
     <Compile Include="Data\DataTable.cs" />
     <Compile Include="Drawing\Color.cs" />
     <Compile Include="Drawing\ContentAlignment.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="Windows\Forms\ControlCollection.cs" />
     <Compile Include="Windows\Forms\DataGridView.cs" />
     <Compile Include="Windows\Forms\DataGridViewColumn.cs" />
+    <Compile Include="Windows\Forms\DataGridViewColumnCollection.cs" />
     <Compile Include="Windows\Forms\DataGridViewColumnHeadersHeightSizeMode.cs" />
     <Compile Include="Windows\Forms\DataGridViewTextBoxColumn.cs" />
     <Compile Include="Windows\Forms\DialogResult.cs" />
@@ -94,6 +97,7 @@
     <Compile Include="Windows\Forms\Form.cs" />
     <Compile Include="Windows\Forms\FormBorderStyle.cs" />
     <Compile Include="Windows\Forms\FormStartPosition.cs" />
+    <Compile Include="Windows\Forms\GridViewCellDisplayCheckBox.cs" />
     <Compile Include="Windows\Forms\GroupBox.cs" />
     <Compile Include="Windows\Forms\HelpInfo.cs" />
     <Compile Include="Windows\Forms\HelpNavigator.cs" />
