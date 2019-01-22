@@ -284,6 +284,21 @@ div[scope="progress"] {
         transition: width 110ms ease;
     }
 
+tr.table-active {
+    background-color: rgb(0, 120, 215);
+    color: white;
+}
+
+tr:hover {
+    background-color: lightgrey;
+    filter: brightness(90%);
+}
+
+tr.table-primary {
+    background-color: rgb(0, 120, 215);
+    color: white;
+}
+
 
 select::-ms-expand {
     display: none;
