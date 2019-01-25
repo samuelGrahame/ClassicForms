@@ -46,6 +46,17 @@ namespace System.Data
             get { return _searchString; }
         }
 
+        private class SearchMatch
+        {
+            public bool Visible;
+            public string Format;
+            public SearchMatch(bool visible, string format)
+            {
+                Visible = visible;
+                Format = format;
+            }
+        }
+
         public void Search(string searchData, DataGridView view)
         {
             if (view == null)
@@ -66,18 +77,18 @@ namespace System.Data
                 _searchResults = new List<int>();
                 int count = view.ColumnCount();
 
-                var UseFormat = new List<Tuple<bool, string>>();
+                var UseFormat = new List<SearchMatch>();
                 for (int x = 0; x < count; x++)
                 {
                     var gridCol = view.GetColumn(x);
                     if (gridCol.Visible)
                     {
                         string FormatString = gridCol.FormatString;
-                        UseFormat.Add(new Tuple<bool, string>(string.IsNullOrWhiteSpace(FormatString), FormatString));
+                        UseFormat.Add(new SearchMatch(string.IsNullOrWhiteSpace(FormatString), FormatString));
                     }
                     else
                     {
-                        UseFormat.Add(new Tuple<bool, string>(false, string.Empty));
+                        UseFormat.Add(new SearchMatch(false, string.Empty));
                     }
                 }
 
@@ -93,16 +104,16 @@ namespace System.Data
 
                             string value;
 
-                            if (helperWhatToDo.Item1)
+                            if (helperWhatToDo.Visible)
                             {
                                 value = Column.GetDisplayValue(y);
                             }
                             else
                             {
-                                value = Column.GetDisplayValue(y, helperWhatToDo.Item2);
+                                value = Column.GetDisplayValue(y, helperWhatToDo.Format);
                             }
 
-                            if (!string.IsNullOrWhiteSpace(value) && value.ToLower().StartsWith(searchData))
+                            if (!string.IsNullOrWhiteSpace(value) && value.ToLower().StartsWith(_searchString))
                             {
                                 _searchResults.Add(y);
                                 break;

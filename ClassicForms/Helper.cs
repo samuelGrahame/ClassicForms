@@ -87,9 +87,9 @@ namespace System
             return Element(new HTMLTableCellElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
         }
 
-        public static HTMLTableHeaderCellElement HeaderCell(string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true)
+        public static HTMLElement HeaderCell(string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true)
         {            
-            return Element(new HTMLTableHeaderCellElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
+            return Element(document.createElement("th"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
         }
 
         public static T Element<T>(T element, string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true) where T : HTMLElement

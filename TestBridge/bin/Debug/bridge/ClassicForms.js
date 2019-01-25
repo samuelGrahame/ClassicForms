@@ -1741,14 +1741,14 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this._searchResults = new (System.Collections.Generic.List$1(System.Int32)).ctor();
                     var count = view.ColumnCount();
 
-                    var UseFormat = new (System.Collections.Generic.List$1(System.Tuple$2(System.Boolean,System.String))).ctor();
+                    var UseFormat = new (System.Collections.Generic.List$1(System.Data.DataTable.SearchMatch)).ctor();
                     for (var x = 0; x < count; x = (x + 1) | 0) {
                         var gridCol = view.GetColumn(x);
                         if (gridCol.Visible) {
                             var FormatString = gridCol.FormatString;
-                            UseFormat.add({ Item1: System.String.isNullOrWhiteSpace(FormatString), Item2: FormatString });
+                            UseFormat.add(new System.Data.DataTable.SearchMatch(System.String.isNullOrWhiteSpace(FormatString), FormatString));
                         } else {
-                            UseFormat.add({ Item1: false, Item2: "" });
+                            UseFormat.add(new System.Data.DataTable.SearchMatch(false, ""));
                         }
                     }
 
@@ -1761,13 +1761,13 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                                 var value;
 
-                                if (helperWhatToDo.Item1) {
+                                if (helperWhatToDo.Visible) {
                                     value = Column.GetDisplayValue(y);
                                 } else {
-                                    value = Column.GetDisplayValue$1(y, helperWhatToDo.Item2);
+                                    value = Column.GetDisplayValue$1(y, helperWhatToDo.Format);
                                 }
 
-                                if (!System.String.isNullOrWhiteSpace(value) && System.String.startsWith(value.toLowerCase(), searchData)) {
+                                if (!System.String.isNullOrWhiteSpace(value) && System.String.startsWith(value.toLowerCase(), this._searchString)) {
                                     this._searchResults.add(y);
                                     break;
                                 }
@@ -1886,6 +1886,21 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             RejectNewRows: function () {
                 this.NewRows.clear();
                 this._inDataChange = false;
+            }
+        }
+    });
+
+    Bridge.define("System.Data.DataTable.SearchMatch", {
+        $kind: "nested class",
+        fields: {
+            Visible: false,
+            Format: null
+        },
+        ctors: {
+            ctor: function (visible, format) {
+                this.$initialize();
+                this.Visible = visible;
+                this.Format = format;
             }
         }
     });
@@ -4768,7 +4783,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Alignment === void 0) { Alignment = "left"; }
                     if (Forecolor === void 0) { Forecolor = null; }
                     if (ac === void 0) { ac = true; }
-                    return System.Helper.Element(HTMLTableHeaderCellElement, document.createElement("th"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
+                    return System.Helper.Element(HTMLElement, document.createElement("th"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
                 },
                 Label: function (Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
                     if (IsBold === void 0) { IsBold = false; }
@@ -12938,7 +12953,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             RightOfTable: null,
             RightOfTableHeader: null,
             ColumnHeadersHeightSizeMode: 0,
-            SearchTextInput: null,
+            txtSearchInput: null,
             btnFind: null,
             btnClear: null,
             btnClose: null,
@@ -13748,13 +13763,13 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.GridFindPanel.style.visibility = "hidden";
                 System.Helper.SetBounds(this.GridFindPanel, 0, 0, "100%", 46);
 
-                this.SearchTextInput = new System.Windows.Forms.TextBox();
+                this.txtSearchInput = ($t = new System.Windows.Forms.TextBox(), $t.Tag = "form-control", $t);
 
-                this.SearchTextInput.addTextChanged(Bridge.fn.bind(this, function (sender, ev) {
+                this.txtSearchInput.addTextChanged(Bridge.fn.bind(this, function (sender, ev) {
                     if (this._searchTimer > -1) {
                         clearTimeout(this._searchTimer);
                     }
-                    if (System.String.isNullOrWhiteSpace(this.SearchTextInput.Text)) {
+                    if (System.String.isNullOrWhiteSpace(this.txtSearchInput.Text)) {
                         this._search();
                     } else {
                         this._searchTimer = Bridge.Int.clip32(setTimeout(Bridge.fn.bind(this, function (a) {
@@ -13763,12 +13778,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                 }));
 
-                this.SearchTextInput.Location = new System.Drawing.Point.$ctor1(30, 13); // = new Drawing.Rectangle(30, 13, 350, 22);
-                this.SearchTextInput.Size = new System.Drawing.Size.$ctor2(350, 22);
+                this.txtSearchInput.Location = new System.Drawing.Point.$ctor1(40, 8); // = new Drawing.Rectangle(30, 13, 350, 22);
+                this.txtSearchInput.Size = new System.Drawing.Size.$ctor2(350, 28);
 
-                this.SearchTextInput.Element.setAttribute("placeholder", "Enter text to search...");
+                this.txtSearchInput.Element.setAttribute("placeholder", "Enter text to search...");
 
-                this.btnFind = ($t = new System.Windows.Forms.Button(), $t.Text = "Find", $t.Location = new System.Drawing.Point.$ctor1(385, 13), $t.Size = new System.Drawing.Size.$ctor2(60, 22), $t);
+                this.btnFind = ($t = new System.Windows.Forms.Button(), $t.Text = "Find", $t.Location = new System.Drawing.Point.$ctor1(395, 8), $t.Size = new System.Drawing.Size.$ctor2(60, 28), $t.Tag = "btn btn-primary", $t);
 
                 this.btnFind.addClick(Bridge.fn.bind(this, function (sender, ev) {
                     if (this._searchTimer > -1) {
@@ -13777,16 +13792,16 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this._search();
                 }));
 
-                this.btnClear = ($t = new System.Windows.Forms.Button(), $t.Text = "Clear", $t.Location = new System.Drawing.Point.$ctor1(449, 13), $t.Size = new System.Drawing.Size.$ctor2(60, 22), $t);
+                this.btnClear = ($t = new System.Windows.Forms.Button(), $t.Text = "Clear", $t.Location = new System.Drawing.Point.$ctor1(459, 8), $t.Size = new System.Drawing.Size.$ctor2(60, 28), $t.Tag = "btn btn-secondary", $t);
                 this.btnClear.addClick(Bridge.fn.bind(this, function (sender, ev) {
                     if (this._searchTimer > -1) {
                         clearTimeout(this._searchTimer);
                     }
-                    this.SearchTextInput.Text = "";
+                    this.txtSearchInput.Text = "";
                 }));
 
 
-                this.btnClose = ($t = new System.Windows.Forms.Button(), $t.Location = new System.Drawing.Point.$ctor1(7, 15), $t.Size = new System.Drawing.Size.$ctor2(18, 18), $t);
+                this.btnClose = ($t = new System.Windows.Forms.Button(), $t.Location = new System.Drawing.Point.$ctor1(6, 8), $t.Size = new System.Drawing.Size.$ctor2(28, 28), $t.Tag = "btn btn-dark", $t);
                 this.btnClose.addClick(Bridge.fn.bind(this, function (sender, ev) {
                     this.btnClear.Element.click();
                     this.CloseFindPanel();
@@ -13794,7 +13809,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.btnClose.Element.innerHTML = "&times;";
 
 
-                System.Helper.AppendChildren$1(this.GridFindPanel, [this.btnClose, this.SearchTextInput, this.btnFind, this.btnClear]);
+                System.Helper.AppendChildren$1(this.GridFindPanel, [this.btnClose, this.txtSearchInput, this.btnFind, this.btnClear]);
 
                 this.SetDefaultSizes();
 
@@ -14753,10 +14768,10 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.RenderGrid();
             },
             _search: function () {
-                if (this.DataSource == null || true) {
+                if (this.DataSource == null || !this.FindPanelVisible) {
                     return;
                 }
-                this.DataSource.Search(this.SearchTextInput.Text, this);
+                this.DataSource.Search(this.txtSearchInput.Text, this);
             },
             MakeRowVisible: function (rowHandle) {
                 if (rowHandle < 0) {

@@ -29,10 +29,10 @@ namespace System.Windows.Forms
 
         public DataGridViewColumnHeadersHeightSizeMode ColumnHeadersHeightSizeMode;
 
-        private TextBox SearchTextInput;
-        private Button btnFind;
-        private Button btnClear;
-        private Button btnClose;
+        public TextBox txtSearchInput;
+        public Button btnFind;
+        public Button btnClear;
+        public Button btnClose;
 
         /// <summary>
         /// Data Row Html Element - Row handle
@@ -1166,9 +1166,9 @@ namespace System.Windows.Forms
         private int _searchTimer = -1;
         private void _search()
         {
-            if (this.DataSource == null || true) // !FindPanelVisible
+            if (this.DataSource == null || !FindPanelVisible) // !FindPanelVisible
                 return;
-            this.DataSource.Search(SearchTextInput.Text, this);
+            this.DataSource.Search(txtSearchInput.Text, this);
         }
 
         public void MakeRowVisible(int rowHandle)
@@ -1789,9 +1789,9 @@ namespace System.Windows.Forms
             GridFindPanel.style.visibility = "hidden";
             GridFindPanel.SetBounds(0, 0, "100%", 46);
 
-            SearchTextInput = new TextBox()
+            txtSearchInput = new TextBox()
             {
-              
+                Tag = "form-control"
                 //OnKeyDown = (sender, ev) =>
                 //{
                 //    if (ev.keyCode == KeyCodes.Enter)
@@ -1801,28 +1801,29 @@ namespace System.Windows.Forms
                 //}
             };
 
-            SearchTextInput.TextChanged += (sender, ev) =>
+            txtSearchInput.TextChanged += (sender, ev) =>
             {
                 if (_searchTimer > -1)
                 {
                     clearTimeout(_searchTimer);
                 }
-                if (string.IsNullOrWhiteSpace(SearchTextInput.Text))
+                if (string.IsNullOrWhiteSpace(txtSearchInput.Text))
                     _search();
                 else
                     _searchTimer = (int)setTimeout((a) => { _search(); }, 500);
             };
 
-            SearchTextInput.Location = new Drawing.Point(30, 13); // = new Drawing.Rectangle(30, 13, 350, 22);
-            SearchTextInput.Size = new Drawing.Size(350, 22);
+            txtSearchInput.Location = new Drawing.Point(40, 8); // = new Drawing.Rectangle(30, 13, 350, 22);
+            txtSearchInput.Size = new Drawing.Size(350, 28);
 
-            SearchTextInput.Element.setAttribute("placeholder", "Enter text to search...");
+            txtSearchInput.Element.setAttribute("placeholder", "Enter text to search...");
 
             btnFind = new Button()
             {
                 Text = "Find",          
-                Location = new Drawing.Point(385, 13),
-                Size = new Drawing.Size(60, 22)                
+                Location = new Drawing.Point(391 + 4, 8),
+                Size = new Drawing.Size(60, 28),
+                Tag = "btn btn-primary"
             };
 
             btnFind.Click += (sender, ev) =>
@@ -1837,8 +1838,9 @@ namespace System.Windows.Forms
             btnClear = new Button()
             {
                 Text = "Clear",                
-                Location = new Drawing.Point(449, 13),
-                Size = new Drawing.Size(60, 22)                
+                Location = new Drawing.Point(455 + 4, 8),
+                Size = new Drawing.Size(60, 28)    ,
+                Tag = "btn btn-secondary"
             };
             btnClear.Click += (sender, ev) =>
             {
@@ -1846,14 +1848,15 @@ namespace System.Windows.Forms
                 {
                     clearTimeout(_searchTimer);
                 }
-                SearchTextInput.Text = string.Empty;
+                txtSearchInput.Text = string.Empty;
             };
 
 
             btnClose = new Button()
             {
-                Location = new Drawing.Point(7, 15),
-                Size = new Drawing.Size(18, 18),                                
+                Location = new Drawing.Point(6, 8),
+                Size = new Drawing.Size(28, 28),                                
+                Tag = "btn btn-dark"
             };
             btnClose.Click += (sender, ev) =>
             {
@@ -1863,7 +1866,7 @@ namespace System.Windows.Forms
             btnClose.Element.innerHTML = "&times;";
 
 
-            GridFindPanel.AppendChildren(btnClose, SearchTextInput, btnFind, btnClear);
+            GridFindPanel.AppendChildren(btnClose, txtSearchInput, btnFind, btnClear);
 
             SetDefaultSizes();
 
@@ -2539,7 +2542,7 @@ namespace System.Windows.Forms
 
         private Action<Event> OnRowDragStart;
 
-        private void SetupColumn(HTMLTableHeaderCellElement se, int index, DataGridViewColumn gcol)
+        private void SetupColumn(HTMLElement se, int index, DataGridViewColumn gcol)
         {
             se.setAttribute("i", Convert.ToString(index));
             se.setAttribute("draggable", "true");
