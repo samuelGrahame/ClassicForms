@@ -153,6 +153,7 @@
             this.dataGridView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView2.Location = new System.Drawing.Point(0, 0);
             this.dataGridView2.Name = "dataGridView2";
+            this.dataGridView2.ReadOnly = true;
             this.dataGridView2.Size = new System.Drawing.Size(584, 358);
             this.dataGridView2.TabIndex = 0;
             this.dataGridView2.Tag = "table";
@@ -162,24 +163,28 @@
             this.Column2.DataPropertyName = "Data1";
             this.Column2.HeaderText = "Data 1";
             this.Column2.Name = "Column2";
+            this.Column2.ReadOnly = true;
             // 
             // Column3
             // 
             this.Column3.DataPropertyName = "Data2";
             this.Column3.HeaderText = "Data 2";
             this.Column3.Name = "Column3";
+            this.Column3.ReadOnly = true;
             // 
             // Column4
             // 
             this.Column4.DataPropertyName = "Data3";
             this.Column4.HeaderText = "Data 3";
             this.Column4.Name = "Column4";
+            this.Column4.ReadOnly = true;
             // 
             // Column5
             // 
             this.Column5.DataPropertyName = "Data4";
             this.Column5.HeaderText = "Data 4";
             this.Column5.Name = "Column5";
+            this.Column5.ReadOnly = true;
             // 
             // frmTest
             // 
