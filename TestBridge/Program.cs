@@ -13,6 +13,8 @@ namespace TestBridge
         {
             var x = new frmTest();
             x.Show();
+
+
         }
     }
 }
