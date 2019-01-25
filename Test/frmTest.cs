@@ -29,7 +29,9 @@ namespace Test
                 var dr = dt.NewRow();
 
                 dr[0] = r.Next();
-
+#if !BRIDGE
+                dt.Rows.Add(dr);
+#endif
             }
 
             dt.AcceptChanges();
@@ -60,13 +62,12 @@ namespace Test
             dt.AcceptChanges();
 
             dataGridView2.DataSource = dt;
-
-
+        
 #if BRIDGE
             dataGridView1.ColumnAutoWidth = true;
 
             dataGridView2.BestFitAllColumns(true);
-
+            dataGridView2.ShowFindPanel();
 #endif
         }
 

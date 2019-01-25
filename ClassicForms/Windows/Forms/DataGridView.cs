@@ -29,6 +29,11 @@ namespace System.Windows.Forms
 
         public DataGridViewColumnHeadersHeightSizeMode ColumnHeadersHeightSizeMode;
 
+        private TextBox SearchTextInput;
+        private Button btnFind;
+        private Button btnClear;
+        private Button btnClose;
+
         /// <summary>
         /// Data Row Html Element - Row handle
         /// </summary>
@@ -55,24 +60,24 @@ namespace System.Windows.Forms
 
         //private ContextItem _showFindPanelContextItem;
 
-        //private bool _findPanelVisible;
+        private bool _findPanelVisible;
 
-        //public bool FindPanelVisible
-        //{
-        //    get { return _findPanelVisible; }
-        //    set
-        //    {
-        //        if (_findPanelVisible != value)
-        //        {
-        //            if (value)
-        //                ShowFindPanel();
-        //            else
-        //                CloseFindPanel();
+        public bool FindPanelVisible
+        {
+            get { return _findPanelVisible; }
+            set
+            {
+                if (_findPanelVisible != value)
+                {
+                    if (value)
+                        ShowFindPanel();
+                    else
+                        CloseFindPanel();
 
-        //        }
+                }
 
-        //    }
-        //}
+            }
+        }
 
         public bool ResolveSearchDataIndex()
         {
@@ -94,34 +99,34 @@ namespace System.Windows.Forms
             }
         }
 
-        //public void ShowFindPanel()
-        //{
-        //    if (!_findPanelVisible)
-        //    {
-        //        _showFindPanelContextItem.Caption = "Close Find Panel";
-        //        _findPanelVisible = true;
-        //        GridFindPanel.style.visibility = "inherit";
+        public void ShowFindPanel()
+        {
+            if (!_findPanelVisible)
+            {
+                //_showFindPanelContextItem.Caption = "Close Find Panel";
+                _findPanelVisible = true;
+                GridFindPanel.style.visibility = "inherit";
 
-        //        SetDefaultSizes();
+                SetDefaultSizes();
 
-        //        RenderGrid();
-        //    }
+                RenderGrid();
+            }
 
-        //}
+        }
 
-        //public void CloseFindPanel()
-        //{
-        //    if (_findPanelVisible)
-        //    {
-        //        _showFindPanelContextItem.Caption = "Show Find Panel";
-        //        _findPanelVisible = false;
-        //        GridFindPanel.style.visibility = "hidden";
+        public void CloseFindPanel()
+        {
+            if (_findPanelVisible)
+            {
+                //_showFindPanelContextItem.Caption = "Show Find Panel";
+                _findPanelVisible = false;
+                GridFindPanel.style.visibility = "hidden";
 
-        //        SetDefaultSizes();
+                SetDefaultSizes();
 
-        //        RenderGrid();
-        //    }
-        //}
+                RenderGrid();
+            }
+        }
 
 
         private DataTable _dataSource = null;
@@ -541,30 +546,30 @@ namespace System.Windows.Forms
                 GridHeader.style.visibility = "inherit";
                 GridHeaderContainer.style.visibility = "inherit";
 
-                //if (FindPanelVisible)
-                //{
-                //    GridHeaderContainer.SetBounds(0, 47, "100%", UnitHeight + 1);
-                //    GridBodyContainer.SetBounds(0, UnitHeight + 2 + 47, "100%", "(100% - " + (UnitHeight + 2 + 47) + "px)");
-                //}
-                //else
-                //{
+                if (FindPanelVisible)
+                {
+                    GridHeaderContainer.SetBounds(0, 47, "100%", UnitHeight + 1);
+                    GridBodyContainer.SetBounds(0, UnitHeight + 2 + 47, "100%", "(100% - " + (UnitHeight + 2 + 47) + "px)");
+                }
+                else
+                {
                     GridHeaderContainer.SetBounds(0, 0, "100%", UnitHeight);
                     GridBodyContainer.SetBounds(0, UnitHeight, "100%", "(100% - " + (UnitHeight) + "px)");
-                //}
+                }
             }
             else
             {
                 GridHeader.style.visibility = "hidden";
                 GridHeaderContainer.style.visibility = "hidden";
 
-                //if (FindPanelVisible)
-                //{
-                //    GridBodyContainer.SetBounds(0, 1 + 46, "100%", "(100% - " + (1 + 46) + "px)");
-                //}
-                //else
-                //{
+                if (FindPanelVisible)
+                {
+                    GridBodyContainer.SetBounds(0, 1 + 46, "100%", "(100% - " + (1 + 46) + "px)");
+                }
+                else
+                {
                     GridBodyContainer.SetBounds(0, 1, "100%", "(100% - 1px)");
-                //}
+                }
             }
         }
 
@@ -1153,6 +1158,8 @@ namespace System.Windows.Forms
      //   private string headingClass;
      //   private string cellClass;
 
+
+
         private Dictionary<int, HTMLElement> CacheRow = new Dictionary<int, HTMLElement>();
         int CountOfDeletion = 0;
 
@@ -1161,7 +1168,7 @@ namespace System.Windows.Forms
         {
             if (this.DataSource == null || true) // !FindPanelVisible
                 return;
-            //this.DataSource.Search(SearchTextInput.Text, this);
+            this.DataSource.Search(SearchTextInput.Text, this);
         }
 
         public void MakeRowVisible(int rowHandle)
@@ -1782,65 +1789,81 @@ namespace System.Windows.Forms
             GridFindPanel.style.visibility = "hidden";
             GridFindPanel.SetBounds(0, 0, "100%", 46);
 
-            //SearchTextInput = new TextInput()
-            //{
-            //    OnTextChanged = (sender) => {
-            //        if (_searchTimer > -1)
-            //        {
-            //            clearTimeout(_searchTimer);
-            //        }
-            //        if (string.IsNullOrWhiteSpace(SearchTextInput.Text))
-            //            _search();
-            //        else
-            //            _searchTimer = (int)setTimeout((a) => { _search(); }, 500);
-            //    },
-            //    OnKeyDown = (sender, ev) => {
-            //        if (ev.keyCode == KeyCodes.Enter)
-            //        {
-            //            btnFind.Content.click();
-            //        }
-            //    }
-            //};
-            //SearchTextInput.Bounds = new Vector4(30, 13, 350, 22);
-            //SearchTextInput.SetAttribute("placeholder", "Enter text to search...");
+            SearchTextInput = new TextBox()
+            {
+              
+                //OnKeyDown = (sender, ev) =>
+                //{
+                //    if (ev.keyCode == KeyCodes.Enter)
+                //    {
+                //        btnFind.Content.click();
+                //    }
+                //}
+            };
 
-            //btnFind = new SimpleButton()
-            //{
-            //    Text = "Find",
-            //    ItemClick = (sender) => {
-            //        if (_searchTimer > -1)
-            //        {
-            //            clearTimeout(_searchTimer);
-            //        }
-            //        _search();
-            //    },
-            //    Bounds = new Vector4(385, 13, 60, 22)
-            //};
-            //btnClear = new SimpleButton()
-            //{
-            //    Text = "Clear",
-            //    ItemClick = (sender) => {
-            //        if (_searchTimer > -1)
-            //        {
-            //            clearTimeout(_searchTimer);
-            //        }
-            //        SearchTextInput.Text = string.Empty;
-            //    },
-            //    Bounds = new Vector4(449, 13, 60, 22)
-            //};
+            SearchTextInput.TextChanged += (sender, ev) =>
+            {
+                if (_searchTimer > -1)
+                {
+                    clearTimeout(_searchTimer);
+                }
+                if (string.IsNullOrWhiteSpace(SearchTextInput.Text))
+                    _search();
+                else
+                    _searchTimer = (int)setTimeout((a) => { _search(); }, 500);
+            };
 
-            //btnClose = new SimpleButton()
-            //{
-            //    Bounds = new Vector4(7, 15, 18, 18),
-            //    ItemClick = (sender) => {
-            //        btnClear.Content.click();
-            //        CloseFindPanel();
-            //    }
-            //};
-            //btnClose.Content.innerHTML = "&times;";
+            SearchTextInput.Location = new Drawing.Point(30, 13); // = new Drawing.Rectangle(30, 13, 350, 22);
+            SearchTextInput.Size = new Drawing.Size(350, 22);
+
+            SearchTextInput.Element.setAttribute("placeholder", "Enter text to search...");
+
+            btnFind = new Button()
+            {
+                Text = "Find",          
+                Location = new Drawing.Point(385, 13),
+                Size = new Drawing.Size(60, 22)                
+            };
+
+            btnFind.Click += (sender, ev) =>
+            {
+                if (_searchTimer > -1)
+                {
+                    clearTimeout(_searchTimer);
+                }
+                _search();
+            };
+
+            btnClear = new Button()
+            {
+                Text = "Clear",                
+                Location = new Drawing.Point(449, 13),
+                Size = new Drawing.Size(60, 22)                
+            };
+            btnClear.Click += (sender, ev) =>
+            {
+                if (_searchTimer > -1)
+                {
+                    clearTimeout(_searchTimer);
+                }
+                SearchTextInput.Text = string.Empty;
+            };
 
 
-            //GridFindPanel.AppendChildren(btnClose, SearchTextInput, btnFind, btnClear);
+            btnClose = new Button()
+            {
+                Location = new Drawing.Point(7, 15),
+                Size = new Drawing.Size(18, 18),                                
+            };
+            btnClose.Click += (sender, ev) =>
+            {
+                btnClear.Element.click();
+                CloseFindPanel();
+            };
+            btnClose.Element.innerHTML = "&times;";
+
+
+            GridFindPanel.AppendChildren(btnClose, SearchTextInput, btnFind, btnClear);
 
             SetDefaultSizes();
 

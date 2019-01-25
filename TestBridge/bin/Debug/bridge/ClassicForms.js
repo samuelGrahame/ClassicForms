@@ -1,7 +1,7 @@
 /**
  * @version 1.0.0.0
  * @copyright Copyright ©  2018
- * @compiler Bridge.NET 17.1.1
+ * @compiler Bridge.NET 17.6.0
  */
 Bridge.assembly("ClassicForms", function ($asm, globals) {
     "use strict";
@@ -1235,7 +1235,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.data = System.Int64.clipu32((System.Int64(this.data).and(System.Int64(~num))).or(System.Int64((((value & num)) >>> 0))));
             },
             equals: function (o) {
-                return ((Bridge.is(o, System.Collections.Specialized.BitVector32)) && (this.data === System.Nullable.getValue(Bridge.cast(Bridge.unbox(o), System.Collections.Specialized.BitVector32)).data));
+                return ((Bridge.is(o, System.Collections.Specialized.BitVector32)) && (this.data === System.Nullable.getValue(Bridge.cast(Bridge.unbox(o, System.Collections.Specialized.BitVector32), System.Collections.Specialized.BitVector32)).data));
             },
             getHashCode: function () {
                 return Bridge.getHashCode(this);
@@ -1296,7 +1296,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         },
         methods: {
             equals: function (o) {
-                return ((Bridge.is(o, System.Collections.Specialized.BitVector32.Section)) && this.Equals(System.Nullable.getValue(Bridge.cast(Bridge.unbox(o), System.Collections.Specialized.BitVector32.Section))));
+                return ((Bridge.is(o, System.Collections.Specialized.BitVector32.Section)) && this.Equals(System.Nullable.getValue(Bridge.cast(Bridge.unbox(o, System.Collections.Specialized.BitVector32.Section), System.Collections.Specialized.BitVector32.Section))));
             },
             Equals: function (obj) {
                 return ((obj.mask === this.mask) && (obj.offset === this.offset));
@@ -1741,7 +1741,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this._searchResults = new (System.Collections.Generic.List$1(System.Int32)).ctor();
                     var count = view.ColumnCount();
 
-                    var UseFormat = new (System.Collections.Generic.List$1(System.Object)).ctor();
+                    var UseFormat = new (System.Collections.Generic.List$1(System.Tuple$2(System.Boolean,System.String))).ctor();
                     for (var x = 0; x < count; x = (x + 1) | 0) {
                         var gridCol = view.GetColumn(x);
                         if (gridCol.Visible) {
@@ -2938,7 +2938,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             equals: function (obj) {
                 if (Bridge.is(obj, System.Drawing.Color)) {
-                    var color = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj), System.Drawing.Color));
+                    var color = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj, System.Drawing.Color), System.Drawing.Color));
                     if (((this.value.equals(color.value)) && (this.state === color.state)) && (this.knownColor === color.knownColor)) {
                         return ((Bridge.referenceEquals(this.name, color.name)) || (((this.name != null) && (color.name != null)) && System.String.equals(this.name, this.name)));
                     }
@@ -3816,7 +3816,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (!(Bridge.is(obj, System.Drawing.PointF))) {
                     return false;
                 }
-                var tf = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj), System.Drawing.PointF));
+                var tf = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj, System.Drawing.PointF), System.Drawing.PointF));
                 return (((tf.X === this.X) && (tf.Y === this.Y)) && Bridge.equals(System.Drawing.PointF, Bridge.getType(this)));
             },
             getHashCode: function () {
@@ -3999,7 +3999,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (!(Bridge.is(obj, System.Drawing.Rectangle))) {
                     return false;
                 }
-                var rectangle = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj), System.Drawing.Rectangle));
+                var rectangle = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj, System.Drawing.Rectangle), System.Drawing.Rectangle));
                 return ((((rectangle.X === this.X) && (rectangle.Y === this.Y)) && (rectangle.Width === this.Width)) && (rectangle.Height === this.Height));
             },
             Contains$2: function (x, y) {
@@ -4216,7 +4216,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (!(Bridge.is(obj, System.Drawing.RectangleF))) {
                     return false;
                 }
-                var ef = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj), System.Drawing.RectangleF));
+                var ef = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj, System.Drawing.RectangleF), System.Drawing.RectangleF));
                 return ((((ef.X === this.X) && (ef.Y === this.Y)) && (ef.Width === this.Width)) && (ef.Height === this.Height));
             },
             Contains$2: function (x, y) {
@@ -4369,7 +4369,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (!(Bridge.is(obj, System.Drawing.Size))) {
                     return false;
                 }
-                var size = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj), System.Drawing.Size));
+                var size = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj, System.Drawing.Size), System.Drawing.Size));
                 return ((size.width === this.width) && (size.height === this.height));
             },
             getHashCode: function () {
@@ -4478,7 +4478,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (!(Bridge.is(obj, System.Drawing.SizeF))) {
                     return false;
                 }
-                var ef = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj), System.Drawing.SizeF));
+                var ef = System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj, System.Drawing.SizeF), System.Drawing.SizeF));
                 return (((ef.Width === this.Width) && (ef.Height === this.Height)) && Bridge.equals(System.Drawing.SizeF, Bridge.getType(this)));
             },
             getHashCode: function () {
@@ -4750,7 +4750,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 },
                 Div: function (classname) {
                     if (classname === void 0) { classname = ""; }
-                    return System.Helper.Element$1(Bridge.global.HTMLDivElement, document.createElement("div"), classname);
+                    return System.Helper.Element$1(HTMLDivElement, document.createElement("div"), classname);
                 },
                 Cell: function (Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
                     if (IsBold === void 0) { IsBold = false; }
@@ -4759,7 +4759,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Alignment === void 0) { Alignment = "left"; }
                     if (Forecolor === void 0) { Forecolor = null; }
                     if (ac === void 0) { ac = true; }
-                    return System.Helper.Element(Bridge.global.HTMLTableCellElement, new HTMLTableCellElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
+                    return System.Helper.Element(HTMLTableCellElement, new HTMLTableCellElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
                 },
                 HeaderCell: function (Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
                     if (IsBold === void 0) { IsBold = false; }
@@ -4768,7 +4768,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Alignment === void 0) { Alignment = "left"; }
                     if (Forecolor === void 0) { Forecolor = null; }
                     if (ac === void 0) { ac = true; }
-                    return System.Helper.Element(Bridge.global.HTMLTableHeaderCellElement, document.createElement("th"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
+                    return System.Helper.Element(HTMLTableHeaderCellElement, document.createElement("th"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
                 },
                 Label: function (Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
                     if (IsBold === void 0) { IsBold = false; }
@@ -4777,7 +4777,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Alignment === void 0) { Alignment = "left"; }
                     if (Forecolor === void 0) { Forecolor = null; }
                     if (ac === void 0) { ac = true; }
-                    return System.Helper.Element(Bridge.global.HTMLSpanElement, document.createElement("span"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
+                    return System.Helper.Element(HTMLSpanElement, document.createElement("span"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
                 },
                 AppendChild: function (c, Node) {
                     c.Element.appendChild(Node.Element);
@@ -5192,8 +5192,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         if (System.Settings._isUsingBootStrap) {
                             System.Settings.DefaultFont = "16px -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"";
                         }
-                    }
-                    catch ($e1) {
+                    } catch ($e1) {
                         $e1 = System.Exception.create($e1);
 
                     }
@@ -5711,7 +5710,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Bridge.is($t, System.IDisposable)) {
                         $t.System$IDisposable$Dispose();
                     }
-                }this.dataGridViewColumns.AddRange(gridViewColumns);
+                }
+                this.dataGridViewColumns.AddRange(gridViewColumns);
             }
         }
     });
@@ -7181,7 +7181,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             if (Bridge.is($t, System.IDisposable)) {
                                 $t.System$IDisposable$Dispose();
                             }
-                        }}
+                        }
+                    }
                     return empty.$clone();
                 },
                 RTLTranslate: function (bounds, withinBounds) {
@@ -7323,7 +7324,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Bridge.is($t, System.IDisposable)) {
                         $t.System$IDisposable$Dispose();
                     }
-                }var preferredSize = System.Windows.Forms.TextRenderer.MeasureText(text, font, proposedConstraints.$clone(), flags);
+                }
+                var preferredSize = System.Windows.Forms.TextRenderer.MeasureText(text, font, proposedConstraints.$clone(), flags);
                 this.nextCacheEntry = (((this.nextCacheEntry + 1) | 0)) % 6;
                 this.sizeCacheList[System.Array.index(this.nextCacheEntry, this.sizeCacheList)] = new System.Windows.Forms.Layout.LayoutUtils.MeasureTextCache.PreferredSizeCache.$ctor1(proposedConstraints.$clone(), preferredSize.$clone());
                 return preferredSize.$clone();
@@ -7570,6 +7572,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         ctors: {
             ctor: function (affectedComponent, affectedProperty) {
                 this.$initialize();
+                System.Object.call(this);
                 this.affectedComponent = affectedComponent;
                 this.affectedProperty = affectedProperty;
             },
@@ -7591,10 +7594,12 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         ctors: {
             ctor: function (link) {
                 this.$initialize();
+                System.Object.call(this);
 
             },
             $ctor1: function (link, button) {
                 this.$initialize();
+                System.Object.call(this);
 
             }
         }
@@ -7833,8 +7838,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     try {
                         System.Windows.Forms.MessageBox.PushHelpInfo(hpi);
                         none = System.Windows.Forms.MessageBox.ShowCore(owner, text, caption, buttons, icon, defaultButton, options, true);
-                    }
-                    finally {
+                    } finally {
                         System.Windows.Forms.MessageBox.PopHelpInfo();
                     }
                     return none;
@@ -8031,6 +8035,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             },
             ctor: function (button, clicks, x, y, delta) {
                 this.$initialize();
+                System.Object.call(this);
                 this.Button = button;
                 this.Clicks = clicks;
                 this.X = x;
@@ -8321,7 +8326,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         },
         methods: {
             equals: function (other) {
-                return ((Bridge.is(other, System.Windows.Forms.Padding)) && (System.Windows.Forms.Padding.op_Equality(System.Nullable.getValue(Bridge.cast(Bridge.unbox(other), System.Windows.Forms.Padding)), this)));
+                return ((Bridge.is(other, System.Windows.Forms.Padding)) && (System.Windows.Forms.Padding.op_Equality(System.Nullable.getValue(Bridge.cast(Bridge.unbox(other, System.Windows.Forms.Padding), System.Windows.Forms.Padding)), this)));
             },
             getHashCode: function () {
                 return (((this.Left ^ System.Windows.Forms.WindowsFormsUtils.RotateLeft(this.Top, 8)) ^ System.Windows.Forms.WindowsFormsUtils.RotateLeft(this.Right, 16)) ^ System.Windows.Forms.WindowsFormsUtils.RotateLeft(this.Bottom, 24));
@@ -10839,7 +10844,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             OnCreate: function (gridView, dataRowIndex, columnIndex) {
                 var value = gridView.GetRowCellValue$1(dataRowIndex, columnIndex);
 
-                var cell = System.Helper.Element$1(Bridge.global.HTMLTableCellElement, new HTMLTableCellElement());
+                var cell = System.Helper.Element$1(HTMLTableCellElement, new HTMLTableCellElement());
                 var input = new System.Windows.Forms.CheckBox();
                 System.Helper.SetBoundsFull$1(input);
                 input.Checked = Bridge.unbox(value);
@@ -10894,6 +10899,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                                 $t.System$IDisposable$Dispose();
                             }
                         }
+
                         System.Windows.Forms.Layout.DefaultLayout.ClearCachedBounds(container);
                     }
                 },
@@ -11002,7 +11008,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             if (dictionary.containsKey(element)) {
                                 var obj2 = dictionary.get(element);
                                 if (obj2 != null) {
-                                    return System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj2), System.Drawing.Rectangle));
+                                    return System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj2, System.Drawing.Rectangle), System.Drawing.Rectangle));
                                 }
                             }
                         }
@@ -11504,7 +11510,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             if (Bridge.is($t, System.IDisposable)) {
                                 $t.System$IDisposable$Dispose();
                             }
-                        }if (containsMin) {
+                        }
+                        if (containsMin) {
                             System.Windows.Forms.Form.CalculateMinmizedFormsLocation();
                         }
                     };
@@ -11529,6 +11536,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             $t.System$IDisposable$Dispose();
                         }
                     }
+
                     return list;
                 },
                 /**
@@ -11731,8 +11739,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         try {
                             System.Windows.Forms.Layout.DefaultLayout.SetDock(this, value);
                             this.OnDockChanged({ });
-                        }
-                        finally {
+                        } finally {
                             this.ResumeLayout();
                         }
                     }
@@ -12112,7 +12119,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Bridge.is($t, System.IDisposable)) {
                         $t.System$IDisposable$Dispose();
                     }
-                }if (diffControl == null) {
+                }
+                if (diffControl == null) {
                     if (ctl.Parent.Parent == null) {
                         return null;
                     }
@@ -12158,6 +12166,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         $t.System$IDisposable$Dispose();
                     }
                 }
+
                 return selected;
             },
             GetAutoSizeMode: function () {
@@ -12378,8 +12387,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         this.layoutSuspendCount = (((this.layoutSuspendCount + 1) | 0)) & 255;
                         try {
                             this.OnLayoutResuming(performLayout);
-                        }
-                        finally {
+                        } finally {
                             this.layoutSuspendCount = (((this.layoutSuspendCount - 1) | 0)) & 255;
                         }
                     }
@@ -12460,8 +12468,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         try {
                             this.CacheTextInternal = true;
                             this.OnLayout(args);
-                        }
-                        finally {
+                        } finally {
                             this.CacheTextInternal = false;
                             this.SetState(8389120, false);
                             this.layoutSuspendCount = 0;
@@ -12515,8 +12522,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.CacheTextInternal = true;
                 try {
                     preferredSizeCore = this.GetPreferredSizeCore(proposedSize.$clone());
-                }
-                finally {
+                } finally {
                     this.CacheTextInternal = false;
                 }
                 preferredSizeCore = this.ApplySizeConstraints(preferredSizeCore.$clone());
@@ -12569,8 +12575,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             //SafeNativeMethods.SetWindowPos(new HandleRef(this.window, this.Handle), NativeMethods.NullHandleRef, x, y, width, height, flags);
                         }
                     }
-                }
-                finally {
+                } finally {
                     //  this.InitScaling(specified);
                     if (this.ParentInternal != null) {
                         System.Windows.Forms.Layout.CommonProperties.xClearPreferredSizeCache(this.ParentInternal);
@@ -12678,7 +12683,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Bridge.is($t, System.IDisposable)) {
                         $t.System$IDisposable$Dispose();
                     }
-                }}
+                }
+            }
         }
     });
 
@@ -12932,6 +12938,19 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             RightOfTable: null,
             RightOfTableHeader: null,
             ColumnHeadersHeightSizeMode: 0,
+            SearchTextInput: null,
+            btnFind: null,
+            btnClear: null,
+            btnClose: null,
+            /**
+             * Data Row Html Element - Row handle
+             *
+             * @instance
+             * @private
+             * @memberof System.Windows.Forms.DataGridView
+             * @type boolean
+             */
+            _findPanelVisible: false,
             _highlighSearchResults: false,
             _dataSource: null,
             OnFocusedRowChanged: null,
@@ -13000,6 +13019,22 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             _disableRender: false
         },
         props: {
+            FindPanelVisible: {
+                get: function () {
+                    return this._findPanelVisible;
+                },
+                set: function (value) {
+                    if (this._findPanelVisible !== value) {
+                        if (value) {
+                            this.ShowFindPanel();
+                        } else {
+                            this.CloseFindPanel();
+                        }
+
+                    }
+
+                }
+            },
             HighlighSearchResults: {
                 get: function () {
                     return this._highlighSearchResults;
@@ -13666,8 +13701,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             try {
                                 var child = rowFragment.childNodes[i4];
                                 this.OnCustomRowStyle(child, parseInt(child.getAttribute("i")));
-                            }
-                            catch (ex) {
+                            } catch (ex) {
                                 ex = System.Exception.create(ex);
                                 //if (Application.AplicationDefition == ApplicationDefitnion.ExpressCraftConsole)
                                 //    ConsoleForm.Log(ex.ToString(), ConsoleLogType.Error);
@@ -13688,18 +13722,18 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 });
                 this.Element.style.outline = "0";
 
-                this.GridHeaderContainer = System.Helper.Element$1(Bridge.global.HTMLElement, document.createElement("table"));
+                this.GridHeaderContainer = System.Helper.Element$1(HTMLElement, document.createElement("table"));
 
-                this.GridHeader = System.Helper.Element$1(Bridge.global.HTMLElement, document.createElement("thead"));
+                this.GridHeader = System.Helper.Element$1(HTMLElement, document.createElement("thead"));
                 System.Helper.SetBounds(this.GridHeader, 0, 0, 0, System.Helper.ToPx(Bridge.box(this.UnitHeight, System.Single, System.Single.format, System.Single.getHashCode)));
-                this.GridBodyContainer = System.Helper.Element$1(Bridge.global.HTMLElement, document.createElement("table"));
+                this.GridBodyContainer = System.Helper.Element$1(HTMLElement, document.createElement("table"));
                 this.GridBodyContainer.style.display = "block";
                 this.GridBodyContainer.style.overflowX = "auto";
                 this.GridBodyContainer.style.overflowY = "auto";
 
                 this.GridHeaderContainer.style.overflow = "hidden";
 
-                this.GridBody = System.Helper.Element$1(Bridge.global.HTMLElement, document.createElement("tbody"));
+                this.GridBody = System.Helper.Element$1(HTMLElement, document.createElement("tbody"));
                 //            border-top: 0;
                 //border-left: 0;
                 this.GridBodyContainer.style.borderTop = "0";
@@ -13714,65 +13748,53 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this.GridFindPanel.style.visibility = "hidden";
                 System.Helper.SetBounds(this.GridFindPanel, 0, 0, "100%", 46);
 
-                //SearchTextInput = new TextInput()
-                //{
-                //    OnTextChanged = (sender) => {
-                //        if (_searchTimer > -1)
-                //        {
-                //            clearTimeout(_searchTimer);
-                //        }
-                //        if (string.IsNullOrWhiteSpace(SearchTextInput.Text))
-                //            _search();
-                //        else
-                //            _searchTimer = (int)setTimeout((a) => { _search(); }, 500);
-                //    },
-                //    OnKeyDown = (sender, ev) => {
-                //        if (ev.keyCode == KeyCodes.Enter)
-                //        {
-                //            btnFind.Content.click();
-                //        }
-                //    }
-                //};
-                //SearchTextInput.Bounds = new Vector4(30, 13, 350, 22);
-                //SearchTextInput.SetAttribute("placeholder", "Enter text to search...");
+                this.SearchTextInput = new System.Windows.Forms.TextBox();
 
-                //btnFind = new SimpleButton()
-                //{
-                //    Text = "Find",
-                //    ItemClick = (sender) => {
-                //        if (_searchTimer > -1)
-                //        {
-                //            clearTimeout(_searchTimer);
-                //        }
-                //        _search();
-                //    },
-                //    Bounds = new Vector4(385, 13, 60, 22)
-                //};
-                //btnClear = new SimpleButton()
-                //{
-                //    Text = "Clear",
-                //    ItemClick = (sender) => {
-                //        if (_searchTimer > -1)
-                //        {
-                //            clearTimeout(_searchTimer);
-                //        }
-                //        SearchTextInput.Text = string.Empty;
-                //    },
-                //    Bounds = new Vector4(449, 13, 60, 22)
-                //};
+                this.SearchTextInput.addTextChanged(Bridge.fn.bind(this, function (sender, ev) {
+                    if (this._searchTimer > -1) {
+                        clearTimeout(this._searchTimer);
+                    }
+                    if (System.String.isNullOrWhiteSpace(this.SearchTextInput.Text)) {
+                        this._search();
+                    } else {
+                        this._searchTimer = Bridge.Int.clip32(setTimeout(Bridge.fn.bind(this, function (a) {
+                            this._search();
+                        }), 500));
+                    }
+                }));
 
-                //btnClose = new SimpleButton()
-                //{
-                //    Bounds = new Vector4(7, 15, 18, 18),
-                //    ItemClick = (sender) => {
-                //        btnClear.Content.click();
-                //        CloseFindPanel();
-                //    }
-                //};
-                //btnClose.Content.innerHTML = "&times;";
+                this.SearchTextInput.Location = new System.Drawing.Point.$ctor1(30, 13); // = new Drawing.Rectangle(30, 13, 350, 22);
+                this.SearchTextInput.Size = new System.Drawing.Size.$ctor2(350, 22);
+
+                this.SearchTextInput.Element.setAttribute("placeholder", "Enter text to search...");
+
+                this.btnFind = ($t = new System.Windows.Forms.Button(), $t.Text = "Find", $t.Location = new System.Drawing.Point.$ctor1(385, 13), $t.Size = new System.Drawing.Size.$ctor2(60, 22), $t);
+
+                this.btnFind.addClick(Bridge.fn.bind(this, function (sender, ev) {
+                    if (this._searchTimer > -1) {
+                        clearTimeout(this._searchTimer);
+                    }
+                    this._search();
+                }));
+
+                this.btnClear = ($t = new System.Windows.Forms.Button(), $t.Text = "Clear", $t.Location = new System.Drawing.Point.$ctor1(449, 13), $t.Size = new System.Drawing.Size.$ctor2(60, 22), $t);
+                this.btnClear.addClick(Bridge.fn.bind(this, function (sender, ev) {
+                    if (this._searchTimer > -1) {
+                        clearTimeout(this._searchTimer);
+                    }
+                    this.SearchTextInput.Text = "";
+                }));
 
 
-                //GridFindPanel.AppendChildren(btnClose, SearchTextInput, btnFind, btnClear);
+                this.btnClose = ($t = new System.Windows.Forms.Button(), $t.Location = new System.Drawing.Point.$ctor1(7, 15), $t.Size = new System.Drawing.Size.$ctor2(18, 18), $t);
+                this.btnClose.addClick(Bridge.fn.bind(this, function (sender, ev) {
+                    this.btnClear.Element.click();
+                    this.CloseFindPanel();
+                }));
+                this.btnClose.Element.innerHTML = "&times;";
+
+
+                System.Helper.AppendChildren$1(this.GridFindPanel, [this.btnClose, this.SearchTextInput, this.btnFind, this.btnClear]);
 
                 this.SetDefaultSizes();
 
@@ -14230,17 +14252,31 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             }
         },
         methods: {
-            /**
-             * Data Row Html Element - Row handle
-             *
-             * @instance
-             * @public
-             * @this System.Windows.Forms.DataGridView
-             * @memberof System.Windows.Forms.DataGridView
-             * @return  {boolean}
-             */
             ResolveSearchDataIndex: function () {
                 return (this.VisibleRowHandles != null && this.VisibleRowHandles.Count > 0);
+            },
+            ShowFindPanel: function () {
+                if (!this._findPanelVisible) {
+                    //_showFindPanelContextItem.Caption = "Close Find Panel";
+                    this._findPanelVisible = true;
+                    this.GridFindPanel.style.visibility = "inherit";
+
+                    this.SetDefaultSizes();
+
+                    this.RenderGrid();
+                }
+
+            },
+            CloseFindPanel: function () {
+                if (this._findPanelVisible) {
+                    //_showFindPanelContextItem.Caption = "Show Find Panel";
+                    this._findPanelVisible = false;
+                    this.GridFindPanel.style.visibility = "hidden";
+
+                    this.SetDefaultSizes();
+
+                    this.RenderGrid();
+                }
             },
             SetVisibleRowHandles: function (T, Cells, asc) {
                 if (this.DataSource._searchActive) {
@@ -14370,28 +14406,22 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     this.GridHeader.style.visibility = "inherit";
                     this.GridHeaderContainer.style.visibility = "inherit";
 
-                    //if (FindPanelVisible)
-                    //{
-                    //    GridHeaderContainer.SetBounds(0, 47, "100%", UnitHeight + 1);
-                    //    GridBodyContainer.SetBounds(0, UnitHeight + 2 + 47, "100%", "(100% - " + (UnitHeight + 2 + 47) + "px)");
-                    //}
-                    //else
-                    //{
-                    System.Helper.SetBounds(this.GridHeaderContainer, 0, 0, "100%", this.UnitHeight);
-                    System.Helper.SetBounds(this.GridBodyContainer, 0, this.UnitHeight, "100%", "(100% - " + System.Single.format((this.UnitHeight)) + "px)");
-                    //}
+                    if (this.FindPanelVisible) {
+                        System.Helper.SetBounds(this.GridHeaderContainer, 0, 47, "100%", this.UnitHeight + 1);
+                        System.Helper.SetBounds(this.GridBodyContainer, 0, this.UnitHeight + 2 + 47, "100%", "(100% - " + System.Single.format((this.UnitHeight + 2 + 47)) + "px)");
+                    } else {
+                        System.Helper.SetBounds(this.GridHeaderContainer, 0, 0, "100%", this.UnitHeight);
+                        System.Helper.SetBounds(this.GridBodyContainer, 0, this.UnitHeight, "100%", "(100% - " + System.Single.format((this.UnitHeight)) + "px)");
+                    }
                 } else {
                     this.GridHeader.style.visibility = "hidden";
                     this.GridHeaderContainer.style.visibility = "hidden";
 
-                    //if (FindPanelVisible)
-                    //{
-                    //    GridBodyContainer.SetBounds(0, 1 + 46, "100%", "(100% - " + (1 + 46) + "px)");
-                    //}
-                    //else
-                    //{
-                    System.Helper.SetBounds(this.GridBodyContainer, 0, 1, "100%", "(100% - 1px)");
-                    //}
+                    if (this.FindPanelVisible) {
+                        System.Helper.SetBounds(this.GridBodyContainer, 0, 47, "100%", "(100% - " + (47) + "px)");
+                    } else {
+                        System.Helper.SetBounds(this.GridBodyContainer, 0, 1, "100%", "(100% - 1px)");
+                    }
                 }
             },
             SortColumn: function () {
@@ -14428,7 +14458,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             this.SetVisibleRowHandles(System.Boolean, column.Column.Cells, sort1);
                             break;
                         case System.Data.DataTypeCode.DateTime: 
-                            this.SetVisibleRowHandles(Bridge.global.System.DateTime, column.Column.Cells, sort1);
+                            this.SetVisibleRowHandles(System.DateTime, column.Column.Cells, sort1);
                             break;
                         case System.Data.DataTypeCode.String: 
                             this.SetVisibleRowHandles(System.String, column.Column.Cells, sort1);
@@ -14726,7 +14756,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 if (this.DataSource == null || true) {
                     return;
                 }
-                //this.DataSource.Search(SearchTextInput.Text, this);
+                this.DataSource.Search(this.SearchTextInput.Text, this);
             },
             MakeRowVisible: function (rowHandle) {
                 if (rowHandle < 0) {
@@ -15253,7 +15283,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         if (Bridge.is($t, System.IDisposable)) {
                             $t.System$IDisposable$Dispose();
                         }
-                    }return pages.ToArray();
+                    }
+                    return pages.ToArray();
                 }
             },
             Font: {
@@ -15412,7 +15443,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Bridge.is($t, System.IDisposable)) {
                         $t.System$IDisposable$Dispose();
                     }
-                }},
+                }
+            },
             RenderTabContent: function () {
                 var $t, $t1;
                 var i = 0;
@@ -15448,6 +15480,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                                         $t1.System$IDisposable$Dispose();
                                     }
                                 }
+
                             } else {
                                 if (!page.Header.Element.classList.contains(this.LinkTag)) {
                                     page.Header.Element.classList.add(this.LinkTag);
@@ -15491,6 +15524,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         $t.System$IDisposable$Dispose();
                     }
                 }
+
                 if (activePage != null) {
                     this.Controls.remove(activePage.Header);
                     this.Controls.add(activePage.Header);
@@ -16054,7 +16088,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         if (Bridge.is($t, System.IDisposable)) {
                             $t.System$IDisposable$Dispose();
                         }
-                    }$t1 = Bridge.getEnumerator(RemoveList);
+                    }
+                    $t1 = Bridge.getEnumerator(RemoveList);
                     try {
                         while ($t1.moveNext()) {
                             var item1 = $t1.Current;
@@ -16064,7 +16099,8 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         if (Bridge.is($t1, System.IDisposable)) {
                             $t1.System$IDisposable$Dispose();
                         }
-                    }},
+                    }
+                },
                 GetActiveFormCollection: function () {
                     for (var i = (System.Windows.Forms.Form._formCollections.Count - 1) | 0; i >= 0; i = (i - 1) | 0) {
                         var frmCol = System.Windows.Forms.Form._formCollections.getItem(i);
