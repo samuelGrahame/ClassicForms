@@ -9,7 +9,7 @@ namespace System
     public static class StringUtils
     {        
         public static int CompareOrdinal(this string strA, string strB)
-        {
+        {            
             if (strA == strB)
             {
                 return 0;
