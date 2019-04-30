@@ -64,11 +64,8 @@
     <Compile Include="Helper.cs" />
     <Compile Include="IServiceProviderV2.cs" />
     <Compile Include="IWellKnownStringEqualityComparer.cs" />
-    <Compile Include="OrdinalComparer.cs" />
-    <Compile Include="OrdinalRandomizedComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="StringComparer.cs" />
     <Compile Include="StringUtils.cs" />
     <Compile Include="Windows\Forms\AnchorStyles.cs" />
     <Compile Include="Windows\Forms\ArrowDirection.cs" />
@@ -151,8 +148,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Bridge, Version=17.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Bridge.Core.17.4.0\lib\net40\Bridge.dll</HintPath>
+    <Reference Include="Bridge, Version=17.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bridge.Core.17.7.0\lib\net40\Bridge.dll</HintPath>
     </Reference>
     <Reference Include="Retyped.Core, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Retyped.Core.1.6.6733\lib\net40\Retyped.Core.dll</HintPath>
@@ -171,11 +168,11 @@
     <Content Include="Bridge\windows10.css" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Bridge.Min.17.4.0\build\Bridge.Min.targets" Condition="Exists('..\packages\Bridge.Min.17.4.0\build\Bridge.Min.targets')" />
+  <Import Project="..\packages\Bridge.Min.17.7.0\build\Bridge.Min.targets" Condition="Exists('..\packages\Bridge.Min.17.7.0\build\Bridge.Min.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Bridge.Min.17.4.0\build\Bridge.Min.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Bridge.Min.17.4.0\build\Bridge.Min.targets'))" />
+    <Error Condition="!Exists('..\packages\Bridge.Min.17.7.0\build\Bridge.Min.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Bridge.Min.17.7.0\build\Bridge.Min.targets'))" />
   </Target>
 </Project>

@@ -1,7 +1,7 @@
 /**
  * @version 1.0.0.0
  * @copyright Copyright ©  2018
- * @compiler Bridge.NET 17.6.0
+ * @compiler Bridge.NET 17.7.0
  */
 Bridge.assembly("ClassicForms", function ($asm, globals) {
     "use strict";
@@ -4721,7 +4721,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
                     ;
                 },
-                Element$1: function (T, element, classname) {
+                Element: function (element, classname) {
                     if (classname === void 0) { classname = ""; }
                     element.className = classname;
 
@@ -4731,7 +4731,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                     return element;
                 },
-                Element: function (T, element, Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
+                Element$1: function (element, Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
                     if (IsBold === void 0) { IsBold = false; }
                     if (IsTiny === void 0) { IsTiny = false; }
                     if (classr === void 0) { classr = ""; }
@@ -4765,7 +4765,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 },
                 Div: function (classname) {
                     if (classname === void 0) { classname = ""; }
-                    return System.Helper.Element$1(HTMLDivElement, document.createElement("div"), classname);
+                    return System.Helper.Element(document.createElement("div"), classname);
                 },
                 Cell: function (Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
                     if (IsBold === void 0) { IsBold = false; }
@@ -4774,7 +4774,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Alignment === void 0) { Alignment = "left"; }
                     if (Forecolor === void 0) { Forecolor = null; }
                     if (ac === void 0) { ac = true; }
-                    return System.Helper.Element(HTMLTableCellElement, new HTMLTableCellElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
+                    return System.Helper.Element$1(new HTMLTableCellElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
                 },
                 HeaderCell: function (Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
                     if (IsBold === void 0) { IsBold = false; }
@@ -4783,7 +4783,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Alignment === void 0) { Alignment = "left"; }
                     if (Forecolor === void 0) { Forecolor = null; }
                     if (ac === void 0) { ac = true; }
-                    return System.Helper.Element(HTMLElement, document.createElement("th"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
+                    return System.Helper.Element$1(document.createElement("th"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
                 },
                 Label: function (Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac) {
                     if (IsBold === void 0) { IsBold = false; }
@@ -4792,7 +4792,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (Alignment === void 0) { Alignment = "left"; }
                     if (Forecolor === void 0) { Forecolor = null; }
                     if (ac === void 0) { ac = true; }
-                    return System.Helper.Element(HTMLSpanElement, document.createElement("span"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
+                    return System.Helper.Element$1(document.createElement("span"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
                 },
                 AppendChild: function (c, Node) {
                     c.Element.appendChild(Node.Element);
@@ -4999,114 +4999,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
     Bridge.define("System.IWellKnownStringEqualityComparer", {
         $kind: "interface"
-    });
-
-    Bridge.define("System.StringComparer", {
-        inherits: [System.Collections.IComparer,System.Collections.IEqualityComparer,System.Collections.Generic.IComparer$1(System.String),System.Collections.Generic.IEqualityComparer$1(System.String)],
-        statics: {
-            fields: {
-                _ordinal: null,
-                _ordinalIgnoreCase: null
-            },
-            props: {
-                InvariantCulture: {
-                    get: function () {
-                        return null;
-                    }
-                },
-                InvariantCultureIgnoreCase: {
-                    get: function () {
-                        return null;
-                    }
-                },
-                Ordinal: {
-                    get: function () {
-                        return System.StringComparer._ordinal;
-                    }
-                },
-                OrdinalIgnoreCase: {
-                    get: function () {
-                        return System.StringComparer._ordinalIgnoreCase;
-                    }
-                }
-            },
-            ctors: {
-                init: function () {
-                    this._ordinal = new System.OrdinalComparer(false);
-                    this._ordinalIgnoreCase = new System.OrdinalComparer(true);
-                }
-            },
-            methods: {
-                Create: function (culture, ignoreCase) {
-                    if (culture == null) {
-                        throw new System.ArgumentNullException.$ctor1("culture");
-                    }
-                    throw new System.NotImplementedException.ctor();
-                    //return new CultureAwareComparer(culture, ignoreCase);
-                }
-            }
-        },
-        alias: [
-            "compare", "System$Collections$IComparer$compare",
-            "equals", "System$Collections$IEqualityComparer$equals",
-            "getHashCode", "System$Collections$IEqualityComparer$getHashCode"
-        ],
-        ctors: {
-            ctor: function () {
-                this.$initialize();
-            }
-        },
-        methods: {
-            compare: function (x, y) {
-                if (Bridge.referenceEquals(x, y)) {
-                    return 0;
-                }
-                if (x == null) {
-                    return -1;
-                }
-                if (y == null) {
-                    return 1;
-                }
-                var str = Bridge.as(x, System.String);
-                if (str != null) {
-                    var str2 = Bridge.as(y, System.String);
-                    if (str2 != null) {
-                        return this.compare$1(str, str2);
-                    }
-                }
-                var comparable = Bridge.as(x, System.IComparable);
-                if (comparable == null) {
-                    throw new System.ArgumentException.$ctor1(System.EnvironmentV2.GetResourceString("Argument_ImplementIComparable"));
-                }
-                return Bridge.compare(comparable, y);
-            },
-            equals: function (x, y) {
-                if (Bridge.referenceEquals(x, y)) {
-                    return true;
-                }
-                if ((x == null) || (y == null)) {
-                    return false;
-                }
-                var str = Bridge.as(x, System.String);
-                if (str != null) {
-                    var str2 = Bridge.as(y, System.String);
-                    if (str2 != null) {
-                        return this.equals2(str, str2);
-                    }
-                }
-                return Bridge.equals(x, y);
-            },
-            getHashCode: function (obj) {
-                if (obj == null) {
-                    throw new System.ArgumentNullException.$ctor1("obj");
-                }
-                var str = Bridge.as(obj, System.String);
-                if (str != null) {
-                    return this.getHashCode2(str);
-                }
-                return Bridge.getHashCode(obj);
-            }
-        }
     });
 
     Bridge.define("System.Settings", {
@@ -10656,168 +10548,6 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
         $kind: "interface"
     });
 
-    Bridge.define("System.OrdinalComparer", {
-        inherits: [System.StringComparer,System.IWellKnownStringEqualityComparer],
-        fields: {
-            _ignoreCase: false
-        },
-        alias: [
-            "compare$1", ["System$Collections$Generic$IComparer$1$System$String$compare", "System$Collections$Generic$IComparer$1$compare"],
-            "equals2", ["System$Collections$Generic$IEqualityComparer$1$System$String$equals2", "System$Collections$Generic$IEqualityComparer$1$equals2"],
-            "getHashCode2", ["System$Collections$Generic$IEqualityComparer$1$System$String$getHashCode2", "System$Collections$Generic$IEqualityComparer$1$getHashCode2"]
-        ],
-        ctors: {
-            ctor: function (ignoreCase) {
-                this.$initialize();
-                System.StringComparer.ctor.call(this);
-                this._ignoreCase = ignoreCase;
-            }
-        },
-        methods: {
-            compare$1: function (x, y) {
-                if (Bridge.referenceEquals(x, y)) {
-                    return 0;
-                }
-                if (x == null) {
-                    return -1;
-                }
-                if (y == null) {
-                    return 1;
-                }
-                if (this._ignoreCase) {
-                    return System.String.compare(x, y, 5);
-                }
-                return System.StringUtils.CompareOrdinal(x, y);
-            },
-            equals$1: function (obj) {
-                var comparer = Bridge.as(obj, System.OrdinalComparer);
-                if (comparer == null) {
-                    return false;
-                }
-                return (this._ignoreCase === comparer._ignoreCase);
-            },
-            equals2: function (x, y) {
-                if (Bridge.referenceEquals(x, y)) {
-                    return true;
-                }
-                if ((x == null) || (y == null)) {
-                    return false;
-                }
-                if (!this._ignoreCase) {
-                    return System.String.equals(x, y);
-                }
-                if (x.length !== y.length) {
-                    return false;
-                }
-                return (System.String.compare(x, y, 5) === 0);
-            },
-            getHashCode$1: function () {
-                var hashCode = Bridge.getHashCode(("OrdinalComparer"));
-                if (!this._ignoreCase) {
-                    return hashCode;
-                }
-                return ~hashCode;
-            },
-            getHashCode2: function (obj) {
-                if (obj == null) {
-                    throw new System.ArgumentNullException.$ctor1("obj");
-                }
-                if (this._ignoreCase) {
-                    return 0; // TODO: TextInfo.GetHashCodeOrdinalIgnoreCase(obj);
-                }
-                return Bridge.getHashCode(obj);
-            },
-            System$IWellKnownStringEqualityComparer$GetEqualityComparerForSerialization: function () {
-                return this;
-            },
-            System$IWellKnownStringEqualityComparer$GetRandomizedEqualityComparer: function () {
-                return new System.OrdinalRandomizedComparer(this._ignoreCase);
-            }
-        }
-    });
-
-    Bridge.define("System.OrdinalRandomizedComparer", {
-        inherits: [System.StringComparer,System.IWellKnownStringEqualityComparer],
-        fields: {
-            _entropy: System.Int64(0),
-            _ignoreCase: false
-        },
-        alias: [
-            "compare$1", ["System$Collections$Generic$IComparer$1$System$String$compare", "System$Collections$Generic$IComparer$1$compare"],
-            "equals2", ["System$Collections$Generic$IEqualityComparer$1$System$String$equals2", "System$Collections$Generic$IEqualityComparer$1$equals2"],
-            "getHashCode2", ["System$Collections$Generic$IEqualityComparer$1$System$String$getHashCode2", "System$Collections$Generic$IEqualityComparer$1$getHashCode2"]
-        ],
-        ctors: {
-            init: function () {
-                this._entropy = System.Int64(0);
-            },
-            ctor: function (ignoreCase) {
-                this.$initialize();
-                System.StringComparer.ctor.call(this);
-                this._ignoreCase = ignoreCase;
-                //TODO : this._entropy = HashHelpers.GetEntropy();
-            }
-        },
-        methods: {
-            compare$1: function (x, y) {
-                if (Bridge.referenceEquals(x, y)) {
-                    return 0;
-                }
-                if (x == null) {
-                    return -1;
-                }
-                if (y == null) {
-                    return 1;
-                }
-                if (this._ignoreCase) {
-                    return System.String.compare(x, y, 5);
-                }
-                return System.StringUtils.CompareOrdinal(x, y);
-            },
-            equals$1: function (obj) {
-                var comparer = Bridge.as(obj, System.OrdinalRandomizedComparer);
-                if (comparer == null) {
-                    return false;
-                }
-                return ((this._ignoreCase === comparer._ignoreCase) && (this._entropy.equals(comparer._entropy)));
-            },
-            equals2: function (x, y) {
-                if (Bridge.referenceEquals(x, y)) {
-                    return true;
-                }
-                if ((x == null) || (y == null)) {
-                    return false;
-                }
-                if (!this._ignoreCase) {
-                    return System.String.equals(x, y);
-                }
-                if (x.length !== y.length) {
-                    return false;
-                }
-                return (System.String.compare(x, y, 5) === 0);
-            },
-            getHashCode$1: function () {
-                var hashCode = Bridge.getHashCode(("OrdinalRandomizedComparer"));
-                return ((this._ignoreCase ? ~hashCode : hashCode) ^ (System.Int64.clip32(this._entropy.and(System.Int64(2147483647)))));
-            },
-            getHashCode2: function (obj) {
-                if (obj == null) {
-                    throw new System.ArgumentNullException.$ctor1("obj");
-                }
-                if (this._ignoreCase) {
-                    return 0; //TODO TextInfo.GetHashCodeOrdinalIgnoreCase(obj, true, this._entropy);
-                }
-                return 0; // TODO string.InternalMarvin32HashString(obj, obj.Length, this._entropy);
-            },
-            System$IWellKnownStringEqualityComparer$GetEqualityComparerForSerialization: function () {
-                return new System.OrdinalComparer(this._ignoreCase);
-            },
-            System$IWellKnownStringEqualityComparer$GetRandomizedEqualityComparer: function () {
-                return new System.OrdinalRandomizedComparer(this._ignoreCase);
-            }
-        }
-    });
-
     Bridge.define("System.Windows.Forms.Layout.IArrangedElement", {
         inherits: [System.ComponentModel.IComponent,System.IDisposable],
         $kind: "interface"
@@ -10859,7 +10589,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
             OnCreate: function (gridView, dataRowIndex, columnIndex) {
                 var value = gridView.GetRowCellValue$1(dataRowIndex, columnIndex);
 
-                var cell = System.Helper.Element$1(HTMLTableCellElement, new HTMLTableCellElement());
+                var cell = System.Helper.Element(new HTMLTableCellElement());
                 var input = new System.Windows.Forms.CheckBox();
                 System.Helper.SetBoundsFull$1(input);
                 input.Checked = Bridge.unbox(value);
@@ -11021,7 +10751,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         var dictionary = Bridge.cast(element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty), System.Collections.Generic.Dictionary$2(System.Object,System.Object));
                         if (dictionary != null) {
                             if (dictionary.containsKey(element)) {
-                                var obj2 = dictionary.get(element);
+                                var obj2 = dictionary.getItem(element);
                                 if (obj2 != null) {
                                     return System.Nullable.getValue(Bridge.cast(Bridge.unbox(obj2, System.Drawing.Rectangle), System.Drawing.Rectangle));
                                 }
@@ -11279,7 +11009,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     if (System.Drawing.Rectangle.op_Inequality(bounds.$clone(), System.Windows.Forms.Layout.DefaultLayout.GetCachedBounds(element))) {
                         var dictionary = Bridge.cast(element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Properties.GetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty), System.Collections.IDictionary);
                         if (dictionary == null) {
-                            dictionary = new (System.Collections.Generic.Dictionary$2(System.Object,System.Object))();
+                            dictionary = new (System.Collections.Generic.Dictionary$2(System.Object,System.Object)).ctor();
                             element.System$Windows$Forms$Layout$IArrangedElement$Container.System$Windows$Forms$Layout$IArrangedElement$Properties.SetObject(System.Windows.Forms.Layout.DefaultLayout._cachedBoundsProperty, dictionary);
                         }
                         dictionary.System$Collections$IDictionary$setItem(element, bounds.$clone());
@@ -13305,7 +13035,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 this._columnHeadersVisible = true;
                 this._useEditForm = true;
                 this.PrevRenderGridScrollId = -1;
-                this.CacheRow = new (System.Collections.Generic.Dictionary$2(System.Int32,HTMLElement))();
+                this.CacheRow = new (System.Collections.Generic.Dictionary$2(System.Int32,HTMLElement)).ctor();
                 this.CountOfDeletion = 0;
                 this._searchTimer = -1;
                 this.oTag = "";
@@ -13532,13 +13262,13 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         Length = this.DataSource.RowCount;
                     }
 
-                    if (this.CacheRow.count > 10) {
+                    if (this.CacheRow.Count > 10) {
                         if (this.CountOfDeletion > 8) {
-                            this.CacheRow = new (System.Collections.Generic.Dictionary$2(System.Int32,HTMLElement))();
+                            this.CacheRow = new (System.Collections.Generic.Dictionary$2(System.Int32,HTMLElement)).ctor();
                             this.CountOfDeletion = 0;
                         } else {
-                            var MaxDelete = (this.CacheRow.count - 10) | 0;
-                            var __length = this.CacheRow.count;
+                            var MaxDelete = (this.CacheRow.Count - 10) | 0;
+                            var __length = this.CacheRow.Count;
                             var KeysToDelete = new (System.Collections.Generic.List$1(System.Int32)).ctor();
                             for (var i1 = 0; i1 < __length; i1 = (i1 + 1) | 0) {
                                 var fieldIndex = System.Linq.Enumerable.from(this.CacheRow).elementAt(i1).key;
@@ -13555,7 +13285,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                             }
                             for (var i2 = 0; i2 < __length; i2 = (i2 + 1) | 0) {
                                 if (this.CacheRow.containsKey(KeysToDelete.getItem(i2))) {
-                                    var x3 = this.CacheRow.get(KeysToDelete.getItem(i2));
+                                    var x3 = this.CacheRow.getItem(KeysToDelete.getItem(i2));
                                     x3.onclick = null;
                                     x3.ondblclick = null;
                                     System.Helper.Empty(x3);
@@ -13568,7 +13298,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                         }
                     }
 
-                    var prevRowCache = this.CacheRow.count;
+                    var prevRowCache = this.CacheRow.Count;
 
                     for (var i3 = start; i3 < Length; i3 = (i3 + 1) | 0) {
                         if (!this.CacheRow.containsKey(i3)) {
@@ -13685,7 +13415,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
 
                             rowFragment.appendChild(dr);
 
-                            this.CacheRow.set(i3, dr);
+                            this.CacheRow.setItem(i3, dr);
                         }
 
                         if (StartedWith !== this.RenderTime) {
@@ -13737,18 +13467,18 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 });
                 this.Element.style.outline = "0";
 
-                this.GridHeaderContainer = System.Helper.Element$1(HTMLElement, document.createElement("table"));
+                this.GridHeaderContainer = System.Helper.Element(document.createElement("table"));
 
-                this.GridHeader = System.Helper.Element$1(HTMLElement, document.createElement("thead"));
+                this.GridHeader = System.Helper.Element(document.createElement("thead"));
                 System.Helper.SetBounds(this.GridHeader, 0, 0, 0, System.Helper.ToPx(Bridge.box(this.UnitHeight, System.Single, System.Single.format, System.Single.getHashCode)));
-                this.GridBodyContainer = System.Helper.Element$1(HTMLElement, document.createElement("table"));
+                this.GridBodyContainer = System.Helper.Element(document.createElement("table"));
                 this.GridBodyContainer.style.display = "block";
                 this.GridBodyContainer.style.overflowX = "auto";
                 this.GridBodyContainer.style.overflowY = "auto";
 
                 this.GridHeaderContainer.style.overflow = "hidden";
 
-                this.GridBody = System.Helper.Element$1(HTMLElement, document.createElement("tbody"));
+                this.GridBody = System.Helper.Element(document.createElement("tbody"));
                 //            border-top: 0;
                 //border-left: 0;
                 this.GridBodyContainer.style.borderTop = "0";
@@ -13842,7 +13572,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 });
 
                 this.addResize(Bridge.fn.bind(this, function (sender, ev) {
-                    this.CacheRow = new (System.Collections.Generic.Dictionary$2(System.Int32,HTMLElement))();
+                    this.CacheRow = new (System.Collections.Generic.Dictionary$2(System.Int32,HTMLElement)).ctor();
                     this.DelayedRenderGrid();
 
                 }));
@@ -13865,7 +13595,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                     }
 
                     if (prevleft !== this.GridBodyContainer.scrollLeft) {
-                        this.CacheRow = new (System.Collections.Generic.Dictionary$2(System.Int32,HTMLElement))();
+                        this.CacheRow = new (System.Collections.Generic.Dictionary$2(System.Int32,HTMLElement)).ctor();
                         prevleft = Bridge.Int.clip32(this.GridBodyContainer.scrollLeft);
                         this.DelayedRenderGrid();
                     } else {
@@ -14988,7 +14718,7 @@ Bridge.assembly("ClassicForms", function ($asm, globals) {
                 }
 
                 if (clear) {
-                    this.CacheRow = new (System.Collections.Generic.Dictionary$2(System.Int32,HTMLElement))();
+                    this.CacheRow = new (System.Collections.Generic.Dictionary$2(System.Int32,HTMLElement)).ctor();
                 }
 
                 if (this.RenderTime > -1) {

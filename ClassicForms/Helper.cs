@@ -66,7 +66,7 @@ namespace System
             };
         }
 
-        public static T Element<T>(T element, string classname = "") where T : HTMLElement
+        public static HTMLElement Element(HTMLElement element, string classname = "")
         {            
             element.className = classname;
 
@@ -79,12 +79,12 @@ namespace System
 
         public static HTMLDivElement Div(string classname = "")
         {
-            return Element(new HTMLDivElement(), classname);
+            return Element(new HTMLDivElement(), classname).As<HTMLDivElement>();
         }
 
         public static HTMLTableCellElement Cell(string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true)
         {
-            return Element(new HTMLTableCellElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
+            return Element(new HTMLTableCellElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac).As<HTMLTableCellElement>();
         }
 
         public static HTMLElement HeaderCell(string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true)
@@ -92,7 +92,7 @@ namespace System
             return Element(document.createElement("th"), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac);
         }
 
-        public static T Element<T>(T element, string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true) where T : HTMLElement
+        public static HTMLElement Element(HTMLElement element, string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true)
         {
             element.className = classr;
 
@@ -127,7 +127,7 @@ namespace System
 
         public static HTMLSpanElement Label(string Caption, float X, float Y, float width, bool IsBold = false, bool IsTiny = false, string classr = "", string Alignment = "left", string Forecolor = null, bool ac = true)
         {            
-            return Element(new HTMLSpanElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac); ;
+            return Element(new HTMLSpanElement(), Caption, X, Y, width, IsBold, IsTiny, classr, Alignment, Forecolor, ac).As<HTMLSpanElement>();
         }
 
         public static Control AppendChild(this Control c, Control Node)
