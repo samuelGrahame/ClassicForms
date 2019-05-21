@@ -91,7 +91,7 @@ namespace System
 #endif
         }
 
-        private static bool _isUsingBootStrap;
+        public static bool _isUsingBootStrap;
         public static bool IsUsingBootStrap()
         {
 #if BLAZOR
@@ -104,7 +104,7 @@ namespace System
 #endif
         }
 
-        private static bool _isUsingMaterial;
+        public static bool _isUsingMaterial;
         public static bool IsUsingMaterial()
         {
             if (_hasLoaded)
