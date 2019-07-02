@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>ClassicForms</id>
-    <version>0.85</version>
+    <version>0.86</version>
     <title>ClassicForms (For Bridge.Net)</title>
     <authors>SG - BL - PH</authors>
     <owners>SG - BL - PH</owners>
@@ -27,7 +27,7 @@
 	  </dependencies>
   </metadata>
   <files>
-	<file src="ClassicForms\bin\Release\ClassicForms.dll" target="lib\net452\ClassicForms.dll" />
+	<file src="ClassicForms\bin\Release\ClassicForms.dll" target="lib\net462\ClassicForms.dll" />
 	<file src="ClassicForms\Bridge\windows10.css" target="content\Bridge" />	
   </files>
  
