@@ -58,12 +58,9 @@ Locate the Index.html under (Bridge/ClassicForms) Project, make a copy. in the c
 Locate the Copy of Index.html and double click on it. you can also include this HTML file in your (Bridge/ClassicForms) Project.
 You can also adjust the properties for the project on running to run a website, then put that path file.
   
-### Previews in Rawgit.
+**Show Case 1 - simple login screen**
 
-Windows Preview:
+https://github.com/samuelGrahame/ClassicForms.Showcase1
 
-https://rawgit.com/samuelGrahame/ClassicForms/master/TestBridge/bin/Debug/bridge/preview.windows.html
+![Alt Login](images/loginExample?raw=true "Login Example")
 
-Bootstrap Preview:
-
-https://rawgit.com/samuelGrahame/ClassicForms/master/TestBridge/bin/Debug/bridge/preview.bootstrap.html
