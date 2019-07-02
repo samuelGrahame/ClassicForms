@@ -62,4 +62,5 @@ You can also adjust the properties for the project on running to run a website, 
 
 https://github.com/samuelGrahame/ClassicForms.Showcase1
 
+![Alt Login](images/loginExample?raw=true "Login Example")
 
