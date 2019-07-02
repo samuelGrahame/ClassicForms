@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>ClassicForms</id>
-    <version>0.86.1</version>
+    <version>0.86.2</version>
     <title>ClassicForms (For Bridge.Net)</title>
     <authors>SG - BL - PH</authors>
     <owners>SG - BL - PH</owners>
@@ -11,7 +11,7 @@
     <description>ClassicForms (For Bridge.Net) - Create a Windows Application using ClassicForms UI and Bridge for the Browser..
 </description>
     <releaseNotes>
-		ClassicForms upgraded to 17.9 bridge
+		ClassicForms Added setting use name of textbox for place holder - it will remove txt from the start and propercase.
 	</releaseNotes>
     <copyright>Copyright 2018</copyright>
     <tags>Bridge Bridge.net Javascript Forms ExpressCraft C# UI jQuery HTML</tags>
