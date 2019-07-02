@@ -20,6 +20,8 @@ namespace System
         public static bool GridViewAutoColumnGenerateFormatAsDate = false;
         public static bool GridViewAutoColumnFormatDates = true;
 
+        public static bool UseNameForInputPlaceholders = false;
+
         /// <summary>
         /// enabled override the default font name.
         /// </summary>

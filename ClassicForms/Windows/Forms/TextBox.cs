@@ -12,6 +12,46 @@ namespace System.Windows.Forms
     {
         public bool Multiline { get; set; }
 
+        public override string Name { get => base.Name; set {
+                if(base.Name != value)
+                {
+                    base.Name = value;
+                    if (Settings.UseNameForInputPlaceholders)
+                    {
+                        if(string.IsNullOrWhiteSpace(value))
+                        {
+                            Element.setAttribute("placeholder", "");
+                        }
+                        else
+                        {
+                            if(value.StartsWith("txt") && value.Length > 3)
+                            {
+                                value = value.Substring(3);
+                            }
+
+                            var builder = new StringBuilder();
+
+                            for (int i = 0; i < value.Length; i++)
+                            {
+                                var c = value[i];
+
+                                if (char.IsUpper(c))
+                                {
+                                    builder.Append(' ');
+                                }
+                                if (i == 0)
+                                    c = char.ToUpper(c);
+                                builder.Append(c);
+
+
+                            }
+                            Element.setAttribute("placeholder", builder.ToString().Trim());
+                        }
+                    }
+                }
+            }
+        }
+
         private HorizontalAlignment _textAlign = HorizontalAlignment.Left;
         public HorizontalAlignment TextAlign { get
             {
@@ -69,6 +109,7 @@ namespace System.Windows.Forms
 
 
         }
+
         private string prevString;
         public override string Text { get { return Element.As<HTMLInputElement>().value; } set
             {

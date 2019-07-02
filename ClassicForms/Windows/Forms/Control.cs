@@ -15,7 +15,7 @@ namespace System.Windows.Forms
     [Serializable]
     public class Control : IArrangedElement, IComponent
     {
-        public string Name { get { return Element.getAttribute("Name"); } set { Element.setAttribute("Name", value); } }
+        public virtual string Name { get { return Element.getAttribute("Name"); } set { Element.setAttribute("Name", value); } }
         private Point _location;
 
         protected virtual void OnChildGotTabbed()
