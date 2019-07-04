@@ -64,3 +64,9 @@ https://github.com/samuelGrahame/ClassicForms.Showcase1
 
 ![Alt Login](images/loginExample.png?raw=true "Login Example")
 
+**Show Case 2 - main page Example with a long text resource in the page**
+
+https://github.com/samuelGrahame/ClassicForms.Showcase2
+
+![Alt Login](images/ResourceFileText.png?raw=true "Resource Main Page Example")
+
