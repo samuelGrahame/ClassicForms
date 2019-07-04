@@ -50,7 +50,8 @@ namespace System
 
         public static WinFormButtonSides WinFormButtonSide = WinFormButtonSides.Right;
 
-        public static Func<Type, string, string> OnFormRequest = null;
+        public static Func<Type, string, string> OnComponentResourceManagerGetString = null;
+        public static bool UseNativeResource = true;
 
         public enum WinFormButtonSides
         {

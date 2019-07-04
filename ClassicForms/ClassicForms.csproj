@@ -34,6 +34,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoStdLib>true</NoStdLib>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Collections\ArrayList.cs" />
@@ -48,6 +49,7 @@
     <Compile Include="Data\DataColumnCollection.cs" />
     <Compile Include="Data\DataRowCollection.cs" />
     <Compile Include="Data\DataTable.cs" />
+    <Compile Include="DateHelper.cs" />
     <Compile Include="Drawing\Color.cs" />
     <Compile Include="Drawing\ContentAlignment.cs" />
     <Compile Include="Drawing\Font.cs" />
@@ -66,6 +68,11 @@
     <Compile Include="IServiceProviderV2.cs" />
     <Compile Include="IWellKnownStringEqualityComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\FastResourceComparer.cs" />
+    <Compile Include="Resources\ResourceReader.cs" />
+    <Compile Include="Resources\ResourceLocator.cs" />
+    <Compile Include="Resources\ResourceTypeCode.cs" />
+    <Compile Include="Runtime\Serialization\Formatters\Binary\ObjectReader.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="StringUtils.cs" />
     <Compile Include="Windows\Forms\AnchorStyles.cs" />
