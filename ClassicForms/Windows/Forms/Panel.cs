@@ -30,6 +30,22 @@ namespace System.Windows.Forms
             }
         }
 
+        public bool AutoScroll
+        {
+            get { return Element.style.overflow == "auto"; }
+            set {
+                if(value)
+                {
+                    Element.style.overflow = "auto";
+                }
+                else
+                {
+                    Element.style.overflow = null;
+                }                
+            }
+        }
+
+
         public Panel() : base()
         {
             TabStop = false;

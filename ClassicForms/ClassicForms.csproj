@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="Collections\ArrayList.cs" />
     <Compile Include="Collections\Generic\Specialized\BitVector32.cs" />
+    <Compile Include="ComponentModel\ComponentResourceManager.cs" />
     <Compile Include="ComponentModel\Container.cs" />
     <Compile Include="ComponentModel\IComponent.cs" />
     <Compile Include="ComponentModel\IContainer.cs" />

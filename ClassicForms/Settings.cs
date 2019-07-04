@@ -50,6 +50,8 @@ namespace System
 
         public static WinFormButtonSides WinFormButtonSide = WinFormButtonSides.Right;
 
+        public static Func<Type, string, string> OnFormRequest = null;
+
         public enum WinFormButtonSides
         {
             Left,
