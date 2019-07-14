@@ -144,6 +144,7 @@ namespace System.Resources
             {
                 return this.DeserializeObject(typeIndex);
             }
+
             var bits = new byte[16];
             for (int i = 0; i < bits.Length; i++)
             {
@@ -160,6 +161,119 @@ namespace System.Resources
                 BitConverter.ToInt32(src, offset + 8),
                 src[offset + 15] == DecimalSignBit,
                 src[offset + 14]);
+        }
+
+        internal object TryGetObject(int pos, ResourceTypeCodeV2 typeCode)
+        {
+            this._store.BaseStream.Seek(this._dataSectionOffset + pos, SeekOrigin.Begin);
+            var x = (ResourceTypeCodeV2)Read7BitEncodedInt(this._store);
+
+            switch (typeCode)
+            {
+                case ResourceTypeCodeV2.Null:
+                    return null;
+
+                case ResourceTypeCodeV2.String:
+                    return this._store.ReadString();
+
+                case ResourceTypeCodeV2.Boolean:
+                    return this._store.ReadBoolean();
+
+                case ResourceTypeCodeV2.Char:
+                    return (char)this._store.ReadUInt16();
+
+                case ResourceTypeCodeV2.Byte:
+                    return this._store.ReadByte();
+
+                case ResourceTypeCodeV2.SByte:
+                    return this._store.ReadSByte();
+
+                case ResourceTypeCodeV2.Int16:
+                    return this._store.ReadInt16();
+
+                case ResourceTypeCodeV2.UInt16:
+                    return this._store.ReadUInt16();
+
+                case ResourceTypeCodeV2.Int32:
+                    return this._store.ReadInt32();
+
+                case ResourceTypeCodeV2.UInt32:
+                    return this._store.ReadUInt32();
+
+                case ResourceTypeCodeV2.Int64:
+                    return this._store.ReadInt64();
+
+                case ResourceTypeCodeV2.UInt64:
+                    return this._store.ReadUInt64();
+
+                case ResourceTypeCodeV2.Single:
+                    return this._store.ReadSingle();
+
+                case ResourceTypeCodeV2.Double:
+                    return this._store.ReadDouble();
+
+                case ResourceTypeCodeV2.Decimal:
+                    return this._store.ReadDecimal();
+
+                case ResourceTypeCodeV2.DateTime:
+                    return DateHelper.FromBinary(this._store.ReadInt64());
+
+                case ResourceTypeCodeV2.TimeSpan:
+                    return new TimeSpan(this._store.ReadInt64());
+
+                case ResourceTypeCodeV2.ByteArray:
+                    {
+                        int count = this._store.ReadInt32();
+                        if (count < 0)
+                        {
+                            object[] values = new object[] { count };
+                            throw new Exception(EnvironmentV2.GetResourceString("BadImageFormat_ResourceDataLengthInvalid", values));
+                        }
+                        if (this._ums == null)
+                        {
+                            if (count > this._store.BaseStream.Length)
+                            {
+                                object[] objArray2 = new object[] { count };
+                                throw new Exception(EnvironmentV2.GetResourceString("BadImageFormat_ResourceDataLengthInvalid", objArray2));
+                            }
+                            return this._store.ReadBytes(count);
+                        }
+                        if (count > (this._ums.Length - this._ums.Position))
+                        {
+                            object[] objArray3 = new object[] { count };
+                            throw new Exception(EnvironmentV2.GetResourceString("BadImageFormat_ResourceDataLengthInvalid", objArray3));
+                        }
+                        byte[] buffer = new byte[count];
+                        int num5 = this._ums.Read(buffer, 0, count);
+                        return buffer;
+                    }
+                case ResourceTypeCodeV2.Stream:
+                    {
+                        int num6 = this._store.ReadInt32();
+                        if (num6 < 0)
+                        {
+                            object[] objArray4 = new object[] { num6 };
+                            throw new Exception(EnvironmentV2.GetResourceString("BadImageFormat_ResourceDataLengthInvalid", objArray4));
+                        }
+                        if (this._ums == null)
+                        {
+                            throw new Exception("Not Supported");
+                            //return new PinnedBufferMemoryStream(this._store.ReadBytes(num6));
+                        }
+                        if (num6 > (this._ums.Length - this._ums.Position))
+                        {
+                            object[] objArray5 = new object[] { num6 };
+                            throw new Exception(EnvironmentV2.GetResourceString("BadImageFormat_ResourceDataLengthInvalid", objArray5));
+                        }
+                        return new MemoryStream(this._buffer, (int)this._ums.Position, num6, false, true);
+                    }
+            }
+            if (typeCode < ResourceTypeCodeV2.StartOfUserTypes)
+            {
+                throw new Exception(EnvironmentV2.GetResourceString("BadImageFormat_TypeMismatch"));
+            }
+            int typeIndex = ((int)typeCode) - 0x40;
+            return this.DeserializeObject(typeIndex);
         }
 
         private object _LoadObjectV2(int pos, out ResourceTypeCodeV2 typeCode)
@@ -638,9 +752,9 @@ namespace System.Resources
                 }
             }
             return -1;
-        }
+        }        
 
-        private Type FindType(int typeIndex)
+        public Type FindType(int typeIndex)
         {
             if ((typeIndex < 0) || (typeIndex >= this._typeTable.Length))
             {
@@ -653,6 +767,10 @@ namespace System.Resources
                 {
                     this._store.BaseStream.Position = this._typeNamePositions[typeIndex];
                     string typeName = this._store.ReadString();
+                    if(typeName.Contains(","))
+                    {
+                        typeName = typeName.Split(',').FirstOrDefault();
+                    }
                     this._typeTable[typeIndex] = Type.GetType(typeName);
                 }
                 finally
@@ -886,6 +1004,44 @@ namespace System.Resources
                 throw new Exception(EnvironmentV2.GetResourceString("BadImageFormat_TypeMismatch"), exception2);
             }
             return obj2;
+        }
+
+        public Type GetTypeFromPos(int pos)
+        {
+            this._store.BaseStream.Seek(this._dataSectionOffset + pos, SeekOrigin.Begin);
+            int typeIndex = Read7BitEncodedInt(this._store);
+            if (this._version == 1)
+            {
+                if (typeIndex == -1)
+                {
+                    return null;
+                }
+                if (this.FindType(typeIndex) != typeof(string))
+                {
+                    object[] objArray1 = new object[] { this.FindType(typeIndex).FullName };
+                    throw new InvalidOperationException(EnvironmentV2.GetResourceString("InvalidOperation_ResourceNotString_Type", objArray1));
+                }
+                return typeof(string);
+            }
+            ResourceTypeCodeV2 code = (ResourceTypeCodeV2)typeIndex;
+            switch (code)
+            {
+                case ResourceTypeCodeV2.String:
+                case ResourceTypeCodeV2.Null:
+                    if (code == ResourceTypeCodeV2.String)
+                    {
+                        return typeof(string);
+                    }
+                    return null;
+            }
+            if (code < ResourceTypeCodeV2.StartOfUserTypes)
+            {
+                return Type.GetType($"System.{code.ToString()}");
+            }
+            else
+            {
+                return this.FindType(((int)code) - 0x40);
+            }            
         }
 
         internal string LoadString(int pos)

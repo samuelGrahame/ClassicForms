@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Resources;
@@ -33,6 +34,51 @@ namespace System.ComponentModel
             {
                 resourceReader = resourceCache[Type];
             }
+        }
+
+        public object GetObject(string name)
+        {
+            if (Settings.UseNativeResource)
+            {
+                if (resourceReader != null)
+                {
+                    try
+                    {
+                        var pos = resourceReader.FindPosForResource(name);
+                        var type = resourceReader.GetTypeFromPos(pos); 
+
+                        if(type == typeof(Bitmap))
+                        {
+                            var obj = resourceReader.TryGetObject(pos, ResourceTypeCodeV2.ByteArray);
+                            if(obj != null)
+                            {
+
+                            }
+                            //TryGetObject
+                        }
+
+                        //var str = resourceReader.LoadString(pos);
+
+                        //ResourceTypeCodeV2 resourceTypeCodeV2;
+                        //var obj = resourceReader.LoadObjectV2(pos, out resourceTypeCodeV2);
+                        //if(obj != null)
+                        //{
+
+                        //}
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine($"Unable to get resource {name} from with in {Type.FullName}.resources.");
+                    }
+                }
+            }
+            if (Settings.OnComponentResourceManagerGetObject != null)
+            {
+                return Settings.OnComponentResourceManagerGetObject(Type, name);
+            }
+            Console.WriteLine("ComponentResourceManager is not supported - please use Settings.OnComponentResourceManagerGetObject");
+            return null;
+
         }
         public string GetString(string name)
         {
