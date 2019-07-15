@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 //using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace System.Resources
         private int _namePositionsPtr;
         private long _nameSectionOffset;
         private int _numResources;
-        //private BinaryFormatter _objFormatter;
+        private BinaryFormatter _objFormatter;
         internal Dictionary<string, ResourceLocator> _resCache;
         private bool[] _safeToDeserialize;
         private BinaryReader _store;
@@ -621,30 +622,37 @@ namespace System.Resources
 
         private object DeserializeObject(int typeIndex)
         {
-            return null;
-            //object obj2;
-            //Type type = this.FindType(typeIndex);
+            //return null;
+            object obj2;
+            Type type = this.FindType(typeIndex);
             //if (this._safeToDeserialize == null)
             //{
             //    this.InitSafeToDeserializeArray();
             //}
             //if (this._safeToDeserialize[typeIndex])
             //{
-            //    this._objFormatter.Binder = this._typeLimitingBinder;
-            //    this._typeLimitingBinder.ExpectingToDeserialize(type);
+            //    this._objFormatter = new BinaryFormatter();
+            //   // this._objFormatter.Binder = this._typeLimitingBinder;
+            //    //this._typeLimitingBinder.ExpectingToDeserialize(type);
             //    obj2 = this._objFormatter.UnsafeDeserialize(this._store.BaseStream, null);
             //}
             //else
             //{
             //    this._objFormatter.Binder = null;
-            //    obj2 = this._objFormatter.Deserialize(this._store.BaseStream);
             //}
-            //if (obj2.GetType() != type)
-            //{
-            //    object[] values = new object[] { type.FullName, obj2.GetType().FullName };
-            //    throw new Exception(EnvironmentV2.GetResourceString("BadImageFormat_ResType&SerBlobMismatch", values));
-            //}
-            //return obj2;
+            if (this._objFormatter == null)
+            {
+                this._objFormatter = new BinaryFormatter();
+            }
+
+            obj2 = this._objFormatter.Deserialize(this._store.BaseStream);
+
+            if (obj2.GetType() != type)
+            {
+                object[] values = new object[] { type.FullName, obj2.GetType().FullName };
+                throw new Exception(EnvironmentV2.GetResourceString("BadImageFormat_ResType&SerBlobMismatch", values));
+            }
+            return obj2;
         }
 
         public void Dispose()
@@ -905,49 +913,51 @@ namespace System.Resources
 
         private void InitSafeToDeserializeArray()
         {
-            return;
-            //this._safeToDeserialize = new bool[this._typeTable.Length];
-            //for (int i = 0; i < this._typeTable.Length; i++)
-            //{
-            //    string str;
-            //    AssemblyName name;
-            //    string fullName;
-            //    long position = this._store.BaseStream.Position;
-            //    try
-            //    {
-            //        this._store.BaseStream.Position = this._typeNamePositions[i];
-            //        str = this._store.ReadString();
-            //    }
-            //    finally
-            //    {
-            //        this._store.BaseStream.Position = position;
-            //    }
-            //    RuntimeType type = (RuntimeType)Type.GetType(str, false);
-            //    if (type == null)
-            //    {
-            //        name = null;
-            //        fullName = str;
-            //    }
-            //    else
-            //    {
-            //        if (type.BaseType == typeof(Enum))
-            //        {
-            //            this._safeToDeserialize[i] = true;
-            //            continue;
-            //        }
-            //        fullName = type.FullName;
-            //        name = new AssemblyName();
-            //        RuntimeAssembly assembly = (RuntimeAssembly)type.Assembly;
-            //        name.Init(assembly.GetSimpleName(), assembly.GetPublicKey(), null, null, assembly.GetLocale(), AssemblyHashAlgorithm.None, AssemblyVersionCompatibility.SameMachine, null, AssemblyNameFlags.PublicKey, null);
-            //    }
-            //    foreach (string str3 in TypesSafeForDeserialization)
-            //    {
-            //        if (ResourceManager.CompareNames(str3, fullName, name))
-            //        {
-            //            this._safeToDeserialize[i] = true;
-            //        }
-            //    }
-            //}
+            //return;
+            this._safeToDeserialize = new bool[this._typeTable.Length];
+            for (int i = 0; i < this._typeTable.Length; i++)
+            {
+                string str;
+                //AssemblyName name;
+                string fullName;
+                long position = this._store.BaseStream.Position;
+                try
+                {
+                    this._store.BaseStream.Position = this._typeNamePositions[i];
+                    str = this._store.ReadString();
+                }
+                finally
+                {
+                    this._store.BaseStream.Position = position;
+                }
+                Type type = Type.GetType(str);
+                if (type == null)
+                {
+                    //name = null;
+                    fullName = str;
+                }
+                else
+                {
+                    if (type.BaseType == typeof(Enum))
+                    {
+                        this._safeToDeserialize[i] = true;
+                        continue;
+                    }
+                    fullName = type.FullName;
+                    //name = new AssemblyName();
+                    //RuntimeAssembly assembly = (RuntimeAssembly)type.Assembly;
+                    //name.Init(assembly.GetSimpleName(), assembly.GetPublicKey(), null, null, assembly.GetLocale(), AssemblyHashAlgorithm.None, AssemblyVersionCompatibility.SameMachine, null, AssemblyNameFlags.PublicKey, null);
+                }
+                foreach (string str3 in TypesSafeForDeserialization)
+                {
+                    this._safeToDeserialize[i] = true;
+
+                    //if (ResourceManager.CompareNames(str3, fullName, name))
+                    //{
+                    //    this._safeToDeserialize[i] = true;
+                    //}
+                }
+            }
         }
 
         internal object LoadObject(int pos)

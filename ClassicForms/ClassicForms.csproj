@@ -44,6 +44,8 @@
     <Compile Include="Runtime\Remoting\Messaging\IInternalMessage.cs" />
     <Compile Include="Runtime\Remoting\Messaging\IMethodReturnMessage.cs" />
     <Compile Include="Runtime\Serialization\FormatterConverter.cs" />
+    <Compile Include="Runtime\Serialization\Formatters\Binary\BinaryFormatter.cs" />
+    <Compile Include="Runtime\Serialization\Formatters\Binary\TypeInformation.cs" />
     <Compile Include="Runtime\Serialization\Formatters\Binary\SerObjectInfoCache.cs" />
     <Compile Include="Runtime\Serialization\Formatters\Binary\IntSizedArray.cs" />
     <Compile Include="Runtime\Serialization\Formatters\Binary\SerObjectInfoInit.cs" />
@@ -138,7 +140,6 @@
     <Compile Include="Runtime\Serialization\SerializationEntryV2.cs" />
     <Compile Include="Runtime\Serialization\ISurrogateSelector.cs" />
     <Compile Include="Runtime\Serialization\ISerializationSurrogate.cs" />
-    <Compile Include="Runtime\Serialization\Formatters\Binary\BinaryFormatter.cs" />
     <Compile Include="Runtime\Serialization\Formatters\Binary\ReadObjectInfo.cs" />
     <Compile Include="Runtime\Serialization\Formatters\Binary\ParseRecord.cs" />
     <Compile Include="Runtime\Serialization\Formatters\Binary\InternalArrayTypeE.cs" />

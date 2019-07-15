@@ -607,21 +607,21 @@ namespace System.Runtime.Serialization.Formatters.Binary
             }
             if (pr.PRmemberValueEnum == InternalMemberValueE.Reference)
             {
-                object obj2 = this.m_objectManager.GetObject(pr.PRidRef);
-                if (obj2 == null)
-                {
-                    int[] destinationArray = new int[record.PRrank];
-                    Array.Copy(record.PRindexMap, 0, destinationArray, 0, record.PRrank);
-                    this.m_objectManager.RecordArrayElementFixup(record.PRobjectId, destinationArray, pr.PRidRef);
-                }
-                else if (record.PRobjectA != null)
-                {
-                    record.PRobjectA[record.PRindexMap[0]] = obj2;
-                }
-                else
-                {
-                    ((Array)record.PRnewObj).SetValue(obj2, record.PRindexMap);
-                }
+                //object obj2 = this.m_objectManager.GetObject(pr.PRidRef);
+                //if (obj2 == null)
+                //{
+                //    int[] destinationArray = new int[record.PRrank];
+                //    Array.Copy(record.PRindexMap, 0, destinationArray, 0, record.PRrank);
+                //    this.m_objectManager.RecordArrayElementFixup(record.PRobjectId, destinationArray, pr.PRidRef);
+                //}
+                //else if (record.PRobjectA != null)
+                //{
+                //    record.PRobjectA[record.PRindexMap[0]] = obj2;
+                //}
+                //else
+                //{
+                //    ((Array)record.PRnewObj).SetValue(obj2, record.PRindexMap);
+                //}
             }
             else if (pr.PRmemberValueEnum == InternalMemberValueE.Nested)
             {
@@ -633,19 +633,19 @@ namespace System.Runtime.Serialization.Formatters.Binary
                 this.stack.Push(pr);
                 if (record.PRarrayElementType != null)
                 {
-                    if (record.PRarrayElementType.IsValueType && (pr.PRarrayElementTypeCode == InternalPrimitiveTypeE.Invalid))
-                    {
-                        pr.PRisValueTypeFixup = true;
-                        // TODO: this.ValueFixupStack.Push(new ValueFixup((Array)record.PRnewObj, record.PRindexMap));
-                    }
-                    else if (record.PRobjectA != null)
-                    {
-                        record.PRobjectA[record.PRindexMap[0]] = pr.PRnewObj;
-                    }
-                    else
-                    {
-                        ((Array)record.PRnewObj).SetValue(pr.PRnewObj, record.PRindexMap);
-                    }
+                    //if (record.PRarrayElementType.IsValueType && (pr.PRarrayElementTypeCode == InternalPrimitiveTypeE.Invalid))
+                    //{
+                    //    pr.PRisValueTypeFixup = true;
+                    //    // TODO: this.ValueFixupStack.Push(new ValueFixup((Array)record.PRnewObj, record.PRindexMap));
+                    //}
+                    //else if (record.PRobjectA != null)
+                    //{
+                    //    record.PRobjectA[record.PRindexMap[0]] = pr.PRnewObj;
+                    //}
+                    //else
+                    //{
+                    //    ((Array)record.PRnewObj).SetValue(pr.PRnewObj, record.PRindexMap);
+                    //}
                 }
             }
             else if (pr.PRmemberValueEnum == InternalMemberValueE.InlineValue)
@@ -653,14 +653,14 @@ namespace System.Runtime.Serialization.Formatters.Binary
                 if ((record.PRarrayElementType == Converter.typeofString) || (pr.PRdtType == Converter.typeofString))
                 {
                     this.ParseString(pr, record);
-                    if (record.PRobjectA != null)
-                    {
-                        record.PRobjectA[record.PRindexMap[0]] = pr.PRvalue;
-                    }
-                    else
-                    {
-                        ((Array)record.PRnewObj).SetValue(pr.PRvalue, record.PRindexMap);
-                    }
+                    //if (record.PRobjectA != null)
+                    //{
+                    //    record.PRobjectA[record.PRindexMap[0]] = pr.PRvalue;
+                    //}
+                    //else
+                    //{
+                    //    ((Array)record.PRnewObj).SetValue(pr.PRvalue, record.PRindexMap);
+                    //}
                 }
                 else if (record.PRisArrayVariant)
                 {
@@ -700,7 +700,7 @@ namespace System.Runtime.Serialization.Formatters.Binary
                     }
                     else
                     {
-                        ((Array)record.PRnewObj).SetValue(pRvalue, record.PRindexMap);
+                        //((Array)record.PRnewObj).SetValue(pRvalue, record.PRindexMap);
                     }
                 }
                 //else if (record.PRprimitiveArray != null)
@@ -724,7 +724,7 @@ namespace System.Runtime.Serialization.Formatters.Binary
                     }
                     else
                     {
-                        ((Array)record.PRnewObj).SetValue(pRvarValue, record.PRindexMap);
+                        //((Array)record.PRnewObj).SetValue(pRvarValue, record.PRindexMap);
                     }
                 }
             }

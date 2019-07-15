@@ -49,7 +49,7 @@ namespace System.ComponentModel
 
                         if(type == typeof(Bitmap))
                         {
-                            var obj = resourceReader.TryGetObject(pos, ResourceTypeCodeV2.ByteArray);
+                            var obj = resourceReader.LoadObject(pos);
                             if(obj != null)
                             {
 

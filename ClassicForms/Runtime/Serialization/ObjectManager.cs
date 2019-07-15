@@ -217,7 +217,7 @@ namespace System.Runtime.Serialization
                                     {
                                         throw new SerializationException(EnvironmentV2.GetResourceString("Serialization_ValueTypeFixup"));
                                     }
-                                    ((Array)holder.ObjectValue).SetValue(holder3.ObjectValue, (int[])member);
+                                    //((Array)holder.ObjectValue).SetValue(holder3.ObjectValue, (int[])member);
                                     break;
 
                                 case 2:
@@ -435,7 +435,7 @@ namespace System.Runtime.Serialization
             }
             if ((indices != null) && (holder.ObjectValue != null))
             {
-                ((Array)holder.ObjectValue).SetValue(objectValue, indices);
+                //((Array)holder.ObjectValue).SetValue(objectValue, indices);
             }
             return true;
         }
