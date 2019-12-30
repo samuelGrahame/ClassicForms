@@ -7,28 +7,28 @@ using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using static Retyped.dom;
+using static Retyped.es5;
+using Bridge;
 
 namespace System.ComponentModel
 {
     public class ComponentResourceManager
     {
         public Type Type;
+        public string Path;
         private ResourceReader resourceReader;
-        private static Dictionary<Type, ResourceReader> resourceCache = new Dictionary<Type, ResourceReader>();        
+
+        public static Dictionary<Type, ResourceReader> resourceCache = new Dictionary<Type, ResourceReader>();        
+
         public ComponentResourceManager(Type type)
         {
-            Type = type;     
-            if(!resourceCache.ContainsKey(Type))
+            Type = type;
+
+            Path = $"/resources/{Type.FullName}/";
+
+            if (!resourceCache.ContainsKey(Type))
             {
-                var data = Type.Assembly.GetManifestResourceData($"{Type.FullName}.resources");
-                try
-                {
-                    resourceCache[Type] = resourceReader = new ResourceReader(new MemoryStream(data), data);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
+                throw new Exception("Please call Form.LoadResourcesAsync() before using ComponentResourceManager.");                
             }
             else
             {
@@ -36,75 +36,86 @@ namespace System.ComponentModel
             }
         }
 
-        public object GetObject(string name)
+        public UInt8Holder GetObject(string name)
         {
-            if (Settings.UseNativeResource)
-            {
-                if (resourceReader != null)
-                {
-                    try
-                    {
-                        var pos = resourceReader.FindPosForResource(name);
-                        var type = resourceReader.GetTypeFromPos(pos); 
-
-                        if(type == typeof(Bitmap))
-                        {
-                            var obj = resourceReader.LoadObject(pos);
-                            if(obj != null)
-                            {
-
-                            }
-                            //TryGetObject
-                        }
-
-                        //var str = resourceReader.LoadString(pos);
-
-                        //ResourceTypeCodeV2 resourceTypeCodeV2;
-                        //var obj = resourceReader.LoadObjectV2(pos, out resourceTypeCodeV2);
-                        //if(obj != null)
-                        //{
-
-                        //}
-                    }
-                    catch (Exception)
-                    {
-                        Console.WriteLine($"Unable to get resource {name} from with in {Type.FullName}.resources.");
-                    }
-                }
-            }
-            if (Settings.OnComponentResourceManagerGetObject != null)
-            {
-                return Settings.OnComponentResourceManagerGetObject(Type, name);
-            }
-            Console.WriteLine("ComponentResourceManager is not supported - please use Settings.OnComponentResourceManagerGetObject");
-            return null;
-
+            return new UInt8Holder() { Array = resourceReader.GetObject(name) };
         }
         public string GetString(string name)
         {
-            if(Settings.UseNativeResource)
-            {
-                if(resourceReader != null)
-                {
-                    try
-                    {
-                        var pos = resourceReader.FindPosForResource(name);
-                        return resourceReader.LoadString(pos);                        
-                    }
-                    catch (Exception)
-                    {
-                        Console.WriteLine($"Unable to get resource {name} from with in {Type.FullName}.resources.");                        
-                    }
-                }
-            }
-            if(Settings.OnComponentResourceManagerGetString != null)
-            {
-                return Settings.OnComponentResourceManagerGetString(Type, name);
-            }
-            Console.WriteLine("ComponentResourceManager is not supported - please use Settings.OnComponentResourceManagerGetString");            
-            return name;
+            return resourceReader.GetString(name);            
+        }
+    }
+
+    public class ResourceReader
+    {
+        public Dictionary<string, object> Data = new Dictionary<string, object>();
+
+
+        public string GetString(string name)
+        {
+            return Data[name].As<string>();
         }
 
-        
+        public Uint8Array GetObject(string name)
+        {
+            return Data[name].As<Uint8Array>();
+        }
     }
+
+    public class BinaryReader
+    {
+        public BinaryReader(Uint8Array data)
+        {
+            Data = data;
+        }
+
+        public Uint8Array Data;
+        public uint Position;
+
+        public string ReadString()
+        {
+            var length = ReadInt();
+            var charArry = new char[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                charArry[i] = ReadChar();
+            }
+
+            return new string(charArry);
+        }
+
+        public char ReadChar()
+        {
+            return (char)Data[Position++];
+        }
+
+        public byte ReadByte()
+        {
+            return Data[Position++];
+        }
+
+        public int ReadInt()
+        {            
+            return BitConverter.ToInt32(
+                new byte[] { Data[Position++], Data[Position++], Data[Position++], Data[Position++] }, 0);
+        }
+
+        public Uint8Array ReadBinary()
+        {
+            var length = (uint)ReadInt();
+            var byteArry = new Uint8Array(length);
+
+            for (uint i = 0; i < length; i++)
+            {
+                byteArry[i] = Data[i + Position];
+            }
+            Position += length;
+
+            return byteArry;
+        }
+
+
+    }
+
 }

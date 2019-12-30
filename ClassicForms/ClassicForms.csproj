@@ -73,6 +73,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="StringUtils.cs" />
+    <Compile Include="UInt8Holder.cs" />
     <Compile Include="Windows\Forms\AnchorStyles.cs" />
     <Compile Include="Windows\Forms\ArrowDirection.cs" />
     <Compile Include="Windows\Forms\AutoScaleMode.cs" />
@@ -165,8 +166,20 @@
     <Reference Include="Retyped.dom, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Retyped.dom.2.8.6733\lib\net40\Retyped.dom.dll</HintPath>
     </Reference>
+    <Reference Include="Retyped.es2015.core, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Retyped.es2015.core.2.8.6733\lib\net40\Retyped.es2015.core.dll</HintPath>
+    </Reference>
+    <Reference Include="Retyped.es2015.iterable, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Retyped.es2015.iterable.2.8.6733\lib\net40\Retyped.es2015.iterable.dll</HintPath>
+    </Reference>
+    <Reference Include="Retyped.es2015.symbol, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Retyped.es2015.symbol.2.8.6733\lib\net40\Retyped.es2015.symbol.dll</HintPath>
+    </Reference>
     <Reference Include="Retyped.es5, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Retyped.es5.2.8.6733\lib\net40\Retyped.es5.dll</HintPath>
+    </Reference>
+    <Reference Include="Retyped.jquery, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Retyped.jquery.3.3.6733\lib\net40\Retyped.jquery.dll</HintPath>
     </Reference>
     <Reference Include="Retyped.scripthost, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Retyped.scripthost.2.8.6733\lib\net40\Retyped.scripthost.dll</HintPath>

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Retyped;
 using static Retyped.dom;
+using static Retyped.es5;
 
 namespace System.Windows.Forms
 {
@@ -21,6 +23,100 @@ namespace System.Windows.Forms
         protected HTMLSpanElement HeadingTitle;
 
         public MenuStrip MainMenuStrip { get; set; }
+
+        
+
+        public static async Task LoadResourcesAsync(Assembly mainAssembly)
+        {           
+            var types = mainAssembly.GetTypes().Where(o => o.BaseType == typeof(Form));
+            
+            if(types != null)
+            {
+                /*@ 
+             var func1 = function makeRequest(method, url) {
+                     return new Promise(function (resolve, reject) {
+                         let xhr = new XMLHttpRequest();
+                         xhr.open(method, url);
+                         xhr.responseType = 'arraybuffer';
+                         xhr.onload = function () {
+                             if (this.status >= 200 && this.status < 300) {
+                                 resolve(new Uint8Array(xhr.response));
+                             } else {
+                                 reject({
+                                     status: this.status,
+                                     statusText: xhr.statusText
+                                 });
+                             }
+                         };
+                         xhr.onerror = function () {
+                             reject({
+                                 status: this.status,
+                                 statusText: xhr.statusText
+                             });
+                         };
+                         xhr.send();
+                     });
+                 } 
+             */
+
+                foreach (var item in types)
+                {
+                    var arrayBuffer = (await Task.FromPromise(Bridge.Script.Call<IPromise>("func1", "GET", $"/Resources/{item.Namespace}.{item.Name}.bin")));
+                    
+                    try
+                    {
+                        if (arrayBuffer == null || arrayBuffer.Length == 0 || arrayBuffer[0] == null)
+                            continue;
+
+                        var arry = (Uint8Array)arrayBuffer[0].ToDynamic();
+                        
+                        var binaryReader = new BinaryReader(arry);
+                        var resourceReader = new ResourceReader();
+
+                        if (binaryReader.ReadChar() == 'S' & binaryReader.ReadChar() == 'G')
+                        {                            
+                            var fields = binaryReader.ReadInt();
+
+                            for (int i = 0; i < fields; i++)
+                            {                                
+                                string name = binaryReader.ReadString();
+                                var type = binaryReader.ReadInt();
+                                
+                                object obj = null;
+
+                                if (type == 0)
+                                {
+                                    // string.
+                                    obj = binaryReader.ReadString();
+                                }
+                                else if (type == 1)
+                                {
+                                    // binary...
+                                    obj = binaryReader.ReadBinary();
+                                }
+                                resourceReader.Data.Add(name, obj);
+                            }
+
+
+                            ComponentResourceManager.resourceCache.Add(item, resourceReader);
+
+                        }
+                        else
+                        {
+                            
+                        }
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                }
+
+
+
+                //await Task.WhenAll(tasks.ToArray());                
+            }
+        }
 
         protected override string GetDefaultTag()
         {
