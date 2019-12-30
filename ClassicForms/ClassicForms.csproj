@@ -178,9 +178,6 @@
     <Reference Include="Retyped.es5, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Retyped.es5.2.8.6733\lib\net40\Retyped.es5.dll</HintPath>
     </Reference>
-    <Reference Include="Retyped.jquery, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Retyped.jquery.3.3.6733\lib\net40\Retyped.jquery.dll</HintPath>
-    </Reference>
     <Reference Include="Retyped.scripthost, Version=2.8.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Retyped.scripthost.2.8.6733\lib\net40\Retyped.scripthost.dll</HintPath>
     </Reference>
