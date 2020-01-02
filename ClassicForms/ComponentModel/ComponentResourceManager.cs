@@ -18,9 +18,19 @@ namespace System.ComponentModel
         public string Path;
         private ResourceReader resourceReader;
 
-        public static Dictionary<Type, ResourceReader> resourceCache = new Dictionary<Type, ResourceReader>();        
+        public static Dictionary<Type, ResourceReader> resourceCache = new Dictionary<Type, ResourceReader>();
+
+        public ComponentResourceManager()
+        {
+
+        }
 
         public ComponentResourceManager(Type type)
+        {
+            AssignType(type);
+        }
+
+        public void AssignType(Type type)
         {
             Type = type;
 
@@ -28,7 +38,7 @@ namespace System.ComponentModel
 
             if (!resourceCache.ContainsKey(Type))
             {
-                throw new Exception("Please call Form.LoadResourcesAsync() before using ComponentResourceManager.");                
+                throw new Exception("Please call Form.LoadResourcesAsync() before using ComponentResourceManager.");
             }
             else
             {

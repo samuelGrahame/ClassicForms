@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.IO;
 using System.Resources;
+using System.Diagnostics;
 
 namespace ClassicFormsResource
 {
@@ -25,31 +26,12 @@ namespace ClassicFormsResource
             }
         }
 
-        static void Main(string[] args)
-        {
-            if (args == null || args.Length == 0)
-                return;//args = new string[] { @"C:\Users\samuel grahame\Source\Repos\ClassicForms.Showcase3\ClassicForms.Showcase3.UI\bin\Debug\ClassicForms.Showcase3.UI.dll" };
-
-            var assmbly = Assembly.LoadFile(args.FirstOrDefault());
-
-            if(!System.IO.Directory.Exists("Resources"))
-                System.IO.Directory.CreateDirectory("Resources");
-
-            var types = assmbly.GetTypes().Where(o => o.BaseType == typeof(Form));
-
-            if (types == null)
-                return;
-
-
-            foreach (var item in types)
-            {
+        static void CreateBin(string startingPath, ResourceSet resourceSet, string name)
+        {            
+            try
+            {                
                 var binaryWriter = new BinaryWriter();
-                
-                var rm = new ResourceManager(item);
-
-                var resourceSet = rm.GetResourceSet(CultureInfo.CurrentCulture, true, true);
-
-                if(resourceSet != null)
+                if (resourceSet != null)
                 {
                     binaryWriter.WriteChar('S');
                     binaryWriter.WriteChar('G');
@@ -77,8 +59,60 @@ namespace ClassicFormsResource
                             binaryWriter.WriteBinary(ImageToByte((Image)entry.Value));
                         }
                     }
-                    File.WriteAllBytes($"Resources\\{item.FullName}.bin", binaryWriter.Data.ToArray());
+                    File.WriteAllBytes(startingPath + $"Resources\\{name}.bin", binaryWriter.Data.ToArray());
                 }
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            if (args == null || args.Length == 0)
+                return;//args = new string[] { @"C:\Users\samuel grahame\Source\Repos\ClassicForms.Showcase3\ClassicForms.Showcase3.UI\bin\Debug\ClassicForms.Showcase3.UI.dll" };
+
+            var assmbly = Assembly.LoadFile(args.FirstOrDefault().Trim());
+
+            var startingPath = "";
+
+            if(args.Length == 2)
+            {
+                startingPath = args[1];
+            }
+
+            if(!System.IO.Directory.Exists(startingPath + "Resources"))
+                System.IO.Directory.CreateDirectory(startingPath + "Resources");
+
+            try
+            {
+                var fullName = assmbly.GetName().Name + ".Properties.Resources";
+                var globalResourceManager = new System.Resources.ResourceManager(fullName, assmbly);
+                CreateBin(startingPath, globalResourceManager.GetResourceSet(CultureInfo.CurrentCulture, true, true), fullName);
+            }
+            catch (Exception)
+            {
+
+            }
+            
+            var types = assmbly.GetTypes().Where(o => o.BaseType == typeof(Form));
+
+            if (types == null)
+                return;
+
+
+            foreach (var item in types)
+            {                
+                try
+                {
+                    var rm = new ResourceManager(item);
+                    CreateBin(startingPath, rm.GetResourceSet(CultureInfo.CurrentCulture, true, true), item.FullName);
+                }
+                catch (Exception)
+                {
+
+                }                
             }
         }
 

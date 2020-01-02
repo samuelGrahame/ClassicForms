@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>ClassicForms</id>
-    <version>0.86.3</version>
+    <version>0.86.8</version>
     <title>ClassicForms (For Bridge.Net)</title>
     <authors>SG - BL - PH</authors>
     <owners>SG - BL - PH</owners>
@@ -13,7 +13,7 @@
     <releaseNotes>
 		Added support to extra text from resource files
 	</releaseNotes>
-    <copyright>Copyright 2018</copyright>
+    <copyright>Copyright 2019</copyright>
     <tags>Bridge Bridge.net Javascript Forms ExpressCraft C# UI jQuery HTML</tags>
 	<dependencies>
 		<dependency id="Bridge" version="[17.9.0]"/>

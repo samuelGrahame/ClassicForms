@@ -26,13 +26,18 @@ namespace System.Windows.Forms
 
         
 
-        public static async Task LoadResourcesAsync(Assembly mainAssembly)
-        {           
-            var types = mainAssembly.GetTypes().Where(o => o.BaseType == typeof(Form));
+        /// <summary>
+        /// mainAssembly -> Executing Assembly
+        /// Resources -> Dummy class in Properties.Resources -> Dynamic
+        /// </summary>
+        /// <param name="mainAssembly"></param>
+        /// <param name="Resources"></param>
+        /// <returns></returns>
+        public static async Task LoadResourcesAsync(Assembly mainAssembly, Action<ComponentResourceManager> assignMainResourceReader)
+        {
             
-            if(types != null)
-            {
-                /*@ 
+
+            /*@ 
              var func1 = function makeRequest(method, url) {
                      return new Promise(function (resolve, reject) {
                          let xhr = new XMLHttpRequest();
@@ -59,62 +64,98 @@ namespace System.Windows.Forms
                  } 
              */
 
-                foreach (var item in types)
+            async Task<bool> DownloadByType(Type item, string fileName, Action<ComponentResourceManager> assignMainResourceReader2 = null)
+            {
+                try
                 {
-                    var arrayBuffer = (await Task.FromPromise(Bridge.Script.Call<IPromise>("func1", "GET", $"/Resources/{item.Namespace}.{item.Name}.bin")));
-                    
-                    try
+                    var arrayBuffer = (await Task.FromPromise(Bridge.Script.Call<IPromise>("func1", "GET", $"/Resources/{fileName}.bin")));
+
+                    if (arrayBuffer == null || arrayBuffer.Length == 0 || arrayBuffer[0] == null)
+                        return false;
+
+                    var arry = (Uint8Array)arrayBuffer[0].ToDynamic();
+
+                    var binaryReader = new BinaryReader(arry);
+                    var resourceReader = new ResourceReader();
+
+                    if (binaryReader.ReadChar() == 'S' & binaryReader.ReadChar() == 'G')
                     {
-                        if (arrayBuffer == null || arrayBuffer.Length == 0 || arrayBuffer[0] == null)
-                            continue;
+                        var fields = binaryReader.ReadInt();
+                        if (fields == 0)
+                            return false;
 
-                        var arry = (Uint8Array)arrayBuffer[0].ToDynamic();
+                        ComponentResourceManager componentResourceManager = null;
+                        dynamic container = null;
+
                         
-                        var binaryReader = new BinaryReader(arry);
-                        var resourceReader = new ResourceReader();
+                        if(assignMainResourceReader2 != null)
+                        {
+                            componentResourceManager = new ComponentResourceManager();
+                            container = componentResourceManager;
+                        }
 
-                        if (binaryReader.ReadChar() == 'S' & binaryReader.ReadChar() == 'G')
-                        {                            
-                            var fields = binaryReader.ReadInt();
 
-                            for (int i = 0; i < fields; i++)
-                            {                                
-                                string name = binaryReader.ReadString();
-                                var type = binaryReader.ReadInt();
-                                
-                                object obj = null;
+                        for (int i = 0; i < fields; i++)
+                        {
+                            string name = binaryReader.ReadString();
+                            var type = binaryReader.ReadInt();
 
-                                if (type == 0)
-                                {
-                                    // string.
-                                    obj = binaryReader.ReadString();
-                                }
-                                else if (type == 1)
-                                {
-                                    // binary...
-                                    obj = binaryReader.ReadBinary();
-                                }
-                                resourceReader.Data.Add(name, obj);
+                            object obj = null;
+
+                            if (type == 0)
+                            {
+                                // string.
+                                obj = binaryReader.ReadString();                                
+                            }
+                            else if (type == 1)
+                            {
+                                // binary...
+                                obj = new UInt8Holder() { Array = binaryReader.ReadBinary() };
+                            }
+                            if(assignMainResourceReader2 != null)
+                            {
+                                container[name] = obj;
                             }
 
-
-                            ComponentResourceManager.resourceCache.Add(item, resourceReader);
-
+                            resourceReader.Data.Add(name, obj);
                         }
-                        else
+   
+                        ComponentResourceManager.resourceCache.Add(item, resourceReader);
+
+                        if (assignMainResourceReader2 != null)
                         {
-                            
+                            componentResourceManager.AssignType(item);
+                            assignMainResourceReader2(componentResourceManager);
                         }
-                    }
-                    catch (Exception)
-                    {
 
-                    }
+
+                        return true;
+
+                    }                    
+                }
+                catch (Exception)
+                {
+
                 }
 
+                return false;
+            }
 
+            var types = mainAssembly.GetTypes().Where(o => o.BaseType == typeof(Form));
+            
+            if(types != null)
+            {
+                var fItem = types.FirstOrDefault();
+                var taskList = new List<Task<bool>>();
+                var name = $"{fItem.Namespace}.Properties";
+                taskList.Add(DownloadByType(mainAssembly.GetType(name), $"{name}.Resources", assignMainResourceReader));
+                                
+                foreach (var item in types)
+                {
+                    taskList.Add(DownloadByType(item, $"{item.Namespace}.{item.Name}"));
+                }
 
-                //await Task.WhenAll(tasks.ToArray());                
+                await Task.WhenAll(taskList.ToArray());
             }
         }
 
