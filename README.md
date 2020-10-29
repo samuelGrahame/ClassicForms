@@ -4,6 +4,8 @@ ClassicForms is a library that allows you to use winforms designer to create des
 
 [![NuGet](https://img.shields.io/nuget/v/classicforms.svg)](https://www.nuget.org/packages/classicforms) [![Built with Bridge.NET](https://img.shields.io/badge/built%20with-Bridge.NET-blue.svg)](http://bridge.net/)
 
+-- Test with ClassicForms with Blazor: https://github.com/samuelGrahame/BlazorClassicForms
+
 ### NuGet
 
 installation of ClassicForms using a new **C# Class Library** project. using [NuGet](https://www.nuget.org/packages/classicforms). Within the NuGet Package Manager, search for **ClassicForms** and click to install. 
